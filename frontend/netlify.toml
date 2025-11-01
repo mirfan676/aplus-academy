@@ -1,4 +1,17 @@
 [build]
   base = "frontend"
   command = "npm run build"
-  publish = "dist"
+  publish = "frontend/dist"
+
+# Ensures React Router works — redirects all requests to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Optional: force HTTPS
+[[redirects]]
+  from = "http://aplusacademy.pk/*"
+  to = "https://aplusacademy.pk/:splat"
+  status = 301
+  force = true
