@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 
+// ✅ Import base API URL
+const API_BASE_URL = "https://aplus-academy.onrender.com"; // <-- your Render backend URL
+
 const TutorForm = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -20,7 +23,8 @@ const TutorForm = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/tutors/register", {
+      // ✅ Use live backend URL here
+      const res = await fetch(`${API_BASE_URL}/tutors/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
