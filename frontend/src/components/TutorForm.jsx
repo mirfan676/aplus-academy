@@ -312,7 +312,7 @@ export default function TutorRegistration() {
         >
           <Box textAlign="center" px={2}>
             <img
-              src="https://www.svgrepo.com/show/453700/teacher-online-education.svg"
+              src="https://www.svgrepo.com/show/382175/browser-education-internet-online-graduation-school-web.svg"
               alt="Tutor Illustration"
               style={{ width: "100%", maxWidth: 350 }}
             />
