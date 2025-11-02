@@ -1,53 +1,123 @@
-/* Reset root */
+/* ---------- Root + Typography ---------- */
 #root {
   width: 100%;
-  max-width: 100%;
   margin: 0;
   padding: 0;
-  text-align: left; /* text alignment handled per section */
-  font-family: Arial, sans-serif;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  background-color: #fff;
 }
 
-/* Logo styles */
+/* Generic responsive images */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ---------- Logo (optional) ---------- */
 .logo {
   height: 6em;
   padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+  transition: filter 300ms ease;
 }
 
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 2em #198754aa);
 }
 
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-/* Logo spin animation */
 @keyframes logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
+  .logo.react {
     animation: logo-spin infinite 20s linear;
   }
 }
 
-/* Card styles */
-.card {
-  padding: 2em;
+/* ---------- Layout Sections ---------- */
+.teacher-directory {
+  padding: 20px;
 }
 
-/* Optional: read-the-docs link */
-.read-the-docs {
-  color: #888;
+/* Search box full width */
+.search-box {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  transition: border-color 0.2s ease;
 }
 
-/* Responsive image fix */
-img {
-  max-width: 100%;
-  height: auto;
+.search-box:focus {
+  border-color: #198754;
+  outline: none;
+}
+
+/* ---------- Teacher List ---------- */
+.teacher-list-scroll {
+  height: 60vh;
+  overflow-y: auto;
+  padding-right: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: #999 #f5f5f5;
+}
+
+.teacher-list-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.teacher-list-scroll::-webkit-scrollbar-thumb {
+  background-color: #999;
+  border-radius: 4px;
+}
+
+.teacher-list-scroll::-webkit-scrollbar-track {
+  background-color: #f5f5f5;
+}
+
+/* Tutor cards */
+.tutor-card {
+  border-radius: 10px;
+  background: #fff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tutor-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ---------- Map Section ---------- */
+.map-box {
+  width: 100%;
+  height: 40vh;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 20px;
+  position: relative;
+}
+
+/* Ensure Leaflet renders correctly inside MUI containers */
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 0 !important;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 992px) {
+  .teacher-list-scroll {
+    height: 50vh;
+  }
+
+  .map-box {
+    height: 40vh;
+  }
 }

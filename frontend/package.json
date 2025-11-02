@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "aplus-academy",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,11 +10,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.4",
+    "@mui/lab": "^7.0.1-beta.18",
+    "@mui/material": "^7.3.4",
+    "@mui/x-data-grid": "^8.16.0",
     "axios": "^1.13.1",
-    "bootstrap": "^5.3.8",
     "leaflet": "^1.9.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-google-recaptcha": "^3.1.0",
     "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.9.5"
   },

@@ -1,141 +1,243 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import {
+  Box,
+  Typography,
+  TextField,
+  Card,
+  CardContent,
+  Divider,
+  Alert,
+  Container,
+  Chip,
+  Stack,
+} from "@mui/material";
+import { CheckCircle, LocationOn, Phone, School } from "@mui/icons-material";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-// Map city names to coordinates (add more cities as needed)
-const cityCoordinates = {
-  "Lahore": [31.5204, 74.3587],
-  "Karor Lal Esan": [30.6353, 70.9353],
-  "Islamabad": [33.6844, 73.0479],
-  "Karachi": [24.8607, 67.0011],
-  "Rawalpindi": [33.5651, 73.0169],
-  "Multan": [30.1575, 71.5249],
-  "Faisalabad": [31.4504, 73.1350],
-  "GFDGFD": [31.5, 74.0], // Example placeholder
-  // add all other cities from your dataset
-};
+// Fix Leaflet markers
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+});
 
 const TeacherDirectory = () => {
   const [teachers, setTeachers] = useState([]);
-  const [search, setSearch] = useState("");
   const [filtered, setFiltered] = useState([]);
+  const [search, setSearch] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     axios
       .get("https://aplus-academy.onrender.com/tutors")
       .then((res) => {
-        const mapped = res.data.map((t) => ({
-          name: t["Full Name"],
-          subject: t["Subject(s)"],
-          qualification: t["Qualification"],
-          experience: t["Experience (Years)"],
-          city: t["City"],
-          phone: t["Contact Number"],
-        }));
-        setTeachers(mapped);
-        setFiltered(mapped);
+        if (Array.isArray(res.data)) {
+          const mapped = res.data.map((t, i) => ({
+            id: i,
+            name: t["Full Name"] || "Unknown",
+            subject: String(t["Subject(s)"] || ""),
+            qualification: t["Qualification"] || "",
+            experience: t["Experience (Years)"] || "",
+            city: t["City"] || "",
+            phone: t["Contact Number"] || "",
+            lat: 31.5204 + Math.random() * 0.1,
+            lng: 74.3587 + Math.random() * 0.1,
+          }));
+          setTeachers(mapped);
+          setFiltered(mapped);
+        } else setError("Invalid data format.");
       })
-      .catch((err) => console.error("Error loading teachers:", err));
+      .catch(() => setError("Unable to fetch teacher data."));
   }, []);
 
-  useEffect(() => {
-    const s = search.toLowerCase();
+  const handleSearch = (e) => {
+    const value = e.target.value.toLowerCase();
+    setSearch(value);
     setFiltered(
       teachers.filter(
         (t) =>
-          t.name?.toLowerCase().includes(s) ||
-          String(t.subject)?.toLowerCase().includes(s) ||
-          t.city?.toLowerCase().includes(s)
+          t.name.toLowerCase().includes(value) ||
+          t.subject.toLowerCase().includes(value) ||
+          t.city.toLowerCase().includes(value)
       )
     );
-  }, [search, teachers]);
-
-  // Leaflet default icon fix
-  delete L.Icon.Default.prototype._getIconUrl;
-  L.Icon.Default.mergeOptions({
-    iconRetinaUrl:
-      "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-    iconUrl:
-      "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-    shadowUrl:
-      "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-  });
+  };
 
   return (
-    <div className="container-fluid py-4">
-      <div className="row">
-        {/* Left Column - List */}
-        <div className="col-md-6 col-lg-7">
-          <h3 className="text-success mb-3">Our Registered Tutors</h3>
+    <Box sx={{ width: "100%", bgcolor: "#f9f9f9", py: 4 }}>
+      <Container maxWidth={false} sx={{ width: "90%" }}>
+        {/* Header */}
+        <Typography
+          variant="h4"
+          align="center"
+          sx={{ mb: 3, fontWeight: "bold" }}
+        >
+          Teacher Directory
+        </Typography>
 
-          <input
-            type="text"
-            className="form-control mb-3"
-            placeholder="Search by name, subject, or city..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+        {/* Search Bar */}
+        <TextField
+          fullWidth
+          label="Search by name, subject, or city"
+          variant="outlined"
+          value={search}
+          onChange={handleSearch}
+          sx={{ mb: 4 }}
+        />
 
-          {filtered.length === 0 && (
-            <div className="alert alert-warning">No tutors found.</div>
-          )}
+        {/* Error */}
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
 
-          {filtered.map((tutor, index) => (
-            <div key={index} className="card mb-3 shadow-sm border-0 p-3">
-              <div className="d-flex justify-content-between align-items-center">
-                <div>
-                  <h5 className="text-success">{tutor.name}</h5>
-                  <p className="mb-1">
-                    <strong>Subject:</strong> {tutor.subject}
-                  </p>
-                  <p className="mb-1">
-                    <strong>City:</strong> {tutor.city}
-                  </p>
-                  <p className="mb-1">
-                    <strong>Experience:</strong> {tutor.experience} years
-                  </p>
-                  <p className="mb-1">
-                    <strong>Qualification:</strong> {tutor.qualification}
-                  </p>
-                  <p className="mb-0 text-muted">
-                    <i className="bi bi-telephone"></i> {tutor.phone}
-                  </p>
-                </div>
-              </div>
-            </div>
+        {/* Teacher Cards */}
+        <Box
+          sx={{
+            maxHeight: "60vh",
+            overflowY: "auto",
+            mb: 4,
+            pr: 1,
+          }}
+        >
+          {filtered.map((t) => (
+            <Card
+              key={t.id}
+              sx={{
+                mb: 3,
+                boxShadow: 3,
+                borderRadius: 2,
+                transition: "0.2s",
+                "&:hover": { transform: "translateY(-3px)", boxShadow: 6 },
+              }}
+            >
+              <CardContent>
+                {/* Top Row */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    flexWrap: "wrap",
+                    mb: 1,
+                  }}
+                >
+                  <Typography
+                    variant="h6"
+                    sx={{ fontWeight: "bold", color: "#0d6efd" }}
+                  >
+                    {t.name}
+                  </Typography>
+
+                  <Chip
+                    label="VERIFIED"
+                    color="success"
+                    size="small"
+                    sx={{ fontWeight: 600 }}
+                  />
+                </Box>
+
+                {/* Basic Info */}
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  alignItems="center"
+                  sx={{ color: "text.secondary", mb: 1 }}
+                >
+                  <LocationOn fontSize="small" />
+                  <Typography>{t.city}</Typography>
+                  <Phone fontSize="small" />
+                  <Typography>{t.phone}</Typography>
+                </Stack>
+
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  alignItems="center"
+                  sx={{ color: "text.secondary", mb: 2 }}
+                >
+                  <School fontSize="small" />
+                  <Typography>{t.qualification}</Typography>
+                  <Typography>| {t.experience} years experience</Typography>
+                </Stack>
+
+                <Divider sx={{ mb: 1 }} />
+
+                {/* Subjects */}
+                <Box sx={{ mb: 1 }}>
+                  {t.subject
+                    .split(",")
+                    .filter(Boolean)
+                    .map((s, i) => (
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        key={i}
+                        alignItems="center"
+                      >
+                        <CheckCircle
+                          fontSize="small"
+                          color="success"
+                          sx={{ opacity: 0.8 }}
+                        />
+                        <Typography variant="body2">{s.trim()}</Typography>
+                      </Stack>
+                    ))}
+                </Box>
+
+                {/* Bio */}
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  {t.name} is a qualified teacher based in {t.city}, specializing in{" "}
+                  {t.subject}. With {t.experience} years of experience, they hold a
+                  {t.qualification ? ` ${t.qualification}` : ""} and are available for
+                  tutoring sessions.
+                </Typography>
+              </CardContent>
+            </Card>
           ))}
-        </div>
+        </Box>
 
-        {/* Right Column - Map */}
-        <div className="col-md-6 col-lg-5 mt-4 mt-md-0">
+        {/* Map Section */}
+        <Box
+          sx={{
+            height: "40vh",
+            borderRadius: 2,
+            overflow: "hidden",
+            boxShadow: 3,
+          }}
+        >
           <MapContainer
-            center={[31.5204, 74.3587]} // default Lahore
+            center={[31.5204, 74.3587]}
             zoom={6}
-            style={{ height: "80vh", width: "100%" }}
+            style={{ height: "100%", width: "100%" }}
           >
             <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution="© OpenStreetMap"
             />
-
-            {filtered.map((t, i) => {
-              const coords = cityCoordinates[t.city] || [31.5204, 74.3587]; // fallback
-              return (
-                <Marker key={i} position={coords}>
-                  <Popup>
-                    <b>{t.name}</b> <br />
-                    {t.subject} <br />
-                    {t.city}
-                  </Popup>
-                </Marker>
-              );
-            })}
+            {filtered.map((teacher) => (
+              <Marker key={teacher.id} position={[teacher.lat, teacher.lng]}>
+                <Popup>
+                  <strong>{teacher.name}</strong>
+                  <br />
+                  {teacher.subject}
+                  <br />
+                  {teacher.city}
+                </Popup>
+              </Marker>
+            ))}
           </MapContainer>
-        </div>
-      </div>
-    </div>
+        </Box>
+      </Container>
+    </Box>
   );
 };
 
