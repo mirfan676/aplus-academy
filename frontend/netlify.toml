@@ -1,17 +1,15 @@
-[build]
-  base = "frontend"
-  command = "npm run build"
-  publish = "frontend/dist"
+# netlify.toml
 
-# Ensures React Router works — redirects all requests to index.html
+[build]
+  # Base directory where package.json exists
+  base = "frontend"
+  # Vite build command
+  command = "npm run build"
+  # Publish directory relative to base
+  publish = "dist"
+
+# React Router SPA redirect
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-
-# Optional: force HTTPS
-[[redirects]]
-  from = "http://aplusacademy.pk/*"
-  to = "https://aplusacademy.pk/:splat"
-  status = 301
-  force = true
