@@ -54,3 +54,11 @@ def register_tutor(tutor: Tutor):
         return {"message": "Tutor registered successfully!"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/tutors")
+def get_tutors():
+    try:
+        records = sheet.get_all_records()
+        return records
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
