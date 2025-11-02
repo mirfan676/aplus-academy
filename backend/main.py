@@ -7,6 +7,7 @@ from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
 from io import BytesIO
+import requests
 
 app = FastAPI(title="APlus Home Tutors API", version="2.0.0")
 
