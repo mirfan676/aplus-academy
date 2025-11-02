@@ -129,8 +129,8 @@ def get_areas(city: str = Query(..., description="City name")):
     try:
         url = "https://nominatim.openstreetmap.org/search"
         params = {
-            "q": city, 
-            "country": "Pakistan",
+            "q": city,
+            "countrycodes": "PK",  # <-- use countrycodes instead of country
             "format": "json",
             "limit": 50,
             "addressdetails": 1
@@ -148,11 +148,14 @@ def get_areas(city: str = Query(..., description="City name")):
                 if key not in ["city", "state", "country"]:
                     areas_set.add(value)
 
-        # If no sub-area found, fallback to city name
         if not areas_set:
             areas_set.add(city)
 
         return {"areas": list(areas_set)}
 
+    except requests.exceptions.HTTPError as e:
+        # For debugging, show the actual response text
+        print("❌ Nominatim HTTP Error:", response.text)
+        raise HTTPException(status_code=response.status_code, detail=response.text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
