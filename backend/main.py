@@ -1,7 +1,7 @@
 import os
 import json
 import gspread
-from fastapi import FastAPI, Form, File, UploadFile, HTTPException
+from fastapi import FastAPI, Form, File, Query, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
