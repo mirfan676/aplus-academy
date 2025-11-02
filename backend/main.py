@@ -129,10 +129,10 @@ def get_areas(city: str = Query(..., description="City name")):
     try:
         url = "https://nominatim.openstreetmap.org/search"
         params = {
-            "city": city,
+            "q": city, 
             "country": "Pakistan",
             "format": "json",
-            "limit": 50,  # fetch more results
+            "limit": 50,
             "addressdetails": 1
         }
         headers = {"User-Agent": "AplusAcademy/1.0"}
@@ -144,10 +144,10 @@ def get_areas(city: str = Query(..., description="City name")):
         areas_set = set()
         for item in data:
             addr = item.get("address", {})
-            # Try to extract suburb/neighbourhood/locality if available
-            for key in ["suburb", "neighbourhood", "quarter", "city_district", "village"]:
-                if key in addr:
-                    areas_set.add(addr[key])
+            for key, value in addr.items():
+                if key not in ["city", "state", "country"]:
+                    areas_set.add(value)
+
         # If no sub-area found, fallback to city name
         if not areas_set:
             areas_set.add(city)
