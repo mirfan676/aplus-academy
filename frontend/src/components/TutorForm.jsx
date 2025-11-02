@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import {
   Box,
@@ -49,19 +49,14 @@ export default function TutorRegistration() {
     "Sialkot",
   ];
 
-  // Fetch areas dynamically from OpenStreetMap (Nominatim)
+  // Fetch areas dynamically from server
   const fetchAreas = async (city) => {
     if (!city) return;
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?city=${city}&country=Pakistan&format=json&limit=15`,
-        { headers: { "User-Agent": "AplusAcademy/1.0" } }
+      const res = await axios.get(
+        `https://aplus-academy.onrender.com/areas?city=${city}`
       );
-      const data = await response.json();
-      const uniqueAreas = [
-        ...new Set(data.map((item) => item.display_name.split(",")[0])),
-      ];
-      setAreas(uniqueAreas);
+      setAreas(res.data.areas || []);
     } catch (error) {
       console.error("Error fetching areas:", error);
       setAreas([]);
@@ -69,12 +64,23 @@ export default function TutorRegistration() {
   };
 
   const handleChange = (e) => {
-    const { id, value, files } = e.target;
+    const { name, value, files } = e.target;
+
     if (files) {
       setFormData({ ...formData, image: files[0] });
     } else {
-      setFormData({ ...formData, [id]: value });
-      if (id === "city") fetchAreas(value);
+      if (name === "city") {
+        setFormData({
+          ...formData,
+          city: value,
+          area1: "",
+          area2: "",
+          area3: "",
+        });
+        fetchAreas(value);
+      } else {
+        setFormData({ ...formData, [name]: value });
+      }
     }
   };
 
@@ -84,6 +90,7 @@ export default function TutorRegistration() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!captchaVerified) {
       setMessage("⚠️ Please verify the CAPTCHA before submitting.");
       return;
@@ -119,6 +126,7 @@ export default function TutorRegistration() {
           bio: "",
           image: null,
         });
+        setAreas([]);
       } else {
         setMessage("⚠️ Failed to submit. Please try again.");
       }
@@ -175,7 +183,7 @@ export default function TutorRegistration() {
                     type="file"
                     hidden
                     accept="image/*"
-                    id="image"
+                    name="image"
                     onChange={handleChange}
                   />
                 </Button>
@@ -190,18 +198,18 @@ export default function TutorRegistration() {
 
               {/* Input Fields */}
               {[
-                { id: "name", label: "Full Name" },
-                { id: "subject", label: "Subject(s)" },
-                { id: "qualification", label: "Qualification" },
-                { id: "experience", label: "Experience (Years)", type: "number" },
-                { id: "phone", label: "Contact Number" },
-              ].map(({ id, label, type = "text" }) => (
+                { name: "name", label: "Full Name" },
+                { name: "subject", label: "Subject(s)" },
+                { name: "qualification", label: "Qualification" },
+                { name: "experience", label: "Experience (Years)", type: "number" },
+                { name: "phone", label: "Contact Number" },
+              ].map(({ name, label, type = "text" }) => (
                 <TextField
-                  key={id}
-                  id={id}
+                  key={name}
+                  name={name}
                   label={label}
                   type={type}
-                  value={formData[id]}
+                  value={formData[name]}
                   onChange={handleChange}
                   required
                   fullWidth
@@ -212,9 +220,9 @@ export default function TutorRegistration() {
               {/* City Dropdown */}
               <TextField
                 select
-                id="city"
+                name="city"
                 label="City"
-                value={formData.city}
+                value={formData.city || ""}
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
@@ -232,9 +240,9 @@ export default function TutorRegistration() {
                 <TextField
                   key={num}
                   select
-                  id={`area${num}`}
+                  name={`area${num}`}
                   label={`Preferred Area ${num}`}
-                  value={formData[`area${num}`]}
+                  value={formData[`area${num}`] || ""}
                   onChange={handleChange}
                   fullWidth
                   margin="normal"
@@ -250,7 +258,7 @@ export default function TutorRegistration() {
 
               {/* Bio Field */}
               <TextField
-                id="bio"
+                name="bio"
                 label="Tutor Bio / Description"
                 multiline
                 rows={4}
