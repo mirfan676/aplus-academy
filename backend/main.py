@@ -7,7 +7,6 @@ from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
 from io import BytesIO
-import requests
 
 app = FastAPI(title="APlus Home Tutors API", version="2.0.0")
 
@@ -125,39 +124,19 @@ def get_tutors():
 
 @app.get("/areas")
 def get_areas(city: str = Query(..., description="City name")):
-    """Fetch proper areas/neighborhoods using OpenStreetMap Nominatim"""
-    try:
-        url = "https://nominatim.openstreetmap.org/search"
-        params = {
-            "q": city,
-            "countrycodes": "PK",
-            "format": "json",
-            "limit": 50,
-            "addressdetails": 1
-        }
-        headers = {"User-Agent": "AplusAcademy/1.0"}
-        response = requests.get(url, params=params, headers=headers)
-        response.raise_for_status()
+    """Return predefined areas for cities"""
+    city_areas = {
+        "Lahore": ["Gulberg", "DHA", "Johar Town", "Model Town", "Shadman"],
+        "Karachi": ["Clifton", "PECHS", "Gulshan-e-Iqbal"],
+        "Islamabad": ["F-6", "G-10", "Blue Area"],
+        "Rawalpindi": ["Satellite Town", "Chaklala", "Bahria Town"],
+        "Faisalabad": ["Madina Town", "Gulistan Colony", "People Colony"],
+        "Multan": ["Shah Rukn-e-Alam", "Cantt", "Township"],
+        "Peshawar": ["Hayatabad", "University Town", "Saddar"],
+        "Quetta": ["Satellite Town", "Jinnah Town", "Sariab Road"],
+        "Gujranwala": ["Bahria Town", "Civil Lines", "Cantt"],
+        "Sialkot": ["Daska Road", "Model Town", "Cantt"],
+    }
+    return {"areas": city_areas.get(city, [city])}
 
-        data = response.json()
-
-        areas_set = set()
-        for item in data:
-            addr = item.get("address", {})
-            # Only pick useful area fields
-            for key in ["suburb", "neighbourhood", "quarter", "city_district"]:
-                if key in addr:
-                    areas_set.add(addr[key])
-
-        # Fallback to city name if no areas found
-        if not areas_set:
-            areas_set.add(city)
-
-        return {"areas": sorted(list(areas_set))}
-
-    except requests.exceptions.HTTPError as e:
-        print("❌ Nominatim HTTP Error:", response.text)
-        raise HTTPException(status_code=response.status_code, detail=response.text)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
