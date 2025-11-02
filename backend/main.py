@@ -44,7 +44,6 @@ sheet = gspread_client.open_by_key(SHEET_ID).sheet1
 def home():
     return {"message": "✅ APlus Home Tutors API is running!"}
 
-
 @app.post("/tutors/register")
 async def register_tutor(
     name: str = Form(...),
@@ -54,27 +53,24 @@ async def register_tutor(
     city: str = Form(...),
     phone: str = Form(...),
     bio: str = Form(...),
-    area1: str = Form(...),
-    area2: str = Form(...),
-    area3: str = Form(...),
+    area1: str = Form(None),
+    area2: str = Form(None),
+    area3: str = Form(None),
     image: UploadFile = File(None),
 ):
+    import traceback
+
     try:
         image_url = "N/A"
 
-        # --- Upload Image to Google Drive ---
-        if image:
-            file_metadata = {
-                "name": image.filename,
-                "parents": [FOLDER_ID]
-            }
-
+        # --- Upload Image to Google Drive (optional) ---
+        if image and image.filename:
+            file_metadata = {"name": image.filename, "parents": [FOLDER_ID]}
             media = MediaIoBaseUpload(
                 BytesIO(await image.read()),
-                mimetype=image.content_type,
+                mimetype=image.content_type or "image/jpeg",
                 resumable=True
             )
-
             file = drive_service.files().create(
                 body=file_metadata,
                 media_body=media,
@@ -82,14 +78,33 @@ async def register_tutor(
             ).execute()
 
             file_id = file.get("id")
-
             # Make the image publicly accessible
             drive_service.permissions().create(
                 fileId=file_id,
                 body={"role": "reader", "type": "anyone"},
             ).execute()
-
             image_url = f"https://drive.google.com/uc?id={file_id}"
+
+        # --- Default areas if not provided ---
+        city_areas = {
+            "Lahore": ["Gulberg", "DHA", "Johar Town", "Model Town", "Shadman"],
+            "Karachi": ["Clifton", "PECHS", "Gulshan-e-Iqbal"],
+            "Islamabad": ["F-6", "G-10", "Blue Area"],
+            "Rawalpindi": ["Satellite Town", "Chaklala", "Bahria Town"],
+            "Faisalabad": ["Madina Town", "Gulistan Colony", "People Colony"],
+            "Multan": ["Shah Rukn-e-Alam", "Cantt", "Township"],
+            "Peshawar": ["Hayatabad", "University Town", "Saddar"],
+            "Quetta": ["Satellite Town", "Jinnah Town", "Sariab Road"],
+            "Gujranwala": ["Bahria Town", "Civil Lines", "Cantt"],
+            "Sialkot": ["Daska Road", "Model Town", "Cantt"],
+        }
+
+        if not area1:
+            area1 = city_areas.get(city, [city])[0]
+        if not area2:
+            area2 = city_areas.get(city, [city])[1] if len(city_areas.get(city, [city])) > 1 else area1
+        if not area3:
+            area3 = city_areas.get(city, [city])[2] if len(city_areas.get(city, [city])) > 2 else area1
 
         # --- Save data to Google Sheets ---
         sheet.append_row([
@@ -106,11 +121,19 @@ async def register_tutor(
             image_url
         ])
 
-        return {"message": "✅ Tutor registered successfully!", "image_url": image_url}
+        return {
+            "message": "✅ Tutor registered successfully!",
+            "image_url": image_url,
+            "areas": [area1, area2, area3]
+        }
 
     except Exception as e:
-        print("❌ Error:", e)
+        # Print full traceback in console
+        print("❌ Error submitting form:", e)
+        traceback.print_exc()
+        # Return detailed error to frontend (can also hide in production)
         raise HTTPException(status_code=500, detail=str(e))
+
 
 
 @app.get("/tutors")
