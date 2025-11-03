@@ -10,12 +10,12 @@ import traceback
 import random
 import math
 
-app = FastAPI(title="APlus Home Tutors API", version="2.2.0")
+app = FastAPI(title="APlus Home Tutors API", version="2.3.0")
 
 # --- CORS ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # change to specific domain in production
+    allow_origins=["*"],  # You can replace * with your domain in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -48,7 +48,7 @@ city_areas = {
 }
 
 
-# --- Generate random point within given radius ---
+# --- Utility: random point within given radius ---
 def random_point_within_radius(center_lat, center_lng, radius_m=1000):
     radius_in_degrees = radius_m / 111320.0
     u = random.random()
@@ -60,7 +60,7 @@ def random_point_within_radius(center_lat, center_lng, radius_m=1000):
     return round(center_lat + lat_offset, 6), round(center_lng + lng_offset, 6)
 
 
-# --- Get area coordinates from OpenStreetMap ---
+# --- Utility: Get area coordinates from OpenStreetMap ---
 def get_area_coordinates(area_name: str, city: str):
     try:
         query = f"{area_name}, {city}, Pakistan"
@@ -102,7 +102,7 @@ async def register_tutor(
     try:
         image_url = "N/A"
 
-        # --- Upload Image to ImgBB ---
+        # --- Upload image to ImgBB ---
         if image and image.filename:
             image_bytes = await image.read()
             encoded_image = base64.b64encode(image_bytes).decode("utf-8")
@@ -114,7 +114,7 @@ async def register_tutor(
             else:
                 print("❌ ImgBB upload failed:", result)
 
-        # --- Default Areas ---
+        # --- Default areas ---
         areas = city_areas.get(city, [city])
         if not area1:
             area1 = areas[0]
@@ -123,12 +123,10 @@ async def register_tutor(
         if not area3:
             area3 = areas[2] if len(areas) > 2 else area1
 
-        # --- Generate coordinates ---
+        # --- Coordinates ---
         if lat and lng:
-            # If frontend already sent coordinates
             latitude, longitude = float(lat), float(lng)
         else:
-            # Backend fallback: generate random point near exact location
             base_lat, base_lng = get_area_coordinates(exactLocation or area1, city)
             if base_lat and base_lng:
                 latitude, longitude = random_point_within_radius(base_lat, base_lng, 1000)
@@ -168,45 +166,45 @@ async def register_tutor(
 @app.get("/tutors")
 def get_tutors():
     try:
-        # Fetch all records from Google Sheet
         records = sheet.get_all_records(empty2zero=False, head=1)
-
         verified_tutors = []
 
         for r in records:
-            # Skip completely empty rows
             if not any(r.values()):
                 continue
 
-            # Read 'Verified' safely and check if it's marked 'Yes' (case-insensitive)
             verified_value = str(r.get("Verified", "")).strip().lower()
             if verified_value != "yes":
                 continue
 
-            # Append only verified tutors
+            def safe_str(val):
+                if val is None:
+                    return ""
+                if isinstance(val, (int, float)):
+                    return str(val)
+                return str(val).strip()
+
             verified_tutors.append({
-                "Name": r.get("Name", "").strip(),
-                "Subject": r.get("Subject", "").strip(),
-                "Qualification": r.get("Qualification", "").strip(),
-                "Experience": r.get("Experience", "").strip(),
-                "City": r.get("City", "").strip(),
-                "Phone": r.get("Phone", "").strip(),
-                "Bio": r.get("Bio", "").strip(),
-                "Area1": r.get("Area1", "").strip(),
-                "Area2": r.get("Area2", "").strip(),
-                "Area3": r.get("Area3", "").strip(),
-                "Image URL": r.get("Image URL", "").strip(),
-                "Latitude": r.get("Latitude", "").strip(),
-                "Longitude": r.get("Longitude", "").strip(),
-                "Verified": "Yes",  # consistent field for frontend
+                "Name": safe_str(r.get("Name")),
+                "Subject": safe_str(r.get("Subject")),
+                "Qualification": safe_str(r.get("Qualification")),
+                "Experience": safe_str(r.get("Experience")),
+                "City": safe_str(r.get("City")),
+                "Phone": safe_str(r.get("Phone")),
+                "Bio": safe_str(r.get("Bio")),
+                "Area1": safe_str(r.get("Area1")),
+                "Area2": safe_str(r.get("Area2")),
+                "Area3": safe_str(r.get("Area3")),
+                "Image URL": safe_str(r.get("Image URL")),
+                "Latitude": safe_str(r.get("Latitude")),
+                "Longitude": safe_str(r.get("Longitude")),
+                "Verified": "Yes",
             })
 
-        # Return verified tutors list
         return verified_tutors
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching tutors: {str(e)}")
-
 
 
 @app.get("/areas")
