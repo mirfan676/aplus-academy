@@ -168,29 +168,45 @@ async def register_tutor(
 @app.get("/tutors")
 def get_tutors():
     try:
+        # Fetch all records from Google Sheet
         records = sheet.get_all_records(empty2zero=False, head=1)
-        filtered = []
+
+        verified_tutors = []
+
         for r in records:
-            if any(r.values()):
-                filtered.append({
-                    "Name": r.get("Name", ""),
-                    "Subject": r.get("Subject", ""),
-                    "Qualification": r.get("Qualification", ""),
-                    "Experience": r.get("Experience", ""),
-                    "City": r.get("City", ""),
-                    "Phone": r.get("Phone", ""),
-                    "Bio": r.get("Bio", ""),
-                    "Area1": r.get("Area1", ""),
-                    "Area2": r.get("Area2", ""),
-                    "Area3": r.get("Area3", ""),
-                    "Image URL": r.get("Image URL", ""),
-                    "Latitude": r.get("Latitude", ""),
-                    "Longitude": r.get("Longitude", ""),
-                    "Verified": r.get("Verified", "").strip(),
-                })
-        return filtered
+            # Skip completely empty rows
+            if not any(r.values()):
+                continue
+
+            # Read 'Verified' safely and check if it's marked 'Yes' (case-insensitive)
+            verified_value = str(r.get("Verified", "")).strip().lower()
+            if verified_value != "yes":
+                continue
+
+            # Append only verified tutors
+            verified_tutors.append({
+                "Name": r.get("Name", "").strip(),
+                "Subject": r.get("Subject", "").strip(),
+                "Qualification": r.get("Qualification", "").strip(),
+                "Experience": r.get("Experience", "").strip(),
+                "City": r.get("City", "").strip(),
+                "Phone": r.get("Phone", "").strip(),
+                "Bio": r.get("Bio", "").strip(),
+                "Area1": r.get("Area1", "").strip(),
+                "Area2": r.get("Area2", "").strip(),
+                "Area3": r.get("Area3", "").strip(),
+                "Image URL": r.get("Image URL", "").strip(),
+                "Latitude": r.get("Latitude", "").strip(),
+                "Longitude": r.get("Longitude", "").strip(),
+                "Verified": "Yes",  # consistent field for frontend
+            })
+
+        # Return verified tutors list
+        return verified_tutors
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Error fetching tutors: {str(e)}")
+
 
 
 @app.get("/areas")
