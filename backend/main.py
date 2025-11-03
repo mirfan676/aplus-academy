@@ -4,7 +4,6 @@ import gspread
 from fastapi import FastAPI, Form, File, Query, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from google.oauth2.service_account import Credentials
-from io import BytesIO
 import requests
 import base64
 import traceback
@@ -22,7 +21,6 @@ app.add_middleware(
 
 # --- GOOGLE SHEETS SETUP ---
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-
 creds_dict = json.loads(os.environ["GOOGLE_CREDENTIALS"])
 creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
 gspread_client = gspread.authorize(creds)
@@ -31,7 +29,7 @@ SHEET_ID = "1wBmbImTrliHEIKk5YxM5PN4eOfkz6XLS28bjxRjmZvY"
 sheet = gspread_client.open_by_key(SHEET_ID).sheet1
 
 # --- IMGBB CONFIG ---
-IMGBB_API_KEY = "5b09de418289beb41cde5d28d5934047"  # Replace with your key
+IMGBB_API_KEY = "5b09de418289beb41cde5d28d5934047"
 
 # --- CITY AREAS ---
 city_areas = {
@@ -46,7 +44,6 @@ city_areas = {
     "Gujranwala": ["Bahria Town", "Civil Lines", "Cantt"],
     "Sialkot": ["Daska Road", "Model Town", "Cantt"],
 }
-
 
 @app.get("/")
 def home():
@@ -128,8 +125,28 @@ async def register_tutor(
 @app.get("/tutors")
 def get_tutors():
     try:
-        records = sheet.get_all_records()
-        return records
+        # Ensure the header row is used, skip empty rows
+        records = sheet.get_all_records(empty2zero=False, head=1)
+        filtered_records = []
+
+        for r in records:
+            # Skip completely empty rows
+            if any(r.values()):
+                filtered_records.append({
+                    "Name": r.get("Name", ""),
+                    "Subject": r.get("Subject", ""),
+                    "Qualification": r.get("Qualification", ""),
+                    "Experience": r.get("Experience", ""),
+                    "City": r.get("City", ""),
+                    "Phone": r.get("Phone", ""),
+                    "Bio": r.get("Bio", ""),
+                    "Area1": r.get("Area1", ""),
+                    "Area2": r.get("Area2", ""),
+                    "Area3": r.get("Area3", ""),
+                    "Image URL": r.get("Image URL", "")
+                })
+
+        return filtered_records
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
