@@ -186,6 +186,7 @@ def get_tutors():
                     "Image URL": r.get("Image URL", ""),
                     "Latitude": r.get("Latitude", ""),
                     "Longitude": r.get("Longitude", ""),
+                    "Verified": r.get("Verified", "").strip(),
                 })
         return filtered
     except Exception as e:
