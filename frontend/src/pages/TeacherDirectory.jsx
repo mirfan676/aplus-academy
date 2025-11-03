@@ -8,7 +8,6 @@ import {
   CircularProgress,
   Container,
   MenuItem,
-  TextField,
   Grid,
   Stack,
   Avatar,
@@ -26,8 +25,7 @@ import L from "leaflet";
 
 // --- Custom Person Marker Icon ---
 const personIcon = new L.Icon({
-  iconUrl:
-    "https://cdn-icons-png.flaticon.com/512/1946/1946429.png", // person icon
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/1946/1946429.png",
   iconSize: [40, 40],
   iconAnchor: [20, 40],
   popupAnchor: [0, -40],
@@ -40,18 +38,21 @@ const TeacherDirectory = () => {
   const [cities, setCities] = useState([]);
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
-  const [userLocation, setUserLocation] = useState([31.5204, 74.3587]); // fallback
+  const [userLocation, setUserLocation] = useState([31.5204, 74.3587]); // fallback: Lahore
   const [visibleCount, setVisibleCount] = useState(5);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Fetch teachers
+  // Fetch teachers from backend
   useEffect(() => {
     axios
       .get("https://aplus-academy.onrender.com/tutors")
       .then((res) => {
         if (Array.isArray(res.data)) {
-          const mapped = res.data.map((t, i) => ({
+          // Filter: only tutors with verified field
+          const validTutors = res.data.filter((t) => t["Verified"] && t["Verified"].trim() !== "");
+
+          const mapped = validTutors.map((t, i) => ({
             id: i,
             name: t["Name"] || "Unknown",
             subject: String(t["Subject"] || ""),
@@ -61,11 +62,14 @@ const TeacherDirectory = () => {
             phone: t["Phone"] || "",
             bio: t["Bio"] || "",
             imageUrl: t["Image URL"] || "",
-            lat: 31.5204 + Math.random() * 0.1, // near Lahore
-            lng: 74.3587 + Math.random() * 0.1,
+            lat: parseFloat(t["Latitude"]) || 31.5204,
+            lng: parseFloat(t["Longitude"]) || 74.3587,
+            verified: t["Verified"]?.trim(),
           }));
+
           setTeachers(mapped);
           setFiltered(mapped);
+
           setSubjects([
             ...new Set(
               mapped.flatMap((t) =>
@@ -83,8 +87,7 @@ const TeacherDirectory = () => {
   // Get user location
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
-      (pos) =>
-        setUserLocation([pos.coords.latitude, pos.coords.longitude]),
+      (pos) => setUserLocation([pos.coords.latitude, pos.coords.longitude]),
       () => console.warn("Geolocation not allowed — using fallback Lahore")
     );
   }, []);
@@ -104,7 +107,6 @@ const TeacherDirectory = () => {
       );
 
     if (userLocation) {
-      // Sort by proximity
       list.sort(
         (a, b) =>
           Math.hypot(a.lat - userLocation[0], a.lng - userLocation[1]) -
@@ -134,33 +136,28 @@ const TeacherDirectory = () => {
           {userLocation ? (
             <MapContainer
               center={userLocation}
-              zoom={12} // ≈ 20km radius
+              zoom={12}
               style={{ height: "100%", width: "100%" }}
             >
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-
-              {/* Circle around user (20km radius) */}
               <Circle
                 center={userLocation}
                 radius={20000}
-                pathOptions={{ color: "#0d6efd", fillColor: "#0d6efd", fillOpacity: 0.1 }}
+                pathOptions={{
+                  color: "#0d6efd",
+                  fillColor: "#0d6efd",
+                  fillOpacity: 0.1,
+                }}
               />
-
-              {/* User marker */}
               <Marker position={userLocation} icon={personIcon}>
                 <Popup>You are here</Popup>
               </Marker>
 
-              {/* Teacher markers */}
               {filtered.map((t) => (
-                <Marker
-                  key={t.id}
-                  position={[t.lat, t.lng]}
-                  icon={personIcon}
-                >
+                <Marker key={t.id} position={[t.lat, t.lng]} icon={personIcon}>
                   <Popup>
                     <strong>{t.name}</strong>
                     <br />
@@ -186,37 +183,19 @@ const TeacherDirectory = () => {
         </Box>
 
         {/* Heading */}
-        <Typography
-          variant="h5"
-          align="center"
-          sx={{ fontWeight: "bold", mb: 3 }}
-        >
+        <Typography variant="h5" align="center" sx={{ fontWeight: "bold", mb: 3 }}>
           Find Teachers Near You
         </Typography>
 
-        {/* Stylish Filters */}
+        {/* Filters */}
         <Grid container spacing={2} justifyContent="center" sx={{ mb: 3 }}>
           <Grid item xs={12} md={4}>
-            <FormControl fullWidth sx={{ minWidth: 200 }}>
+            <FormControl fullWidth>
               <InputLabel>Filter by City</InputLabel>
               <Select
                 value={selectedCity}
                 onChange={(e) => setSelectedCity(e.target.value)}
                 label="Filter by City"
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      maxHeight: 250,
-                      borderRadius: 2,
-                      boxShadow: 6,
-                    },
-                  },
-                }}
-                sx={{
-                  borderRadius: 3,
-                  bgcolor: "white",
-                  "&:hover": { bgcolor: "#f5f5f5" },
-                }}
               >
                 <MenuItem value="">All Cities</MenuItem>
                 {cities.map((city, i) => (
@@ -229,26 +208,12 @@ const TeacherDirectory = () => {
           </Grid>
 
           <Grid item xs={12} md={4}>
-            <FormControl fullWidth sx={{ minWidth: 200 }}>
+            <FormControl fullWidth>
               <InputLabel>Filter by Subject</InputLabel>
               <Select
                 value={selectedSubject}
                 onChange={(e) => setSelectedSubject(e.target.value)}
                 label="Filter by Subject"
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      maxHeight: 250,
-                      borderRadius: 2,
-                      boxShadow: 6,
-                    },
-                  },
-                }}
-                sx={{
-                  borderRadius: 3,
-                  bgcolor: "white",
-                  "&:hover": { bgcolor: "#f5f5f5" },
-                }}
               >
                 <MenuItem value="">All Subjects</MenuItem>
                 {subjects.map((subj, i) => (
@@ -261,12 +226,7 @@ const TeacherDirectory = () => {
           </Grid>
         </Grid>
 
-        {/* Loader / Error */}
-        {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {error}
-          </Alert>
-        )}
+        {error && <Alert severity="error">{error}</Alert>}
         {loading && (
           <Box sx={{ display: "flex", justifyContent: "center", py: 3 }}>
             <CircularProgress />
@@ -295,19 +255,18 @@ const TeacherDirectory = () => {
                   spacing={2}
                 >
                   <Stack direction="row" spacing={2} alignItems="center">
-                    <Avatar
-                      src={t.imageUrl}
-                      alt={t.name}
-                      sx={{ width: 56, height: 56 }}
-                    />
-                    <Typography
-                      variant="h6"
-                      sx={{ fontWeight: "bold", color: "#0d6efd" }}
-                    >
+                    <Avatar src={t.imageUrl} alt={t.name} sx={{ width: 56, height: 56 }} />
+                    <Typography variant="h6" sx={{ fontWeight: "bold", color: "#0d6efd" }}>
                       {t.name}
                     </Typography>
                   </Stack>
-                  <Chip label="VERIFIED" color="success" size="small" />
+
+                  {t.verified === "Yes" && (
+                    <Chip label="VERIFIED" color="success" size="small" />
+                  )}
+                  {t.verified === "No" && (
+                    <Chip label="NEW TEACHER" sx={{ bgcolor: "#ff80ab", color: "white" }} size="small" />
+                  )}
                 </Stack>
 
                 <Stack
@@ -334,42 +293,21 @@ const TeacherDirectory = () => {
                 </Stack>
 
                 <Box sx={{ mt: 1 }}>
-                  {t.subject
-                    .split(",")
-                    .filter(Boolean)
-                    .map((s, i) => (
-                      <Stack
-                        key={i}
-                        direction="row"
-                        spacing={1}
-                        alignItems="center"
-                      >
-                        <CheckCircle
-                          fontSize="small"
-                          color="success"
-                          sx={{ opacity: 0.8 }}
-                        />
-                        <Typography variant="body2">{s.trim()}</Typography>
-                      </Stack>
-                    ))}
+                  {t.subject.split(",").filter(Boolean).map((s, i) => (
+                    <Stack key={i} direction="row" spacing={1} alignItems="center">
+                      <CheckCircle fontSize="small" color="success" sx={{ opacity: 0.8 }} />
+                      <Typography variant="body2">{s.trim()}</Typography>
+                    </Stack>
+                  ))}
                 </Box>
 
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mt: 1 }}
-                >
-                  {t.name} is a qualified teacher based in {t.city}, specializing
-                  in {t.subject || "various subjects"}. With {t.experience}{" "}
-                  years of experience, they hold{" "}
-                  {t.qualification ? t.qualification : "a teaching background"}{" "}
-                  and are available for tutoring sessions.
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1, whiteSpace: "pre-line" }}>
+                  {t.bio}
                 </Typography>
               </CardContent>
             </Card>
           ))}
 
-        {/* Load More */}
         {!loading && visibleCount < filtered.length && (
           <Box sx={{ textAlign: "center", mt: 2 }}>
             <Button
@@ -390,7 +328,7 @@ const TeacherDirectory = () => {
 
         {!loading && filtered.length === 0 && (
           <Typography align="center" color="text.secondary" sx={{ mt: 3 }}>
-            No teachers found matching your filters.
+            No verified teachers found matching your filters.
           </Typography>
         )}
       </Container>
