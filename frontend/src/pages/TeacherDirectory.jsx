@@ -11,6 +11,7 @@ import {
   Container,
   Chip,
   Stack,
+  Avatar,
 } from "@mui/material";
 import { CheckCircle, LocationOn, Phone, School } from "@mui/icons-material";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
@@ -41,18 +42,20 @@ const TeacherDirectory = () => {
         if (Array.isArray(res.data)) {
           const mapped = res.data.map((t, i) => ({
             id: i,
-            name: t["Full Name"] || "Unknown",
-            subject: String(t["Subject(s)"] || ""),
+            name: t["Name"] || "Unknown",
+            subject: String(t["Subject"] || ""),
             qualification: t["Qualification"] || "",
-            experience: t["Experience (Years)"] || "",
+            experience: t["Experience"] || "",
             city: t["City"] || "",
-            phone: t["Contact Number"] || "",
-            lat: 31.5204 + Math.random() * 0.1,
+            phone: t["Phone"] || "",
+            bio: t["Bio"] || "",
+            imageUrl: t["Image URL"] || "",
+            lat: 31.5204 + Math.random() * 0.1, // Random coordinates near Lahore
             lng: 74.3587 + Math.random() * 0.1,
           }));
           setTeachers(mapped);
           setFiltered(mapped);
-        } else setError("Invalid data format.");
+        } else setError("Invalid data format from server.");
       })
       .catch(() => setError("Unable to fetch teacher data."));
   }, []);
@@ -100,14 +103,7 @@ const TeacherDirectory = () => {
         )}
 
         {/* Teacher Cards */}
-        <Box
-          sx={{
-            maxHeight: "60vh",
-            overflowY: "auto",
-            mb: 4,
-            pr: 1,
-          }}
-        >
+        <Box sx={{ maxHeight: "60vh", overflowY: "auto", mb: 4, pr: 1 }}>
           {filtered.map((t) => (
             <Card
               key={t.id}
@@ -120,22 +116,26 @@ const TeacherDirectory = () => {
               }}
             >
               <CardContent>
-                {/* Top Row */}
+                {/* Top Row: Avatar + Name + Verified */}
                 <Box
                   sx={{
                     display: "flex",
+                    alignItems: "center",
                     justifyContent: "space-between",
-                    alignItems: "flex-start",
-                    flexWrap: "wrap",
                     mb: 1,
+                    flexWrap: "wrap",
                   }}
                 >
-                  <Typography
-                    variant="h6"
-                    sx={{ fontWeight: "bold", color: "#0d6efd" }}
-                  >
-                    {t.name}
-                  </Typography>
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <Avatar
+                      src={t.imageUrl}
+                      alt={t.name}
+                      sx={{ width: 56, height: 56 }}
+                    />
+                    <Typography variant="h6" sx={{ fontWeight: "bold", color: "#0d6efd" }}>
+                      {t.name}
+                    </Typography>
+                  </Stack>
 
                   <Chip
                     label="VERIFIED"
@@ -145,25 +145,16 @@ const TeacherDirectory = () => {
                   />
                 </Box>
 
-                {/* Basic Info */}
-                <Stack
-                  direction="row"
-                  spacing={2}
-                  alignItems="center"
-                  sx={{ color: "text.secondary", mb: 1 }}
-                >
+                {/* Location + Phone */}
+                <Stack direction="row" spacing={2} alignItems="center" sx={{ color: "text.secondary", mb: 1 }}>
                   <LocationOn fontSize="small" />
                   <Typography>{t.city}</Typography>
                   <Phone fontSize="small" />
                   <Typography>{t.phone}</Typography>
                 </Stack>
 
-                <Stack
-                  direction="row"
-                  spacing={2}
-                  alignItems="center"
-                  sx={{ color: "text.secondary", mb: 2 }}
-                >
+                {/* Qualification + Experience */}
+                <Stack direction="row" spacing={2} alignItems="center" sx={{ color: "text.secondary", mb: 2 }}>
                   <School fontSize="small" />
                   <Typography>{t.qualification}</Typography>
                   <Typography>| {t.experience} years experience</Typography>
@@ -177,17 +168,8 @@ const TeacherDirectory = () => {
                     .split(",")
                     .filter(Boolean)
                     .map((s, i) => (
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        key={i}
-                        alignItems="center"
-                      >
-                        <CheckCircle
-                          fontSize="small"
-                          color="success"
-                          sx={{ opacity: 0.8 }}
-                        />
+                      <Stack key={i} direction="row" spacing={1} alignItems="center">
+                        <CheckCircle fontSize="small" color="success" sx={{ opacity: 0.8 }} />
                         <Typography variant="body2">{s.trim()}</Typography>
                       </Stack>
                     ))}
@@ -195,10 +177,7 @@ const TeacherDirectory = () => {
 
                 {/* Bio */}
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  {t.name} is a qualified teacher based in {t.city}, specializing in{" "}
-                  {t.subject}. With {t.experience} years of experience, they hold a
-                  {t.qualification ? ` ${t.qualification}` : ""} and are available for
-                  tutoring sessions.
+                  {t.name} is a qualified teacher based in {t.city}, specializing in {t.subject || "various subjects"}. With {t.experience} years of experience, they hold{t.qualification ? ` ${t.qualification}` : ""} and are available for tutoring sessions.
                 </Typography>
               </CardContent>
             </Card>
@@ -206,19 +185,8 @@ const TeacherDirectory = () => {
         </Box>
 
         {/* Map Section */}
-        <Box
-          sx={{
-            height: "40vh",
-            borderRadius: 2,
-            overflow: "hidden",
-            boxShadow: 3,
-          }}
-        >
-          <MapContainer
-            center={[31.5204, 74.3587]}
-            zoom={6}
-            style={{ height: "100%", width: "100%" }}
-          >
+        <Box sx={{ height: "40vh", borderRadius: 2, overflow: "hidden", boxShadow: 3 }}>
+          <MapContainer center={[31.5204, 74.3587]} zoom={6} style={{ height: "100%", width: "100%" }}>
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
