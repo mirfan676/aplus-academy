@@ -1,3 +1,4 @@
+import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import TutorForm from "./components/TutorForm";
 import TeacherDirectory from "./pages/TeacherDirectory";
@@ -15,7 +16,14 @@ import {
   Grid,
   Card,
   CardContent,
+  IconButton,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  useMediaQuery,
 } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 import theme from "./theme";
 
 function Home() {
@@ -115,38 +123,103 @@ function Home() {
 }
 
 function App() {
+  const isMobile = useMediaQuery("(max-width:900px)");
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+
+  const menuItems = [
+    { label: "Home", path: "/" },
+    { label: "Register", path: "/register" },
+    { label: "Tutors", path: "/teachers" },
+    { label: "About Us", path: "/about" },
+  ];
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
         {/* Navbar */}
-        <AppBar position="sticky" color="inherit" elevation={1}>
-          <Toolbar>
-            <Typography
-              variant="h6"
-              color="primary"
-              sx={{ flexGrow: 1, fontWeight: "bold" }}
+        <AppBar position="sticky" color="inherit" elevation={2}>
+          <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+            {/* Logo */}
+            <Box
               component={Link}
               to="/"
-              style={{ textDecoration: "none" }}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                textDecoration: "none",
+              }}
             >
-              A Plus Home Tutors
-            </Typography>
+              <Box
+                component="img"
+                src="/logo.svg"
+                alt="A Plus Home Tutors"
+                sx={{ height: 48 }}
+              />
+            </Box>
 
-            <Button color="primary" component={Link} to="/">
-              Home
-            </Button>
-            <Button color="primary" component={Link} to="/register">
-              Register
-            </Button>
-            <Button color="primary" component={Link} to="/teachers">
-              Tutors
-            </Button>
-            <Button color="primary" component={Link} to="/about">
-              About Us
-            </Button>
+
+            {/* Desktop Menu */}
+            {!isMobile && (
+              <Box sx={{ display: "flex", gap: 2 }}>
+                {menuItems.map((item) => (
+                  <Button
+                    key={item.path}
+                    component={Link}
+                    to={item.path}
+                    color="primary"
+                    sx={{
+                      textTransform: "none",
+                      fontWeight: "500",
+                      "&:hover": {
+                        textDecoration: "underline",
+                      },
+                    }}
+                  >
+                    {item.label}
+                  </Button>
+                ))}
+              </Box>
+            )}
+
+            {/* Mobile Menu Button */}
+            {isMobile && (
+              <IconButton
+                color="primary"
+                edge="end"
+                onClick={() => setDrawerOpen(true)}
+              >
+                <MenuIcon />
+              </IconButton>
+            )}
           </Toolbar>
         </AppBar>
+
+        {/* Mobile Drawer */}
+        <Drawer
+          anchor="right"
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+        >
+          <Box sx={{ width: 240, mt: 2 }}>
+            <List>
+              {menuItems.map((item) => (
+                <ListItem
+                  button
+                  key={item.path}
+                  component={Link}
+                  to={item.path}
+                  onClick={() => setDrawerOpen(false)}
+                >
+                  <ListItemText
+                    primary={item.label}
+                    sx={{ textAlign: "right" }}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+        </Drawer>
 
         {/* Main Content */}
         <Routes>
@@ -157,14 +230,7 @@ function App() {
               <Container sx={{ py: 6 }}>
                 <Card sx={{ maxWidth: 700, mx: "auto", boxShadow: 3 }}>
                   <CardContent>
-                    <Typography
-                      variant="h5"
-                      textAlign="center"
-                      color="primary"
-                      gutterBottom
-                    >
-                      Tutor Registration Form
-                    </Typography>
+                    {/* Removed duplicate title here */}
                     <TutorForm />
                   </CardContent>
                 </Card>
