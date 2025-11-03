@@ -4,9 +4,10 @@ import gspread
 from fastapi import FastAPI, Form, File, Query, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from google.oauth2.service_account import Credentials
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaIoBaseUpload
 from io import BytesIO
+import requests
+import base64
+import traceback
 
 app = FastAPI(title="APlus Home Tutors API", version="2.0.0")
 
@@ -20,29 +21,37 @@ app.add_middleware(
 )
 
 # --- GOOGLE SHEETS SETUP ---
-SCOPES = [
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive"
-]
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
-# Load credentials from environment variable
 creds_dict = json.loads(os.environ["GOOGLE_CREDENTIALS"])
 creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
-
-# Authorize Google clients
 gspread_client = gspread.authorize(creds)
-drive_service = build("drive", "v3", credentials=creds)
 
-# --- CONFIG ---
 SHEET_ID = "1wBmbImTrliHEIKk5YxM5PN4eOfkz6XLS28bjxRjmZvY"
-FOLDER_ID = "1sgKkV_ZehAbgpvAwbD_JulJvJoust_f8"
-
 sheet = gspread_client.open_by_key(SHEET_ID).sheet1
+
+# --- IMGBB CONFIG ---
+IMGBB_API_KEY = "5b09de418289beb41cde5d28d5934047"  # Replace with your key
+
+# --- CITY AREAS ---
+city_areas = {
+    "Lahore": ["Gulberg", "DHA", "Johar Town", "Model Town", "Shadman"],
+    "Karachi": ["Clifton", "PECHS", "Gulshan-e-Iqbal"],
+    "Islamabad": ["F-6", "G-10", "Blue Area"],
+    "Rawalpindi": ["Satellite Town", "Chaklala", "Bahria Town"],
+    "Faisalabad": ["Madina Town", "Gulistan Colony", "People Colony"],
+    "Multan": ["Shah Rukn-e-Alam", "Cantt", "Township"],
+    "Peshawar": ["Hayatabad", "University Town", "Saddar"],
+    "Quetta": ["Satellite Town", "Jinnah Town", "Sariab Road"],
+    "Gujranwala": ["Bahria Town", "Civil Lines", "Cantt"],
+    "Sialkot": ["Daska Road", "Model Town", "Cantt"],
+}
 
 
 @app.get("/")
 def home():
     return {"message": "✅ APlus Home Tutors API is running!"}
+
 
 @app.post("/tutors/register")
 async def register_tutor(
@@ -58,53 +67,36 @@ async def register_tutor(
     area3: str = Form(None),
     image: UploadFile = File(None),
 ):
-    import traceback
-
     try:
         image_url = "N/A"
 
-        # --- Upload Image to Google Drive (optional) ---
+        # --- Upload Image to ImgBB ---
         if image and image.filename:
-            file_metadata = {"name": image.filename, "parents": [FOLDER_ID]}
-            media = MediaIoBaseUpload(
-                BytesIO(await image.read()),
-                mimetype=image.content_type or "image/jpeg",
-                resumable=True
-            )
-            file = drive_service.files().create(
-                body=file_metadata,
-                media_body=media,
-                fields="id"
-            ).execute()
+            image_bytes = await image.read()
+            encoded_image = base64.b64encode(image_bytes).decode("utf-8")
 
-            file_id = file.get("id")
-            # Make the image publicly accessible
-            drive_service.permissions().create(
-                fileId=file_id,
-                body={"role": "reader", "type": "anyone"},
-            ).execute()
-            image_url = f"https://drive.google.com/uc?id={file_id}"
+            payload = {
+                "key": IMGBB_API_KEY,
+                "image": encoded_image,
+                "name": image.filename
+            }
+
+            response = requests.post("https://api.imgbb.com/1/upload", data=payload)
+            result = response.json()
+
+            if result.get("success"):
+                image_url = result["data"]["url"]
+            else:
+                print("❌ ImgBB upload failed:", result)
 
         # --- Default areas if not provided ---
-        city_areas = {
-            "Lahore": ["Gulberg", "DHA", "Johar Town", "Model Town", "Shadman"],
-            "Karachi": ["Clifton", "PECHS", "Gulshan-e-Iqbal"],
-            "Islamabad": ["F-6", "G-10", "Blue Area"],
-            "Rawalpindi": ["Satellite Town", "Chaklala", "Bahria Town"],
-            "Faisalabad": ["Madina Town", "Gulistan Colony", "People Colony"],
-            "Multan": ["Shah Rukn-e-Alam", "Cantt", "Township"],
-            "Peshawar": ["Hayatabad", "University Town", "Saddar"],
-            "Quetta": ["Satellite Town", "Jinnah Town", "Sariab Road"],
-            "Gujranwala": ["Bahria Town", "Civil Lines", "Cantt"],
-            "Sialkot": ["Daska Road", "Model Town", "Cantt"],
-        }
-
+        areas = city_areas.get(city, [city])
         if not area1:
-            area1 = city_areas.get(city, [city])[0]
+            area1 = areas[0]
         if not area2:
-            area2 = city_areas.get(city, [city])[1] if len(city_areas.get(city, [city])) > 1 else area1
+            area2 = areas[1] if len(areas) > 1 else area1
         if not area3:
-            area3 = city_areas.get(city, [city])[2] if len(city_areas.get(city, [city])) > 2 else area1
+            area3 = areas[2] if len(areas) > 2 else area1
 
         # --- Save data to Google Sheets ---
         sheet.append_row([
@@ -128,38 +120,20 @@ async def register_tutor(
         }
 
     except Exception as e:
-        # Print full traceback in console
         print("❌ Error submitting form:", e)
         traceback.print_exc()
-        # Return detailed error to frontend (can also hide in production)
         raise HTTPException(status_code=500, detail=str(e))
-
 
 
 @app.get("/tutors")
 def get_tutors():
-    """Fetch all tutor records from Google Sheets"""
     try:
         records = sheet.get_all_records()
         return records
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.get("/areas")
 def get_areas(city: str = Query(..., description="City name")):
-    """Return predefined areas for cities"""
-    city_areas = {
-        "Lahore": ["Gulberg", "DHA", "Johar Town", "Model Town", "Shadman"],
-        "Karachi": ["Clifton", "PECHS", "Gulshan-e-Iqbal"],
-        "Islamabad": ["F-6", "G-10", "Blue Area"],
-        "Rawalpindi": ["Satellite Town", "Chaklala", "Bahria Town"],
-        "Faisalabad": ["Madina Town", "Gulistan Colony", "People Colony"],
-        "Multan": ["Shah Rukn-e-Alam", "Cantt", "Township"],
-        "Peshawar": ["Hayatabad", "University Town", "Saddar"],
-        "Quetta": ["Satellite Town", "Jinnah Town", "Sariab Road"],
-        "Gujranwala": ["Bahria Town", "Civil Lines", "Cantt"],
-        "Sialkot": ["Daska Road", "Model Town", "Cantt"],
-    }
     return {"areas": city_areas.get(city, [city])}
-
-
