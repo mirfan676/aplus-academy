@@ -1,26 +1,21 @@
 import os
 import json
 import gspread
-from fastapi import FastAPI, Form, File, Query, UploadFile, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from google.oauth2.service_account import Credentials
 import requests
 import base64
 import traceback
 import random
 import math
-from functools import lru_cache
-import time
+from fastapi import FastAPI, Form, File, Query, UploadFile, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from google.oauth2.service_account import Credentials
 
 app = FastAPI(title="APlus Home Tutors API", version="2.3.0")
 
-# Cache tutors for 5 minutes
-_tutor_cache = {"data": None, "timestamp": 0}
-
-# --- CORS ---
+# --- CORS CONFIG ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # You can replace * with your domain in production
+    allow_origins=["*"],  # Replace * with your domain in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -31,7 +26,6 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 creds_dict = json.loads(os.environ["GOOGLE_CREDENTIALS"])
 creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
 gspread_client = gspread.authorize(creds)
-
 SHEET_ID = "1wBmbImTrliHEIKk5YxM5PN4eOfkz6XLS28bjxRjmZvY"
 sheet = gspread_client.open_by_key(SHEET_ID).sheet1
 
@@ -53,7 +47,7 @@ city_areas = {
 }
 
 
-# --- Utility: random point within given radius ---
+# --- Utility: Generate random point within radius ---
 def random_point_within_radius(center_lat, center_lng, radius_m=1000):
     radius_in_degrees = radius_m / 111320.0
     u = random.random()
@@ -72,15 +66,21 @@ def get_area_coordinates(area_name: str, city: str):
         url = "https://nominatim.openstreetmap.org/search"
         params = {"q": query, "format": "json", "limit": 1}
         headers = {"User-Agent": "APlusAcademy/1.0"}
+
         res = requests.get(url, params=params, headers=headers, timeout=10)
         res.raise_for_status()
         data = res.json()
+
         if data and len(data) > 0:
             return float(data[0]["lat"]), float(data[0]["lon"])
+
     except Exception as e:
         print(f"⚠️ Error fetching coordinates for {area_name}: {e}")
+
     return None, None
 
+
+# --- ROUTES ---
 
 @app.get("/")
 def home():
@@ -114,6 +114,7 @@ async def register_tutor(
             payload = {"key": IMGBB_API_KEY, "image": encoded_image, "name": image.filename}
             response = requests.post("https://api.imgbb.com/1/upload", data=payload)
             result = response.json()
+
             if result.get("success"):
                 image_url = result["data"]["url"]
             else:
@@ -140,19 +141,8 @@ async def register_tutor(
 
         # --- Save to Google Sheet ---
         sheet.append_row([
-            name,
-            subject,
-            qualification,
-            experience,
-            city,
-            phone,
-            bio,
-            area1,
-            area2,
-            area3,
-            image_url,
-            latitude or "",
-            longitude or "",
+            name, subject, qualification, experience, city, phone, bio,
+            area1, area2, area3, image_url, latitude or "", longitude or ""
         ])
 
         return {
@@ -169,48 +159,47 @@ async def register_tutor(
 
 
 @app.get("/tutors")
-def get_tutors(
-    city: str = Query(None),
-    subject: str = Query(None)
-):
+def get_tutors():
     try:
-        global _tutor_cache
-        now = time.time()
-        if not _tutor_cache["data"] or now - _tutor_cache["timestamp"] > 300:
-            records = sheet.get_all_values()
-            headers = records[0]
-            tutors = []
-            for row in records[1:]:
-                data = dict(zip(headers, row))
-                if str(data.get("Verified", "")).strip().lower() == "yes":
-                    tutors.append({
-                        "Name": data.get("Name", ""),
-                        "Subject": data.get("Subject", ""),
-                        "Qualification": data.get("Qualification", ""),
-                        "Experience": data.get("Experience", ""),
-                        "City": data.get("City", ""),
-                        "Phone": data.get("Phone", ""),
-                        "Bio": data.get("Bio", ""),
-                        "Area1": data.get("Area1", ""),
-                        "Area2": data.get("Area2", ""),
-                        "Area3": data.get("Area3", ""),
-                        "Image URL": data.get("Image URL", ""),
-                        "Latitude": data.get("Latitude", ""),
-                        "Longitude": data.get("Longitude", ""),
-                        "Verified": "Yes",
-                    })
-            _tutor_cache = {"data": tutors, "timestamp": now}
+        records = sheet.get_all_records(empty2zero=False, head=1)
+        verified_tutors = []
 
-        tutors = _tutor_cache["data"]
+        for r in records:
+            if not any(r.values()):
+                continue
 
-        if city:
-            tutors = [t for t in tutors if t["City"].lower() == city.lower()]
-        if subject:
-            tutors = [t for t in tutors if subject.lower() in t["Subject"].lower()]
+            verified_value = str(r.get("Verified", "")).strip().lower()
+            if verified_value != "yes":
+                continue
 
-        return tutors[:100]  # Limit to first 100
+            def safe_str(val):
+                if val is None:
+                    return ""
+                if isinstance(val, (int, float)):
+                    return str(val)
+                return str(val).strip()
+
+            verified_tutors.append({
+                "Name": safe_str(r.get("Name")),
+                "Subject": safe_str(r.get("Subject")),
+                "Qualification": safe_str(r.get("Qualification")),
+                "Experience": safe_str(r.get("Experience")),
+                "City": safe_str(r.get("City")),
+                "Phone": safe_str(r.get("Phone")),
+                "Bio": safe_str(r.get("Bio")),
+                "Area1": safe_str(r.get("Area1")),
+                "Area2": safe_str(r.get("Area2")),
+                "Area3": safe_str(r.get("Area3")),
+                "Image URL": safe_str(r.get("Image URL")),
+                "Latitude": safe_str(r.get("Latitude")),
+                "Longitude": safe_str(r.get("Longitude")),
+                "Verified": "Yes",
+            })
+
+        return verified_tutors
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Error fetching tutors: {str(e)}")
 
 
 @app.get("/areas")
