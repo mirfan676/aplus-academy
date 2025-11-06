@@ -9,8 +9,13 @@ import base64
 import traceback
 import random
 import math
+from functools import lru_cache
+import time
 
 app = FastAPI(title="APlus Home Tutors API", version="2.3.0")
+
+# Cache tutors for 5 minutes
+_tutor_cache = {"data": None, "timestamp": 0}
 
 # --- CORS ---
 app.add_middleware(
@@ -164,47 +169,48 @@ async def register_tutor(
 
 
 @app.get("/tutors")
-def get_tutors():
+def get_tutors(
+    city: str = Query(None),
+    subject: str = Query(None)
+):
     try:
-        records = sheet.get_all_records(empty2zero=False, head=1)
-        verified_tutors = []
+        global _tutor_cache
+        now = time.time()
+        if not _tutor_cache["data"] or now - _tutor_cache["timestamp"] > 300:
+            records = sheet.get_all_values()
+            headers = records[0]
+            tutors = []
+            for row in records[1:]:
+                data = dict(zip(headers, row))
+                if str(data.get("Verified", "")).strip().lower() == "yes":
+                    tutors.append({
+                        "Name": data.get("Name", ""),
+                        "Subject": data.get("Subject", ""),
+                        "Qualification": data.get("Qualification", ""),
+                        "Experience": data.get("Experience", ""),
+                        "City": data.get("City", ""),
+                        "Phone": data.get("Phone", ""),
+                        "Bio": data.get("Bio", ""),
+                        "Area1": data.get("Area1", ""),
+                        "Area2": data.get("Area2", ""),
+                        "Area3": data.get("Area3", ""),
+                        "Image URL": data.get("Image URL", ""),
+                        "Latitude": data.get("Latitude", ""),
+                        "Longitude": data.get("Longitude", ""),
+                        "Verified": "Yes",
+                    })
+            _tutor_cache = {"data": tutors, "timestamp": now}
 
-        for r in records:
-            if not any(r.values()):
-                continue
+        tutors = _tutor_cache["data"]
 
-            verified_value = str(r.get("Verified", "")).strip().lower()
-            if verified_value != "yes":
-                continue
+        if city:
+            tutors = [t for t in tutors if t["City"].lower() == city.lower()]
+        if subject:
+            tutors = [t for t in tutors if subject.lower() in t["Subject"].lower()]
 
-            def safe_str(val):
-                if val is None:
-                    return ""
-                if isinstance(val, (int, float)):
-                    return str(val)
-                return str(val).strip()
-
-            verified_tutors.append({
-                "Name": safe_str(r.get("Name")),
-                "Subject": safe_str(r.get("Subject")),
-                "Qualification": safe_str(r.get("Qualification")),
-                "Experience": safe_str(r.get("Experience")),
-                "City": safe_str(r.get("City")),
-                "Phone": safe_str(r.get("Phone")),
-                "Bio": safe_str(r.get("Bio")),
-                "Area1": safe_str(r.get("Area1")),
-                "Area2": safe_str(r.get("Area2")),
-                "Area3": safe_str(r.get("Area3")),
-                "Image URL": safe_str(r.get("Image URL")),
-                "Latitude": safe_str(r.get("Latitude")),
-                "Longitude": safe_str(r.get("Longitude")),
-                "Verified": "Yes",
-            })
-
-        return verified_tutors
-
+        return tutors[:100]  # Limit to first 100
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching tutors: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/areas")
