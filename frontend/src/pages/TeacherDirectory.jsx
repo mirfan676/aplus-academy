@@ -297,158 +297,201 @@ const TeacherDirectory = () => {
           /* --- Paste this inside your render where you map tutors --- */
 filtered.slice(0, visibleCount).map((t) => (
   <Card
-    key={t.id}
+  key={t.id}
+  sx={{
+    mb: 3,
+    p: { xs: 2, md: 3 },
+    borderRadius: 3,
+    boxShadow: 3,
+    position: "relative",
+    overflow: "visible",
+    transition: "0.3s",
+    "&:hover": { boxShadow: 6, transform: "translateY(-4px)" },
+  }}
+>
+  {/* ✅ Top Section — Avatar, Name, Verified Badge, Stars */}
+  <Grid
+    container
+    alignItems="center"
+    spacing={2}
     sx={{
-      mb: 3,
-      p: { xs: 2, md: 3 },
-      borderRadius: 3,
-      boxShadow: 3,
-      position: "relative",         // important for absolute children
-      overflow: "visible",
-      transition: "0.3s",
-      "&:hover": { boxShadow: 6, transform: "translateY(-4px)" },
+      flexWrap: { xs: "wrap", md: "nowrap" },
+      mb: 2,
     }}
   >
-    {/* Top-left avatar (absolute) */}
-    <Avatar
-      src={t.imageUrl}
-      alt={t.name}
+    {/* Profile Image */}
+    <Grid item xs={12} sm={3} sx={{ textAlign: "center" }}>
+      <Avatar
+        src={t.imageUrl}
+        alt={t.name}
+        sx={{
+          width: 80,
+          height: 80,
+          border: "3px solid #0d6efd",
+          margin: "auto",
+          boxShadow: 2,
+        }}
+      />
+    </Grid>
+
+    {/* Name, Qualification, Verification, Stars */}
+    <Grid item xs={12} sm={9}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: "6px",
+        }}
+      >
+        <Typography variant="h6" fontWeight={700} color="#0d6efd">
+          {t.name}
+        </Typography>
+
+        {t.verified?.toLowerCase() === "yes" && (
+          <Box
+            sx={{
+              backgroundColor: "#4caf50",
+              color: "white",
+              px: 1,
+              py: 0.2,
+              borderRadius: "12px",
+              fontSize: "12px",
+              display: "flex",
+              alignItems: "center",
+              gap: 0.5,
+            }}
+          >
+            <CheckCircle fontSize="small" /> Verified
+          </Box>
+        )}
+
+        <Box sx={{ color: "gold", ml: "auto" }}>{"⭐".repeat(5)}</Box>
+      </Box>
+
+      {t.qualification && (
+        <Typography variant="body2" color="text.secondary">
+          {t.qualification}
+        </Typography>
+      )}
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        {t.city}
+      </Typography>
+    </Grid>
+  </Grid>
+
+  {/* ✅ Subjects and Preferred Areas */}
+  <Grid container spacing={2} alignItems="flex-start">
+    {/* Subjects Section */}
+    <Grid item xs={12} md={6}>
+      <Typography
+        variant="subtitle1"
+        sx={{ fontWeight: "700", color: "#b71c1c", mb: 1 }}
+      >
+        SUBJECTS
+      </Typography>
+
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+          gap: "6px 12px",
+          wordWrap: "break-word",
+        }}
+      >
+        {t.subject
+          ?.split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .map((s, i) => (
+            <Typography
+              key={i}
+              variant="body2"
+              sx={{ display: "flex", alignItems: "center", gap: "4px" }}
+            >
+              <span>⭐</span> {s}
+            </Typography>
+          ))}
+      </Box>
+    </Grid>
+
+    {/* Vertical Divider */}
+    <Grid
+      item
+      md={0.1}
       sx={{
-        width: 84,
-        height: 84,
-        border: "3px solid #0d6efd",
-        position: "absolute",
-        left: 16,
-        top: 16,
-        boxShadow: 1,
+        display: { xs: "none", md: "block" },
+        borderLeft: "2px solid #000",
+        height: "100%",
+        mx: 1,
       }}
     />
 
-    {/* Verified badge + stars (top-right absolute group) */}
-    <Box sx={{ position: "absolute", right: 16, top: 18, textAlign: "right" }}>
-      {t.verified?.toLowerCase() === "yes" && (
-        <Chip
-          icon={<CheckCircle />}
-          label="Verified"
-          color="success"
-          size="small"
-          sx={{ mb: 0.5 }}
-        />
-      )}
-      <Box>
-        <Typography component="span" variant="body2" sx={{ color: "gold" }}>
-          {"⭐".repeat(5)}
-        </Typography>
-      </Box>
-    </Box>
+    {/* Preferred Areas Section */}
+    <Grid item xs={12} md={5}>
+      <Typography
+        variant="subtitle1"
+        sx={{ fontWeight: "700", color: "#b71c1c", mb: 1 }}
+      >
+        PREFERRED AREAS
+      </Typography>
 
-    {/* Content container: add left padding to avoid avatar overlap */}
-    <Grid container spacing={2} sx={{ pl: { xs: 0, md: 12 } }} alignItems="flex-start">
-      {/* Top row: Name / Qualification / Location */}
-      <Grid item xs={12}>
-        <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-          <Box>
-            <Typography variant="h6" fontWeight="700" color="#0d6efd">
-              {t.name}
-            </Typography>
-            {t.qualification && (
-              <Typography variant="body2" color="text.secondary">
-                {t.qualification}
-              </Typography>
-            )}
-            <Typography variant="body2" color="text.secondary">
-              {(t.Area1 || t.Area2 || t.city) && (
-                <>
-                  {t.Area1 || t.Area2 ? `${t.Area1 || t.Area2}, ` : ""}
-                  {t.city}
-                </>
-              )}
-            </Typography>
-          </Box>
-
-          {/* on smaller screens the top-right absolute badge still shows; keep an empty box here to preserve layout */}
-          <Box sx={{ display: { xs: "none", md: "block" }, width: 120 }} />
-        </Stack>
-      </Grid>
-
-      {/* Divider */}
-      <Grid item xs={12}>
-        <Box sx={{ borderBottom: "1px solid #eee", my: 1 }} />
-      </Grid>
-
-      {/* Main body: Subjects (left, two-column) and Preferred Areas (right, single column) */}
-      <Grid item xs={12} md={7}>
-        <Typography
-          variant="subtitle2"
-          fontWeight="700"
-          sx={{ borderBottom: "2px solid #0d6efd", display: "inline-block", pb: 0.4, mb: 1 }}
-        >
-          Subjects
-        </Typography>
-
-        <Grid container spacing={1} sx={{ mt: 1 }}>
-          {t.subject
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean)
-            .map((s, i) => (
-              // each subject occupies half width on md+ and full width on xs
-              <Grid item xs={12} sm={6} key={i}>
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  <Typography variant="body2">⭐</Typography>
-                  <Typography variant="body2">{s}</Typography>
-                </Stack>
-              </Grid>
-            ))}
-        </Grid>
-      </Grid>
-
-      <Grid item xs={12} md={5}>
-        <Typography
-          variant="subtitle2"
-          fontWeight="700"
-          sx={{ borderBottom: "2px solid #0d6efd", display: "inline-block", pb: 0.4, mb: 1 }}
-        >
-          Preferred Areas
-        </Typography>
-
-        <Box sx={{ mt: 1 }}>
-          {[t.Area1, t.Area2, t.Area3]
-            .filter(Boolean)
-            .map((area, i) => (
-              <Typography key={i} variant="body2" sx={{ mt: 0.5 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+        {Array.isArray(t.preferredAreas)
+          ? t.preferredAreas.map((area, i) => (
+              <Typography key={i} variant="body2">
                 📍 {area}
               </Typography>
-            ))}
-        </Box>
-      </Grid>
-
-      {/* Action row: aligned right */}
-      <Grid item xs={12}>
-        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => (window.location.href = `/teacher/${t.id}`)}
-          >
-            View Details
-          </Button>
-
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: "#0d6efd",
-              borderRadius: 3,
-              "&:hover": { backgroundColor: "#0b5ed7" },
-            }}
-            onClick={() => (window.location.href = `/hire/${t.id}`)}
-          >
-            Hire Me
-          </Button>
-        </Box>
-      </Grid>
+            ))
+          : [t.Area1, t.Area2, t.Area3]
+              .filter(Boolean)
+              .map((area, i) => (
+                <Typography key={i} variant="body2">
+                  📍 {area}
+                </Typography>
+              ))}
+      </Box>
     </Grid>
-  </Card>
+  </Grid>
+
+  {/* ✅ Buttons */}
+  <Box
+    sx={{
+      display: "flex",
+      justifyContent: "flex-end",
+      mt: 2,
+      gap: 2,
+      flexWrap: "wrap",
+    }}
+  >
+    <Button
+      variant="contained"
+      sx={{
+        backgroundColor: "#b71c1c",
+        fontWeight: 700,
+        fontStyle: "italic",
+        "&:hover": { backgroundColor: "#a31515" },
+      }}
+      onClick={() => (window.location.href = `/teacher/${t.id}`)}
+    >
+      VIEW DETAILS
+    </Button>
+    <Button
+      variant="contained"
+      sx={{
+        backgroundColor: "#b71c1c",
+        fontWeight: 700,
+        fontStyle: "italic",
+        "&:hover": { backgroundColor: "#a31515" },
+      }}
+      onClick={() => (window.location.href = `/hire/${t.id}`)}
+    >
+      HIRE ME
+    </Button>
+  </Box>
+</Card>
+
+
 
 
           ))
