@@ -386,7 +386,7 @@ filtered.slice(0, visibleCount).map((t) => (
     <Grid item xs={12} md={6}>
       <Typography
         variant="subtitle1"
-        sx={{ fontWeight: "700", color: "#b71c1c", mb: 1 }}
+        sx={{ fontWeight: "700", color: "#0d6efd", mb: 1 }}
       >
         SUBJECTS
       </Typography>
@@ -431,7 +431,7 @@ filtered.slice(0, visibleCount).map((t) => (
     <Grid item xs={12} md={5}>
       <Typography
         variant="subtitle1"
-        sx={{ fontWeight: "700", color: "#b71c1c", mb: 1 }}
+        sx={{ fontWeight: "700", color: "#0d6efd", mb: 1 }}
       >
         PREFERRED AREAS
       </Typography>
@@ -467,10 +467,10 @@ filtered.slice(0, visibleCount).map((t) => (
     <Button
       variant="contained"
       sx={{
-        backgroundColor: "#b71c1c",
+        backgroundColor: "#0d6efd",
         fontWeight: 700,
         fontStyle: "italic",
-        "&:hover": { backgroundColor: "#a31515" },
+        "&:hover": { backgroundColor: "#0d6efd" },
       }}
       onClick={() => (window.location.href = `/teacher/${t.id}`)}
     >
@@ -479,10 +479,10 @@ filtered.slice(0, visibleCount).map((t) => (
     <Button
       variant="contained"
       sx={{
-        backgroundColor: "#b71c1c",
+        backgroundColor: "#4caf50",
         fontWeight: 700,
         fontStyle: "italic",
-        "&:hover": { backgroundColor: "#a31515" },
+        "&:hover": { backgroundColor: "#4caf50" },
       }}
       onClick={() => (window.location.href = `/hire/${t.id}`)}
     >
