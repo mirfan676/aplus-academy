@@ -8,9 +8,7 @@ import {
   CircularProgress,
   Container,
   MenuItem,
-  Stack,
   Avatar,
-  Chip,
   Alert,
   Button,
   FormControl,
@@ -41,12 +39,12 @@ const TeacherDirectory = () => {
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
   const [userLocation, setUserLocation] = useState([31.5204, 74.3587]); // Lahore fallback
-  const [visibleCount, setVisibleCount] = useState(5);
+  const [visibleCount, setVisibleCount] = useState(10);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [mapVisible, setMapVisible] = useState(false);
 
-  // Load tutors (with caching)
+  // Fetch tutors with caching
   useEffect(() => {
     const fetchTutors = async () => {
       try {
@@ -107,41 +105,31 @@ const TeacherDirectory = () => {
     );
   }, []);
 
-  // Extract subjects & cities for dropdowns
+  // Subjects & Cities
   const subjects = useMemo(() => {
-    if (!teachers.length) return [];
     return [
       ...new Set(
-        teachers.flatMap((t) => t.subject.split(",").map((s) => s.trim()))
+        teachers.flatMap((t) => t.subject?.split(",").map((s) => s.trim()) || [])
       ),
     ];
   }, [teachers]);
 
   const cities = useMemo(() => {
-    if (!teachers.length) return [];
     return [...new Set(teachers.map((t) => t.city).filter(Boolean))];
   }, [teachers]);
 
-  // Filter + sort tutors (memoized for performance)
+  // Filter & sort
   const filtered = useMemo(() => {
-    if (!teachers.length) return [];
     let list = [...teachers];
-
     if (selectedCity)
-      list = list.filter(
-        (t) => t.city.toLowerCase() === selectedCity.toLowerCase()
-      );
+      list = list.filter((t) => t.city.toLowerCase() === selectedCity.toLowerCase());
     if (selectedSubject)
-      list = list.filter((t) =>
-        t.subject.toLowerCase().includes(selectedSubject.toLowerCase())
-      );
-
+      list = list.filter((t) => t.subject.toLowerCase().includes(selectedSubject.toLowerCase()));
     list.sort(
       (a, b) =>
         Math.hypot(a.lat - userLocation[0], a.lng - userLocation[1]) -
         Math.hypot(b.lat - userLocation[0], b.lng - userLocation[1])
     );
-
     return list;
   }, [selectedCity, selectedSubject, teachers, userLocation]);
 
@@ -150,7 +138,7 @@ const TeacherDirectory = () => {
   return (
     <Box sx={{ bgcolor: "#f9f9f9", py: 2 }}>
       <Container maxWidth="lg">
-        {/* Lazy Map Section */}
+        {/* Map */}
         <Box
           sx={{
             height: { xs: "1in", md: "1.5in" },
@@ -162,25 +150,8 @@ const TeacherDirectory = () => {
           onMouseEnter={() => !mapVisible && setMapVisible(true)}
         >
           {mapVisible ? (
-            <Suspense
-              fallback={
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    height: "100%",
-                  }}
-                >
-                  <CircularProgress size={28} />
-                </Box>
-              }
-            >
-              <LazyMap
-                userLocation={userLocation}
-                filtered={filtered}
-                personIcon={personIcon}
-              />
+            <Suspense fallback={<CircularProgress />}>
+              <LazyMap userLocation={userLocation} filtered={filtered} personIcon={personIcon} />
             </Suspense>
           ) : (
             <Box
@@ -198,325 +169,92 @@ const TeacherDirectory = () => {
         </Box>
 
         {/* Heading */}
-        <Typography
-          variant="h5"
-          align="center"
-          sx={{ fontWeight: "bold", mb: 3 }}
-        >
+        <Typography variant="h5" align="center" sx={{ fontWeight: "bold", mb: 3 }}>
           Find Teachers Near You
         </Typography>
 
         {/* Filters */}
         <Grid container spacing={2} justifyContent="center" sx={{ mb: 3 }}>
           <Grid item xs={12} md={4}>
-            <FormControl fullWidth sx={{ minWidth: 180 }}>
+            <FormControl fullWidth>
               <InputLabel shrink>Select City</InputLabel>
-              <Select
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
-                label="Select City"
-                displayEmpty
-                sx={{
-                  bgcolor: "#fff",
-                  borderRadius: 2,
-                  height: { xs: 50, sm: 56 },
-                  fontSize: { xs: "0.9rem", sm: "1rem" },
-                  boxShadow: 1,
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#ccc",
-                  },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#0d6efd",
-                  },
-                  "& .MuiSelect-select": {
-                    py: { xs: 1, sm: 1.3 },
-                    px: 2,
-                  },
-                }}
-              >
+              <Select value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)}>
                 <MenuItem value="">
                   <em>All Cities</em>
                 </MenuItem>
                 {cities.map((city, i) => (
-                  <MenuItem key={i} value={city}>
-                    {city}
-                  </MenuItem>
+                  <MenuItem key={i} value={city}>{city}</MenuItem>
                 ))}
               </Select>
             </FormControl>
           </Grid>
-
           <Grid item xs={12} md={4}>
-            <FormControl fullWidth sx={{ minWidth: 180 }}>
+            <FormControl fullWidth>
               <InputLabel shrink>Select Subject</InputLabel>
-              <Select
-                value={selectedSubject}
-                onChange={(e) => setSelectedSubject(e.target.value)}
-                label="Select Subject"
-                displayEmpty
-                sx={{
-                  bgcolor: "#fff",
-                  borderRadius: 2,
-                  height: { xs: 50, sm: 56 },
-                  fontSize: { xs: "0.9rem", sm: "1rem" },
-                  boxShadow: 1,
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#ccc",
-                  },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#0d6efd",
-                  },
-                  "& .MuiSelect-select": {
-                    py: { xs: 1, sm: 1.3 },
-                    px: 2,
-                  },
-                }}
-              >
+              <Select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)}>
                 <MenuItem value="">
                   <em>All Subjects</em>
                 </MenuItem>
                 {subjects.map((s, i) => (
-                  <MenuItem key={i} value={s}>
-                    {s}
-                  </MenuItem>
+                  <MenuItem key={i} value={s}>{s}</MenuItem>
                 ))}
               </Select>
             </FormControl>
           </Grid>
         </Grid>
 
-        {/* Error Message */}
+        {/* Error */}
         {error && <Alert severity="error">{error}</Alert>}
 
-        {/* Teacher Cards */}
+        {/* Cards */}
         {loading ? (
-          <Box sx={{ textAlign: "center", py: 5 }}>
-            <CircularProgress />
-          </Box>
-        ) : filtered.length ? (
-          /* --- Paste this inside your render where you map tutors --- */
-filtered.slice(0, visibleCount).map((t) => (
-  <Card
-  key={t.id}
-  sx={{
-    mb: 3,
-    p: { xs: 2, md: 3 },
-    borderRadius: 3,
-    boxShadow: 3,
-    position: "relative",
-    overflow: "visible",
-    transition: "0.3s",
-    "&:hover": { boxShadow: 6, transform: "translateY(-4px)" },
-  }}
->
-  {/* ✅ Top Section — Avatar, Name, Verified Badge, Stars */}
-  <Grid
-    container
-    alignItems="center"
-    spacing={2}
-    sx={{
-      flexWrap: { xs: "wrap", md: "nowrap" },
-      mb: 2,
-    }}
-  >
-    {/* Profile Image */}
-    <Grid item xs={12} sm={3} sx={{ textAlign: "center" }}>
-      <Avatar
-        src={t.imageUrl}
-        alt={t.name}
-        sx={{
-          width: 80,
-          height: 80,
-          border: "3px solid #0d6efd",
-          margin: "auto",
-          boxShadow: 2,
-        }}
-      />
-    </Grid>
-
-    {/* Name, Qualification, Verification, Stars */}
-    <Grid item xs={12} sm={9}>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: "6px",
-        }}
-      >
-        <Typography variant="h6" fontWeight={700} color="#0d6efd">
-          {t.name}
-        </Typography>
-
-        {t.verified?.toLowerCase() === "yes" && (
-          <Box
-            sx={{
-              backgroundColor: "#4caf50",
-              color: "white",
-              px: 1,
-              py: 0.2,
-              borderRadius: "12px",
-              fontSize: "12px",
-              display: "flex",
-              alignItems: "center",
-              gap: 0.5,
-            }}
-          >
-            <CheckCircle fontSize="small" /> Verified
-          </Box>
-        )}
-
-        <Box sx={{ color: "gold", ml: "auto" }}>{"⭐".repeat(5)}</Box>
-      </Box>
-
-      {t.qualification && (
-        <Typography variant="body2" color="text.secondary">
-          {t.qualification}
-        </Typography>
-      )}
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        {t.city}
-      </Typography>
-    </Grid>
-  </Grid>
-
-  {/* ✅ Subjects and Preferred Areas */}
-  <Grid container spacing={2} alignItems="flex-start">
-    {/* Subjects Section */}
-    <Grid item xs={12} md={6}>
-      <Typography
-        variant="subtitle1"
-        sx={{ fontWeight: "700", color: "#0d6efd", mb: 1 }}
-      >
-        SUBJECTS
-      </Typography>
-
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-          gap: "6px 12px",
-          wordWrap: "break-word",
-        }}
-      >
-        {t.subject
-          ?.split(",")
-          .map((s) => s.trim())
-          .filter(Boolean)
-          .map((s, i) => (
-            <Typography
-              key={i}
-              variant="body2"
-              sx={{ display: "flex", alignItems: "center", gap: "4px" }}
-            >
-              <span>⭐</span> {s}
-            </Typography>
-          ))}
-      </Box>
-    </Grid>
-
-    {/* Vertical Divider */}
-    <Grid
-      item
-      md={0.1}
-      sx={{
-        display: { xs: "none", md: "block" },
-        borderLeft: "2px solid #000",
-        height: "100%",
-        mx: 1,
-      }}
-    />
-
-    {/* Preferred Areas Section */}
-    <Grid item xs={12} md={5}>
-      <Typography
-        variant="subtitle1"
-        sx={{ fontWeight: "700", color: "#0d6efd", mb: 1 }}
-      >
-        PREFERRED AREAS
-      </Typography>
-
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-        {Array.isArray(t.preferredAreas)
-          ? t.preferredAreas.map((area, i) => (
-              <Typography key={i} variant="body2">
-                📍 {area}
-              </Typography>
-            ))
-          : [t.Area1, t.Area2, t.Area3]
-              .filter(Boolean)
-              .map((area, i) => (
-                <Typography key={i} variant="body2">
-                  📍 {area}
-                </Typography>
-              ))}
-      </Box>
-    </Grid>
-  </Grid>
-
-  {/* ✅ Buttons */}
-  <Box
-    sx={{
-      display: "flex",
-      justifyContent: "flex-end",
-      mt: 2,
-      gap: 2,
-      flexWrap: "wrap",
-    }}
-  >
-    <Button
-      variant="contained"
-      sx={{
-        backgroundColor: "#0d6efd",
-        fontWeight: 700,
-        fontStyle: "italic",
-        "&:hover": { backgroundColor: "#0d6efd" },
-      }}
-      onClick={() => (window.location.href = `/teacher/${t.id}`)}
-    >
-      VIEW DETAILS
-    </Button>
-    <Button
-      variant="contained"
-      sx={{
-        backgroundColor: "#4caf50",
-        fontWeight: 700,
-        fontStyle: "italic",
-        "&:hover": { backgroundColor: "#4caf50" },
-      }}
-      onClick={() => (window.location.href = `/hire/${t.id}`)}
-    >
-      HIRE ME
-    </Button>
-  </Box>
-</Card>
-
-
-
-
-          ))
-        ) : (
+          <Box sx={{ textAlign: "center", py: 5 }}><CircularProgress /></Box>
+        ) : filtered.length === 0 ? (
           <Typography align="center" color="text.secondary" sx={{ mt: 3 }}>
             No teachers found matching your filters.
           </Typography>
+        ) : (
+          filtered.slice(0, visibleCount).map((t) => (
+            <Card key={t.id} sx={{ mb: 3, p: 2, borderRadius: 3, boxShadow: 3 }}>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={12} sm={3}>
+                  <Avatar src={t.imageUrl || ""} alt={t.name} sx={{ width: 80, height: 80 }} />
+                </Grid>
+                <Grid item xs={12} sm={9}>
+                  <Typography variant="h6" fontWeight={700} color="#0d6efd">{t.name}</Typography>
+                  {t.verified?.toLowerCase() === "yes" && <CheckCircle color="success" />}
+                  <Typography variant="body2" color="text.secondary">{t.qualification}</Typography>
+                  <Typography variant="body2" color="text.secondary">{t.city}</Typography>
+                </Grid>
+              </Grid>
+
+              <Grid container spacing={2} sx={{ mt: 1 }}>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle2">SUBJECTS</Typography>
+                  {t.subject?.split(",").map((s, i) => (
+                    <Typography key={i} variant="body2">⭐ {s.trim()}</Typography>
+                  ))}
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle2">PREFERRED AREAS</Typography>
+                  {[t.Area1, t.Area2, t.Area3].filter(Boolean).map((a, i) => (
+                    <Typography key={i} variant="body2">📍 {a}</Typography>
+                  ))}
+                </Grid>
+              </Grid>
+
+              <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
+                <Button variant="contained" color="primary" onClick={() => window.location.href=`/teacher/${t.id}`}>VIEW DETAILS</Button>
+                <Button variant="contained" color="success" onClick={() => window.location.href=`/hire/${t.id}`}>HIRE ME</Button>
+              </Box>
+            </Card>
+          ))
         )}
 
         {/* Load More */}
         {!loading && visibleCount < filtered.length && (
           <Box sx={{ textAlign: "center", mt: 2 }}>
-            <Button
-              variant="contained"
-              onClick={handleLoadMore}
-              sx={{
-                backgroundColor: "#0d6efd",
-                borderRadius: 3,
-                px: 4,
-                py: 1,
-                "&:hover": { backgroundColor: "#0b5ed7" },
-              }}
-            >
-              Load More
-            </Button>
+            <Button variant="contained" onClick={handleLoadMore}>Load More</Button>
           </Box>
         )}
       </Container>
