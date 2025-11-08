@@ -1,8 +1,10 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import TutorForm from "./components/TutorForm";
-import TeacherDirectory from "./pages/TeacherDirectory";
+import TeacherDirectory from "./components/TeacherDirectory";
 import AboutUs from "./pages/AboutUs";
+import TeacherProfile from "./components/TeacherProfile";
+import HireForm from "./components/HireForm";
 import "./App.css";
 import {
   ThemeProvider,
@@ -239,6 +241,8 @@ function App() {
           />
           <Route path="/teachers" element={<TeacherDirectory />} />
           <Route path="/about" element={<AboutUs />} />
+          <Route path="/teacher/:id" element={<TeacherProfile />} />
+          <Route path="/hire/:id" element={<HireForm />} />
         </Routes>
 
         {/* Footer */}
