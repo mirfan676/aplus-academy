@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -22,7 +22,7 @@ const TeacherProfile = () => {
     const cached = localStorage.getItem("aplus_tutors_cache");
     if (cached) {
       const data = JSON.parse(cached).data;
-      const found = data.find((t) => t.id === Number(id));
+      const found = data.find((t) => Number(t.id) === Number(id));
       setTeacher(found);
     }
   }, [id]);
@@ -149,9 +149,11 @@ const TeacherProfile = () => {
           <Button
             variant="contained"
             color="success"
-            onClick={() => navigate(`/hire/${teacher.id}`)}
+            component={Link}
+            to={`/hire/${teacher.id}`}
+            state={{ teacherId: teacher.id, teacherName: teacher.name }}
           >
-            Hire {teacher.name.split(" ")[0]}
+            Hire {teacher.name?.split(" ")[0] || "Teacher"}
           </Button>
           <Button
             variant="outlined"

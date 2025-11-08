@@ -10,15 +10,18 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
 
-const RECAPTCHA_SITE_KEY = "6LcTdf8rAAAAAHUIrbcURlFEKtL4-4siGvJgYpxl"; // ✅ your existing key
+const RECAPTCHA_SITE_KEY = "6LcTdf8rAAAAAHUIrbcURlFEKtL4-4siGvJgYpxl";
 
 const HireForm = () => {
-  const { id } = useParams(); // ✅ correct param name
-  const [teacher, setTeacher] = useState(null);
+  const { id: urlId } = useParams();
+  const location = useLocation();
+  const teacherId = location.state?.teacherId || urlId || null;
+  const teacherNameFromState = location.state?.teacherName || null;
 
+  const [teacher, setTeacher] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -31,43 +34,45 @@ const HireForm = () => {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
-  // ✅ Fetch teacher info
+  // ✅ Fetch teacher info if ID exists
   useEffect(() => {
     const fetchTeacher = async () => {
+      if (!teacherId) {
+        // If we only have teacherName (no ID)
+        if (teacherNameFromState)
+          setTeacher({ Name: teacherNameFromState });
+        else
+          setTeacher({ Name: "Unknown Teacher" });
+        return;
+      }
+
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/teachers/${id}`
+          `${import.meta.env.VITE_API_BASE_URL}/teachers/${teacherId}`
         );
         if (!response.ok) throw new Error("Failed to fetch teacher data");
         const data = await response.json();
         setTeacher(data);
       } catch (err) {
         console.error("Error fetching teacher:", err);
-        setTeacher({ Name: "Unknown Teacher" });
+        setTeacher({ Name: teacherNameFromState || "Unknown Teacher" });
       }
     };
     fetchTeacher();
-  }, [id]);
+  }, [teacherId, teacherNameFromState]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleCaptcha = (value) => {
-    setCaptchaVerified(!!value);
-  };
+  const handleCaptcha = (value) => setCaptchaVerified(!!value);
 
-  // ✅ Limit to 2 requests per hour (based on localStorage)
+  // ✅ Limit 2 requests/hour
   const canSendRequest = () => {
     const history = JSON.parse(localStorage.getItem("hireRequests") || "[]");
     const now = Date.now();
-
-    // Keep only requests within the last hour
     const recent = history.filter((time) => now - time < 60 * 60 * 1000);
-
     if (recent.length >= 2) return false;
-
-    // Save updated history
     recent.push(now);
     localStorage.setItem("hireRequests", JSON.stringify(recent));
     return true;
@@ -78,20 +83,12 @@ const HireForm = () => {
     setSuccess("");
     setError("");
 
-    if (!captchaVerified) {
-      setError("⚠️ Please verify the CAPTCHA before submitting.");
-      return;
-    }
-
-    if (!canSendRequest()) {
-      setError("⏳ You have reached the limit of 2 requests per hour.");
-      return;
-    }
-
-    if (!formData.name || !formData.email || !formData.phone || !formData.message) {
-      setError("Please fill all fields.");
-      return;
-    }
+    if (!captchaVerified)
+      return setError("⚠️ Please verify the CAPTCHA before submitting.");
+    if (!canSendRequest())
+      return setError("⏳ You have reached the limit of 2 requests per hour.");
+    if (!formData.name || !formData.email || !formData.phone || !formData.message)
+      return setError("Please fill all fields.");
 
     setLoading(true);
 
@@ -103,8 +100,8 @@ const HireForm = () => {
           student_name: formData.name,
           student_email: formData.email,
           student_phone: formData.phone,
-          teacher_name: teacher?.Name || "Unknown",
-          teacher_id: id,
+          teacher_name: teacher?.Name || teacherNameFromState || "Unknown",
+          teacher_id: teacherId || "N/A",
           message: formData.message,
         },
         import.meta.env.VITE_EMAILJS_PUBLIC_KEY
@@ -124,7 +121,12 @@ const HireForm = () => {
   return (
     <Container maxWidth="sm" sx={{ py: 4 }}>
       <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
-        <Typography variant="h5" fontWeight={700} color="#0d6efd" sx={{ mb: 2 }}>
+        <Typography
+          variant="h5"
+          fontWeight={700}
+          color="#0d6efd"
+          sx={{ mb: 2 }}
+        >
           Hire {teacher ? teacher.Name : "Loading..."}
         </Typography>
 
@@ -183,7 +185,11 @@ const HireForm = () => {
             sx={{ backgroundColor: "#0d6efd", fontWeight: 700 }}
             disabled={loading}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : "Send Request"}
+            {loading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Send Request"
+            )}
           </Button>
         </Box>
       </Card>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, Suspense, useMemo } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -244,8 +245,17 @@ const TeacherDirectory = () => {
               </Grid>
 
               <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
-                <Button variant="contained" color="primary" onClick={() => window.location.href=`/teacher/${t.id}`}>VIEW DETAILS</Button>
-                <Button variant="contained" color="success" onClick={() => window.location.href=`/hire/${t.id}`}>HIRE ME</Button>
+                <Button variant="contained" sx={{ backgroundColor: "#29b554", "&:hover": { backgroundColor: "#218838" } }}
+                 onClick={() => window.location.href=`/teacher/${t.id}`}>VIEW DETAILS</Button>
+                <Button
+                  component={Link}
+                  to={`/hire/${t.id}`}
+                  state={{ teacherId: t.id, teacherName: t.name  }}  
+                  variant="contained"
+                  sx={{ backgroundColor: "#004aad", "&:hover": { backgroundColor: "#003a8d" } }}
+                >
+                  Hire ME
+                </Button>
               </Box>
             </Card>
           ))
