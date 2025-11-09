@@ -10,12 +10,12 @@ from fastapi import FastAPI, Form, File, Query, UploadFile, HTTPException, Reque
 from fastapi.middleware.cors import CORSMiddleware
 from google.oauth2.service_account import Credentials
 
-app = FastAPI(title="APlus Home Tutors API", version="2.7.0")
+app = FastAPI(title="APlus Home Tutors API", version="2.8.0")
 
 # --- CORS CONFIG ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Replace with your production domain
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -80,20 +80,23 @@ def get_ip_geolocation(ip: str):
 # --- ROUTES ---
 @app.get("/")
 def home():
-    return {"message": "✅ APlus Home Tutors API is running with province-district-city support!"}
+    return {"message": "✅ APlus Home Tutors API is running with province-district-tehsil support!"}
 
 @app.get("/locations")
 def get_locations():
-    """Return full hierarchy of provinces, districts, and areas."""
     return pakistan_data
 
 @app.get("/districts")
 def get_districts(province: str = Query(...)):
     return {"districts": list(pakistan_data.get(province, {}).keys())}
 
-@app.get("/cities")
-def get_cities(province: str = Query(...), district: str = Query(...)):
-    return {"cities": pakistan_data.get(province, {}).get(district, [])}
+@app.get("/tehsils")
+def get_tehsils(province: str = Query(...), district: str = Query(...)):
+    return {"tehsils": list(pakistan_data.get(province, {}).get(district, {}).keys())}
+
+@app.get("/areas")
+def get_areas(province: str = Query(...), district: str = Query(...), tehsil: str = Query(...)):
+    return {"areas": pakistan_data.get(province, {}).get(district, {}).get(tehsil, [])}
 
 # --- Tutor Registration Endpoint ---
 @app.post("/tutors/register")
@@ -133,9 +136,11 @@ async def register_tutor(
                 image_url = result["data"]["url"]
 
         # --- Determine default areas if missing ---
-        default_areas = pakistan_data.get(province, {}).get(district, [city])
+        default_areas = []
+        if province and district and tehsil:
+            default_areas = pakistan_data.get(province, {}).get(district, {}).get(tehsil, [])
         if not area1:
-            area1 = default_areas[0]
+            area1 = default_areas[0] if len(default_areas) > 0 else city
         if not area2:
             area2 = default_areas[1] if len(default_areas) > 1 else area1
         if not area3:
@@ -158,12 +163,12 @@ async def register_tutor(
         # --- Save to Google Sheet ---
         sheet.append_row([
             name,
-            subject if subject else major_subjects,  # Subject or major subjects
+            subject if subject else major_subjects,
             qualification,
             experience,
             province,
             district,
-            tehsil,  
+            tehsil,
             city,
             phone,
             bio,
@@ -174,8 +179,8 @@ async def register_tutor(
             image_url,
             latitude or "",
             longitude or "",
-            "No",   # Verified by default
-            "",     # Date Added (optional)
+            "No",  # Verified by default
+            "",    # Date Added
             profile_url or ""
         ])
 
@@ -184,7 +189,7 @@ async def register_tutor(
             "image_url": image_url,
             "province": province,
             "district": district,
-            "city": city,
+            "tehsil": tehsil,
             "areas": [area1, area2, area3],
             "coordinates": {"lat": latitude, "lng": longitude},
             "profile_url": profile_url or ""
@@ -209,9 +214,7 @@ def get_tutors():
                 continue
 
             def safe_str(val):
-                if val is None:
-                    return ""
-                return str(val).strip()
+                return str(val).strip() if val is not None else ""
 
             verified_tutors.append({
                 "Name": safe_str(r.get("Name")),
@@ -220,6 +223,7 @@ def get_tutors():
                 "Experience": safe_str(r.get("Experience")),
                 "Province": safe_str(r.get("Province")),
                 "District": safe_str(r.get("District")),
+                "Tehsil": safe_str(r.get("Tehsil")),
                 "City": safe_str(r.get("City")),
                 "Phone": safe_str(r.get("Phone")),
                 "Bio": safe_str(r.get("Bio")),
@@ -253,9 +257,7 @@ def get_teacher(teacher_id: int):
             raise HTTPException(status_code=404, detail="Teacher not found")
 
         def safe_str(val):
-            if val is None:
-                return ""
-            return str(val).strip()
+            return str(val).strip() if val is not None else ""
 
         return {
             "Name": safe_str(teacher.get("Name")),
@@ -264,6 +266,7 @@ def get_teacher(teacher_id: int):
             "Experience": safe_str(teacher.get("Experience")),
             "Province": safe_str(teacher.get("Province")),
             "District": safe_str(teacher.get("District")),
+            "Tehsil": safe_str(teacher.get("Tehsil")),
             "City": safe_str(teacher.get("City")),
             "Phone": safe_str(teacher.get("Phone")),
             "Bio": safe_str(teacher.get("Bio")),

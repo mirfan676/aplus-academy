@@ -1,135 +1,144 @@
-import React, { useState, useEffect } from "react";
-import { Box, TextField, MenuItem } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Box, TextField, MenuItem, CircularProgress } from "@mui/material";
 import axios from "axios";
 
 export default function LocationSelector({ onChange }) {
   const [locations, setLocations] = useState({});
-  const [province, setProvince] = useState("");
-  const [district, setDistrict] = useState("");
-  const [tehsil, setTehsil] = useState("");
-  const [area, setArea] = useState("");
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [tehsils, setTehsils] = useState([]);
+  const [areas, setAreas] = useState([]);
 
-  const [districtsList, setDistrictsList] = useState([]);
-  const [tehsilsList, setTehsilsList] = useState([]);
-  const [areasList, setAreasList] = useState([]);
+  const [selected, setSelected] = useState({
+    province: "",
+    district: "",
+    tehsil: "",
+    area1: "",
+    area2: "",
+    area3: "",
+  });
 
-  // Load locations.json from API
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const res = await axios.get("https://aplus-academy.onrender.com/locations");
+        const res = await axios.get("/locations");
         setLocations(res.data);
+        setProvinces(Object.keys(res.data));
       } catch (err) {
         console.error("Error fetching locations:", err);
+      } finally {
+        setLoading(false);
       }
     };
     fetchLocations();
   }, []);
 
-  // Update districts when province changes
   useEffect(() => {
-    if (province) {
-      const districts = Object.keys(locations[province] || {});
-      setDistrictsList(districts);
-      setDistrict("");
-      setTehsil("");
-      setArea("");
-      setTehsilsList([]);
-      setAreasList([]);
-      onChange({ province, district: "", tehsil: "", cityArea: "", latitude: "", longitude: "" });
+    if (selected.province) {
+      const dist = Object.keys(locations[selected.province] || {});
+      setDistricts(dist);
+      setSelected((prev) => ({
+        ...prev,
+        district: "",
+        tehsil: "",
+        area1: "",
+        area2: "",
+        area3: "",
+      }));
+      setTehsils([]);
+      setAreas([]);
     }
-  }, [province, locations]);
+  }, [selected.province, locations]);
 
-  // Update tehsils when district changes
   useEffect(() => {
-    if (province && district) {
-      const tehsils = Object.keys(locations[province][district] || {});
-      setTehsilsList(tehsils);
-      setTehsil("");
-      setArea("");
-      setAreasList([]);
-      onChange({ province, district, tehsil: "", cityArea: "", latitude: "", longitude: "" });
+    if (selected.province && selected.district) {
+      const ths = Object.keys(
+        locations[selected.province][selected.district] || {}
+      );
+      setTehsils(ths);
+      setSelected((prev) => ({
+        ...prev,
+        tehsil: "",
+        area1: "",
+        area2: "",
+        area3: "",
+      }));
+      setAreas([]);
     }
-  }, [district, province, locations]);
+  }, [selected.district, selected.province, locations]);
 
-  // Update areas when tehsil changes
   useEffect(() => {
-    if (province && district && tehsil) {
-      const areas = locations[province][district][tehsil] || [];
-      setAreasList(areas);
-      setArea("");
-      onChange({ province, district, tehsil, cityArea: "", latitude: "", longitude: "" });
+    if (selected.province && selected.district && selected.tehsil) {
+      const ar =
+        locations[selected.province][selected.district][selected.tehsil] || [];
+      setAreas(ar);
+      setSelected((prev) => ({
+        ...prev,
+        area1: ar[0] || "",
+        area2: ar[1] || "",
+        area3: ar[2] || "",
+      }));
     }
-  }, [tehsil, district, province, locations]);
+  }, [selected.tehsil, selected.district, selected.province, locations]);
 
-  // Update selected area
+  // Notify parent
   useEffect(() => {
-    if (province && district && tehsil && area) {
-      onChange({ province, district, tehsil, cityArea: area, latitude: "", longitude: "" });
-    }
-  }, [area, tehsil, district, province, onChange]);
+    onChange({
+      province: selected.province,
+      district: selected.district,
+      tehsil: selected.tehsil,
+      area1: selected.area1,
+      area2: selected.area2,
+      area3: selected.area3,
+    });
+  }, [selected, onChange]);
+
+  if (loading) return <CircularProgress />;
 
   return (
-    <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2 }}>
-      {/* Province */}
+    <Box display="flex" flexDirection="column" gap={2}>
       <TextField
         select
         label="Province"
-        value={province}
-        onChange={(e) => setProvince(e.target.value)}
+        value={selected.province}
+        onChange={(e) => setSelected({ ...selected, province: e.target.value })}
         fullWidth
       >
-        {Object.keys(locations).map((prov) => (
-          <MenuItem key={prov} value={prov}>
-            {prov}
+        {provinces.map((p) => (
+          <MenuItem key={p} value={p}>
+            {p}
           </MenuItem>
         ))}
       </TextField>
 
-      {/* District */}
       <TextField
         select
         label="District"
-        value={district}
-        onChange={(e) => setDistrict(e.target.value)}
+        value={selected.district}
+        onChange={(e) => setSelected({ ...selected, district: e.target.value })}
         fullWidth
-        disabled={!districtsList.length}
+        disabled={!selected.province}
       >
-        {districtsList.map((dist) => (
-          <MenuItem key={dist} value={dist}>
-            {dist}
+        {districts.map((d) => (
+          <MenuItem key={d} value={d}>
+            {d}
           </MenuItem>
         ))}
       </TextField>
 
-      {/* Tehsil */}
       <TextField
         select
         label="Tehsil"
-        value={tehsil}
-        onChange={(e) => setTehsil(e.target.value)}
+        value={selected.tehsil}
+        onChange={(e) => setSelected({ ...selected, tehsil: e.target.value })}
         fullWidth
-        disabled={!tehsilsList.length}
+        disabled={!selected.district}
       >
-        {tehsilsList.map((t) => (
+        {tehsils.map((t) => (
           <MenuItem key={t} value={t}>
             {t}
-          </MenuItem>
-        ))}
-      </TextField>
-
-      {/* Area */}
-      <TextField
-        select
-        label="Area"
-        value={area}
-        onChange={(e) => setArea(e.target.value)}
-        fullWidth
-        disabled={!areasList.length}
-      >
-        {areasList.map((a) => (
-          <MenuItem key={a} value={a}>
-            {a}
           </MenuItem>
         ))}
       </TextField>

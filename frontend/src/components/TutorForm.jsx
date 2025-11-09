@@ -34,7 +34,13 @@ const qualificationsList = [
 ];
 
 const higherEducation = ["BS", "MSc", "MA", "MS/MPhil", "PhD"];
-const subjectsList = ["Computer Science", "Mathematics", "Physics", "Economics", "Biology"];
+const subjectsList = [
+  "Computer Science",
+  "Mathematics",
+  "Physics",
+  "Economics",
+  "Biology",
+];
 
 export default function TutorRegistration() {
   const [formData, setFormData] = useState({
@@ -54,18 +60,18 @@ export default function TutorRegistration() {
 
   const [location, setLocation] = useState({
     province: "",
-    district: "",
-    tehsil: "",
-    city: "",
-    area: "",
-    latitude: "",
-    longitude: "",
+  district: "",
+  tehsil: "",
+  area1: "",
+  area2: "",
+  area3: "",
   });
 
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [captchaVerified, setCaptchaVerified] = useState(false);
 
+  // Update subject type based on qualification
   useEffect(() => {
     setShowSubjectDropdown(higherEducation.includes(formData.qualification));
     if (!higherEducation.includes(formData.qualification)) {
@@ -97,13 +103,13 @@ export default function TutorRegistration() {
 
     setLoading(true);
 
-    const submissionData = new FormData();
-    Object.entries(formData).forEach(([k, v]) => submissionData.append(k, v));
-    Object.entries(location).forEach(([k, v]) => submissionData.append(k, v));
-
     try {
+      const submissionData = new FormData();
+      Object.entries(formData).forEach(([k, v]) => submissionData.append(k, v));
+      Object.entries(location).forEach(([k, v]) => submissionData.append(k, v));
+
       const res = await axios.post(
-        "https://aplus-academy.onrender.com/tutors/register",
+        "/tutors/register",
         submissionData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
@@ -126,10 +132,9 @@ export default function TutorRegistration() {
           province: "",
           district: "",
           tehsil: "",
-          city: "",
-          area: "",
-          latitude: "",
-          longitude: "",
+          area1: "",
+          area2: "",
+          area3: "",
         });
       } else setMessage("⚠️ Failed to submit. Try again.");
     } catch (err) {
@@ -194,6 +199,7 @@ export default function TutorRegistration() {
                 )}
               </Box>
 
+              {/* Basic Info */}
               <TextField
                 label="Full Name"
                 name="name"
@@ -221,6 +227,7 @@ export default function TutorRegistration() {
                 ))}
               </TextField>
 
+              {/* Subject / Major Subjects */}
               {showSubjectDropdown ? (
                 <TextField
                   select
@@ -277,6 +284,7 @@ export default function TutorRegistration() {
                 margin="normal"
               />
 
+              {/* Location Selector */}
               <Typography variant="subtitle1" fontWeight={700} mt={2} mb={1}>
                 📍 Location
               </Typography>
@@ -284,6 +292,7 @@ export default function TutorRegistration() {
                 onChange={(loc) => setLocation({ ...location, ...loc })}
               />
 
+              {/* Bio */}
               <TextField
                 name="bio"
                 label="Tutor Bio"
@@ -296,6 +305,7 @@ export default function TutorRegistration() {
                 placeholder="Describe your teaching experience"
               />
 
+              {/* Captcha */}
               <Box textAlign="center" mt={3} mb={2}>
                 <ReCAPTCHA sitekey={RECAPTCHA_SITE_KEY} onChange={handleCaptcha} />
               </Box>
