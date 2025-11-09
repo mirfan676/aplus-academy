@@ -10,7 +10,7 @@ from fastapi import FastAPI, Form, File, Query, UploadFile, HTTPException, Reque
 from fastapi.middleware.cors import CORSMiddleware
 from google.oauth2.service_account import Credentials
 
-app = FastAPI(title="APlus Home Tutors API", version="2.8.0")
+app = FastAPI(title="APlus Home Tutors API", version="3.0.0")
 
 # --- CORS CONFIG ---
 app.add_middleware(
@@ -31,7 +31,7 @@ SHEET_ID = "1wBmbImTrliHEIKk5YxM5PN4eOfkz6XLS28bjxRjmZvY"
 sheet = gspread_client.open_by_key(SHEET_ID).sheet1
 
 # --- IMGBB CONFIG ---
-IMGBB_API_KEY = "5b09de418289beb41cde5d28d5934047"
+IMGBB_API_KEY = os.environ.get("IMGBB_API_KEY", "")
 
 # --- LOAD LOCATIONS JSON ---
 LOCATIONS_FILE = os.path.join(os.path.dirname(__file__), "locations.json")
@@ -136,9 +136,7 @@ async def register_tutor(
                 image_url = result["data"]["url"]
 
         # --- Determine default areas if missing ---
-        default_areas = []
-        if province and district and tehsil:
-            default_areas = pakistan_data.get(province, {}).get(district, {}).get(tehsil, [])
+        default_areas = pakistan_data.get(province, {}).get(district, {}).get(tehsil, [])
         if not area1:
             area1 = default_areas[0] if len(default_areas) > 0 else city
         if not area2:

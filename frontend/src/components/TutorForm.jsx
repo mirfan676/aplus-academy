@@ -17,7 +17,6 @@ import {
   Link as MuiLink,
 } from "@mui/material";
 import ReCAPTCHA from "react-google-recaptcha";
-import LocationSelector from "./LocationSelector";
 
 const RECAPTCHA_SITE_KEY = "6LcTdf8rAAAAAHUIrbcURlFEKtL4-4siGvJgYpxl";
 
@@ -58,26 +57,81 @@ export default function TutorRegistration() {
   const [majorSubjectsList, setMajorSubjectsList] = useState([]);
   const [showSubjectDropdown, setShowSubjectDropdown] = useState(false);
 
+  const [locationsData, setLocationsData] = useState({});
   const [location, setLocation] = useState({
     province: "",
-  district: "",
-  tehsil: "",
-  area1: "",
-  area2: "",
-  area3: "",
+    district: "",
+    tehsil: "",
+    area1: "",
+    area2: "",
+    area3: "",
   });
+
+  const [districtsList, setDistrictsList] = useState([]);
+  const [tehsilsList, setTehsilsList] = useState([]);
+  const [areasList, setAreasList] = useState([]);
 
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [captchaVerified, setCaptchaVerified] = useState(false);
 
-  // Update subject type based on qualification
+  // --- Fetch locations on mount ---
+  useEffect(() => {
+    axios
+      .get("/locations")
+      .then((res) => setLocationsData(res.data.Punjab || {}))
+      .catch((err) => console.error("Error fetching locations:", err));
+  }, []);
+
+  // --- Update subject type based on qualification ---
   useEffect(() => {
     setShowSubjectDropdown(higherEducation.includes(formData.qualification));
     if (!higherEducation.includes(formData.qualification)) {
       setFormData({ ...formData, subject: "" });
     }
   }, [formData.qualification]);
+
+  // --- Update districts when province changes ---
+  useEffect(() => {
+    if (location.province && locationsData[location.province]) {
+      const districts = Object.keys(locationsData[location.province]);
+      setDistrictsList(districts);
+    } else {
+      setDistrictsList([]);
+    }
+    setLocation((prev) => ({ ...prev, district: "", tehsil: "", area1: "", area2: "", area3: "" }));
+    setTehsilsList([]);
+    setAreasList([]);
+  }, [location.province, locationsData]);
+
+  // --- Update tehsils when district changes ---
+  useEffect(() => {
+    if (location.province && location.district) {
+      const tehsils = Object.keys(locationsData[location.province][location.district] || {});
+      setTehsilsList(tehsils);
+    } else {
+      setTehsilsList([]);
+    }
+    setLocation((prev) => ({ ...prev, tehsil: "", area1: "", area2: "", area3: "" }));
+    setAreasList([]);
+  }, [location.district, location.province, locationsData]);
+
+  // --- Update areas when tehsil changes ---
+  useEffect(() => {
+    if (location.province && location.district && location.tehsil) {
+      const areas = locationsData[location.province][location.district][location.tehsil] || [];
+      setAreasList(areas);
+      setLocation((prev) => ({
+        ...prev,
+        area1: areas[0] || "",
+        area2: areas[1] || areas[0] || "",
+        area3: areas[2] || areas[0] || "",
+      }));
+    } else {
+      setAreasList([]);
+      setLocation((prev) => ({ ...prev, area1: "", area2: "", area3: "" }));
+    }
+  }, [location.tehsil, location.district, location.province, locationsData]);
 
   const handleCaptcha = (value) => setCaptchaVerified(!!value);
 
@@ -94,6 +148,11 @@ export default function TutorRegistration() {
     setMajorSubjectsList(words);
   };
 
+  const handleLocationChange = (e) => {
+    const { name, value } = e.target;
+    setLocation((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
@@ -102,17 +161,14 @@ export default function TutorRegistration() {
     if (!formData.agree) return setMessage("⚠️ Please agree to Terms.");
 
     setLoading(true);
-
     try {
       const submissionData = new FormData();
       Object.entries(formData).forEach(([k, v]) => submissionData.append(k, v));
       Object.entries(location).forEach(([k, v]) => submissionData.append(k, v));
 
-      const res = await axios.post(
-        "/tutors/register",
-        submissionData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
+      const res = await axios.post("/tutors/register", submissionData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       if (res.status === 200) {
         setMessage("✅ Tutor registered successfully!");
@@ -288,9 +344,110 @@ export default function TutorRegistration() {
               <Typography variant="subtitle1" fontWeight={700} mt={2} mb={1}>
                 📍 Location
               </Typography>
-              <LocationSelector
-                onChange={(loc) => setLocation({ ...location, ...loc })}
-              />
+
+              <TextField
+                select
+                label="Province"
+                name="province"
+                value={location.province}
+                onChange={handleLocationChange}
+                required
+                fullWidth
+                margin="normal"
+              >
+                {Object.keys(locationsData).map((prov) => (
+                  <MenuItem key={prov} value={prov}>
+                    {prov}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <TextField
+                select
+                label="District"
+                name="district"
+                value={location.district}
+                onChange={handleLocationChange}
+                required
+                fullWidth
+                margin="normal"
+                disabled={!districtsList.length}
+              >
+                {districtsList.map((dist) => (
+                  <MenuItem key={dist} value={dist}>
+                    {dist}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <TextField
+                select
+                label="Tehsil"
+                name="tehsil"
+                value={location.tehsil}
+                onChange={handleLocationChange}
+                required
+                fullWidth
+                margin="normal"
+                disabled={!tehsilsList.length}
+              >
+                {tehsilsList.map((t) => (
+                  <MenuItem key={t} value={t}>
+                    {t}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <TextField
+                select
+                label="Area 1"
+                name="area1"
+                value={location.area1}
+                onChange={handleLocationChange}
+                fullWidth
+                margin="normal"
+                disabled={!areasList.length}
+              >
+                {areasList.map((a, idx) => (
+                  <MenuItem key={idx} value={a}>
+                    {a}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <TextField
+                select
+                label="Area 2"
+                name="area2"
+                value={location.area2}
+                onChange={handleLocationChange}
+                fullWidth
+                margin="normal"
+                disabled={!areasList.length}
+              >
+                {areasList.map((a, idx) => (
+                  <MenuItem key={idx} value={a}>
+                    {a}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <TextField
+                select
+                label="Area 3"
+                name="area3"
+                value={location.area3}
+                onChange={handleLocationChange}
+                fullWidth
+                margin="normal"
+                disabled={!areasList.length}
+              >
+                {areasList.map((a, idx) => (
+                  <MenuItem key={idx} value={a}>
+                    {a}
+                  </MenuItem>
+                ))}
+              </TextField>
 
               {/* Bio */}
               <TextField

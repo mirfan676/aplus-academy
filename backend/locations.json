@@ -1,238 +1,238 @@
 {
   "Punjab": {
     "Lahore": {
-      "Cantonment": ["Cantonment", "Defence", "Garden Town"],
-      "City": ["Anarkali", "Ichhra", "Gulberg"],
-      "Model Town": ["Model Town", "Johar Town", "Shadman"],
-      "Raiwind": ["Raiwind", "Prem Nagar"],
-      "Shalimar": ["Shalimar", "Gulshan-e-Ravi", "Sabzazar"]
+      "Cantonment": ["Area1", "Area2"],
+      "City": ["Area1", "Area2"],
+      "Model Town": ["Area1", "Area2"],
+      "Raiwind": ["Area1", "Area2"],
+      "Shalimar": ["Area1", "Area2"]
     },
     "Kasur": {
-      "Chunian": ["Chunian", "Bhagtanwala"],
-      "Kasur": ["Kasur City", "Kot Choudhry"],
-      "Kot Radha Kishan": ["Kot Radha Kishan"],
-      "Pattoki": ["Pattoki", "Rasulpur"]
+      "Chunian": ["Area1", "Area2"],
+      "Kasur": ["Area1", "Area2"],
+      "Kot Radha Kishan": ["Area1", "Area2"],
+      "Pattoki": ["Area1", "Area2"]
     },
     "Sheikhupura": {
-      "Ferozewala": ["Ferozewala", "Rasulpur"],
-      "Muridke": ["Muridke", "Chak No. 27"],
-      "Safdarabad": ["Safdarabad"],
-      "Sheikhupura": ["Sheikhupura City", "Hadyana"],
-      "Sharakpura": ["Sharakpura"]
+      "Ferozewala": ["Area1", "Area2"],
+      "Muridke": ["Area1", "Area2"],
+      "Safdarabad": ["Area1", "Area2"],
+      "Sheikhupura": ["Area1", "Area2"],
+      "Sharakpura": ["Area1", "Area2"]
     },
     "Nankana Sahib": {
-      "Nankana Sahib": ["Nankana City", "Warburton"],
-      "Sangla Hill": ["Sangla Hill"],
-      "Shah Kot": ["Shah Kot"]
+      "Nankana Sahab": ["Area1", "Area2"],
+      "Sangla Hill": ["Area1", "Area2"],
+      "Shah Kot": ["Area1", "Area2"]
     },
     "Gujrat": {
-      "Gujrat": ["Gujrat City", "Sardarabad"],
-      "Kharian": ["Kharian", "Dinga"],
-      "Sarai Alamgir": ["Sarai Alamgir"],
-      "Jalalpur Jattan": ["Jalalpur Jattan"],
-      "Kunjah": ["Kunjah"]
+      "Gujrat": ["Area1", "Area2"],
+      "Kharian": ["Area1", "Area2"],
+      "Sarai Alamgir": ["Area1", "Area2"],
+      "Jalalpur Jattan": ["Area1", "Area2"],
+      "Kunja": ["Area1", "Area2"]
     },
     "Mandi Bahauddin": {
-      "Malakwal": ["Malakwal"],
-      "Mandi Bahauddin": ["Mandi Bahauddin City"],
-      "Phalia": ["Phalia"]
+      "Malakwal": ["Area1", "Area2"],
+      "Mandi Bahauddin": ["Area1", "Area2"],
+      "Phalia": ["Area1", "Area2"]
     },
     "Hafizabad": {
-      "Hafizabad": ["Hafizabad City"],
-      "Pindi Bhattian": ["Pindi Bhattian"]
+      "Hafizabad": ["Area1", "Area2"],
+      "Pindi Bhattian": ["Area1", "Area2"]
     },
     "Wazirabad": {
-      "Wazirabad": ["Wazirabad City"],
-      "Alipur Chatha": ["Alipur Chatha"]
+      "Wazirabad": ["Area1", "Area2"],
+      "Alipur Chatta": ["Area1", "Area2"]
     },
     "Gujranwala": {
-      "Gujranwala City": ["Gujranwala City"],
-      "Gujranwala Saddar": ["Gujranwala Saddar"],
-      "Kamoke": ["Kamoke"],
-      "Nowshera Virkan": ["Nowshera"]
+      "Gujranwala City": ["Area1", "Area2"],
+      "Gujranwala Saddar": ["Area1", "Area2"],
+      "Kamoke": ["Area1", "Area2"],
+      "Nowshera": ["Area1", "Area2"]
     },
     "Narowal": {
-      "Narowal": ["Narowal City"],
-      "Shakkargarh": ["Shakkargarh"],
-      "Zafarwal": ["Zafarwal"]
+      "Narowal": ["Area1", "Area2"],
+      "Shakkargarh": ["Area1", "Area2"],
+      "Zaffarwal": ["Area1", "Area2"]
     },
     "Sialkot": {
-      "Daska": ["Daska City"],
-      "Pasrur": ["Pasrur"],
-      "Sambrial": ["Sambrial"],
-      "Sialkot": ["Sialkot City"]
+      "Daska": ["Area1", "Area2"],
+      "Pasrur": ["Area1", "Area2"],
+      "Sambrial": ["Area1", "Area2"],
+      "Sialkot": ["Area1", "Area2"]
     },
     "Faisalabad": {
-      "Chak Jhumra": ["Chak Jhumra"],
-      "Faisalabad": ["Faisalabad City"],
-      "Faisalabad Saddar": ["Faisalabad Saddar"],
-      "Jaranwala": ["Jaranwala"],
-      "Samundri": ["Samundri"],
-      "Tandlianwala": ["Tandlianwala"]
+      "Chak Jhumra": ["Area1", "Area2"],
+      "Faisalabad": ["Area1", "Area2"],
+      "Faisalabad Saddar": ["Area1", "Area2"],
+      "Jaranwala": ["Area1", "Area2"],
+      "Samundri": ["Area1", "Area2"],
+      "Tandlianwala": ["Area1", "Area2"]
     },
     "Jhang": {
-      "Jhang": ["Jhang City"],
-      "Shorkot": ["Shorkot"],
-      "Ahmadpur Sial": ["Ahmadpur Sial"],
-      "Athara Hazari": ["Athara Hazari"],
-      "Mandi Shah Jeewna": ["Mandi Shah Jeewna"]
+      "Jhang": ["Area1", "Area2"],
+      "Shorkot": ["Area1", "Area2"],
+      "Ahmadpur Sial": ["Area1", "Area2"],
+      "Athara Hazari": ["Area1", "Area2"],
+      "Mandi Shah Jeewna": ["Area1", "Area2"]
     },
     "Chiniot": {
-      "Bhawana": ["Bhawana"],
-      "Chiniot": ["Chiniot City"],
-      "Lalian": ["Lalian"]
+      "Bhawana": ["Area1", "Area2"],
+      "Chiniot": ["Area1", "Area2"],
+      "Lalian": ["Area1", "Area2"]
     },
     "Toba Tek Singh": {
-      "Gojra": ["Gojra"],
-      "Kamalia": ["Kamalia"],
-      "Pir Mahal": ["Pir Mahal"],
-      "Toba Tek Singh": ["Toba City"]
+      "Gojra": ["Area1", "Area2"],
+      "Kamalia": ["Area1", "Area2"],
+      "Pir Mahal": ["Area1", "Area2"],
+      "Toba Tek Singh": ["Area1", "Area2"]
     },
     "Sargodha": {
-      "Bhalwal": ["Bhalwal"],
-      "Bhera": ["Bhera"],
-      "Kot Momin": ["Kot Momin"],
-      "Sahiwal": ["Sahiwal City"],
-      "Sargodha": ["Sargodha City"],
-      "Shahpur": ["Shahpur"],
-      "Sillanwala": ["Sillanwala"]
+      "Bhalwal": ["Area1", "Area2"],
+      "Bhera": ["Area1", "Area2"],
+      "Kot Momin": ["Area1", "Area2"],
+      "Sahiwal": ["Area1", "Area2"],
+      "Sargodha": ["Area1", "Area2"],
+      "Shahpur": ["Area1", "Area2"],
+      "Sillanwala": ["Area1", "Area2"]
     },
     "Khushab": {
-      "Khushab": ["Khushab City"],
-      "Noorpur": ["Noorpur Thal"],
-      "Quaidabad": ["Quaidabad"],
-      "Naushera": ["Naushera (Wadi-e-Soon)"]
+      "Khushab": ["Area1", "Area2"],
+      "Noorpur": ["Area1", "Area2"],
+      "Quaidabad": ["Area1", "Area2"],
+      "Naushera (Wadi-e-Soon)": ["Area1", "Area2"]
     },
     "Mianwali": {
-      "Isakhel": ["Isakhel"],
-      "Mianwali": ["Mianwali City"],
-      "Piplan": ["Piplan"]
+      "Isakhel": ["Area1", "Area2"],
+      "Mianwali": ["Area1", "Area2"],
+      "Piplan": ["Area1", "Area2"]
     },
     "Bhakkar": {
-      "Bhakkar": ["Bhakkar City"],
-      "Darya Khan": ["Darya Khan"],
-      "Kaloorkot": ["Kaloorkot"],
-      "Mankera": ["Mankera"]
+      "Bhakkar": ["Area1", "Area2"],
+      "Darya Khan": ["Area1", "Area2"],
+      "Kaloorkot": ["Area1", "Area2"],
+      "Mankera": ["Area1", "Area2"]
     },
     "Sahiwal": {
-      "Chichawatni": ["Chichawatni"],
-      "Sahiwal": ["Sahiwal City"]
+      "Chicha Watni": ["Area1", "Area2"],
+      "Sahiwal": ["Area1", "Area2"]
     },
     "Okara": {
-      "Depalpur": ["Depalpur"],
-      "Okara": ["Okara City"],
-      "Renala Khurd": ["Renala Khurd"]
+      "Depalpur": ["Area1", "Area2"],
+      "Okara": ["Area1", "Area2"],
+      "Renala Khurd": ["Area1", "Area2"]
     },
     "Pakpattan": {
-      "Arifwala": ["Arifwala"],
-      "Pakpattan": ["Pakpattan City"]
+      "Arifwala": ["Area1", "Area2"],
+      "Pakpattan": ["Area1", "Area2"]
     },
     "Multan": {
-      "Jalalpur Pirwala": ["Jalalpur Pirwala"],
-      "Multan City": ["Multan City"],
-      "Multan Saddar": ["Multan Saddar"],
-      "Shujabad": ["Shujabad"]
+      "Jalalpur Pirwala": ["Area1", "Area2"],
+      "Multan City": ["Area1", "Area2"],
+      "Multan Saddar": ["Area1", "Area2"],
+      "ShujAbad": ["Area1", "Area2"]
     },
     "Vehari": {
-      "Burewala": ["Burewala"],
-      "Mailsi": ["Mailsi"],
-      "Vehari": ["Vehari City"]
+      "Burewala": ["Area1", "Area2"],
+      "Melsi": ["Area1", "Area2"],
+      "Vehari": ["Area1", "Area2"]
     },
     "Lodhran": {
-      "Dunyapur": ["Dunyapur"],
-      "Kahror Pacca": ["Kahror Pacca"],
-      "Lodhran": ["Lodhran City"]
+      "Duniyapur": ["Area1", "Area2"],
+      "Kahror Pacca": ["Area1", "Area2"],
+      "Lodhran": ["Area1", "Area2"]
     },
     "Khanewal": {
-      "Jahanian": ["Jahanian"],
-      "Kabirwala": ["Kabirwala"],
-      "Mian Channu": ["Mian Channu"],
-      "Khanewal": ["Khanewal City"]
+      "Jahanian": ["Area1", "Area2"],
+      "Kabirwala": ["Area1", "Area2"],
+      "Mian Channu": ["Area1", "Area2"],
+      "Khanewal": ["Area1", "Area2"]
     },
     "Dera Ghazi Khan": {
-      "Dera Ghazi Khan": ["D.G. Khan City"],
-      "De-excluded Area DG Khan": ["De-excluded Area"],
-      "Kot Chutta": ["Kot Chutta"]
+      "Dera Gazi Khan": ["Area1", "Area2"],
+      "De-excluded Area DG Khan": ["Area1", "Area2"],
+      "Kot Chutta": ["Area1", "Area2"]
     },
     "Rajanpur": {
-      "Jampur": ["Jampur"],
-      "Rajanpur": ["Rajanpur City"],
-      "Rojhan": ["Rojhan"],
-      "De-excluded Area Rajanpur": ["De-excluded Area"]
+      "Jampur": ["Area1", "Area2"],
+      "Rajanpur": ["Area1", "Area2"],
+      "Rojhan": ["Area1", "Area2"],
+      "De-excluded Area Rajhanpur": ["Area1", "Area2"]
     },
     "Taunsa Sharif": {
-      "Taunsa": ["Taunsa City"],
-      "Kohe Suleiman": ["Kohe Suleiman"],
-      "Vevoha": ["Vevoha"]
+      "Taunsa": ["Area1", "Area2"],
+      "Kohe Suleiman": ["Area1", "Area2"],
+      "Vevoha": ["Area1", "Area2"]
     },
     "Layyah": {
-      "Chaubara": ["Chaubara"],
-      "Karor Lal Esan": ["Karor Lal Esan"],
-      "Layyah": ["Layyah City"]
+      "Chaubara": ["Area1", "Area2"],
+      "Karor Lal Essan": ["Area1", "Area2"],
+      "Layyah": ["Area1", "Area2"]
     },
     "Kot Addu": {
-      "Kot Addu": ["Kot Addu City"],
-      "Chowk Sarwar Shaheed": ["Chowk Sarwar Shaheed"]
+      "Kot Addu": ["Area1", "Area2"],
+      "Chowk Sarwar Shaheed": ["Area1", "Area2"]
     },
-    "Muzaffargarh": {
-      "Alipur": ["Alipur"],
-      "Jatoi": ["Jatoi"],
-      "Muzaffargarh": ["Muzaffargarh City"]
+    "Muzaffar Garh": {
+      "Alipur": ["Area1", "Area2"],
+      "Jatoi": ["Area1", "Area2"],
+      "Muzaffar Garh": ["Area1", "Area2"]
     },
     "Rawalpindi": {
-      "Rawalpindi": ["Rawalpindi City"],
-      "Gujar Khan": ["Gujar Khan"],
-      "Kahuta": ["Kahuta"],
-      "Kallar Syedan": ["Kallar Syedan"],
-      "Taxila": ["Taxila"]
+      "Rawalpindi": ["Area1", "Area2"],
+      "Gujar Khan": ["Area1", "Area2"],
+      "Kahuta": ["Area1", "Area2"],
+      "Kallar Syedan": ["Area1", "Area2"],
+      "Texila": ["Area1", "Area2"]
     },
     "Jhelum": {
-      "Dina": ["Dina"],
-      "Jhelum": ["Jhelum City"],
-      "Pind Dadan Khan": ["Pind Dadan Khan"],
-      "Sohawa": ["Sohawa"]
+      "Dina": ["Area1", "Area2"],
+      "Jhelum": ["Area1", "Area2"],
+      "Pind Dadan Khan": ["Area1", "Area2"],
+      "Sohawa": ["Area1", "Area2"]
     },
     "Attock": {
-      "Attock": ["Attock City"],
-      "Fateh Jang": ["Fateh Jang"],
-      "Hassan Abdal": ["Hassan Abdal"],
-      "Hazro": ["Hazro"],
-      "Jand": ["Jand"],
-      "Pindi Gheb": ["Pindi Gheb"]
+      "Attock": ["Area1", "Area2"],
+      "Fateh Jang": ["Area1", "Area2"],
+      "Hassan Abdal": ["Area1", "Area2"],
+      "Hazro": ["Area1", "Area2"],
+      "Jand": ["Area1", "Area2"],
+      "Pindi Gheb": ["Area1", "Area2"]
     },
     "Murree": {
-      "Kotli Sattian": ["Kotli Sattian"],
-      "Murree": ["Murree City"]
+      "Kotli Sattian": ["Area1", "Area2"],
+      "Murree": ["Area1", "Area2"]
     },
     "Talagang": {
-      "Talagang": ["Talagang"],
-      "Lawa": ["Lawa"]
+      "Talang": ["Area1", "Area2"],
+      "Lawa": ["Area1", "Area2"]
     },
     "Chakwal": {
-      "Chakwal": ["Chakwal City"],
-      "Choa Saidan Shah": ["Choa Saidan Shah"],
-      "Kallar Kahar": ["Kallar Kahar"]
+      "Chakwal": ["Area1", "Area2"],
+      "Choa Shaidan Shah": ["Area1", "Area2"],
+      "Kallar Kahar": ["Area1", "Area2"]
     },
     "Bahawalpur": {
-      "Ahmedpur East": ["Ahmedpur East"],
-      "Bahawalpur City": ["Bahawalpur City"],
-      "Bahawalpur Saddar": ["Bahawalpur Saddar"],
-      "Hasilpur": ["Hasilpur"],
-      "Khairpur Tamewali": ["Khairpur Tamewali"],
-      "Yazman": ["Yazman"]
+      "Ahmedpur East": ["Area1", "Area2"],
+      "Bahawalpur City": ["Area1", "Area2"],
+      "Bahawalpur Saddar": ["Area1", "Area2"],
+      "Hasilpur": ["Area1", "Area2"],
+      "Khairpur Tamewali": ["Area1", "Area2"],
+      "Yazman": ["Area1", "Area2"]
     },
     "Rahim Yar Khan": {
-      "Khanpur": ["Khanpur"],
-      "Liaqatpur": ["Liaqatpur"],
-      "Rahim Yar Khan": ["Rahim Yar Khan City"],
-      "Sadiqabad": ["Sadiqabad"]
+      "Khanpur": ["Area1", "Area2"],
+      "Liaqatpur": ["Area1", "Area2"],
+      "Rahim yar Khan": ["Area1", "Area2"],
+      "Sadiqabad": ["Area1", "Area2"]
     },
     "Bahawalnagar": {
-      "Bahawalnagar": ["Bahawalnagar City"],
-      "Chishtian": ["Chishtian"],
-      "Fort Abbas": ["Fort Abbas"],
-      "Haroonabad": ["Haroonabad"],
-      "Minchinabad": ["Minchinabad"]
+      "Bahawalnagar": ["Area1", "Area2"],
+      "Chishtian": ["Area1", "Area2"],
+      "Fortabbas": ["Area1", "Area2"],
+      "Haroonabad": ["Area1", "Area2"],
+      "Minchinabad": ["Area1", "Area2"]
     }
   }
 }
