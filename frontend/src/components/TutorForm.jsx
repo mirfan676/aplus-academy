@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Box,
@@ -12,6 +12,8 @@ import {
   Avatar,
   FormControlLabel,
   Checkbox,
+  MenuItem,
+  Chip,
   Link as MuiLink,
 } from "@mui/material";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -19,11 +21,27 @@ import LocationSelector from "./LocationSelector";
 
 const RECAPTCHA_SITE_KEY = "6LcTdf8rAAAAAHUIrbcURlFEKtL4-4siGvJgYpxl";
 
+const qualificationsList = [
+  "O-Level",
+  "A-Level",
+  "FSc/F.A",
+  "BSc/BA",
+  "BS",
+  "MSc",
+  "MA",
+  "MS/MPhil",
+  "PhD",
+];
+
+const higherEducation = ["BS", "MSc", "MA", "MS/MPhil", "PhD"];
+const subjectsList = ["Computer Science", "Mathematics", "Physics", "Economics", "Biology"];
+
 export default function TutorRegistration() {
   const [formData, setFormData] = useState({
     name: "",
-    subject: "",
     qualification: "",
+    subject: "",
+    major_subjects: "",
     experience: "",
     phone: "",
     bio: "",
@@ -31,9 +49,13 @@ export default function TutorRegistration() {
     agree: false,
   });
 
+  const [majorSubjectsList, setMajorSubjectsList] = useState([]);
+  const [showSubjectDropdown, setShowSubjectDropdown] = useState(false);
+
   const [location, setLocation] = useState({
     province: "",
     district: "",
+    tehsil: "",
     city: "",
     area: "",
     latitude: "",
@@ -44,6 +66,13 @@ export default function TutorRegistration() {
   const [loading, setLoading] = useState(false);
   const [captchaVerified, setCaptchaVerified] = useState(false);
 
+  useEffect(() => {
+    setShowSubjectDropdown(higherEducation.includes(formData.qualification));
+    if (!higherEducation.includes(formData.qualification)) {
+      setFormData({ ...formData, subject: "" });
+    }
+  }, [formData.qualification]);
+
   const handleCaptcha = (value) => setCaptchaVerified(!!value);
 
   const handleChange = (e) => {
@@ -51,6 +80,12 @@ export default function TutorRegistration() {
     if (files) setFormData({ ...formData, image: files[0] });
     else if (type === "checkbox") setFormData({ ...formData, [name]: checked });
     else setFormData({ ...formData, [name]: value });
+  };
+
+  const handleMajorSubjectsChange = (e) => {
+    const words = e.target.value.trim().split(/\s+/).slice(0, 5);
+    setFormData({ ...formData, major_subjects: words.join(" ") });
+    setMajorSubjectsList(words);
   };
 
   const handleSubmit = async (e) => {
@@ -77,17 +112,20 @@ export default function TutorRegistration() {
         setMessage("✅ Tutor registered successfully!");
         setFormData({
           name: "",
-          subject: "",
           qualification: "",
+          subject: "",
+          major_subjects: "",
           experience: "",
           phone: "",
           bio: "",
           image: null,
           agree: false,
         });
+        setMajorSubjectsList([]);
         setLocation({
           province: "",
           district: "",
+          tehsil: "",
           city: "",
           area: "",
           latitude: "",
@@ -156,34 +194,96 @@ export default function TutorRegistration() {
                 )}
               </Box>
 
-              {/* Basic Info */}
-              {[
-                { name: "name", label: "Full Name" },
-                { name: "subject", label: "Subjects" },
-                { name: "qualification", label: "Qualification" },
-                { name: "experience", label: "Experience (Years)", type: "number" },
-                { name: "phone", label: "Contact Number" },
-              ].map(({ name, label, type = "text" }) => (
+              <TextField
+                label="Full Name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                fullWidth
+                margin="normal"
+              />
+
+              <TextField
+                select
+                label="Qualification"
+                name="qualification"
+                value={formData.qualification}
+                onChange={handleChange}
+                required
+                fullWidth
+                margin="normal"
+              >
+                {qualificationsList.map((q) => (
+                  <MenuItem key={q} value={q}>
+                    {q}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              {showSubjectDropdown ? (
                 <TextField
-                  key={name}
-                  name={name}
-                  label={label}
-                  type={type}
-                  value={formData[name]}
+                  select
+                  label="Subject"
+                  name="subject"
+                  value={formData.subject}
                   onChange={handleChange}
                   required
                   fullWidth
                   margin="normal"
-                />
-              ))}
+                >
+                  {subjectsList.map((sub) => (
+                    <MenuItem key={sub} value={sub}>
+                      {sub}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              ) : (
+                <Box>
+                  <TextField
+                    label="Major Subjects (Max 5 words)"
+                    name="major_subjects"
+                    value={formData.major_subjects}
+                    onChange={handleMajorSubjectsChange}
+                    fullWidth
+                    required
+                    margin="normal"
+                  />
+                  <Box sx={{ mt: 1, display: "flex", gap: 1, flexWrap: "wrap" }}>
+                    {majorSubjectsList.map((word, idx) => (
+                      <Chip key={idx} label={word} color="primary" size="small" />
+                    ))}
+                  </Box>
+                </Box>
+              )}
 
-              {/* Location */}
+              <TextField
+                label="Experience (Years)"
+                name="experience"
+                type="number"
+                value={formData.experience}
+                onChange={handleChange}
+                required
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                label="Contact Number"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+                fullWidth
+                margin="normal"
+              />
+
               <Typography variant="subtitle1" fontWeight={700} mt={2} mb={1}>
                 📍 Location
               </Typography>
-              <LocationSelector onChange={setLocation} />
+              <LocationSelector
+                onChange={(loc) => setLocation({ ...location, ...loc })}
+              />
 
-              {/* Bio */}
               <TextField
                 name="bio"
                 label="Tutor Bio"
@@ -196,7 +296,6 @@ export default function TutorRegistration() {
                 placeholder="Describe your teaching experience"
               />
 
-              {/* Captcha */}
               <Box textAlign="center" mt={3} mb={2}>
                 <ReCAPTCHA sitekey={RECAPTCHA_SITE_KEY} onChange={handleCaptcha} />
               </Box>

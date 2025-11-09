@@ -10,7 +10,7 @@ from fastapi import FastAPI, Form, File, Query, UploadFile, HTTPException, Reque
 from fastapi.middleware.cors import CORSMiddleware
 from google.oauth2.service_account import Credentials
 
-app = FastAPI(title="APlus Home Tutors API", version="2.6.0")
+app = FastAPI(title="APlus Home Tutors API", version="2.7.0")
 
 # --- CORS CONFIG ---
 app.add_middleware(
@@ -26,6 +26,7 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 creds_dict = json.loads(os.environ["GOOGLE_CREDENTIALS"])
 creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
 gspread_client = gspread.authorize(creds)
+
 SHEET_ID = "1wBmbImTrliHEIKk5YxM5PN4eOfkz6XLS28bjxRjmZvY"
 sheet = gspread_client.open_by_key(SHEET_ID).sheet1
 
@@ -94,15 +95,18 @@ def get_districts(province: str = Query(...)):
 def get_cities(province: str = Query(...), district: str = Query(...)):
     return {"cities": pakistan_data.get(province, {}).get(district, [])}
 
+# --- Tutor Registration Endpoint ---
 @app.post("/tutors/register")
 async def register_tutor(
     request: Request,
     name: str = Form(...),
     subject: str = Form(...),
+    major_subjects: str = Form(None),
     qualification: str = Form(...),
     experience: int = Form(...),
     province: str = Form(...),
     district: str = Form(...),
+    tehsil: str = Form(...),
     city: str = Form(...),
     phone: str = Form(...),
     bio: str = Form(...),
@@ -128,7 +132,7 @@ async def register_tutor(
             if result.get("success"):
                 image_url = result["data"]["url"]
 
-        # --- Determine areas if missing ---
+        # --- Determine default areas if missing ---
         default_areas = pakistan_data.get(province, {}).get(district, [city])
         if not area1:
             area1 = default_areas[0]
@@ -153,8 +157,26 @@ async def register_tutor(
 
         # --- Save to Google Sheet ---
         sheet.append_row([
-            name, subject, qualification, experience, province, district, city, phone, bio,
-            area1, area2, area3, exactLocation or "", image_url, latitude or "", longitude or "", profile_url or ""
+            name,
+            subject if subject else major_subjects,  # Subject or major subjects
+            qualification,
+            experience,
+            province,
+            district,
+            tehsil,  
+            city,
+            phone,
+            bio,
+            area1,
+            area2,
+            area3,
+            exactLocation or "",
+            image_url,
+            latitude or "",
+            longitude or "",
+            "No",   # Verified by default
+            "",     # Date Added (optional)
+            profile_url or ""
         ])
 
         return {
@@ -173,6 +195,7 @@ async def register_tutor(
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
+# --- Get All Verified Tutors ---
 @app.get("/tutors")
 def get_tutors():
     try:
@@ -216,6 +239,7 @@ def get_tutors():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching tutors: {str(e)}")
 
+# --- Get Single Teacher ---
 @app.get("/tutors/{teacher_id}")
 def get_teacher(teacher_id: int):
     try:

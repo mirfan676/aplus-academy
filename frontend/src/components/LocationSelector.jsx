@@ -1,156 +1,138 @@
 import React, { useState, useEffect } from "react";
+import { Box, TextField, MenuItem } from "@mui/material";
+import axios from "axios";
 
 export default function LocationSelector({ onChange }) {
-  const [locationData, setLocationData] = useState({});
+  const [locations, setLocations] = useState({});
   const [province, setProvince] = useState("");
   const [district, setDistrict] = useState("");
-  const [city, setCity] = useState("");
+  const [tehsil, setTehsil] = useState("");
   const [area, setArea] = useState("");
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
 
-  // Fetch locations.json from backend on mount
+  const [districtsList, setDistrictsList] = useState([]);
+  const [tehsilsList, setTehsilsList] = useState([]);
+  const [areasList, setAreasList] = useState([]);
+
+  // Load locations.json from API
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/locations`);
-        const data = await res.json();
-        setLocationData(data);
+        const res = await axios.get("https://aplus-academy.onrender.com/locations");
+        setLocations(res.data);
       } catch (err) {
-        console.error("Failed to fetch locations.json", err);
+        console.error("Error fetching locations:", err);
       }
     };
     fetchLocations();
   }, []);
 
-  // Notify parent about changes
+  // Update districts when province changes
   useEffect(() => {
-    onChange({
-      province,
-      district,
-      city,
-      area,
-      latitude,
-      longitude,
-      Area1: area || city || "",
-      Area2: "",
-      Area3: "",
-    });
-  }, [province, district, city, area, latitude, longitude]);
-
-  // Detect location via browser geolocation or fallback to IP
-  const detectLocation = async () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setLatitude(pos.coords.latitude.toFixed(6));
-          setLongitude(pos.coords.longitude.toFixed(6));
-        },
-        async () => {
-          try {
-            const res = await fetch("https://ipapi.co/json/");
-            const data = await res.json();
-            setLatitude(data.latitude?.toFixed(6) || "");
-            setLongitude(data.longitude?.toFixed(6) || "");
-            setProvince(data.region || "");
-            setDistrict(data.city || "");
-            setCity(data.city || "");
-          } catch (err) {
-            console.error("IP fallback failed", err);
-          }
-        }
-      );
+    if (province) {
+      const districts = Object.keys(locations[province] || {});
+      setDistrictsList(districts);
+      setDistrict("");
+      setTehsil("");
+      setArea("");
+      setTehsilsList([]);
+      setAreasList([]);
+      onChange({ province, district: "", tehsil: "", cityArea: "", latitude: "", longitude: "" });
     }
-  };
+  }, [province, locations]);
+
+  // Update tehsils when district changes
+  useEffect(() => {
+    if (province && district) {
+      const tehsils = Object.keys(locations[province][district] || {});
+      setTehsilsList(tehsils);
+      setTehsil("");
+      setArea("");
+      setAreasList([]);
+      onChange({ province, district, tehsil: "", cityArea: "", latitude: "", longitude: "" });
+    }
+  }, [district, province, locations]);
+
+  // Update areas when tehsil changes
+  useEffect(() => {
+    if (province && district && tehsil) {
+      const areas = locations[province][district][tehsil] || [];
+      setAreasList(areas);
+      setArea("");
+      onChange({ province, district, tehsil, cityArea: "", latitude: "", longitude: "" });
+    }
+  }, [tehsil, district, province, locations]);
+
+  // Update selected area
+  useEffect(() => {
+    if (province && district && tehsil && area) {
+      onChange({ province, district, tehsil, cityArea: area, latitude: "", longitude: "" });
+    }
+  }, [area, tehsil, district, province, onChange]);
 
   return (
-    <div style={{ marginTop: 16, marginBottom: 16 }}>
+    <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2 }}>
       {/* Province */}
-      <label>Province</label>
-      <select
+      <TextField
+        select
+        label="Province"
         value={province}
-        onChange={(e) => {
-          setProvince(e.target.value);
-          setDistrict("");
-          setCity("");
-        }}
-        className="w-full border rounded-md p-2"
+        onChange={(e) => setProvince(e.target.value)}
+        fullWidth
       >
-        <option value="">Select Province</option>
-        {Object.keys(locationData).map((p) => (
-          <option key={p} value={p}>{p}</option>
+        {Object.keys(locations).map((prov) => (
+          <MenuItem key={prov} value={prov}>
+            {prov}
+          </MenuItem>
         ))}
-      </select>
+      </TextField>
 
       {/* District */}
-      {province && (
-        <>
-          <label style={{ marginTop: 8 }}>District</label>
-          <select
-            value={district}
-            onChange={(e) => {
-              setDistrict(e.target.value);
-              setCity("");
-            }}
-            className="w-full border rounded-md p-2"
-          >
-            <option value="">Select District</option>
-            {Object.keys(locationData[province] || {}).map((d) => (
-              <option key={d} value={d}>{d}</option>
-            ))}
-          </select>
-        </>
-      )}
+      <TextField
+        select
+        label="District"
+        value={district}
+        onChange={(e) => setDistrict(e.target.value)}
+        fullWidth
+        disabled={!districtsList.length}
+      >
+        {districtsList.map((dist) => (
+          <MenuItem key={dist} value={dist}>
+            {dist}
+          </MenuItem>
+        ))}
+      </TextField>
 
-      {/* City / Major Area */}
-      {district && (
-        <>
-          <label style={{ marginTop: 8 }}>City / Major Area</label>
-          <select
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            className="w-full border rounded-md p-2"
-          >
-            <option value="">Select City</option>
-            {(locationData[province]?.[district] || []).map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
-        </>
-      )}
+      {/* Tehsil */}
+      <TextField
+        select
+        label="Tehsil"
+        value={tehsil}
+        onChange={(e) => setTehsil(e.target.value)}
+        fullWidth
+        disabled={!tehsilsList.length}
+      >
+        {tehsilsList.map((t) => (
+          <MenuItem key={t} value={t}>
+            {t}
+          </MenuItem>
+        ))}
+      </TextField>
 
-      {/* Exact Area */}
-      <label style={{ marginTop: 8 }}>Exact Area</label>
-      <input
-        type="text"
+      {/* Area */}
+      <TextField
+        select
+        label="Area"
         value={area}
         onChange={(e) => setArea(e.target.value)}
-        placeholder="e.g. Model Town Block C"
-        className="w-full border rounded-md p-2"
-      />
-
-      {/* Detect Location Button */}
-      <button
-        type="button"
-        onClick={detectLocation}
-        style={{
-          marginTop: 10,
-          backgroundColor: "#56ab2f",
-          color: "white",
-          padding: "8px 12px",
-          borderRadius: 6,
-          cursor: "pointer",
-        }}
+        fullWidth
+        disabled={!areasList.length}
       >
-        Detect My Location
-      </button>
-
-      {/* Coordinates Display */}
-      {latitude && longitude && (
-        <p style={{ marginTop: 6, fontSize: 13 }}>
-          📍 Coordinates: {latitude}, {longitude}
-        </p>
-      )}
-    </div>
+        {areasList.map((a) => (
+          <MenuItem key={a} value={a}>
+            {a}
+          </MenuItem>
+        ))}
+      </TextField>
+    </Box>
   );
 }

@@ -1,37 +1,238 @@
 {
   "Punjab": {
-    "Lahore": ["Model Town", "Johar Town", "Gulberg", "DHA", "Shalimar"],
-    "Faisalabad": ["Madina Town", "Peoples Colony", "Ghulam Muhammadabad"],
-    "Multan": ["Cantt", "Bosan Road", "New Multan"],
-    "Rawalpindi": ["Satellite Town", "Chaklala", "Bahria Town"],
-    "Gujranwala": ["Civil Lines", "Satellite Town", "Wapda Town"],
-    "Sialkot": ["Cantt", "Daska Road", "Model Town"],
-    "Bahawalpur": ["Cantt", "Model Town", "Satellite Town"],
-    "Sargodha": ["University Road", "Satellite Town", "Jinnah Colony"]
-  },
-  "Sindh": {
-    "Karachi": ["Clifton", "PECHS", "Gulshan-e-Iqbal", "DHA", "North Nazimabad"],
-    "Hyderabad": ["Qasimabad", "Latifabad", "Hirabad"],
-    "Sukkur": ["Minara Road", "Military Road", "Shikarpur Road"]
-  },
-  "Khyber Pakhtunkhwa": {
-    "Peshawar": ["Hayatabad", "University Town", "Saddar"],
-    "Abbottabad": ["Mandian", "Supply", "Jinnahabad"],
-    "Mardan": ["Cantonment", "Baghdada", "College Chowk"]
-  },
-  "Balochistan": {
-    "Quetta": ["Satellite Town", "Jinnah Town", "Sariab Road"],
-    "Gwadar": ["Marine Drive", "Old City", "New Town"]
-  },
-  "Islamabad Capital Territory": {
-    "Islamabad": ["F-6", "G-10", "Blue Area", "I-8", "F-11"]
-  },
-  "Gilgit-Baltistan": {
-    "Gilgit": ["Jutial", "Amphas", "Konodas"],
-    "Skardu": ["Hussainabad", "College Road", "Satpara"]
-  },
-  "Azad Jammu & Kashmir": {
-    "Muzaffarabad": ["Chattar", "Domel", "Naluchi"],
-    "Mirpur": ["Allama Iqbal Road", "Civil Lines", "Sector F-1"]
+    "Lahore": {
+      "Cantonment": ["Cantonment", "Defence", "Garden Town"],
+      "City": ["Anarkali", "Ichhra", "Gulberg"],
+      "Model Town": ["Model Town", "Johar Town", "Shadman"],
+      "Raiwind": ["Raiwind", "Prem Nagar"],
+      "Shalimar": ["Shalimar", "Gulshan-e-Ravi", "Sabzazar"]
+    },
+    "Kasur": {
+      "Chunian": ["Chunian", "Bhagtanwala"],
+      "Kasur": ["Kasur City", "Kot Choudhry"],
+      "Kot Radha Kishan": ["Kot Radha Kishan"],
+      "Pattoki": ["Pattoki", "Rasulpur"]
+    },
+    "Sheikhupura": {
+      "Ferozewala": ["Ferozewala", "Rasulpur"],
+      "Muridke": ["Muridke", "Chak No. 27"],
+      "Safdarabad": ["Safdarabad"],
+      "Sheikhupura": ["Sheikhupura City", "Hadyana"],
+      "Sharakpura": ["Sharakpura"]
+    },
+    "Nankana Sahib": {
+      "Nankana Sahib": ["Nankana City", "Warburton"],
+      "Sangla Hill": ["Sangla Hill"],
+      "Shah Kot": ["Shah Kot"]
+    },
+    "Gujrat": {
+      "Gujrat": ["Gujrat City", "Sardarabad"],
+      "Kharian": ["Kharian", "Dinga"],
+      "Sarai Alamgir": ["Sarai Alamgir"],
+      "Jalalpur Jattan": ["Jalalpur Jattan"],
+      "Kunjah": ["Kunjah"]
+    },
+    "Mandi Bahauddin": {
+      "Malakwal": ["Malakwal"],
+      "Mandi Bahauddin": ["Mandi Bahauddin City"],
+      "Phalia": ["Phalia"]
+    },
+    "Hafizabad": {
+      "Hafizabad": ["Hafizabad City"],
+      "Pindi Bhattian": ["Pindi Bhattian"]
+    },
+    "Wazirabad": {
+      "Wazirabad": ["Wazirabad City"],
+      "Alipur Chatha": ["Alipur Chatha"]
+    },
+    "Gujranwala": {
+      "Gujranwala City": ["Gujranwala City"],
+      "Gujranwala Saddar": ["Gujranwala Saddar"],
+      "Kamoke": ["Kamoke"],
+      "Nowshera Virkan": ["Nowshera"]
+    },
+    "Narowal": {
+      "Narowal": ["Narowal City"],
+      "Shakkargarh": ["Shakkargarh"],
+      "Zafarwal": ["Zafarwal"]
+    },
+    "Sialkot": {
+      "Daska": ["Daska City"],
+      "Pasrur": ["Pasrur"],
+      "Sambrial": ["Sambrial"],
+      "Sialkot": ["Sialkot City"]
+    },
+    "Faisalabad": {
+      "Chak Jhumra": ["Chak Jhumra"],
+      "Faisalabad": ["Faisalabad City"],
+      "Faisalabad Saddar": ["Faisalabad Saddar"],
+      "Jaranwala": ["Jaranwala"],
+      "Samundri": ["Samundri"],
+      "Tandlianwala": ["Tandlianwala"]
+    },
+    "Jhang": {
+      "Jhang": ["Jhang City"],
+      "Shorkot": ["Shorkot"],
+      "Ahmadpur Sial": ["Ahmadpur Sial"],
+      "Athara Hazari": ["Athara Hazari"],
+      "Mandi Shah Jeewna": ["Mandi Shah Jeewna"]
+    },
+    "Chiniot": {
+      "Bhawana": ["Bhawana"],
+      "Chiniot": ["Chiniot City"],
+      "Lalian": ["Lalian"]
+    },
+    "Toba Tek Singh": {
+      "Gojra": ["Gojra"],
+      "Kamalia": ["Kamalia"],
+      "Pir Mahal": ["Pir Mahal"],
+      "Toba Tek Singh": ["Toba City"]
+    },
+    "Sargodha": {
+      "Bhalwal": ["Bhalwal"],
+      "Bhera": ["Bhera"],
+      "Kot Momin": ["Kot Momin"],
+      "Sahiwal": ["Sahiwal City"],
+      "Sargodha": ["Sargodha City"],
+      "Shahpur": ["Shahpur"],
+      "Sillanwala": ["Sillanwala"]
+    },
+    "Khushab": {
+      "Khushab": ["Khushab City"],
+      "Noorpur": ["Noorpur Thal"],
+      "Quaidabad": ["Quaidabad"],
+      "Naushera": ["Naushera (Wadi-e-Soon)"]
+    },
+    "Mianwali": {
+      "Isakhel": ["Isakhel"],
+      "Mianwali": ["Mianwali City"],
+      "Piplan": ["Piplan"]
+    },
+    "Bhakkar": {
+      "Bhakkar": ["Bhakkar City"],
+      "Darya Khan": ["Darya Khan"],
+      "Kaloorkot": ["Kaloorkot"],
+      "Mankera": ["Mankera"]
+    },
+    "Sahiwal": {
+      "Chichawatni": ["Chichawatni"],
+      "Sahiwal": ["Sahiwal City"]
+    },
+    "Okara": {
+      "Depalpur": ["Depalpur"],
+      "Okara": ["Okara City"],
+      "Renala Khurd": ["Renala Khurd"]
+    },
+    "Pakpattan": {
+      "Arifwala": ["Arifwala"],
+      "Pakpattan": ["Pakpattan City"]
+    },
+    "Multan": {
+      "Jalalpur Pirwala": ["Jalalpur Pirwala"],
+      "Multan City": ["Multan City"],
+      "Multan Saddar": ["Multan Saddar"],
+      "Shujabad": ["Shujabad"]
+    },
+    "Vehari": {
+      "Burewala": ["Burewala"],
+      "Mailsi": ["Mailsi"],
+      "Vehari": ["Vehari City"]
+    },
+    "Lodhran": {
+      "Dunyapur": ["Dunyapur"],
+      "Kahror Pacca": ["Kahror Pacca"],
+      "Lodhran": ["Lodhran City"]
+    },
+    "Khanewal": {
+      "Jahanian": ["Jahanian"],
+      "Kabirwala": ["Kabirwala"],
+      "Mian Channu": ["Mian Channu"],
+      "Khanewal": ["Khanewal City"]
+    },
+    "Dera Ghazi Khan": {
+      "Dera Ghazi Khan": ["D.G. Khan City"],
+      "De-excluded Area DG Khan": ["De-excluded Area"],
+      "Kot Chutta": ["Kot Chutta"]
+    },
+    "Rajanpur": {
+      "Jampur": ["Jampur"],
+      "Rajanpur": ["Rajanpur City"],
+      "Rojhan": ["Rojhan"],
+      "De-excluded Area Rajanpur": ["De-excluded Area"]
+    },
+    "Taunsa Sharif": {
+      "Taunsa": ["Taunsa City"],
+      "Kohe Suleiman": ["Kohe Suleiman"],
+      "Vevoha": ["Vevoha"]
+    },
+    "Layyah": {
+      "Chaubara": ["Chaubara"],
+      "Karor Lal Esan": ["Karor Lal Esan"],
+      "Layyah": ["Layyah City"]
+    },
+    "Kot Addu": {
+      "Kot Addu": ["Kot Addu City"],
+      "Chowk Sarwar Shaheed": ["Chowk Sarwar Shaheed"]
+    },
+    "Muzaffargarh": {
+      "Alipur": ["Alipur"],
+      "Jatoi": ["Jatoi"],
+      "Muzaffargarh": ["Muzaffargarh City"]
+    },
+    "Rawalpindi": {
+      "Rawalpindi": ["Rawalpindi City"],
+      "Gujar Khan": ["Gujar Khan"],
+      "Kahuta": ["Kahuta"],
+      "Kallar Syedan": ["Kallar Syedan"],
+      "Taxila": ["Taxila"]
+    },
+    "Jhelum": {
+      "Dina": ["Dina"],
+      "Jhelum": ["Jhelum City"],
+      "Pind Dadan Khan": ["Pind Dadan Khan"],
+      "Sohawa": ["Sohawa"]
+    },
+    "Attock": {
+      "Attock": ["Attock City"],
+      "Fateh Jang": ["Fateh Jang"],
+      "Hassan Abdal": ["Hassan Abdal"],
+      "Hazro": ["Hazro"],
+      "Jand": ["Jand"],
+      "Pindi Gheb": ["Pindi Gheb"]
+    },
+    "Murree": {
+      "Kotli Sattian": ["Kotli Sattian"],
+      "Murree": ["Murree City"]
+    },
+    "Talagang": {
+      "Talagang": ["Talagang"],
+      "Lawa": ["Lawa"]
+    },
+    "Chakwal": {
+      "Chakwal": ["Chakwal City"],
+      "Choa Saidan Shah": ["Choa Saidan Shah"],
+      "Kallar Kahar": ["Kallar Kahar"]
+    },
+    "Bahawalpur": {
+      "Ahmedpur East": ["Ahmedpur East"],
+      "Bahawalpur City": ["Bahawalpur City"],
+      "Bahawalpur Saddar": ["Bahawalpur Saddar"],
+      "Hasilpur": ["Hasilpur"],
+      "Khairpur Tamewali": ["Khairpur Tamewali"],
+      "Yazman": ["Yazman"]
+    },
+    "Rahim Yar Khan": {
+      "Khanpur": ["Khanpur"],
+      "Liaqatpur": ["Liaqatpur"],
+      "Rahim Yar Khan": ["Rahim Yar Khan City"],
+      "Sadiqabad": ["Sadiqabad"]
+    },
+    "Bahawalnagar": {
+      "Bahawalnagar": ["Bahawalnagar City"],
+      "Chishtian": ["Chishtian"],
+      "Fort Abbas": ["Fort Abbas"],
+      "Haroonabad": ["Haroonabad"],
+      "Minchinabad": ["Minchinabad"]
+    }
   }
 }
