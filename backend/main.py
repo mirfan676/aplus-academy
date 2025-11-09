@@ -6,16 +6,16 @@ import base64
 import traceback
 import random
 import math
-from fastapi import FastAPI, Form, File, Query, UploadFile, HTTPException
+from fastapi import FastAPI, Form, File, Query, UploadFile, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from google.oauth2.service_account import Credentials
 
-app = FastAPI(title="APlus Home Tutors API", version="2.3.0")
+app = FastAPI(title="APlus Home Tutors API", version="2.5.0")
 
 # --- CORS CONFIG ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Replace * with your domain in production
+    allow_origins=["*"],  # Replace with your production domain
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,22 +32,12 @@ sheet = gspread_client.open_by_key(SHEET_ID).sheet1
 # --- IMGBB CONFIG ---
 IMGBB_API_KEY = "5b09de418289beb41cde5d28d5934047"
 
-# --- CITY AREAS ---
-city_areas = {
-    "Lahore": ["Gulberg", "DHA", "Johar Town", "Model Town", "Shadman"],
-    "Karachi": ["Clifton", "PECHS", "Gulshan-e-Iqbal"],
-    "Islamabad": ["F-6", "G-10", "Blue Area"],
-    "Rawalpindi": ["Satellite Town", "Chaklala", "Bahria Town"],
-    "Faisalabad": ["Madina Town", "Gulistan Colony", "People Colony"],
-    "Multan": ["Shah Rukn-e-Alam", "Cantt", "Township"],
-    "Peshawar": ["Hayatabad", "University Town", "Saddar"],
-    "Quetta": ["Satellite Town", "Jinnah Town", "Sariab Road"],
-    "Gujranwala": ["Bahria Town", "Civil Lines", "Cantt"],
-    "Sialkot": ["Daska Road", "Model Town", "Cantt"],
-}
+# --- LOAD LOCATIONS JSON ---
+LOCATIONS_FILE = os.path.join(os.path.dirname(__file__), "locations.json")
+with open(LOCATIONS_FILE, "r", encoding="utf-8") as f:
+    pakistan_data = json.load(f)
 
-
-# --- Utility: Generate random point within radius ---
+# --- Utility: Random nearby point ---
 def random_point_within_radius(center_lat, center_lng, radius_m=1000):
     radius_in_degrees = radius_m / 111320.0
     u = random.random()
@@ -58,41 +48,61 @@ def random_point_within_radius(center_lat, center_lng, radius_m=1000):
     lng_offset = w * math.sin(t) / math.cos(math.radians(center_lat))
     return round(center_lat + lat_offset, 6), round(center_lng + lng_offset, 6)
 
-
-# --- Utility: Get area coordinates from OpenStreetMap ---
-def get_area_coordinates(area_name: str, city: str):
+# --- Utility: Get coordinates from OpenStreetMap ---
+def get_area_coordinates(area_name: str, city: str, province: str):
     try:
-        query = f"{area_name}, {city}, Pakistan"
+        query = f"{area_name}, {city}, {province}, Pakistan"
         url = "https://nominatim.openstreetmap.org/search"
         params = {"q": query, "format": "json", "limit": 1}
         headers = {"User-Agent": "APlusAcademy/1.0"}
-
         res = requests.get(url, params=params, headers=headers, timeout=10)
         res.raise_for_status()
         data = res.json()
-
-        if data and len(data) > 0:
+        if data:
             return float(data[0]["lat"]), float(data[0]["lon"])
-
     except Exception as e:
         print(f"⚠️ Error fetching coordinates for {area_name}: {e}")
-
     return None, None
 
+# --- Utility: Fallback IP-based geolocation ---
+def get_ip_geolocation(ip: str):
+    try:
+        url = f"https://ipapi.co/{ip}/json/"
+        res = requests.get(url, timeout=8)
+        if res.status_code == 200:
+            data = res.json()
+            return data.get("latitude"), data.get("longitude"), data.get("city"), data.get("region")
+    except Exception as e:
+        print("⚠️ IP geolocation error:", e)
+    return None, None, None, None
 
 # --- ROUTES ---
-
 @app.get("/")
 def home():
-    return {"message": "✅ APlus Home Tutors API is running!"}
+    return {"message": "✅ APlus Home Tutors API is running with province-district-city support!"}
 
+@app.get("/locations")
+def get_locations():
+    """Return full hierarchy of provinces, districts, and areas."""
+    return pakistan_data
+
+@app.get("/districts")
+def get_districts(province: str = Query(...)):
+    return {"districts": list(pakistan_data.get(province, {}).keys())}
+
+@app.get("/cities")
+def get_cities(province: str = Query(...), district: str = Query(...)):
+    return {"cities": pakistan_data.get(province, {}).get(district, [])}
 
 @app.post("/tutors/register")
 async def register_tutor(
+    request: Request,
     name: str = Form(...),
     subject: str = Form(...),
     qualification: str = Form(...),
     experience: int = Form(...),
+    province: str = Form(...),
+    district: str = Form(...),
     city: str = Form(...),
     phone: str = Form(...),
     bio: str = Form(...),
@@ -114,49 +124,53 @@ async def register_tutor(
             payload = {"key": IMGBB_API_KEY, "image": encoded_image, "name": image.filename}
             response = requests.post("https://api.imgbb.com/1/upload", data=payload)
             result = response.json()
-
             if result.get("success"):
                 image_url = result["data"]["url"]
-            else:
-                print("❌ ImgBB upload failed:", result)
 
-        # --- Default areas ---
-        areas = city_areas.get(city, [city])
+        # --- Determine areas if missing ---
+        default_areas = pakistan_data.get(province, {}).get(district, [city])
         if not area1:
-            area1 = areas[0]
+            area1 = default_areas[0]
         if not area2:
-            area2 = areas[1] if len(areas) > 1 else area1
+            area2 = default_areas[1] if len(default_areas) > 1 else area1
         if not area3:
-            area3 = areas[2] if len(areas) > 2 else area1
+            area3 = default_areas[2] if len(default_areas) > 2 else area1
 
-        # --- Coordinates ---
+        # --- Location logic ---
         if lat and lng:
             latitude, longitude = float(lat), float(lng)
         else:
-            base_lat, base_lng = get_area_coordinates(exactLocation or area1, city)
-            if base_lat and base_lng:
-                latitude, longitude = random_point_within_radius(base_lat, base_lng, 1000)
-            else:
-                latitude, longitude = None, None
+            base_lat, base_lng = get_area_coordinates(exactLocation or area1, city, province)
+            if not base_lat or not base_lng:
+                client_ip = request.client.host
+                base_lat, base_lng, ip_city, ip_region = get_ip_geolocation(client_ip)
+                if not city and ip_city:
+                    city = ip_city
+                if not province and ip_region:
+                    province = ip_region
+            latitude, longitude = random_point_within_radius(base_lat, base_lng, 800) if base_lat else (None, None)
 
         # --- Save to Google Sheet ---
         sheet.append_row([
-            name, subject, qualification, experience, city, phone, bio,
-            area1, area2, area3, image_url, latitude or "", longitude or ""
+            name, subject, qualification, experience, province, district, city, phone, bio,
+            area1, area2, area3, exactLocation or "", image_url,
+            latitude or "", longitude or ""
         ])
 
         return {
             "message": "✅ Tutor registered successfully!",
             "image_url": image_url,
+            "province": province,
+            "district": district,
+            "city": city,
             "areas": [area1, area2, area3],
             "coordinates": {"lat": latitude, "lng": longitude},
         }
 
     except Exception as e:
-        print("❌ Error submitting form:", e)
+        print("❌ Error submitting tutor form:", e)
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.get("/tutors")
 def get_tutors():
@@ -167,16 +181,12 @@ def get_tutors():
         for r in records:
             if not any(r.values()):
                 continue
-
-            verified_value = str(r.get("Verified", "")).strip().lower()
-            if verified_value != "yes":
+            if str(r.get("Verified", "")).strip().lower() != "yes":
                 continue
 
             def safe_str(val):
                 if val is None:
                     return ""
-                if isinstance(val, (int, float)):
-                    return str(val)
                 return str(val).strip()
 
             verified_tutors.append({
@@ -184,6 +194,8 @@ def get_tutors():
                 "Subject": safe_str(r.get("Subject")),
                 "Qualification": safe_str(r.get("Qualification")),
                 "Experience": safe_str(r.get("Experience")),
+                "Province": safe_str(r.get("Province")),
+                "District": safe_str(r.get("District")),
                 "City": safe_str(r.get("City")),
                 "Phone": safe_str(r.get("Phone")),
                 "Bio": safe_str(r.get("Bio")),
@@ -200,8 +212,3 @@ def get_tutors():
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching tutors: {str(e)}")
-
-
-@app.get("/areas")
-def get_areas(city: str = Query(..., description="City name")):
-    return {"areas": city_areas.get(city, [city])}

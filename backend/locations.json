@@ -1,0 +1,37 @@
+{
+  "Punjab": {
+    "Lahore": ["Model Town", "Johar Town", "Gulberg", "DHA", "Shalimar"],
+    "Faisalabad": ["Madina Town", "Peoples Colony", "Ghulam Muhammadabad"],
+    "Multan": ["Cantt", "Bosan Road", "New Multan"],
+    "Rawalpindi": ["Satellite Town", "Chaklala", "Bahria Town"],
+    "Gujranwala": ["Civil Lines", "Satellite Town", "Wapda Town"],
+    "Sialkot": ["Cantt", "Daska Road", "Model Town"],
+    "Bahawalpur": ["Cantt", "Model Town", "Satellite Town"],
+    "Sargodha": ["University Road", "Satellite Town", "Jinnah Colony"]
+  },
+  "Sindh": {
+    "Karachi": ["Clifton", "PECHS", "Gulshan-e-Iqbal", "DHA", "North Nazimabad"],
+    "Hyderabad": ["Qasimabad", "Latifabad", "Hirabad"],
+    "Sukkur": ["Minara Road", "Military Road", "Shikarpur Road"]
+  },
+  "Khyber Pakhtunkhwa": {
+    "Peshawar": ["Hayatabad", "University Town", "Saddar"],
+    "Abbottabad": ["Mandian", "Supply", "Jinnahabad"],
+    "Mardan": ["Cantonment", "Baghdada", "College Chowk"]
+  },
+  "Balochistan": {
+    "Quetta": ["Satellite Town", "Jinnah Town", "Sariab Road"],
+    "Gwadar": ["Marine Drive", "Old City", "New Town"]
+  },
+  "Islamabad Capital Territory": {
+    "Islamabad": ["F-6", "G-10", "Blue Area", "I-8", "F-11"]
+  },
+  "Gilgit-Baltistan": {
+    "Gilgit": ["Jutial", "Amphas", "Konodas"],
+    "Skardu": ["Hussainabad", "College Road", "Satpara"]
+  },
+  "Azad Jammu & Kashmir": {
+    "Muzaffarabad": ["Chattar", "Domel", "Naluchi"],
+    "Mirpur": ["Allama Iqbal Road", "Civil Lines", "Sector F-1"]
+  }
+}

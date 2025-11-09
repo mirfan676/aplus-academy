@@ -9,13 +9,13 @@ import {
   Alert,
   CircularProgress,
   Paper,
-  MenuItem,
   Avatar,
   FormControlLabel,
   Checkbox,
   Link as MuiLink,
 } from "@mui/material";
 import ReCAPTCHA from "react-google-recaptcha";
+import LocationSelector from "./LocationSelector";
 
 const RECAPTCHA_SITE_KEY = "6LcTdf8rAAAAAHUIrbcURlFEKtL4-4siGvJgYpxl";
 
@@ -25,128 +25,32 @@ export default function TutorRegistration() {
     subject: "",
     qualification: "",
     experience: "",
-    city: "",
-    area1: "",
-    area2: "",
-    area3: "",
-    exactLocation: "",
     phone: "",
     bio: "",
     image: null,
-    lat: "",
-    lng: "",
     agree: false,
   });
 
-  const [areas, setAreas] = useState([]);
+  const [location, setLocation] = useState({
+    province: "",
+    district: "",
+    city: "",
+    area: "",
+    latitude: "",
+    longitude: "",
+  });
+
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [captchaVerified, setCaptchaVerified] = useState(false);
 
-  const cities = [
-    "Lahore",
-    "Karachi",
-    "Islamabad",
-    "Rawalpindi",
-    "Faisalabad",
-    "Multan",
-    "Peshawar",
-    "Quetta",
-    "Gujranwala",
-    "Sialkot",
-  ];
+  const handleCaptcha = (value) => setCaptchaVerified(!!value);
 
-  // Fetch areas dynamically from backend
-  const fetchAreas = async (city) => {
-    if (!city) return;
-    try {
-      const res = await axios.get(
-        `https://aplus-academy.onrender.com/areas?city=${city}`
-      );
-      setAreas(res.data.areas || []);
-    } catch (error) {
-      console.error("Error fetching areas:", error);
-      setAreas([]);
-    }
-  };
-
-  // Get approximate coordinates for a given area and city using Nominatim
-  const fetchAreaCoordinates = async (area, city) => {
-    try {
-      const res = await axios.get("https://nominatim.openstreetmap.org/search", {
-        params: {
-          q: `${area}, ${city}, Pakistan`,
-          format: "json",
-          limit: 1,
-        },
-      });
-      if (res.data && res.data.length > 0) {
-        const { lat, lon } = res.data[0];
-        return { lat: parseFloat(lat), lng: parseFloat(lon) };
-      }
-    } catch (err) {
-      console.error("Geocoding error:", err);
-    }
-    return null;
-  };
-
-  // Generate random coordinates within 1km radius around given center
-  const generateRandomNearby = (center) => {
-    const radius = 1000; // meters
-    const earthRadius = 6378137; // meters
-    const randomDistance = Math.random() * radius;
-    const randomBearing = Math.random() * 2 * Math.PI;
-
-    const newLat =
-      center.lat +
-      (randomDistance / earthRadius) * (180 / Math.PI) * Math.cos(randomBearing);
-    const newLng =
-      center.lng +
-      (randomDistance / earthRadius) *
-        (180 / Math.PI) *
-        Math.sin(randomBearing) /
-        Math.cos((center.lat * Math.PI) / 180);
-
-    return { lat: newLat.toFixed(6), lng: newLng.toFixed(6) };
-  };
-
-  const handleChange = async (e) => {
+  const handleChange = (e) => {
     const { name, value, files, checked, type } = e.target;
-
-    if (files) {
-      setFormData({ ...formData, image: files[0] });
-    } else if (type === "checkbox") {
-      setFormData({ ...formData, [name]: checked });
-    } else {
-      if (name === "city") {
-        setFormData({
-          ...formData,
-          city: value,
-          area1: "",
-          area2: "",
-          area3: "",
-          exactLocation: "",
-          lat: "",
-          lng: "",
-        });
-        fetchAreas(value);
-      } else if (name === "exactLocation") {
-        setFormData({ ...formData, exactLocation: value });
-        if (formData.city) {
-          const center = await fetchAreaCoordinates(value, formData.city);
-          if (center) {
-            const { lat, lng } = generateRandomNearby(center);
-            setFormData((prev) => ({ ...prev, lat, lng }));
-          }
-        }
-      } else {
-        setFormData({ ...formData, [name]: value });
-      }
-    }
-  };
-
-  const handleCaptcha = (value) => {
-    setCaptchaVerified(!!value);
+    if (files) setFormData({ ...formData, image: files[0] });
+    else if (type === "checkbox") setFormData({ ...formData, [name]: checked });
+    else setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
@@ -165,9 +69,8 @@ export default function TutorRegistration() {
     setMessage("Submitting...");
 
     const submissionData = new FormData();
-    Object.entries(formData).forEach(([key, value]) =>
-      submissionData.append(key, value)
-    );
+    Object.entries(formData).forEach(([k, v]) => submissionData.append(k, v));
+    Object.entries(location).forEach(([k, v]) => submissionData.append(k, v));
 
     try {
       const res = await axios.post(
@@ -183,24 +86,24 @@ export default function TutorRegistration() {
           subject: "",
           qualification: "",
           experience: "",
-          city: "",
-          area1: "",
-          area2: "",
-          area3: "",
-          exactLocation: "",
           phone: "",
           bio: "",
           image: null,
-          lat: "",
-          lng: "",
           agree: false,
         });
-        setAreas([]);
+        setLocation({
+          province: "",
+          district: "",
+          city: "",
+          area: "",
+          latitude: "",
+          longitude: "",
+        });
       } else {
         setMessage("⚠️ Failed to submit. Please try again.");
       }
-    } catch (error) {
-      console.error("Submission error:", error);
+    } catch (err) {
+      console.error(err);
       setMessage("❌ Error submitting form. Server might be down.");
     } finally {
       setLoading(false);
@@ -209,7 +112,6 @@ export default function TutorRegistration() {
 
   return (
     <Box sx={{ backgroundColor: "#f5f9f5", minHeight: "100vh", py: 6 }}>
-      {/* Banner Section */}
       <Box
         sx={{
           textAlign: "center",
@@ -223,17 +125,13 @@ export default function TutorRegistration() {
           Tutor Registration Portal
         </Typography>
         <Typography variant="subtitle1">
-          Join A+ Academy and connect with thousands of students today!
+          Join A+ Academy and connect with students across Pakistan!
         </Typography>
       </Box>
 
       <Grid container spacing={4} justifyContent="center">
-        {/* Left Column: Form */}
         <Grid item xs={12} md={6}>
-          <Paper
-            elevation={3}
-            sx={{ p: 4, borderRadius: 3, mx: "auto", maxWidth: 600 }}
-          >
+          <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
             <Typography
               variant="h5"
               color="success.main"
@@ -244,7 +142,7 @@ export default function TutorRegistration() {
             </Typography>
 
             <Box component="form" onSubmit={handleSubmit}>
-              {/* Image Upload */}
+              {/* Upload Image */}
               <Box textAlign="center" mb={2}>
                 <Button variant="contained" component="label" color="success">
                   Upload Profile Picture
@@ -270,11 +168,7 @@ export default function TutorRegistration() {
                 { name: "name", label: "Full Name" },
                 { name: "subject", label: "Subject(s)" },
                 { name: "qualification", label: "Qualification" },
-                {
-                  name: "experience",
-                  label: "Experience (Years)",
-                  type: "number",
-                },
+                { name: "experience", label: "Experience (Years)", type: "number" },
                 { name: "phone", label: "Contact Number" },
               ].map(({ name, label, type = "text" }) => (
                 <TextField
@@ -290,67 +184,11 @@ export default function TutorRegistration() {
                 />
               ))}
 
-              {/* City */}
-              <TextField
-                select
-                name="city"
-                label="City"
-                value={formData.city || ""}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                required
-              >
-                {cities.map((city) => (
-                  <MenuItem key={city} value={city}>
-                    {city}
-                  </MenuItem>
-                ))}
-              </TextField>
-
-              {/* Exact Location */}
-              <TextField
-                select
-                name="exactLocation"
-                label="Select Exact Location (for map)"
-                value={formData.exactLocation || ""}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                disabled={!areas.length}
-                helperText={
-                  formData.lat && formData.lng
-                    ? `📍 Approx. coordinates: ${formData.lat}, ${formData.lng}`
-                    : "Select your nearby area to mark approximate location (1 km radius)"
-                }
-              >
-                {areas.map((area, index) => (
-                  <MenuItem key={index} value={area}>
-                    {area}
-                  </MenuItem>
-                ))}
-              </TextField>
-
-              {/* Preferred Areas */}
-              {[1, 2, 3].map((num) => (
-                <TextField
-                  key={num}
-                  select
-                  name={`area${num}`}
-                  label={`Preferred Area ${num}`}
-                  value={formData[`area${num}`] || ""}
-                  onChange={handleChange}
-                  fullWidth
-                  margin="normal"
-                  disabled={!areas.length}
-                >
-                  {areas.map((area, index) => (
-                    <MenuItem key={index} value={area}>
-                      {area}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              ))}
+              {/* Location Selector */}
+              <Typography variant="subtitle1" mt={2} mb={1}>
+                📍 Location Information
+              </Typography>
+              <LocationSelector onChange={setLocation} />
 
               {/* Bio */}
               <TextField
@@ -362,18 +200,14 @@ export default function TutorRegistration() {
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
-                placeholder="Describe your teaching experience, style, and achievements..."
+                placeholder="Describe your teaching experience..."
               />
 
-              {/* CAPTCHA */}
+              {/* Captcha */}
               <Box textAlign="center" mt={3} mb={2}>
-                <ReCAPTCHA
-                  sitekey={RECAPTCHA_SITE_KEY}
-                  onChange={handleCaptcha}
-                />
+                <ReCAPTCHA sitekey={RECAPTCHA_SITE_KEY} onChange={handleCaptcha} />
               </Box>
 
-              {/* Terms */}
               <FormControlLabel
                 control={
                   <Checkbox
@@ -387,7 +221,7 @@ export default function TutorRegistration() {
                   <Typography variant="body2">
                     I agree to the{" "}
                     <MuiLink href="/terms" target="_blank">
-                      Terms & Conditions
+                      Terms
                     </MuiLink>{" "}
                     and{" "}
                     <MuiLink href="/privacy" target="_blank">
@@ -398,24 +232,18 @@ export default function TutorRegistration() {
                 }
               />
 
-              {/* Submit */}
               <Button
                 type="submit"
                 variant="contained"
                 color="success"
                 fullWidth
-                sx={{ mt: 2, py: 1 }}
+                sx={{ mt: 2 }}
                 disabled={loading}
               >
-                {loading ? (
-                  <CircularProgress size={24} color="inherit" />
-                ) : (
-                  "Submit Registration"
-                )}
+                {loading ? <CircularProgress size={24} /> : "Submit Registration"}
               </Button>
             </Box>
 
-            {/* Message */}
             {message && (
               <Alert
                 severity={
@@ -431,28 +259,6 @@ export default function TutorRegistration() {
               </Alert>
             )}
           </Paper>
-        </Grid>
-
-        {/* Right Column: Illustration */}
-        <Grid
-          item
-          xs={12}
-          md={4}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <Box textAlign="center" px={2}>
-            <img
-              src="/logo-register-page.svg"
-              alt="Tutor Illustration"
-              style={{ width: "100%", maxWidth: 350 }}
-            />
-            <Typography variant="subtitle1" mt={2} color="text.secondary">
-              Empower your teaching career — register now and reach eager
-              students across Pakistan.
-            </Typography>
-          </Box>
         </Grid>
       </Grid>
     </Box>
