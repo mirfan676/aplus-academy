@@ -10,7 +10,7 @@ from fastapi import FastAPI, Form, File, Query, UploadFile, HTTPException, Reque
 from fastapi.middleware.cors import CORSMiddleware
 from google.oauth2.service_account import Credentials
 
-app = FastAPI(title="APlus Home Tutors API", version="2.5.0")
+app = FastAPI(title="APlus Home Tutors API", version="2.6.0")
 
 # --- CORS CONFIG ---
 app.add_middleware(
@@ -113,6 +113,7 @@ async def register_tutor(
     lat: str = Form(None),
     lng: str = Form(None),
     image: UploadFile = File(None),
+    profile_url: str = Form(None),
 ):
     try:
         image_url = "N/A"
@@ -153,8 +154,7 @@ async def register_tutor(
         # --- Save to Google Sheet ---
         sheet.append_row([
             name, subject, qualification, experience, province, district, city, phone, bio,
-            area1, area2, area3, exactLocation or "", image_url,
-            latitude or "", longitude or ""
+            area1, area2, area3, exactLocation or "", image_url, latitude or "", longitude or "", profile_url or ""
         ])
 
         return {
@@ -165,6 +165,7 @@ async def register_tutor(
             "city": city,
             "areas": [area1, area2, area3],
             "coordinates": {"lat": latitude, "lng": longitude},
+            "profile_url": profile_url or ""
         }
 
     except Exception as e:
@@ -202,9 +203,11 @@ def get_tutors():
                 "Area1": safe_str(r.get("Area1")),
                 "Area2": safe_str(r.get("Area2")),
                 "Area3": safe_str(r.get("Area3")),
+                "ExactLocation": safe_str(r.get("ExactLocation")),
                 "Image URL": safe_str(r.get("Image URL")),
                 "Latitude": safe_str(r.get("Latitude")),
                 "Longitude": safe_str(r.get("Longitude")),
+                "Profile URL": safe_str(r.get("Profile URL")),
                 "Verified": "Yes",
             })
 
@@ -212,3 +215,44 @@ def get_tutors():
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching tutors: {str(e)}")
+
+@app.get("/tutors/{teacher_id}")
+def get_teacher(teacher_id: int):
+    try:
+        records = sheet.get_all_records(empty2zero=False, head=1)
+        teacher = None
+        for idx, r in enumerate(records):
+            if idx == teacher_id:
+                teacher = r
+                break
+        if not teacher:
+            raise HTTPException(status_code=404, detail="Teacher not found")
+
+        def safe_str(val):
+            if val is None:
+                return ""
+            return str(val).strip()
+
+        return {
+            "Name": safe_str(teacher.get("Name")),
+            "Subject": safe_str(teacher.get("Subject")),
+            "Qualification": safe_str(teacher.get("Qualification")),
+            "Experience": safe_str(teacher.get("Experience")),
+            "Province": safe_str(teacher.get("Province")),
+            "District": safe_str(teacher.get("District")),
+            "City": safe_str(teacher.get("City")),
+            "Phone": safe_str(teacher.get("Phone")),
+            "Bio": safe_str(teacher.get("Bio")),
+            "Area1": safe_str(teacher.get("Area1")),
+            "Area2": safe_str(teacher.get("Area2")),
+            "Area3": safe_str(teacher.get("Area3")),
+            "ExactLocation": safe_str(teacher.get("ExactLocation")),
+            "Image URL": safe_str(teacher.get("Image URL")),
+            "Latitude": safe_str(teacher.get("Latitude")),
+            "Longitude": safe_str(teacher.get("Longitude")),
+            "Profile URL": safe_str(teacher.get("Profile URL")),
+            "Verified": safe_str(teacher.get("Verified")),
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

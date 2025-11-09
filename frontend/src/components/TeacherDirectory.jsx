@@ -15,6 +15,7 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Chip,
 } from "@mui/material";
 import { CheckCircle } from "@mui/icons-material";
 import L from "leaflet";
@@ -31,7 +32,6 @@ const personIcon = new L.Icon({
   popupAnchor: [0, -40],
 });
 
-// Cache constants
 const CACHE_KEY = "aplus_tutors_cache";
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 1 day
 
@@ -50,7 +50,6 @@ const TeacherDirectory = () => {
     const fetchTutors = async () => {
       try {
         setLoading(true);
-
         const cached = localStorage.getItem(CACHE_KEY);
         if (cached) {
           const parsed = JSON.parse(cached);
@@ -102,11 +101,10 @@ const TeacherDirectory = () => {
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (pos) => setUserLocation([pos.coords.latitude, pos.coords.longitude]),
-      () => console.warn("Geolocation not allowed — using Lahore fallback")
+      () => console.warn("Geolocation not allowed — using fallback")
     );
   }, []);
 
-  // Subjects & Cities
   const subjects = useMemo(() => {
     return [
       ...new Set(
@@ -119,7 +117,6 @@ const TeacherDirectory = () => {
     return [...new Set(teachers.map((t) => t.city).filter(Boolean))];
   }, [teachers]);
 
-  // Filter & sort
   const filtered = useMemo(() => {
     let list = [...teachers];
     if (selectedCity)
@@ -137,13 +134,13 @@ const TeacherDirectory = () => {
   const handleLoadMore = () => setVisibleCount((prev) => prev + 5);
 
   return (
-    <Box sx={{ bgcolor: "#f9f9f9", py: 2 }}>
+    <Box sx={{ bgcolor: "#f9f9f9", py: 4 }}>
       <Container maxWidth="lg">
         {/* Map */}
         <Box
           sx={{
-            height: { xs: "1in", md: "1.5in" },
-            borderRadius: 2,
+            height: { xs: "250px", md: "350px" },
+            borderRadius: 3,
             overflow: "hidden",
             mb: 3,
             boxShadow: 3,
@@ -152,7 +149,11 @@ const TeacherDirectory = () => {
         >
           {mapVisible ? (
             <Suspense fallback={<CircularProgress />}>
-              <LazyMap userLocation={userLocation} filtered={filtered} personIcon={personIcon} />
+              <LazyMap
+                userLocation={userLocation}
+                filtered={filtered}
+                personIcon={personIcon}
+              />
             </Suspense>
           ) : (
             <Box
@@ -169,8 +170,13 @@ const TeacherDirectory = () => {
           )}
         </Box>
 
-        {/* Heading */}
-        <Typography variant="h5" align="center" sx={{ fontWeight: "bold", mb: 3 }}>
+        <Typography
+          variant="h5"
+          fontWeight={700}
+          color="#0d6efd"
+          align="center"
+          sx={{ mb: 3 }}
+        >
           Find Teachers Near You
         </Typography>
 
@@ -179,92 +185,165 @@ const TeacherDirectory = () => {
           <Grid item xs={12} md={4}>
             <FormControl fullWidth>
               <InputLabel shrink>Select City</InputLabel>
-              <Select value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)}>
+              <Select
+                value={selectedCity}
+                onChange={(e) => setSelectedCity(e.target.value)}
+              >
                 <MenuItem value="">
                   <em>All Cities</em>
                 </MenuItem>
                 {cities.map((city, i) => (
-                  <MenuItem key={i} value={city}>{city}</MenuItem>
+                  <MenuItem key={i} value={city}>
+                    {city}
+                  </MenuItem>
                 ))}
               </Select>
             </FormControl>
           </Grid>
+
           <Grid item xs={12} md={4}>
             <FormControl fullWidth>
               <InputLabel shrink>Select Subject</InputLabel>
-              <Select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)}>
+              <Select
+                value={selectedSubject}
+                onChange={(e) => setSelectedSubject(e.target.value)}
+              >
                 <MenuItem value="">
                   <em>All Subjects</em>
                 </MenuItem>
                 {subjects.map((s, i) => (
-                  <MenuItem key={i} value={s}>{s}</MenuItem>
+                  <MenuItem key={i} value={s}>
+                    {s}
+                  </MenuItem>
                 ))}
               </Select>
             </FormControl>
           </Grid>
         </Grid>
 
-        {/* Error */}
         {error && <Alert severity="error">{error}</Alert>}
 
-        {/* Cards */}
         {loading ? (
-          <Box sx={{ textAlign: "center", py: 5 }}><CircularProgress /></Box>
+          <Box sx={{ textAlign: "center", py: 5 }}>
+            <CircularProgress />
+          </Box>
         ) : filtered.length === 0 ? (
           <Typography align="center" color="text.secondary" sx={{ mt: 3 }}>
             No teachers found matching your filters.
           </Typography>
         ) : (
           filtered.slice(0, visibleCount).map((t) => (
-            <Card key={t.id} sx={{ mb: 3, p: 2, borderRadius: 3, boxShadow: 3 }}>
+            <Card
+              key={t.id}
+              sx={{ mb: 3, p: 3, borderRadius: 3, boxShadow: 4 }}
+            >
               <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} sm={3}>
-                  <Avatar src={t.imageUrl || ""} alt={t.name} sx={{ width: 80, height: 80 }} />
+                <Grid item xs={12} sm={3} textAlign="center">
+                  <Avatar
+                    src={t.imageUrl || ""}
+                    alt={t.name}
+                    sx={{
+                      width: 100,
+                      height: 100,
+                      border: "3px solid #0d6efd",
+                      mx: "auto",
+                    }}
+                  />
+                  {t.verified?.toLowerCase() === "yes" && (
+                    <Chip
+                      icon={<CheckCircle />}
+                      label="Verified"
+                      color="success"
+                      size="small"
+                      sx={{ mt: 1 }}
+                    />
+                  )}
                 </Grid>
                 <Grid item xs={12} sm={9}>
-                  <Typography variant="h6" fontWeight={700} color="#0d6efd">{t.name}</Typography>
-                  {t.verified?.toLowerCase() === "yes" && <CheckCircle color="success" />}
-                  <Typography variant="body2" color="text.secondary">{t.qualification}</Typography>
-                  <Typography variant="body2" color="text.secondary">{t.city}</Typography>
+                  <Typography variant="h6" fontWeight={700} color="#0d6efd">
+                    {t.name}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {t.qualification}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {t.city}
+                  </Typography>
                 </Grid>
               </Grid>
 
-              <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid container spacing={2} sx={{ mt: 2 }}>
                 <Grid item xs={12} md={6}>
-                  <Typography variant="subtitle2">SUBJECTS</Typography>
+                  <Typography variant="subtitle2" fontWeight={700}>
+                    Subjects
+                  </Typography>
                   {t.subject?.split(",").map((s, i) => (
-                    <Typography key={i} variant="body2">⭐ {s.trim()}</Typography>
+                    <Chip
+                      key={i}
+                      label={s.trim()}
+                      color="primary"
+                      variant="outlined"
+                      size="small"
+                      sx={{ mr: 0.5, mb: 0.5 }}
+                    />
                   ))}
                 </Grid>
+
                 <Grid item xs={12} md={6}>
-                  <Typography variant="subtitle2">PREFERRED AREAS</Typography>
-                  {[t.Area1, t.Area2, t.Area3].filter(Boolean).map((a, i) => (
-                    <Typography key={i} variant="body2">📍 {a}</Typography>
-                  ))}
+                  <Typography variant="subtitle2" fontWeight={700}>
+                    Preferred Areas
+                  </Typography>
+                  {[t.Area1, t.Area2, t.Area3]
+                    .filter(Boolean)
+                    .map((a, i) => (
+                      <Typography key={i} variant="body2">
+                        📍 {a}
+                      </Typography>
+                    ))}
                 </Grid>
               </Grid>
 
-              <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
-                <Button variant="contained" sx={{ backgroundColor: "#29b554", "&:hover": { backgroundColor: "#218838" } }}
-                 onClick={() => window.location.href=`/teacher/${t.id}`}>VIEW DETAILS</Button>
+              <Box sx={{ mt: 2, display: "flex", gap: 2, flexWrap: "wrap" }}>
+                <Button
+                  component={Link}
+                  to={`/teacher/${t.id}`}
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#0d6efd",
+                    "&:hover": { backgroundColor: "#0b5ed7" },
+                    fontWeight: 700,
+                  }}
+                >
+                  View Profile
+                </Button>
                 <Button
                   component={Link}
                   to={`/hire/${t.id}`}
-                  state={{ teacherId: t.id, teacherName: t.name  }}  
+                  state={{ teacherId: t.id, teacherName: t.name }}
                   variant="contained"
-                  sx={{ backgroundColor: "#004aad", "&:hover": { backgroundColor: "#003a8d" } }}
+                  sx={{
+                    backgroundColor: "#29b554",
+                    "&:hover": { backgroundColor: "#218838" },
+                    fontWeight: 700,
+                  }}
                 >
-                  Hire ME
+                  Hire {t.name?.split(" ")[0]}
                 </Button>
               </Box>
             </Card>
           ))
         )}
 
-        {/* Load More */}
         {!loading && visibleCount < filtered.length && (
           <Box sx={{ textAlign: "center", mt: 2 }}>
-            <Button variant="contained" onClick={handleLoadMore}>Load More</Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleLoadMore}
+              sx={{ fontWeight: 700 }}
+            >
+              Load More
+            </Button>
           </Box>
         )}
       </Container>

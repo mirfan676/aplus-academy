@@ -55,18 +55,12 @@ export default function TutorRegistration() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
 
-    if (!captchaVerified) {
-      setMessage("⚠️ Please verify the CAPTCHA before submitting.");
-      return;
-    }
-    if (!formData.agree) {
-      setMessage("⚠️ Please agree to the Terms and Conditions.");
-      return;
-    }
+    if (!captchaVerified) return setMessage("⚠️ Please verify CAPTCHA.");
+    if (!formData.agree) return setMessage("⚠️ Please agree to Terms.");
 
     setLoading(true);
-    setMessage("Submitting...");
 
     const submissionData = new FormData();
     Object.entries(formData).forEach(([k, v]) => submissionData.append(k, v));
@@ -99,9 +93,7 @@ export default function TutorRegistration() {
           latitude: "",
           longitude: "",
         });
-      } else {
-        setMessage("⚠️ Failed to submit. Please try again.");
-      }
+      } else setMessage("⚠️ Failed to submit. Try again.");
     } catch (err) {
       console.error(err);
       setMessage("❌ Error submitting form. Server might be down.");
@@ -111,40 +103,41 @@ export default function TutorRegistration() {
   };
 
   return (
-    <Box sx={{ backgroundColor: "#f5f9f5", minHeight: "100vh", py: 6 }}>
+    <Box sx={{ bgcolor: "#f9f9f9", minHeight: "100vh", py: 6 }}>
       <Box
         sx={{
           textAlign: "center",
           mb: 5,
-          background: "linear-gradient(135deg, #a8e063, #56ab2f)",
           py: 6,
           color: "white",
+          background: "linear-gradient(135deg, #a8e063, #56ab2f)",
         }}
       >
-        <Typography variant="h4" fontWeight="bold">
-          Tutor Registration Portal
+        <Typography variant="h4" fontWeight={700}>
+          Tutor Registration
         </Typography>
         <Typography variant="subtitle1">
-          Join A+ Academy and connect with students across Pakistan!
+          Join A+ Academy and connect with students across Pakistan
         </Typography>
       </Box>
 
-      <Grid container spacing={4} justifyContent="center">
+      <Grid container justifyContent="center">
         <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
+          <Paper elevation={4} sx={{ p: 4, borderRadius: 3 }}>
             <Typography
               variant="h5"
-              color="success.main"
+              color="#0d6efd"
+              fontWeight={700}
               textAlign="center"
               mb={3}
             >
-              Tutor Registration Form
+              Register as Tutor
             </Typography>
 
             <Box component="form" onSubmit={handleSubmit}>
               {/* Upload Image */}
               <Box textAlign="center" mb={2}>
-                <Button variant="contained" component="label" color="success">
+                <Button variant="contained" component="label" color="primary">
                   Upload Profile Picture
                   <input
                     type="file"
@@ -166,7 +159,7 @@ export default function TutorRegistration() {
               {/* Basic Info */}
               {[
                 { name: "name", label: "Full Name" },
-                { name: "subject", label: "Subject(s)" },
+                { name: "subject", label: "Subjects" },
                 { name: "qualification", label: "Qualification" },
                 { name: "experience", label: "Experience (Years)", type: "number" },
                 { name: "phone", label: "Contact Number" },
@@ -184,23 +177,23 @@ export default function TutorRegistration() {
                 />
               ))}
 
-              {/* Location Selector */}
-              <Typography variant="subtitle1" mt={2} mb={1}>
-                📍 Location Information
+              {/* Location */}
+              <Typography variant="subtitle1" fontWeight={700} mt={2} mb={1}>
+                📍 Location
               </Typography>
               <LocationSelector onChange={setLocation} />
 
               {/* Bio */}
               <TextField
                 name="bio"
-                label="Tutor Bio / Description"
+                label="Tutor Bio"
                 multiline
                 rows={4}
                 value={formData.bio}
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
-                placeholder="Describe your teaching experience..."
+                placeholder="Describe your teaching experience"
               />
 
               {/* Captcha */}
@@ -235,12 +228,12 @@ export default function TutorRegistration() {
               <Button
                 type="submit"
                 variant="contained"
-                color="success"
+                color="primary"
                 fullWidth
                 sx={{ mt: 2 }}
                 disabled={loading}
               >
-                {loading ? <CircularProgress size={24} /> : "Submit Registration"}
+                {loading ? <CircularProgress size={24} color="inherit" /> : "Submit Registration"}
               </Button>
             </Box>
 

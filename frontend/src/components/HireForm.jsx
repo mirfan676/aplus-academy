@@ -118,7 +118,12 @@ const HireForm = () => {
   return (
     <Container maxWidth="sm" sx={{ py: 4 }}>
       <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
-        <Typography variant="h5" fontWeight={700} color="#0d6efd" sx={{ mb: 2 }}>
+        <Typography
+          variant="h5"
+          fontWeight={700}
+          color="#0d6efd"
+          sx={{ mb: 3 }}
+        >
           Hire {teacher ? teacher.Name : "Loading..."}
         </Typography>
 

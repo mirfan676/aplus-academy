@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -10,39 +10,56 @@ import {
   Button,
   CircularProgress,
   Container,
+  Alert,
 } from "@mui/material";
 import { CheckCircle } from "@mui/icons-material";
 
 const TeacherProfile = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [teacher, setTeacher] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const cached = localStorage.getItem("aplus_tutors_cache");
     if (cached) {
-      const data = JSON.parse(cached).data;
-      const found = data.find((t) => Number(t.id) === Number(id));
-      setTeacher(found);
+      try {
+        const data = JSON.parse(cached).data;
+        const found = data.find((t) => Number(t.id) === Number(id));
+        if (found) setTeacher(found);
+        else setError("Teacher not found.");
+      } catch (err) {
+        console.error("Error parsing cache:", err);
+        setError("Failed to load teacher profile.");
+      }
+    } else {
+      setError("No cached data available.");
     }
+    setLoading(false);
   }, [id]);
 
-  if (!teacher)
+  if (loading)
     return (
       <Box sx={{ textAlign: "center", mt: 10 }}>
         <CircularProgress />
       </Box>
     );
 
+  if (error)
+    return (
+      <Container maxWidth="sm" sx={{ mt: 10 }}>
+        <Alert severity="error">{error}</Alert>
+        <Box sx={{ mt: 3, textAlign: "center" }}>
+          <Button variant="outlined" onClick={() => window.history.back()}>
+            Go Back
+          </Button>
+        </Box>
+      </Container>
+    );
+
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
-      <Card
-        sx={{
-          p: { xs: 2, md: 4 },
-          borderRadius: 3,
-          boxShadow: 4,
-        }}
-      >
+      <Card sx={{ p: { xs: 2, md: 4 }, borderRadius: 3, boxShadow: 4 }}>
         {/* Top Section */}
         <Grid container spacing={3} alignItems="center">
           <Grid item xs={12} sm={4} textAlign="center">
@@ -81,17 +98,12 @@ const TeacherProfile = () => {
 
         {/* Subjects */}
         <Box sx={{ mt: 4 }}>
-          <Typography
-            variant="subtitle1"
-            fontWeight={700}
-            color="#0d6efd"
-            gutterBottom
-          >
+          <Typography variant="subtitle1" fontWeight={700} color="#0d6efd" gutterBottom>
             Subjects
           </Typography>
           <Grid container spacing={1}>
             {teacher.subject
-              .split(",")
+              ?.split(",")
               .map((s) => s.trim())
               .filter(Boolean)
               .map((sub, i) => (
@@ -104,12 +116,7 @@ const TeacherProfile = () => {
 
         {/* Preferred Areas */}
         <Box sx={{ mt: 3 }}>
-          <Typography
-            variant="subtitle1"
-            fontWeight={700}
-            color="#0d6efd"
-            gutterBottom
-          >
+          <Typography variant="subtitle1" fontWeight={700} color="#0d6efd" gutterBottom>
             Preferred Areas
           </Typography>
           {[teacher.Area1, teacher.Area2, teacher.Area3]
@@ -124,12 +131,7 @@ const TeacherProfile = () => {
         {/* Bio */}
         {teacher.bio && (
           <Box sx={{ mt: 3 }}>
-            <Typography
-              variant="subtitle1"
-              fontWeight={700}
-              color="#0d6efd"
-              gutterBottom
-            >
+            <Typography variant="subtitle1" fontWeight={700} color="#0d6efd" gutterBottom>
               About
             </Typography>
             <Typography variant="body2">{teacher.bio}</Typography>
@@ -155,10 +157,7 @@ const TeacherProfile = () => {
           >
             Hire {teacher.name?.split(" ")[0] || "Teacher"}
           </Button>
-          <Button
-            variant="outlined"
-            onClick={() => window.history.back()}
-          >
+          <Button variant="outlined" onClick={() => window.history.back()}>
             Back
           </Button>
         </Box>

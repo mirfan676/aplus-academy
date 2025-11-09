@@ -1,4 +1,3 @@
-// src/components/LocationSelector.jsx
 import React, { useState, useEffect } from "react";
 
 export default function LocationSelector({ onChange }) {
@@ -14,7 +13,7 @@ export default function LocationSelector({ onChange }) {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/locations`);
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/locations`);
         const data = await res.json();
         setLocationData(data);
       } catch (err) {
@@ -26,7 +25,17 @@ export default function LocationSelector({ onChange }) {
 
   // Notify parent about changes
   useEffect(() => {
-    onChange({ province, district, city, area, latitude, longitude });
+    onChange({
+      province,
+      district,
+      city,
+      area,
+      latitude,
+      longitude,
+      Area1: area || city || "",
+      Area2: "",
+      Area3: "",
+    });
   }, [province, district, city, area, latitude, longitude]);
 
   // Detect location via browser geolocation or fallback to IP
@@ -86,7 +95,7 @@ export default function LocationSelector({ onChange }) {
             className="w-full border rounded-md p-2"
           >
             <option value="">Select District</option>
-            {Object.keys(locationData[province]).map((d) => (
+            {Object.keys(locationData[province] || {}).map((d) => (
               <option key={d} value={d}>{d}</option>
             ))}
           </select>
@@ -103,7 +112,7 @@ export default function LocationSelector({ onChange }) {
             className="w-full border rounded-md p-2"
           >
             <option value="">Select City</option>
-            {locationData[province][district].map((c) => (
+            {(locationData[province]?.[district] || []).map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
