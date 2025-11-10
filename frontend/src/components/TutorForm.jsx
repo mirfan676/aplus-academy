@@ -63,6 +63,7 @@ export default function TutorRegistration() {
     province: "",
     district: "",
     tehsil: "",
+    city:"",
     area1: "",
     area2: "",
     area3: "",
@@ -401,6 +402,30 @@ export default function TutorRegistration() {
                     {t}
                   </MenuItem>
                 ))}
+              </TextField>
+
+              {/* ✅ City/Town */}
+              <TextField
+                select
+                label="City / Town"
+                name="city"
+                value={location.city}
+                onChange={handleLocationChange}
+                required
+                fullWidth
+                margin="normal"
+                disabled={!location.tehsil}
+              >
+                {location.province &&
+                  location.district &&
+                  location.tehsil &&
+                  (locationsData[location.province]?.[location.district]?.[location.tehsil] ||
+                    []
+                  ).map((city) => (
+                    <MenuItem key={city} value={city}>
+                      {city}
+                    </MenuItem>
+                  ))}
               </TextField>
 
               <TextField
