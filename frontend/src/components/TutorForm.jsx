@@ -78,11 +78,12 @@ export default function TutorRegistration() {
 
   // --- Fetch locations on mount ---
   useEffect(() => {
-        api
+    api
       .get("/locations")
-      .then((res) => setLocationsData(res.data.Punjab || {}))
+      .then((res) => {
+        if (res.data) setLocationsData(res.data);
+      })
       .catch((err) => console.error("Error fetching locations:", err));
-
   }, []);
 
   // --- Update subject type based on qualification ---
