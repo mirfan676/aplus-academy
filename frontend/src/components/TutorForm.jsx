@@ -78,41 +78,14 @@ export default function TutorRegistration() {
 
   // --- Fetch locations on mount ---
   useEffect(() => {
-    const fetchLocations = async () => {
-      try {
-        const res = await api.get("/locations");
-        let data = res.data;
+  api
+    .get("/locations")
+    .then((res) => {
+      if (res.data) setLocationsData(res.data);
+    })
+    .catch((err) => console.error("Error fetching locations:", err));
+}, []);
 
-        // Handle case if API returns array or string instead of object
-        if (typeof data === "string") {
-          try {
-            data = JSON.parse(data);
-          } catch {
-            console.error("Locations API returned invalid JSON:", data);
-            return;
-          }
-        } else if (Array.isArray(data)) {
-          // If an array, convert it to an object with indices as keys
-          const obj = {};
-          data.forEach((item, idx) => {
-            obj[idx] = item;
-          });
-          data = obj;
-        }
-
-        // Check if data is an object
-        if (data && typeof data === "object") {
-          setLocationsData(data);
-        } else {
-          console.error("Locations API returned unexpected structure:", data);
-        }
-      } catch (err) {
-        console.error("Error fetching locations:", err);
-      }
-    };
-
-    fetchLocations();
-  }, []);
 
 
   // --- Update subject type based on qualification ---
