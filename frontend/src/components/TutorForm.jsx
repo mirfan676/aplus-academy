@@ -81,10 +81,22 @@ export default function TutorRegistration() {
     api
       .get("/locations")
       .then((res) => {
-        if (res.data) setLocationsData(res.data);
+        const data = res.data;
+        if (Array.isArray(data)) {
+          // Live API returned array, convert to object with province names as keys
+          const obj = {};
+          data.forEach(item => {
+            // assuming each item has a "province" field
+            obj[item.province] = item.districts || {};
+          });
+          setLocationsData(obj);
+        } else if (typeof data === "object") {
+          setLocationsData(data);
+        }
       })
       .catch((err) => console.error("Error fetching locations:", err));
   }, []);
+
 
   // --- Update subject type based on qualification ---
   useEffect(() => {
