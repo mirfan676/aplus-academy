@@ -78,23 +78,40 @@ export default function TutorRegistration() {
 
   // --- Fetch locations on mount ---
   useEffect(() => {
-    api
-      .get("/locations")
-      .then((res) => {
-        const data = res.data;
-        if (Array.isArray(data)) {
-          // Live API returned array, convert to object with province names as keys
+    const fetchLocations = async () => {
+      try {
+        const res = await api.get("/locations");
+        let data = res.data;
+
+        // Handle case if API returns array or string instead of object
+        if (typeof data === "string") {
+          try {
+            data = JSON.parse(data);
+          } catch {
+            console.error("Locations API returned invalid JSON:", data);
+            return;
+          }
+        } else if (Array.isArray(data)) {
+          // If an array, convert it to an object with indices as keys
           const obj = {};
-          data.forEach(item => {
-            // assuming each item has a "province" field
-            obj[item.province] = item.districts || {};
+          data.forEach((item, idx) => {
+            obj[idx] = item;
           });
-          setLocationsData(obj);
-        } else if (typeof data === "object") {
-          setLocationsData(data);
+          data = obj;
         }
-      })
-      .catch((err) => console.error("Error fetching locations:", err));
+
+        // Check if data is an object
+        if (data && typeof data === "object") {
+          setLocationsData(data);
+        } else {
+          console.error("Locations API returned unexpected structure:", data);
+        }
+      } catch (err) {
+        console.error("Error fetching locations:", err);
+      }
+    };
+
+    fetchLocations();
   }, []);
 
 
