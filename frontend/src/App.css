@@ -152,3 +152,24 @@ img {
     padding: 16px;
   }
 }
+@media (max-width: 576px) {
+  .filter-container select,
+  .filter-container .MuiInputBase-root {
+    font-size: 14px;
+  }
+  .map-box {
+    height: 30vh;
+    margin-top: 12px;
+  }
+  .teacher-list-scroll {
+    height: 40vh;
+    padding-right: 4px;
+  }
+   .filter-container {
+    top: 0;
+    padding: 12px 8px;
+    margin-bottom: 16px;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
