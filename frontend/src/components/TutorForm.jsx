@@ -149,15 +149,21 @@ export default function TutorRegistration() {
   };
 
   const handleMajorSubjectsChange = (e) => {
-  const words = e.target.value
-    .split(/[\s,]+/)       // Split by spaces or commas
-    .map((w) => w.trim())  // Remove extra whitespace
-    .filter((w) => w)      // Remove empty strings
-    .slice(0, 5);          // Limit to 5 items
+  const inputValue = e.target.value;
 
-  setFormData({ ...formData, major_subjects: words.join(" ") });
+  // Update the raw input so the user can type freely
+  setFormData({ ...formData, major_subjects: inputValue });
+
+  // Split input by spaces or commas, remove empty strings, limit to 5 words
+  const words = inputValue
+    .split(/[\s,]+/)
+    .map((w) => w.trim())
+    .filter((w) => w)
+    .slice(0, 5);
+
   setMajorSubjectsList(words);
 };
+
 
 
   const handleLocationChange = (e) => {
