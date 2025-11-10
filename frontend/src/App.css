@@ -7,37 +7,10 @@
   background-color: #fff;
 }
 
-/* Generic responsive images */
 img {
   max-width: 100%;
   height: auto;
   display: block;
-}
-
-/* ---------- Logo (optional) ---------- */
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  transition: filter 300ms ease;
-}
-
-.logo:hover {
-  filter: drop-shadow(0 0 2em #198754aa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .logo.react {
-    animation: logo-spin infinite 20s linear;
-  }
 }
 
 /* ---------- Layout Sections ---------- */
@@ -45,22 +18,73 @@ img {
   padding: 20px;
 }
 
-/* Search box full width */
-.search-box {
-  width: 100%;
-  padding: 12px 16px;
-  font-size: 1rem;
+/* ---------- Filter Section (Sticky) ---------- */
+.filter-container {
+  position: sticky;
+  top: 80px; /* adjust if navbar overlaps */
+  z-index: 100;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 16px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  transition: all 0.3s ease;
+}
+
+.filter-container select,
+.filter-container .MuiInputBase-root {
+  min-width: 240px;
+  background-color: #fff;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.filter-container select:focus,
+.filter-container .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #0d6efd !important;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+}
+
+/* ---------- Tutor Cards ---------- */
+.tutor-card {
+  border-radius: 14px;
+  background: #fff;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.tutor-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.tutor-card .subjects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tutor-card .MuiChip-root {
+  border-radius: 16px;
+  font-weight: 500;
+}
+
+/* ---------- Buttons ---------- */
+.tutor-card button {
   border-radius: 8px;
-  border: 1px solid #ccc;
-  transition: border-color 0.2s ease;
+  text-transform: none;
+  font-weight: 600;
 }
 
-.search-box:focus {
-  border-color: #198754;
-  outline: none;
-}
-
-/* ---------- Teacher List ---------- */
+/* ---------- Scroll ---------- */
 .teacher-list-scroll {
   height: 60vh;
   overflow-y: auto;
@@ -82,29 +106,16 @@ img {
   background-color: #f5f5f5;
 }
 
-/* Tutor cards */
-.tutor-card {
-  border-radius: 10px;
-  background: #fff;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.tutor-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-}
-
 /* ---------- Map Section ---------- */
 .map-box {
   width: 100%;
   height: 40vh;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   margin-top: 20px;
   position: relative;
 }
 
-/* Ensure Leaflet renders correctly inside MUI containers */
 .leaflet-container {
   width: 100% !important;
   height: 100% !important;
@@ -119,5 +130,25 @@ img {
 
   .map-box {
     height: 40vh;
+  }
+
+  .filter-container {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px 16px;
+    border-radius: 0;
+    box-shadow: none;
+    background: #f9f9f9;
+    top: 60px;
+  }
+
+  .filter-container select,
+  .filter-container .MuiInputBase-root {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  .tutor-card {
+    padding: 16px;
   }
 }

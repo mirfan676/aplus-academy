@@ -16,15 +16,14 @@ import {
   InputLabel,
   Select,
   Chip,
+  Paper,
 } from "@mui/material";
 import { CheckCircle } from "@mui/icons-material";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Lazy load the map
 const LazyMap = React.lazy(() => import("./LazyMapSection"));
 
-// Custom person icon for map markers
 const personIcon = new L.Icon({
   iconUrl: "https://cdn-icons-png.flaticon.com/512/1946/1946429.png",
   iconSize: [40, 40],
@@ -39,13 +38,12 @@ const TeacherDirectory = () => {
   const [teachers, setTeachers] = useState([]);
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
-  const [userLocation, setUserLocation] = useState([31.5204, 74.3587]); // Lahore fallback
-  const [visibleCount, setVisibleCount] = useState(10);
+  const [userLocation, setUserLocation] = useState([31.5204, 74.3587]);
+  const [visibleCount, setVisibleCount] = useState(9);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [mapVisible, setMapVisible] = useState(false);
 
-  // Fetch tutors with caching
   useEffect(() => {
     const fetchTutors = async () => {
       try {
@@ -96,7 +94,6 @@ const TeacherDirectory = () => {
     fetchTutors();
   }, []);
 
-  // Get user location
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (pos) => setUserLocation([pos.coords.latitude, pos.coords.longitude]),
@@ -121,7 +118,9 @@ const TeacherDirectory = () => {
     if (selectedCity)
       list = list.filter((t) => t.city.toLowerCase() === selectedCity.toLowerCase());
     if (selectedSubject)
-      list = list.filter((t) => t.subject.toLowerCase().includes(selectedSubject.toLowerCase()));
+      list = list.filter((t) =>
+        t.subject.toLowerCase().includes(selectedSubject.toLowerCase())
+      );
     list.sort(
       (a, b) =>
         Math.hypot(a.lat - userLocation[0], a.lng - userLocation[1]) -
@@ -130,7 +129,7 @@ const TeacherDirectory = () => {
     return list;
   }, [selectedCity, selectedSubject, teachers, userLocation]);
 
-  const handleLoadMore = () => setVisibleCount((prev) => prev + 5);
+  const handleLoadMore = () => setVisibleCount((prev) => prev + 6);
 
   return (
     <Box sx={{ bgcolor: "#f9f9f9", py: 4 }}>
@@ -179,46 +178,72 @@ const TeacherDirectory = () => {
           Find Teachers Near You
         </Typography>
 
-        {/* Filters */}
-        <Grid container spacing={2} justifyContent="center" sx={{ mb: 3 }}>
-          <Grid item xs={12} md={4}>
-            <FormControl fullWidth>
-              <InputLabel shrink>Select City</InputLabel>
-              <Select
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
-              >
-                <MenuItem value="">
-                  <em>All Cities</em>
-                </MenuItem>
-                {cities.map((city, i) => (
-                  <MenuItem key={i} value={city}>
-                    {city}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
+        {/* Sticky Filters */}
+<Paper
+  elevation={3}
+  className="filter-container"
+  sx={{
+    position: "sticky",
+    top: 60,
+    zIndex: 20,
+    p: 2,
+    borderRadius: 3,
+    backgroundColor: "rgba(255, 255, 255, 0.15)", // light transparent white
+    backdropFilter: "blur(10px)", // frosted glass effect
+    WebkitBackdropFilter: "blur(10px)", // Safari support
+    border: "1px solid rgba(255, 255, 255, 0.3)",
+    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+  }}
+>
+  <Grid
+    container
+    spacing={2}
+    justifyContent="center"
+    sx={{
+      "& .MuiFormControl-root": { minWidth: "240px" },
+    }}
+  >
+    <Grid item xs={12} sm={6} md={4}>
+      <FormControl fullWidth>
+        <InputLabel>Select City</InputLabel>
+        <Select
+          value={selectedCity}
+          onChange={(e) => setSelectedCity(e.target.value)}
+        >
+          <MenuItem value="">
+            <em>All Cities</em>
+          </MenuItem>
+          {cities.map((city, i) => (
+            <MenuItem key={i} value={city}>
+              {city}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Grid>
 
-          <Grid item xs={12} md={4}>
-            <FormControl fullWidth>
-              <InputLabel shrink>Select Subject</InputLabel>
-              <Select
-                value={selectedSubject}
-                onChange={(e) => setSelectedSubject(e.target.value)}
-              >
-                <MenuItem value="">
-                  <em>All Subjects</em>
-                </MenuItem>
-                {subjects.map((s, i) => (
-                  <MenuItem key={i} value={s}>
-                    {s}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-        </Grid>
+    <Grid item xs={12} sm={6} md={4}>
+      <FormControl fullWidth>
+        <InputLabel>Select Subject</InputLabel>
+        <Select
+          value={selectedSubject}
+          onChange={(e) => setSelectedSubject(e.target.value)}
+        >
+          <MenuItem value="">
+            <em>All Subjects</em>
+          </MenuItem>
+          {subjects.map((s, i) => (
+            <MenuItem key={i} value={s}>
+              {s}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Grid>
+  </Grid>
+</Paper>
+
+
 
         {error && <Alert severity="error">{error}</Alert>}
 
@@ -231,110 +256,202 @@ const TeacherDirectory = () => {
             No teachers found matching your filters.
           </Typography>
         ) : (
-          filtered.slice(0, visibleCount).map((t) => (
-            <Card
-              key={t.id}
-              sx={{ mb: 3, p: 3, borderRadius: 3, boxShadow: 4 }}
-            >
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} sm={3} textAlign="center">
-                  <Avatar
-                    src={t.imageUrl || ""}
-                    alt={t.name}
+          <Grid
+            container
+            spacing={3}
+            justifyContent="center"
+            alignItems="stretch"
+            sx={{
+              rowGap: 3,
+            }}
+          >
+            {filtered.slice(0, visibleCount).map((t) => (
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                md={4}
+                lg={3}
+                key={t.id}
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <Card
                     sx={{
-                      width: 100,
-                      height: 100,
-                      border: "3px solid #0d6efd",
-                      mx: "auto",
+                      p: 3,
+                      borderRadius: 3,
+                      boxShadow: 3,
+                      height: "100%",
+                      width: "100%",
+                      maxWidth: "320px",
+                      minWidth: "260px",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      textAlign: "center",
+                      transition: "transform 0.25s ease, box-shadow 0.25s ease",
+                      "&:hover": {
+                        transform: "translateY(-6px)",
+                        boxShadow: 6,
+                      },
                     }}
-                  />
-                  {t.verified?.toLowerCase() === "yes" && (
-                    <Chip
-                      icon={<CheckCircle />}
-                      label="Verified"
-                      color="success"
-                      size="small"
-                      sx={{ mt: 1 }}
-                    />
-                  )}
-                </Grid>
-                <Grid item xs={12} sm={9}>
-                  <Typography variant="h6" fontWeight={700} color="#0d6efd">
-                    {t.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {t.qualification}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {t.city}
-                  </Typography>
-                </Grid>
-              </Grid>
+                  >
+                    {/* --- Top: Avatar + Verified --- */}
+                    <Box sx={{ mb: 2 }}>
+                      <Avatar
+                        src={t.imageUrl || ""}
+                        alt={t.name}
+                        sx={{
+                          width: 90,
+                          height: 90,
+                          border: "3px solid #0d6efd",
+                          mx: "auto",
+                          mb: 1,
+                        }}
+                      />
+                      {t.verified?.toLowerCase() === "yes" && (
+                        <Chip
+                          icon={<CheckCircle />}
+                          label="Verified"
+                          color="success"
+                          size="small"
+                          sx={{ fontSize: "0.75rem" }}
+                        />
+                      )}
+                    </Box>
 
-              <Grid container spacing={2} sx={{ mt: 2 }}>
-                <Grid item xs={12} md={6}>
-                  <Typography variant="subtitle2" fontWeight={700}>
-                    Subjects
-                  </Typography>
-                  {t.subject?.split(",").map((s, i) => (
-                    <Chip
-                      key={i}
-                      label={s.trim()}
-                      color="primary"
-                      variant="outlined"
-                      size="small"
-                      sx={{ mr: 0.5, mb: 0.5 }}
-                    />
-                  ))}
-                </Grid>
-
-                <Grid item xs={12} md={6}>
-                  <Typography variant="subtitle2" fontWeight={700}>
-                    Preferred Areas
-                  </Typography>
-                  {[t.Area1, t.Area2, t.Area3]
-                    .filter(Boolean)
-                    .map((a, i) => (
-                      <Typography key={i} variant="body2">
-                        📍 {a}
+                    {/* --- Middle: Name / Info --- */}
+                    <Box sx={{ flexGrow: 1, mb: 2 }}>
+                      <Typography
+                        variant="h6"
+                        fontWeight={700}
+                        color="#0d6efd"
+                        sx={{ lineHeight: 1.2 }}
+                      >
+                        {t.name}
                       </Typography>
-                    ))}
-                </Grid>
-              </Grid>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mt: 0.5, fontWeight: 500 }}
+                      >
+                        {t.qualification}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        📍 {t.city}
+                      </Typography>
+                    </Box>
 
-              <Box sx={{ mt: 2, display: "flex", gap: 2, flexWrap: "wrap" }}>
-                <Button
-                  component={Link}
-                  to={`/teacher/${t.id}`}
-                  variant="contained"
-                  sx={{
-                    backgroundColor: "#0d6efd",
-                    "&:hover": { backgroundColor: "#0b5ed7" },
-                    fontWeight: 700,
-                  }}
-                >
-                  View Profile
-                </Button>
-                <Button
-                  component={Link}
-                  to={`/hire/${t.id}`}
-                  state={{ teacherId: t.id, teacherName: t.name }}
-                  variant="contained"
-                  sx={{
-                    backgroundColor: "#29b554",
-                    "&:hover": { backgroundColor: "#218838" },
-                    fontWeight: 700,
-                  }}
-                >
-                  Hire {t.name?.split(" ")[0]}
-                </Button>
-              </Box>
-            </Card>
-          ))
+                    {/* --- Subjects Section --- */}
+                    {t.subject && (
+                      <Box sx={{ mb: 2 }}>
+                        <Typography
+                          variant="subtitle2"
+                          fontWeight={700}
+                          sx={{ mb: 0.5, color: "text.primary" }}
+                        >
+                          Subjects
+                        </Typography>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            justifyContent: "center",
+                            gap: 0.5,
+                          }}
+                        >
+                          {t.subject
+                            ?.split(",")
+                            .map((s, i) => (
+                              <Chip
+                                key={i}
+                                label={s.trim()}
+                                color="primary"
+                                variant="outlined"
+                                size="small"
+                                sx={{
+                                  fontSize: "0.7rem",
+                                }}
+                              />
+                            ))}
+                        </Box>
+                      </Box>
+                    )}
+
+                    {/* --- Preferred Areas Section --- */}
+                    <Box sx={{ mb: 2 }}>
+                      <Typography
+                        variant="subtitle2"
+                        fontWeight={700}
+                        sx={{ mb: 0.5, color: "text.primary" }}
+                      >
+                        Preferred Areas
+                      </Typography>
+                      <Box>
+                        {[t.Area1, t.Area2, t.Area3]
+                          .filter(Boolean)
+                          .map((a, i) => (
+                            <Typography
+                              key={i}
+                              variant="body2"
+                              sx={{ fontSize: "0.85rem", lineHeight: 1.3 }}
+                            >
+                              📍 {a}
+                            </Typography>
+                          ))}
+                      </Box>
+                    </Box>
+
+                    {/* --- Bottom: Buttons --- */}
+                    <Box
+                      sx={{
+                        mt: "auto",
+                        display: "flex",
+                        gap: 1,
+                        flexWrap: "wrap",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Button
+                        component={Link}
+                        to={`/teacher/${t.id}`}
+                        variant="contained"
+                        sx={{
+                          backgroundColor: "#0d6efd",
+                          "&:hover": { backgroundColor: "#0b5ed7" },
+                          fontWeight: 700,
+                          px: 2.5,
+                        }}
+                      >
+                        View Profile
+                      </Button>
+                      <Button
+                        component={Link}
+                        to={`/hire/${t.id}`}
+                        state={{ teacherId: t.id, teacherName: t.name }}
+                        variant="contained"
+                        sx={{
+                          backgroundColor: "#29b554",
+                          "&:hover": { backgroundColor: "#218838" },
+                          fontWeight: 700,
+                          px: 2.5,
+                        }}
+                      >
+                        Hire Me
+                      </Button>
+                    </Box>
+                  </Card>
+              </Grid>
+            ))}
+          </Grid>
+
         )}
 
         {!loading && visibleCount < filtered.length && (
-          <Box sx={{ textAlign: "center", mt: 2 }}>
+          <Box sx={{ textAlign: "center", mt: 4 }}>
             <Button
               variant="contained"
               color="primary"
