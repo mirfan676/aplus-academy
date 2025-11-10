@@ -17,6 +17,7 @@ import {
   Link as MuiLink,
 } from "@mui/material";
 import ReCAPTCHA from "react-google-recaptcha";
+import api from "../api";
 
 const RECAPTCHA_SITE_KEY = "6LcTdf8rAAAAAHUIrbcURlFEKtL4-4siGvJgYpxl";
 
@@ -77,10 +78,11 @@ export default function TutorRegistration() {
 
   // --- Fetch locations on mount ---
   useEffect(() => {
-    axios
+        api
       .get("/locations")
       .then((res) => setLocationsData(res.data.Punjab || {}))
       .catch((err) => console.error("Error fetching locations:", err));
+
   }, []);
 
   // --- Update subject type based on qualification ---
@@ -166,12 +168,12 @@ export default function TutorRegistration() {
       Object.entries(formData).forEach(([k, v]) => submissionData.append(k, v));
       Object.entries(location).forEach(([k, v]) => submissionData.append(k, v));
 
-      const res = await axios.post("/tutors/register", submissionData, {
+      const res = await api.post("/tutors/register", submissionData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       if (res.status === 200) {
-        setMessage("✅ Tutor registered successfully!");
+        setMessage("Tutor registered successfully!");
         setFormData({
           name: "",
           qualification: "",

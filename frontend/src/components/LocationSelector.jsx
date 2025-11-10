@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, TextField, MenuItem, CircularProgress } from "@mui/material";
 import axios from "axios";
+import api from "../api";
 
 export default function LocationSelector({ onChange }) {
   const [locations, setLocations] = useState({});
@@ -24,9 +25,19 @@ export default function LocationSelector({ onChange }) {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const res = await axios.get("/locations");
-        setLocations(res.data.Punjab || {}); // Load only Punjab for now
-        setProvinces(Object.keys(res.data.Punjab || {}));
+       const res = await api.get("/locations");
+
+        if (res.data) {
+          setLocations(res.data);
+          const provs = Object.keys(res.data);
+          setProvinces(provs);
+
+          // Auto-select Punjab if it's the only one
+          if (provs.length === 1) {
+            setSelected((prev) => ({ ...prev, province: provs[0] }));
+          }
+        }
+
       } catch (err) {
         console.error("Error fetching locations:", err);
       } finally {

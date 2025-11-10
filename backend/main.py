@@ -80,7 +80,7 @@ def get_ip_geolocation(ip: str):
 # --- ROUTES ---
 @app.get("/")
 def home():
-    return {"message": "✅ APlus Home Tutors API is running with province-district-tehsil support!"}
+    return {"message": "APlus Home Tutors API is running with province-district-tehsil support!"}
 
 @app.get("/locations")
 def get_locations():
