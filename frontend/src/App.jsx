@@ -154,6 +154,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+       <CookieConsent />
       <Router>
         <PageTracker />
 
@@ -278,7 +279,6 @@ function App() {
             Empowering education, one student at a time.
           </Typography>
         </Box>
-        <CookieConsent />
       </Router>
     </ThemeProvider>
   );
