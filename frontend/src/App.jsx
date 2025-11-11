@@ -6,6 +6,7 @@ import AboutUs from "./pages/AboutUs";
 import TeacherProfile from "./components/TeacherProfile";
 import HireForm from "./components/HireForm";
 import "./App.css";
+import CookieConsent from "./components/CookieConsent";
 import {
   ThemeProvider,
   CssBaseline,
@@ -277,6 +278,7 @@ function App() {
             Empowering education, one student at a time.
           </Typography>
         </Box>
+        <CookieConsent />
       </Router>
     </ThemeProvider>
   );

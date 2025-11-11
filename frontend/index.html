@@ -42,16 +42,28 @@
       rel="stylesheet"
     />
 
-    <!-- ✅ Google Analytics 4 (GA4) -->
+    <!-- ✅ Google Consent Mode v2 Setup -->
+    <script>
+      // Default consent (before user interacts with your cookie banner)
+      // This ensures no cookies are used until consent is given.
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+
+      gtag('consent', 'default', {
+        'ad_storage': 'denied',
+        'analytics_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied'
+      });
+    </script>
+
+    <!-- ✅ Your existing GA4 Tag -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-P104YESY15"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-      gtag("config", "G-P104YESY15");
+      gtag('js', new Date());
+      gtag('config', 'G-P104YESY15');
     </script>
+
 
     <!-- ✅ Optional: Google Site Verification (for Search Console, replace with your code) -->
     <!-- <meta name="google-site-verification" content="YOUR_VERIFICATION_CODE_HERE" /> -->
