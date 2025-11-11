@@ -1,5 +1,5 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import React, { useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
 import TutorForm from "./components/TutorForm";
 import TeacherDirectory from "./components/TeacherDirectory";
 import AboutUs from "./pages/AboutUs";
@@ -28,6 +28,20 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import theme from "./theme";
 
+/* ✅ Google Analytics Page View Tracking Hook */
+function usePageTracking() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (window.gtag) {
+      window.gtag("config", "G-P104YESY15", {
+        page_path: location.pathname + location.search,
+      });
+    }
+  }, [location]);
+}
+
+/* ✅ Home Component */
 function Home() {
   return (
     <>
@@ -124,6 +138,7 @@ function Home() {
   );
 }
 
+/* ✅ Main App */
 function App() {
   const isMobile = useMediaQuery("(max-width:900px)");
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -139,6 +154,8 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
+        <PageTracker />
+
         {/* Navbar */}
         <AppBar position="sticky" color="inherit" elevation={2}>
           <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -159,7 +176,6 @@ function App() {
                 sx={{ height: 48 }}
               />
             </Box>
-
 
             {/* Desktop Menu */}
             {!isMobile && (
@@ -223,7 +239,7 @@ function App() {
           </Box>
         </Drawer>
 
-        {/* Main Content */}
+        {/* Routes */}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route
@@ -232,7 +248,6 @@ function App() {
               <Container sx={{ py: 6 }}>
                 <Card sx={{ maxWidth: 700, mx: "auto", boxShadow: 3 }}>
                   <CardContent>
-                    {/* Removed duplicate title here */}
                     <TutorForm />
                   </CardContent>
                 </Card>
@@ -265,6 +280,12 @@ function App() {
       </Router>
     </ThemeProvider>
   );
+}
+
+/* ✅ PageTracker component (wrapper for GA4 hook) */
+function PageTracker() {
+  usePageTracking();
+  return null;
 }
 
 export default App;
