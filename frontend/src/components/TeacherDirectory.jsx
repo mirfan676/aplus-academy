@@ -279,26 +279,26 @@ const TeacherDirectory = () => {
                 }}
               >
                 <Card
-                    sx={{
-                      p: 3,
-                      borderRadius: 3,
-                      boxShadow: 3,
-                      height: "100%",
-                      width: "100%",
-                      maxWidth: "320px",
-                      minWidth: "260px",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      textAlign: "center",
-                      transition: "transform 0.25s ease, box-shadow 0.25s ease",
-                      "&:hover": {
-                        transform: "translateY(-6px)",
-                        boxShadow: 6,
-                      },
-                    }}
-                  >
+  sx={{
+    p: 3,
+    borderRadius: 3,
+    boxShadow: 3,
+    width: "100%",
+    maxWidth: "320px",
+    minWidth: "260px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    textAlign: "center",
+    height: "100%",
+    transition: "transform 0.25s ease, box-shadow 0.25s ease",
+    "&:hover": {
+      transform: "translateY(-6px)",
+      boxShadow: 6,
+    },
+  }}
+>
                     {/* --- Top: Avatar + Verified --- */}
                     <Box sx={{ mb: 2 }}>
                       <Avatar
@@ -345,65 +345,87 @@ const TeacherDirectory = () => {
                       </Typography>
                     </Box>
 
-                    {/* --- Subjects Section --- */}
-                    {t.subject && (
-                      <Box sx={{ mb: 2 }}>
-                        <Typography
-                          variant="subtitle2"
-                          fontWeight={700}
-                          sx={{ mb: 0.5, color: "text.primary" }}
-                        >
-                          Subjects
-                        </Typography>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            flexWrap: "wrap",
-                            justifyContent: "center",
-                            gap: 0.5,
-                          }}
-                        >
-                          {t.subject
-                            ?.split(",")
-                            .map((s, i) => (
-                              <Chip
-                                key={i}
-                                label={s.trim()}
-                                color="primary"
-                                variant="outlined"
-                                size="small"
-                                sx={{
-                                  fontSize: "0.7rem",
-                                }}
-                              />
-                            ))}
-                        </Box>
-                      </Box>
-                    )}
+                   {/* --- Subjects & Areas Container --- */}
+<Box
+  sx={{
+    flexGrow: 1,
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    minHeight: 160, // 👈 ensures equal vertical space
+  }}
+>
+  {/* --- Subjects Section --- */}
+  {t.subject && (
+    <Box sx={{ mb: 1 }}>
+      <Typography
+        variant="subtitle2"
+        fontWeight={700}
+        sx={{ mb: 0.5, color: "text.primary" }}
+      >
+        Subjects
+      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          gap: 0.5,
+          minHeight: 40, // 👈 ensures all headings align
+        }}
+      >
+        {t.subject
+          ?.split(",")
+          .map((s, i) => (
+            <Chip
+              key={i}
+              label={s.trim()}
+              color="primary"
+              variant="outlined"
+              size="small"
+              sx={{
+                fontSize: "0.7rem",
+              }}
+            />
+          ))}
+      </Box>
+    </Box>
+  )}
 
-                    {/* --- Preferred Areas Section --- */}
-                    <Box sx={{ mb: 2 }}>
-                      <Typography
-                        variant="subtitle2"
-                        fontWeight={700}
-                        sx={{ mb: 0.5, color: "text.primary" }}
-                      >
-                        Preferred Areas
-                      </Typography>
-                      <Box>
-                        {[t.Area1, t.Area2, t.Area3]
-                          .filter(Boolean)
-                          .map((a, i) => (
-                            <Typography
-                              key={i}
-                              variant="body2"
-                              sx={{ fontSize: "0.85rem", lineHeight: 1.3 }}
-                            >
-                              📍 {a}
-                            </Typography>
-                          ))}
-                      </Box>
-                    </Box>
+  {/* --- Preferred Areas Section --- */}
+  <Box>
+    <Typography
+      variant="subtitle2"
+      fontWeight={700}
+      sx={{ mb: 0.5, color: "text.primary" }}
+    >
+      Preferred Areas
+    </Typography>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 0.3,
+        minHeight: 40, // 👈 keeps alignment
+      }}
+    >
+      {[t.Area1, t.Area2, t.Area3]
+        .filter(Boolean)
+        .map((a, i) => (
+          <Typography
+            key={i}
+            variant="body2"
+            sx={{ fontSize: "0.85rem", lineHeight: 1.3 }}
+          >
+            📍 {a}
+          </Typography>
+        ))}
+    </Box>
+  </Box>
+</Box>
+
 
                     {/* --- Bottom: Buttons --- */}
                     <Box
