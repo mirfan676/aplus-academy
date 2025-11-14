@@ -7,6 +7,9 @@ import TeacherProfile from "./components/TeacherProfile";
 import HireForm from "./components/HireForm";
 import "./App.css";
 import CookieConsent from "./components/CookieConsent";
+import TermsAndConditions from "./pages/TermsAndConditions";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+
 import {
   ThemeProvider,
   CssBaseline,
@@ -43,7 +46,17 @@ function usePageTracking() {
 }
 
 /* ✅ Home Component */
+import useSEO from "./hooks/useSEO";
+
 function Home() {
+  useSEO({
+    title: "A Plus Home Tutors — Trusted Home & Online Tuition in Pakistan",
+    description: "Pakistan’s trusted platform for home and online tuition — connecting students with expert tutors for O/A Levels, Matric, and Quran classes. Learn with highly qualified and verified tutors across Pakistan.",
+    canonical: "https://www.aplusacademy.pk/",
+    ogImage: "https://www.aplusacademy.pk/aplus-logo.png",
+    ogUrl: "https://www.aplusacademy.pk/",
+  });
+
   return (
     <>
       {/* Hero Section */}
@@ -138,6 +151,7 @@ function Home() {
     </>
   );
 }
+
 
 /* ✅ Main App */
 function App() {
@@ -258,6 +272,8 @@ function App() {
           />
           <Route path="/teachers" element={<TeacherDirectory />} />
           <Route path="/about" element={<AboutUs />} />
+          <Route path="/terms" element={<TermsAndConditions />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/teacher/:id" element={<TeacherProfile />} />
           <Route path="/hire/:id" element={<HireForm />} />
         </Routes>
