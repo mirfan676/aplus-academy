@@ -101,10 +101,6 @@ const TermsAndConditions = () => {
         </Typography>
       </Box>
 
-      <Divider sx={{ mt: 5, mb: 2 }} />
-      <Typography variant="body2" color="text.secondary" align="center">
-        © {new Date().getFullYear()} A Plus Home Tutors — Empowering Students Nationwide.
-      </Typography>
     </Container>
   );
 };
