@@ -77,6 +77,8 @@ export default function TutorRegistration() {
   const [loading, setLoading] = useState(false);
   const [captchaVerified, setCaptchaVerified] = useState(false);
 
+  const [imageError, setImageError] = useState(false);
+
   // --- Fetch locations on mount ---
   useEffect(() => {
   api
@@ -143,10 +145,16 @@ export default function TutorRegistration() {
 
   const handleChange = (e) => {
     const { name, value, files, checked, type } = e.target;
-    if (files) setFormData({ ...formData, image: files[0] });
-    else if (type === "checkbox") setFormData({ ...formData, [name]: checked });
-    else setFormData({ ...formData, [name]: value });
+    if (files) {
+      setFormData({ ...formData, image: files[0] });
+      setImageError(false); // <-- clear error
+    } else if (type === "checkbox") {
+      setFormData({ ...formData, [name]: checked });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
+
 
   const handleMajorSubjectsChange = (e) => {
   const inputValue = e.target.value;
@@ -177,6 +185,11 @@ export default function TutorRegistration() {
 
     if (!captchaVerified) return setMessage("⚠️ Please verify CAPTCHA.");
     if (!formData.agree) return setMessage("⚠️ Please agree to Terms.");
+    if (!formData.image) {
+      setImageError(true); // <-- mark error
+      return setMessage("⚠️ Please upload a profile picture.");
+    }
+
 
     setLoading(true);
     try {
@@ -254,7 +267,15 @@ export default function TutorRegistration() {
             <Box component="form" onSubmit={handleSubmit}>
               {/* Upload Image */}
               <Box textAlign="center" mb={2}>
-                <Button variant="contained" component="label" color="primary">
+                <Button
+                  variant="contained"
+                  component="label"
+                  color={imageError ? "error" : "primary"}
+                  sx={{
+                    animation: imageError ? "shake 0.5s" : "none",
+                    mb: 1,
+                  }}
+                >
                   Upload Profile Picture
                   <input
                     type="file"
@@ -264,6 +285,7 @@ export default function TutorRegistration() {
                     onChange={handleChange}
                   />
                 </Button>
+
                 {formData.image && (
                   <Avatar
                     src={URL.createObjectURL(formData.image)}
