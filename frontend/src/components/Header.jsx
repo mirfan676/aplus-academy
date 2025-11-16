@@ -227,19 +227,6 @@ const Header = () => {
           >
             +92-3066762289
           </Button>
-
-          <Button
-            startIcon={<EmailIcon />}
-            href="mailto:aplushometutorspk@gmail.com"
-            variant="outlined"
-            fullWidth
-            sx={{
-              textTransform: "none",
-              backdropFilter: "blur(10px)",
-            }}
-          >
-            aplushometutorspk@gmail.com
-          </Button>
         </Box>
       </Drawer>
     </>
