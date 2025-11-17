@@ -27,6 +27,18 @@ const cardsData = [
       "Get premium-quality home tutoring with budget-friendly monthly packages. No hidden charges, no long-term commitments—just transparent pricing designed to support every family without compromising on educational excellence.",
     icon: "/icons/affordable.svg",
   },
+  {
+    title: "Personalised Study Plans",
+    description:
+      "Because every child learns differently, we create customized study plans based on their strengths, weaknesses, and academic goals. Our tailored approach ensures faster progress, stronger concepts, and consistent improvement in daily learning.",
+    icon: "/icons/plans.svg",
+  },
+  {
+    title: "Safe & Reliable Home Tutoring",
+    description:
+      "Your child’s safety and learning comfort come first. We provide background-checked tutors, verified identities, and a secure teaching experience at home or online — trusted by hundreds of parents across Pakistan.",
+    icon: "/icons/safe.svg",
+  },
 ];
 
 const containerVariants = {
@@ -47,9 +59,14 @@ const AdvantagesSection = () => {
   return (
     <Box sx={{ py: 8, px: { xs: 2, md: 6 }, backgroundColor: "#f0f4f8" }}>
       <Typography
-        variant="h5"
+        variant="h4"
         fontWeight={700}
-        sx={{ mb: 6, textAlign: "center", color: "#004aad" }}
+        sx={{ mb: 6, textAlign: "center", color: "#004aad", fontSize: {
+      xs: "1.5rem", // mobile
+      sm: "1.8rem", // small devices
+      md: "2.0rem", // tablets
+      lg: "2.2rem", // desktop
+    } }}
       >
         Why Parents Trust APlus Home Tutors
       </Typography>
@@ -156,7 +173,7 @@ const AdvantagesSection = () => {
 
                   {/* Fixed text width */}
                   <Box sx={{ maxWidth: "260px" }}>
-                    <Typography variant="h6" fontWeight={700} sx={{ mb: 1 }}>
+                    <Typography variant="h6" fontWeight={700} sx={{ mb: 1, color: "#29b554" }}>
                       {card.title}
                     </Typography>
 
