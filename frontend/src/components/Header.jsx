@@ -16,7 +16,6 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
-import EmailIcon from "@mui/icons-material/Email";
 
 const Header = () => {
   const isMobile = useMediaQuery("(max-width:900px)");
@@ -80,7 +79,7 @@ const Header = () => {
           >
             <Box
               component="img"
-              src="/logo.svg"
+              src="/logo-nav.svg"
               alt="A Plus Home Tutors"
               sx={{
                 height: 48,
@@ -107,7 +106,7 @@ const Header = () => {
                       fontSize: "16px",
                       px: 1.8,
                       py: 0.7,
-                      borderRadius: "10px",
+                      borderRadius: "0px",
                       position: "relative",
                       transition: "all 0.3s ease",
                       ...(isActive && activeStyles),
@@ -116,6 +115,7 @@ const Header = () => {
                         transform: "translateY(-2px) scale(1.06)",
                         background: "rgba(255,255,255,0.2)",
                         backdropFilter: "blur(10px)",
+                        borderRadius: "0px",
                       },
 
                       "&::after": {

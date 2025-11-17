@@ -1,144 +1,134 @@
 import React from "react";
-import { Box, Typography, Button, Grid, useMediaQuery, IconButton } from "@mui/material";
-import WhatsAppIcon from "@mui/icons-material/WhatsApp";
-import EmailIcon from "@mui/icons-material/Email";
+import { Box, Typography, Button, useTheme, useMediaQuery } from "@mui/material";
+import { Link } from "react-router-dom";
 
-const HeroSection = () => {
-  const isMobile = useMediaQuery("(max-width:900px)");
-  const isTablet = useMediaQuery("(max-width:1200px)");
+export default function HeroSection() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // <600px
+  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md")); // 600px-900px
+
+  const glassFrame = {
+    position: "absolute",
+    bottom: isMobile ? "-15px" : "-25px",
+    right: isMobile ? "-10px" : "-30px",
+    padding: isMobile ? "6px" : "10px",
+    borderRadius: "20px",
+    backdropFilter: "blur(10px)",
+    background: "rgba(255, 255, 255, 0.25)",
+    border: "1px solid rgba(255, 255, 255, 0.35)",
+    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
+  };
+
+  const whiteFrame = {
+    position: "absolute",
+    bottom: isMobile ? "-15px" : "-25px",
+    right: isMobile ? "-10px" : "-30px",
+    padding: isMobile ? "6px" : "10px",
+    borderRadius: "20px",
+    background: "rgba(255, 255, 255, 0.95)",
+    border: "1px solid rgba(255, 255, 255, 0.35)",
+    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
+  };
 
   return (
     <Box
       sx={{
-        py: isMobile ? 6 : 10,
-        px: isMobile ? 2 : 6,
+        width: "100%",
+        minHeight: { xs: "60vh", sm: "75vh", md: "85vh" },
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        flexDirection: { xs: "column-reverse", md: "row" },
+        px: { xs: 3, sm: 5, md: 10 },
+        pt: { xs: 4, sm: 6, md: 10 },
         backgroundColor: "#f5f5f7",
         position: "relative",
-        overflow: "hidden",
       }}
     >
-      <Grid
-        container
-        spacing={isMobile ? 3 : 6}
-        alignItems="center"
-        justifyContent="space-between"
-        sx={{
-          flexDirection: isMobile ? "column-reverse" : "row",
-        }}
-      >
-        {/* Text Section */}
-        <Grid item xs={12} md={6} sx={{ zIndex: 1 }}>
-          <Typography
-            variant={isMobile ? "h5" : "h4"}
-            fontWeight={700}
-            sx={{ color: "#004aad", mb: 2 }}
-          >
-            Find Expert Home & Online Tutors
-          </Typography>
-
-          <Typography sx={{ mb: 3, fontSize: isMobile ? "14px" : "16px" }}>
-            APlus Home Tutors provides qualified, verified, and experienced
-            teachers for all classes and subjects in Lahore, Islamabad,
-            Rawalpindi, Karachi, and across Pakistan.
-          </Typography>
-
-          <Button
-            variant="contained"
-            size="large"
-            sx={{
-              background: "#29b554",
-              "&:hover": { background: "#22a049" },
-              mt: 1,
-              width: isMobile ? "100%" : "auto",
-            }}
-          >
-            Hire a Tutor
-          </Button>
-        </Grid>
-
-        {/* Image Section */}
-        <Grid
-          item
-          xs={12}
-          md={6}
+      {/* LEFT TEXT */}
+      <Box sx={{ maxWidth: { xs: "100%", sm: 450, md: 520 }, textAlign: { xs: "center", md: "left" } }}>
+        <Typography
+          variant="h2"
           sx={{
-            display: "flex",
-            justifyContent: isMobile ? "center" : "flex-end",
+            fontSize: { xs: "1.8rem", sm: "2.4rem", md: "3.2rem" },
+            fontWeight: 800,
+            lineHeight: 1.2,
+            color: "#004aad",
           }}
         >
-          <Box
-            sx={{
-              width: isMobile ? "80%" : isTablet ? "60%" : "100%",
-              maxWidth: 400,
-              borderRadius: "16px",
-              overflow: "hidden",
-              boxShadow: "0 15px 30px rgba(0,0,0,0.1)",
-              background: isMobile
-                ? "none"
-                : "linear-gradient(135deg, #e0f7fa 0%, #ffffff 100%)",
-            }}
-          >
-            <Box
-              component="img"
-              src="assets/hero-image.jpg"
-              alt="Aplus Best Home Tutors"
-              sx={{
-                width: "100%",
-                height: "auto",
-                display: "block",
-                borderRadius: "16px",
-              }}
-            />
-          </Box>
-        </Grid>
-      </Grid>
+          Premium Home Tutors For All Classes in Lahore
+        </Typography>
 
-      {/* Floating Icon Buttons */}
+        <Typography
+          sx={{
+            mt: 2,
+            fontSize: { xs: "0.9rem", sm: "1rem", md: "1.25rem" },
+            color: "#555",
+          }}
+        >
+          Expert one‑to‑one tutoring at your home — trusted by parents, students, and teachers.
+        </Typography>
+
+        <Button
+          component={Link}
+          to="/teachers"
+          variant="contained"
+          size="large"
+          sx={{
+            background: "#29b554",
+            "&:hover": { background: "#22a049" },
+            mt: 3,
+            px: 5,
+            py: 1.5,
+            borderRadius: "10px",
+            fontSize: { xs: "0.95rem", sm: "1.05rem", md: "1.1rem" },
+            width: { xs: "100%", sm: "auto" },
+            transition: "all 0.3s ease",
+          }}
+        >
+          Hire a Tutor
+        </Button>
+      </Box>
+
+      {/* RIGHT HERO IMAGES */}
       <Box
         sx={{
-          position: "absolute",
-          bottom: isMobile ? 16 : 32,
-          right: isMobile ? 16 : 32,
+          position: "relative",
+          mt: { xs: 6, md: 0 },
           display: "flex",
-          flexDirection: "column",
-          gap: 1,
-          zIndex: 10,
+          justifyContent: { xs: "center", md: "flex-end" },
         }}
       >
-        <IconButton
-          component="a"
-          href="https://wa.me/923066762289"
-          target="_blank"
-          rel="noopener noreferrer"
+        {/* MAIN IMAGE */}
+        <Box
+          component="img"
+          src="assets/hero-main.webp"
+          alt="Students"
           sx={{
-            backgroundColor: "#25D366",
-            color: "white",
-            "&:hover": { backgroundColor: "#1ebe5b", transform: "scale(1.1)" },
-            width: 56,
-            height: 56,
+            width: { xs: 260, sm: 350, md: 430 },
+            height: "auto",
+            borderRadius: "30px",
+            boxShadow: "0 20px 40px rgba(0,0,0,0.18)",
+            transition: "transform 0.3s ease",
+            "&:hover": { transform: "scale(1.02)" },
           }}
-        >
-          <WhatsAppIcon />
-        </IconButton>
+        />
 
-        <IconButton
-          component="a"
-          href="mailto:aplushometutorspk@gmail.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          sx={{
-            backgroundColor: "#0072c6",
-            color: "white",
-            "&:hover": { backgroundColor: "#005ea3", transform: "scale(1.1)" },
-            width: 56,
-            height: 56,
-          }}
-        >
-          <EmailIcon />
-        </IconButton>
+        {/* SMALL OVERLAPPING IMAGE WITH GLASS FRAME */}
+        <Box sx={whiteFrame}>
+          <Box
+            component="img"
+            src="assets/hero-small.webp"
+            alt="Tutor"
+            sx={{
+              width: { xs: 100, sm: 120, md: 150 },
+              height: "auto",
+              borderRadius: "15px",
+              display: "block",
+            }}
+          />
+        </Box>
       </Box>
     </Box>
   );
-};
-
-export default HeroSection;
+}

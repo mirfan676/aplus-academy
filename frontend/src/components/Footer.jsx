@@ -27,9 +27,9 @@ const Footer = () => {
         <Grid item xs={6} md={2}>
           <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
             <img
-              src="/aplus-logo.png"
+              src="logo-footer.svg"
               alt="APlus Home Tutors"
-              style={{ height: "60px", marginRight: "10px" }}
+              style={{ height: "150px", marginRight: "10px" }}
             />
           </Box>
 
@@ -41,24 +41,6 @@ const Footer = () => {
             and one-on-one guidance that transforms academic performance.
           </Typography>
 
-          {/* QUICK WHATSAPP CONTACT */}
-          <Box sx={{ mt: 3 }}>
-            <Button
-              variant="contained"
-              startIcon={<WhatsApp />}
-              href="https://wa.me/923066762289"
-              sx={{
-                bgcolor: "#25D366",
-                color: "#000",
-                fontWeight: 600,
-                px: 3,
-                py: 1,
-                "&:hover": { bgcolor: "#1ebe5c" },
-              }}
-            >
-              WhatsApp Us: 0306-6762289
-            </Button>
-          </Box>
         </Grid>
 
         {/* ACADEMY LINKS */}
