@@ -9,6 +9,8 @@ import math
 from fastapi import FastAPI, Form, File, Query, UploadFile, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from google.oauth2.service_account import Credentials
+from datetime import datetime, timedelta
+
 
 app = FastAPI(title="APlus Home Tutors API", version="3.0.0")
 
@@ -29,6 +31,10 @@ gspread_client = gspread.authorize(creds)
 
 SHEET_ID = "1wBmbImTrliHEIKk5YxM5PN4eOfkz6XLS28bjxRjmZvY"
 sheet = gspread_client.open_by_key(SHEET_ID).sheet1
+cached_tutors = []
+last_fetch_time = datetime.min
+CACHE_DURATION = timedelta(minutes=5)
+
 
 # --- IMGBB CONFIG ---
 IMGBB_API_KEY = os.environ.get("IMGBB_API_KEY", "")
@@ -201,20 +207,24 @@ async def register_tutor(
 # --- Get All Verified Tutors ---
 @app.get("/tutors")
 def get_tutors():
+    global cached_tutors, last_fetch_time
+
+    now = datetime.utcnow()
+    if now - last_fetch_time < CACHE_DURATION:
+        return cached_tutors   # return fast 0.01s
+
+    # Fetch fresh data from sheet
     try:
         records = sheet.get_all_records(empty2zero=False, head=1)
-        verified_tutors = []
+        verified = []
 
         for r in records:
-            if not any(r.values()):
-                continue
             if str(r.get("Verified", "")).strip().lower() != "yes":
                 continue
 
-            def safe_str(val):
-                return str(val).strip() if val is not None else ""
+            def safe_str(v): return str(v).strip() if v else ""
 
-            verified_tutors.append({
+            verified.append({
                 "Name": safe_str(r.get("Name")),
                 "Subject": safe_str(r.get("Subject")),
                 "Qualification": safe_str(r.get("Qualification")),
@@ -232,13 +242,16 @@ def get_tutors():
                 "Latitude": safe_str(r.get("Latitude")),
                 "Longitude": safe_str(r.get("Longitude")),
                 "Profile URL": safe_str(r.get("Profile URL")),
-                "Verified": "Yes",
+                "Verified": "Yes"
             })
 
-        return verified_tutors
+        cached_tutors = verified
+        last_fetch_time = now
+        return verified
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching tutors: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # --- Get Single Teacher ---
 @app.get("/tutors/{teacher_id}")
