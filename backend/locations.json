@@ -1,17 +1,392 @@
 {
   "Punjab": {
     "Lahore": {
-      "Lahore City": ["Lahore City"],
-      "Lahore Cantt": ["Lahore Cantt"],
-      "Model Town": ["Model Town"],
-      "Shalimar": ["Shalimar"],
-      "Raiwind": ["Raiwind"],
-      "Allama Iqbal": ["Allama Iqbal"],
-      "Nishter": ["Nishter"],
-      "Saddar": ["Saddar"],
-      "Wahga": ["Wahga"],
-      "Ravi": ["Ravi"]
-    },
+      "Raiwind": [
+        "Chak Boota",
+        "Ghangh Sharif",
+        "Jalal Pura",
+        "Jodho Dheer",
+        "Dhonday",
+        "Karyal",
+        "Kingra",
+        "Ladhy Kay Uchay",
+        "Raiwind",
+        "Rakh Jodho Dheer",
+        "Rakh Paji",
+        "Chak Wehgal",
+        "Rakh Ladhy Kay Uchay",
+        "Ladhy Kay Neiwen",
+        "Wattna",
+        "Boliana Otar",
+        "Bachokey Majha",
+        "Asal Lakhowal",
+        "Chak 62 Kot Jewan Mal",
+        "Tukra Alam Shah",
+        "Janjaty",
+        "Jia Bagga",
+        "Khana Nepal",
+        "Rakh Rai",
+        "Manak",
+        "Paji",
+        "Rai",
+        "Fateh Singh Wala",
+        "Rakh Pura",
+        "Taro Gill",
+        "Bhai Kot",
+        "Burhan Pura",
+        "Bath",
+        "Jhuggian lodhray",
+        "Sham Kay Bhattian",
+        "Kamas",
+        "Manga Hattar",
+        "Manga Ottar",
+        "Nehla",
+        "Mall",
+        "Tarrarah",
+        "Khurd Pur",
+        "Maraka",
+        "Mohlan Wal",
+        "Bado Kay Sani",
+        "Rakh Sultan Kay",
+        "Ram Kot",
+        "Rangil Pur",
+        "Sultan Kay",
+        "Lodhray",
+        "Sundar"
+      ],
+      "Allama Iqbal": [
+        "Ameer Pura",
+        "Bhalye Gill",
+        "Muqaddam Singh Wala",
+        "Rakh Sheikh Da Kot",
+        "Bhobattian",
+        "Chung Panjgrian",
+        "Julyana",
+        "Musalla",
+        "Khaliq Abad",
+        "Rakh Khamba",
+        "Boola Garhi",
+        "Katar Band",
+        "Rakh Theki",
+        "Kanjra",
+        "Gopi Rai",
+        "Mureed Wal",
+        "Niaz Beg",
+        "Amar Kot",
+        "Shahpur Khanpur"
+      ],
+      "Nishter": [
+        "Asal Suleman",
+        "Khand",
+        "Badoki",
+        "Ladhay Kay Bhullar",
+        "Jhedhu",
+        "Rakh Jhedhu",
+        "Kacha",
+        "Nangar",
+        "Seedhar",
+        "Gollvehra",
+        "Pandoki",
+        "Halloki",
+        "Sadhoki",
+        "Theh Panju",
+        "Toor Warraich",
+        "Attari Saroba",
+        "Dullu Kalan",
+        "Dullu Khurd",
+        "Dev Khurd & Kalan",
+        "Jathol",
+        "Ghanakar",
+        "Bhullar",
+        "Kamahan",
+        "Leel",
+        "Bukish Pura",
+        "Kot Wedhawa Singh",
+        "Atto Asal",
+        "Khanu Harni",
+        "Gajju Matta",
+        "Jhulkay",
+        "Kahna Nau",
+        "Kahna Kohna",
+        "Keet",
+        "Theh Chanp",
+        "Kot Mela Ram",
+        "Kot Pars Ram",
+        "Kot Islam Pura",
+        "Kot Nabi Bukhsh Wala",
+        "Sarraich",
+        "Chak Asu",
+        "Shahzada",
+        "Mehdi Pur"
+      ],
+      "Model Town": [
+        "Bagrian Dharamchand",
+        "Tahiat",
+        "Chandaray",
+        "Rakh Chand Rai",
+        "Keer Kalan",
+        "Kot Lakhpat",
+        "Davis Abad",
+        "Model Town",
+        "Pindi Rajputan",
+        "Khamba",
+        "Sattu Katla",
+        "Ghulam Ghous Wala",
+        "Ajodia Pur",
+        "Amar Sidhu",
+        "Rakh Kot Lakhpat",
+        "Bhabra",
+        "Bhekhywaal",
+        "Dhana Singh Wala",
+        "Ichhra",
+        "Jogeen Pura",
+        "Muhammad Sultan Abad"
+      ],
+      "Lahore Cantt": [
+        "Arazi Sehjpal",
+        "Chobacha Guru Ram Rai",
+        "Chung Khurd",
+        "Keer khurd",
+        "Charrar",
+        "Guru Mangat",
+        "Gohawa",
+        "Jhuggian Alfa",
+        "Kohar",
+        "Korray",
+        "Lahore cantt",
+        "Malik Pur",
+        "Shev Pur Kalan",
+        "Mian Meer",
+        "Noor Pur Kambowan",
+        "Sahjpal",
+        "Bhangali",
+        "Jalalabad",
+        "Chak Dhera",
+        "Chak Bharat",
+        "Class Mari / Kalas Mari",
+        "Dhoori",
+        "Mandian Wala",
+        "Fateh Jang Singh Wala",
+        "Lehna Singh Wala",
+        "Ghuwindi Khushhal Singh",
+        "Hassan Abad",
+        "Heera Singh Wala",
+        "Rakh Bhangali",
+        "Padri",
+        "Rakh Padri",
+        "Dograey khurd",
+        "Phularwan",
+        "Rakh Terrah",
+        "Terrah"
+      ],
+      "Saddar": [
+        "Barka Kalan",
+        "Brahaman Abad",
+        "Gobind Pura",
+        "Barka Khurd",
+        "Barki",
+        "Deo Sani",
+        "Kharmallian",
+        "Dhilwan",
+        "Jhallian",
+        "Ghanay Kay",
+        "Opal",
+        "Hadyara",
+        "Kohrian",
+        "Dherkey",
+        "Laloh",
+        "Karan Kay",
+        "Mojokay",
+        "Padhana",
+        "Pathan Kay",
+        "Rakh Hardat Singh",
+        "Theh Sarja Marja",
+        "Ram Pura Kalan",
+        "Ram Pura Khurd",
+        "Chinko Windi",
+        "Soyian Kalan",
+        "Soyian Khurd",
+        "Gaga",
+        "Heir",
+        "Harpal Kay",
+        "Pathan Wala",
+        "Rorran Wala",
+        "Karbath",
+        "Lidher",
+        "Mulkho Kay",
+        "Tattlay",
+        "Motta Singh Wala",
+        "Natha Singh Wala",
+        "Noor Pur",
+        "Dera Chahal",
+        "Rakh Dera Chahal",
+        "Sangat Pura",
+        "Thaither",
+        "Asal Guru Kay",
+        "Ahallu",
+        "Chak Ahallu",
+        "Bahu Bholy",
+        "Dhala Kulla",
+        "Ghuwind",
+        "Ghuwindi",
+        "Jahman",
+        "Rakh Bakhunth",
+        "Budhwar",
+        "Dhalla",
+        "Lakhokay",
+        "Rakh Dhalla",
+        "Guru Mangat Naubabad",
+        "Raja Bholay",
+        "Rorrah",
+        "Sorra",
+        "Keerka",
+        "Maliyyan",
+        "Thatha Khurd"
+      ],
+      "Wahga": [
+        "Chaapa",
+        "Rakh Rehman Pura",
+        "Jallo",
+        "Khera",
+        "Minhala Khurd Kalan",
+        "Narwar",
+        "Paddy",
+        "Nathoki",
+        "Nawan Pind Gojraan",
+        "Bhaini Sindhwaan",
+        "Qila Jeven Singh",
+        "Rakh Dhoori",
+        "Kharak",
+        "Sahan Kay",
+        "Khawaja Faiq",
+        "Taqipur",
+        "Jhandheer",
+        "Thehpura",
+        "Bhaseen",
+        "Dogoich",
+        "Wahgaryaan",
+        "Atto Kay Awan",
+        "Dogray Kalan",
+        "Manawaan",
+        "Rakh Chahbeel",
+        "Sheb Pura Khurd",
+        "Chak Ram Pura",
+        "Ram Pura Jagir",
+        "Hussain Abad",
+        "Mannaa",
+        "Rakh Bhaseen",
+        "Sannat Pura",
+        "Rakh Sultan Pura",
+        "Dunichand Wala",
+        "Gopal Singh Wala",
+        "Narrian Pura",
+        "Thatha Tarran",
+        "Thathi Koda",
+        "Bagriyaan Syedaan",
+        "Kot Dunichand",
+        "Tulspura",
+        "Dayal",
+        "Bhanu Chak",
+        "Lakhan Kay",
+        "Wahga",
+        "Awan Dhaya Wala",
+        "Mari",
+        "Marlwar",
+        "Bhaini Dehalwaan",
+        "Echogil",
+        "Ganja Sindhu",
+        "Jindyala",
+        "Hando Gujran",
+        "Lakhodher",
+        "Saggian Wassao Pura",
+        "Arazi Talwara",
+        "Malikpur Gharki",
+        "Talwara War",
+        "Natt",
+        "Tej Garh",
+        "Thatha Dhilwan",
+        "Wiswiyaan"
+      ],
+      "Shalimar": [
+        "Baghban Pura",
+        "Begum Pura",
+        "Bhogiwal",
+        "Kot Khwaja Saeed",
+        "Kotlie Ghasi",
+        "Moman Pura",
+        "Madusan Pura",
+        "Mahmood Booti",
+        "Devi Pura",
+        "Qilla Khazana",
+        "Shadipura",
+        "Achnat Garh",
+        "Fateh Garh",
+        "Ghari Shahu",
+        "Gung",
+        "Chandiaan",
+        "Harbans Pura",
+        "Qila Gujjar Singh",
+        "Kotli Pir Abdul Rehman",
+        "Sahuwari",
+        "Salamat Pura",
+        "Tajpura"
+      ],
+      "Ravi": [
+        "Fateh Puri",
+        "Shahdara Padao",
+        "Tar Garh",
+        "Jia Musa",
+        "Chak Kot Begum",
+        "Har Narian Pura",
+        "Khokhar",
+        "Rakh Shahdara Jungle",
+        "Kot Begum",
+        "Kot Muhiboo",
+        "Nain Sukh",
+        "Shahdara",
+        "Aeno Bhatti",
+        "Arazi Janjua",
+        "Baghanwala",
+        "Bela Basti Ram",
+        "Bhamma",
+        "Jhuggian Jodha",
+        "Hardo Jabbo",
+        "Karol War",
+        "Khoui Meeran",
+        "Nolakha",
+        "Ram Kishan Wala"
+      ],
+      "Lahore City": [
+        "Ganjan Kalan",
+        "Rakh Shahdara Mazraua",
+        "Chak Jia Musa",
+        "Lahore Khas",
+        "Mozang",
+        "Qila Hakeema",
+        "Raj Garh",
+        "Sheesh Mahal",
+        "Babu Sabu",
+        "Chamru Pur",
+        "Nonarian",
+        "Sanda Khurd",
+        "Saggian Kalan War",
+        "Sandan Kalan",
+        "Bhadroo",
+        "Shera Kot",
+        "Kot Kambo",
+        "Dholan wal",
+        "Kot Muhammadi",
+        "Jhuggian Nagra",
+        "Saidpur",
+        "Kaky Zai",
+        "Kharak",
+        "Nawan Kot",
+        "Paki Thathi",
+        "Sodiwal"
+      ]
+    }
+}
+,
     "Kasur": {
       "Kasur": ["Kasur"],
       "Kot Radha Kishan": ["Kot Radha Kishan"],
@@ -237,6 +612,587 @@
       "Darya Khan": ["Darya Khan"],
       "Mankera": ["Mankera"],
       "Kalur Kot": ["Kalur Kot"]
+    }
+  },
+    "Sindh": {
+    "Karachi": {
+      "Karachi East": ["Gulshan-e-Iqbal", "Jamshed Town"],
+      "Karachi West": ["Mominabad", "Orangi Town"],
+      "Karachi South": ["Lyari", "Saddar Town"],
+      "Karachi Central": ["Gulberg Town", "Liaquatabad Town"],
+      "Korangi": ["Korangi", "Shah Faisal"],
+      "Malir": ["Malir", "Ibrahim Hyderi", "Gadap Town"]
+    },
+    "Hyderabad": {
+      "Hyderabad City": ["Hyderabad Urban", "Latifabad", "Qasimabad"],
+      "Hyderabad Rural": ["Hyderabad Rural"]
+    },
+    "Sukkur": {
+      "Sukkur City": ["Sukkur City"],
+      "New Sukkur": ["New Sukkur"],
+      "Pano Aqil": ["Pano Aqil"]
+    },
+    "Larkana": {
+      "Larkana": ["Larkana"],
+      "Ratodero": ["Ratodero"],
+      "Dokri": ["Dokri"],
+      "Bakrani": ["Bakrani"]
+    },
+    "Nawabshah (Shaheed Benazirabad)": {
+      "Nawabshah": ["Nawabshah"],
+      "Daur": ["Daur"],
+      "Qazi Ahmed": ["Qazi Ahmed"],
+      "Sakrand": ["Sakrand"]
+    },
+    "Mirpurkhas": {
+      "Mirpurkhas": ["Mirpurkhas"],
+      "Digri": ["Digri"],
+      "Jhuddo": ["Jhuddo"],
+      "Kot Ghulam Muhammad": ["Kot Ghulam Muhammad"],
+      "Shujabad": ["Shujabad"]
+    },
+    "Umerkot": {
+      "Umerkot": ["Umerkot"],
+      "Kunri": ["Kunri"],
+      "Pithoro": ["Pithoro"],
+      "Samaro": ["Samaro"]
+    },
+    "Tharparkar": {
+      "Mithi": ["Mithi"],
+      "Chachro": ["Chachro"],
+      "Dahli": ["Dahli"],
+      "Islamkot": ["Islamkot"],
+      "Nagarparkar": ["Nagarparkar"]
+    },
+    "Badin": {
+      "Badin": ["Badin"],
+      "Talhar": ["Talhar"],
+      "Matli": ["Matli"],
+      "Shaheed Fazil Rahu": ["Shaheed Fazil Rahu"],
+      "Tando Bago": ["Tando Bago"]
+    },
+    "Thatta": {
+      "Thatta": ["Thatta"],
+      "Mirpur Sakro": ["Mirpur Sakro"],
+      "Ghorabari": ["Ghorabari"],
+      "Keti Bander": ["Keti Bander"]
+    },
+    "Sujawal": {
+      "Sujawal": ["Sujawal"],
+      "Jati": ["Jati"],
+      "Kharo Chan": ["Kharo Chan"],
+      "Shah Bandar": ["Shah Bandar"]
+    },
+    "Dadu": {
+      "Dadu": ["Dadu"],
+      "Kotri": ["Kotri"],
+      "Sehwan": ["Sehwan"],
+      "Johi": ["Johi"],
+      "Mehar": ["Mehar"]
+    },
+    "Jamshoro": {
+      "Jamshoro": ["Jamshoro"],
+      "Kotri": ["Kotri"],
+      "Manjhand": ["Manjhand"],
+      "Sehwan Sharif": ["Sehwan Sharif"]
+    },
+    "Tando Allahyar": {
+      "Tando Allahyar": ["Tando Allahyar"],
+      "Chamber": ["Chamber"],
+      "Jhando Mari": ["Jhando Mari"]
+    },
+    "Tando Muhammad Khan": {
+      "Tando Muhammad Khan": ["Tando Muhammad Khan"],
+      "Bulri Shah Karim": ["Bulri Shah Karim"],
+      "Tando Ghulam Hyder": ["Tando Ghulam Hyder"]
+    },
+    "Jacobabad": {
+      "Jacobabad": ["Jacobabad"],
+      "Thul": ["Thul"],
+      "Garhi Khairo": ["Garhi Khairo"]
+    },
+    "Kashmore": {
+      "Kandhkot": ["Kandhkot"],
+      "Kashmore": ["Kashmore"],
+      "Tangwani": ["Tangwani"]
+    },
+    "Shikarpur": {
+      "Shikarpur": ["Shikarpur"],
+      "Khanpur": ["Khanpur"],
+      "Lakhi": ["Lakhi"],
+      "Garhi Yasin": ["Garhi Yasin"]
+    },
+    "Ghotki": {
+      "Ghotki": ["Ghotki"],
+      "Mirpur Mathelo": ["Mirpur Mathelo"],
+      "Ubauro": ["Ubauro"]
+    },
+    "Khairpur": {
+      "Khairpur": ["Khairpur"],
+      "Gambat": ["Gambat"],
+      "Kot Diji": ["Kot Diji"],
+      "Kingri": ["Kingri"],
+      "Sobhodero": ["Sobhodero"]
+    },
+    "Sanghar": {
+      "Sanghar": ["Sanghar"],
+      "Shahdadpur": ["Shahdadpur"],
+      "Tando Adam": ["Tando Adam"],
+      "Sinjhoro": ["Sinjhoro"],
+      "Khipro": ["Khipro"]
+    }
+  },
+  "KPK": {
+    "Peshawar": {
+      "Peshawar": ["Peshawar"],
+      "Shah Alam": ["Shah Alam"],
+      "Mathra": ["Mathra"],
+      "Badabher": ["Badabher"],
+      "Chamkani": ["Chamkani"],
+      "Hassan Khel": ["Hassan Khel"]
+    },
+    "Mardan": {
+      "Mardan": ["Mardan"],
+      "Takht Bhai": ["Takht Bhai"],
+      "Katlang": ["Katlang"],
+      "Rustam": ["Rustam"],
+      "Ghari Kapura": ["Ghari Kapura"]
+    },
+    "Charsadda": {
+      "Charsadda": ["Charsadda"],
+      "Shabqadar": ["Shabqadar"],
+      "Tangi": ["Tangi"]
+    },
+    "Nowshera": {
+      "Nowshera": ["Nowshera"],
+      "Pabbi": ["Pabbi"],
+      "Jehangira": ["Jehangira"]
+    },
+    "Swabi": {
+      "Swabi": ["Swabi"],
+      "Topi": ["Topi"],
+      "Lahor": ["Lahor"],
+      "Razar": ["Razar"]
+    },
+    "Kohat": {
+      "Kohat": ["Kohat"],
+      "Lachi": ["Lachi"],
+      "Gumbat": ["Gumbat"]
+    },
+    "Hangu": {
+      "Hangu": ["Hangu"],
+      "Tall": ["Tall"],
+      "Doaba": ["Doaba"]
+    },
+    "Karak": {
+      "Karak": ["Karak"],
+      "Takht-e-Nasrati": ["Takht-e-Nasrati"],
+      "Banda Daud Shah": ["Banda Daud Shah"]
+    },
+    "Bannu": {
+      "Bannu": ["Bannu"],
+      "Domel": ["Domel"],
+      "Kakki": ["Kakki"]
+    },
+    "Lakki Marwat": {
+      "Lakki Marwat": ["Lakki Marwat"],
+      "Sari Naurang": ["Sari Naurang"]
+    },
+    "Dera Ismail Khan": {
+      "Dera Ismail Khan": ["Dera Ismail Khan"],
+      "Paharpur": ["Paharpur"],
+      "Kulachi": ["Kulachi"],
+      "Daraban": ["Daraban"],
+      "Paroa": ["Paroa"]
+    },
+    "Tank": {
+      "Tank": ["Tank"],
+      "Jandola": ["Jandola"]
+    },
+    "Haripur": {
+      "Haripur": ["Haripur"],
+      "Khanpur": ["Khanpur"],
+      "Ghazi": ["Ghazi"]
+    },
+    "Abbottabad": {
+      "Abbottabad": ["Abbottabad"],
+      "Havelian": ["Havelian"],
+      "Lora": ["Lora"]
+    },
+    "Mansehra": {
+      "Mansehra": ["Mansehra"],
+      "Balakot": ["Balakot"],
+      "Oghi": ["Oghi"],
+      "Darband": ["Darband"]
+    },
+    "Battagram": {
+      "Battagram": ["Battagram"],
+      "Allai": ["Allai"]
+    },
+    "Torghar": {
+      "Judba": ["Judba"],
+      "Kandar Hassanzai": ["Kandar Hassanzai"],
+      "Akhazai": ["Akhazai"]
+    },
+    "Swat": {
+      "Mingora / Babuzai": ["Babuzai"],
+      "Barikot": ["Barikot"],
+      "Kabal": ["Kabal"],
+      "Charbagh": ["Charbagh"],
+      "Matta": ["Matta"],
+      "Khwazakhela": ["Khwazakhela"],
+      "Bahrain": ["Bahrain"]
+    },
+    "Shangla": {
+      "Alpuri": ["Alpuri"],
+      "Puran": ["Puran"],
+      "Bisham": ["Bisham"]
+    },
+    "Buner": {
+      "Daggar": ["Daggar"],
+      "Gagra": ["Gagra"],
+      "Khudu Khel": ["Khudu Khel"],
+      "Chamla": ["Chamla"]
+    },
+    "Malakand": {
+      "Batkhela": ["Batkhela"],
+      "Dargai": ["Dargai"]
+    },
+    "Lower Dir": {
+      "Timergara": ["Timergara"],
+      "Samar Bagh": ["Samar Bagh"],
+      "Lal Qila": ["Lal Qila"]
+    },
+    "Upper Dir": {
+      "Dir": ["Dir"],
+      "Wari": ["Wari"]
+    },
+    "Chitral Lower": {
+      "Chitral": ["Chitral"],
+      "Ayun": ["Ayun"]
+    },
+    "Chitral Upper": {
+      "Mastuj": ["Mastuj"],
+      "Torkhow / Terich": ["Torkhow", "Terich"]
+    },
+    "Khyber": {
+      "Landi Kotal": ["Landi Kotal"],
+      "Jamrud": ["Jamrud"],
+      "Bara": ["Bara"]
+    },
+    "Orakzai": {
+      "Upper Orakzai": ["Upper Orakzai"],
+      "Lower Orakzai": ["Lower Orakzai"]
+    },
+    "Kurram": {
+      "Parachinar": ["Parachinar"],
+      "Sadda": ["Sadda"],
+      "Upper Kurram": ["Upper Kurram"],
+      "Lower Kurram": ["Lower Kurram"]
+    },
+    "North Waziristan": {
+      "Miram Shah": ["Miram Shah"],
+      "Miran Shah": ["Miran Shah"],
+      "Razmak": ["Razmak"],
+      "Datta Khel": ["Datta Khel"]
+    },
+    "South Waziristan": {
+      "Wana": ["Wana"],
+      "Shakai": ["Shakai"],
+      "Toi Khulla": ["Toi Khulla"]
+    }
+  },
+  "Balochistan": {
+    "Quetta": {
+      "Quetta City": ["Quetta City"],
+      "Sariab": ["Sariab"],
+      "Shahbaz Town": ["Shahbaz Town"],
+      "Satellite Town": ["Satellite Town"]
+    },
+    "Pishin": {
+      "Pishin": ["Pishin"],
+      "Hurramzai": ["Hurramzai"],
+      "Barshore": ["Barshore"]
+    },
+    "Killa Abdullah": {
+      "Chaman": ["Chaman"],
+      "Dobandi": ["Dobandi"],
+      "Gulistan": ["Gulistan"]
+    },
+    "Ziarat": {
+      "Ziarat": ["Ziarat"],
+      "Sanati": ["Sanati"]
+    },
+    "Loralai": {
+      "Loralai": ["Loralai"],
+      "Duki": ["Duki"],
+      "Mekhtar": ["Mekhtar"]
+    },
+    "Musa Khel": {
+      "Musa Khel": ["Musa Khel"],
+      "Toeada": ["Toeada"]
+    },
+    "Barkhan": {
+      "Barkhan": ["Barkhan"]
+    },
+    "Kohlu": {
+      "Kohlu": ["Kohlu"],
+      "Kahan": ["Kahan"],
+      "Maiwand": ["Maiwand"]
+    },
+    "Dera Bugti": {
+      "Dera Bugti": ["Dera Bugti"],
+      "Sui": ["Sui"],
+      "Phelawagh": ["Phelawagh"],
+      "Baiker": ["Baiker"]
+    },
+    "Sibi": {
+      "Sibi": ["Sibi"],
+      "Lehri": ["Lehri"],
+      "Kutmandai": ["Kutmandai"]
+    },
+    "Harnai": {
+      "Harnai": ["Harnai"],
+      "Sharag": ["Sharag"]
+    },
+    "Jaffarabad": {
+      "Jaffarabad": ["Jaffarabad"],
+      "Usta Muhammad": ["Usta Muhammad"],
+      "Gandar": ["Gandar"]
+    },
+    "Naseerabad": {
+      "Dera Murad Jamali": ["Dera Murad Jamali"],
+      "Tamboo": ["Tamboo"],
+      "Chattar": ["Chattar"]
+    },
+    "Kharan": {
+      "Kharan": ["Kharan"]
+    },
+    "Washuk": {
+      "Washuk": ["Washuk"],
+      "Mashkel": ["Mashkel"],
+      "Basima": ["Basima"]
+    },
+    "Chagai": {
+      "Dalbandin": ["Dalbandin"],
+      "Nokundi": ["Nokundi"],
+      "Taftan": ["Taftan"]
+    },
+    "Nushki": {
+      "Nushki": ["Nushki"]
+    },
+    "Kalat": {
+      "Kalat": ["Kalat"],
+      "Surab": ["Surab"]
+    },
+    "Mastung": {
+      "Mastung": ["Mastung"],
+      "Dasht": ["Dasht"],
+      "Khad Khoocha": ["Khad Khoocha"]
+    },
+    "Awaran": {
+      "Awaran": ["Awaran"],
+      "Gishkore": ["Gishkore"]
+    },
+    "Lasbela": {
+      "Hub": ["Hub"],
+      "Bela": ["Bela"],
+      "Dureji": ["Dureji"],
+      "Lakhra": ["Lakhra"]
+    },
+    "Gwadar": {
+      "Gwadar": ["Gwadar"],
+      "Jiwani": ["Jiwani"],
+      "Pasni": ["Pasni"],
+      "Ormara": ["Ormara"]
+    },
+    "Kech (Turbat)": {
+      "Turbat": ["Turbat"],
+      "Dasht": ["Dasht"],
+      "Tump": ["Tump"],
+      "Mand": ["Mand"]
+    },
+    "Panjgur": {
+      "Panjgur": ["Panjgur"],
+      "Paroom": ["Paroom"],
+      "Gichk": ["Gichk"]
+    },
+    "Khuzdar": {
+      "Khuzdar": ["Khuzdar"],
+      "Wadh": ["Wadh"],
+      "Naal": ["Naal"],
+      "Zehri": ["Zehri"]
+    },
+    "Qila Saifullah": {
+      "Qila Saifullah": ["Qila Saifullah"],
+      "Muslim Bagh": ["Muslim Bagh"],
+      "Kan Mehtarzai": ["Kan Mehtarzai"]
+    },
+    "Sherani": {
+      "Sherani": ["Sherani"]
+    },
+    "Zhob": {
+      "Zhob": ["Zhob"],
+      "Ashwat": ["Ashwat"]
+    }
+  },
+  "Gilgit-Baltistan": {
+    "Gilgit": {
+      "Gilgit": ["Gilgit"],
+      "Danyor": ["Danyor"],
+      "Juglot": ["Juglot"],
+      "Naltar": ["Naltar"],
+      "Haramosh": ["Haramosh"]
+    },
+    "Skardu": {
+      "Skardu": ["Skardu"],
+      "Rondu": ["Rondu"],
+      "Gamba": ["Gamba"],
+      "Shigar (Old Skardu Tehsil)": ["Shigar"]
+    },
+    "Shigar": {
+      "Shigar": ["Shigar"],
+      "Gulabpur": ["Gulabpur"]
+    },
+    "Kharmang": {
+      "Kharmang": ["Kharmang"],
+      "Tolti": ["Tolti"]
+    },
+    "Ghanche": {
+      "Khaplu": ["Khaplu"],
+      "Mashabrum": ["Mashabrum"],
+      "Keris": ["Keris"]
+    },
+    "Astore": {
+      "Astore": ["Astore"],
+      "Shounter": ["Shounter"],
+      "Gudai": ["Gudai"],
+      "Rattu": ["Rattu"]
+    },
+    "Diamer": {
+      "Chilas": ["Chilas"],
+      "Darel": ["Darel"],
+      "Tangir": ["Tangir"],
+      "Goharabad": ["Goharabad"]
+    },
+    "Nagar": {
+      "Nagar Khas": ["Nagar Khas"],
+      "Hoper": ["Hoper"],
+      "Askurdas": ["Askurdas"]
+    },
+    "Hunza": {
+      "Karimabad": ["Karimabad"],
+      "Gojal": ["Gojal"],
+      "Aliabad": ["Aliabad"],
+      "Shimshal": ["Shimshal"]
+    },
+    "Ghizer": {
+      "Gahkuch": ["Gahkuch"],
+      "Gupis": ["Gupis"],
+      "Yasin": ["Yasin"],
+      "Ishkoman": ["Ishkoman"],
+      "Punial": ["Punial"]
+    },
+    "Upper Chitral": {
+      "Mastuj": ["Mastuj"],
+      "Torkhow": ["Torkhow"],
+      "Mulkhow": ["Mulkhow"]
+    }
+  },
+  "Azad Jammu & Kashmir (AJK)": {
+    "Muzaffarabad": {
+      "Muzaffarabad": ["Muzaffarabad"],
+      "Nasirabad": ["Nasirabad"],
+      "Hattian": ["Hattian"],
+      "Chikar": ["Chikar"],
+      "Dhirkot": ["Dhirkot"]
+    },
+    "Hattian Bala": {
+      "Hattian Bala": ["Hattian Bala"],
+      "Chikar": ["Chikar"],
+      "Leepa": ["Leepa"]
+    },
+    "Neelum": {
+      "Athmuqam": ["Athmuqam"],
+      "Sharda": ["Sharda"],
+      "Kel": ["Kel"],
+      "Taobat": ["Taobat"]
+    },
+    "Bhimber": {
+      "Bhimber": ["Bhimber"],
+      "Samahni": ["Samahni"],
+      "Barnala": ["Barnala"]
+    },
+    "Kotli": {
+      "Kotli": ["Kotli"],
+      "Sehnsa": ["Sehnsa"],
+      "Khuiratta": ["Khuiratta"],
+      "Fatehpur Thakiala (Nakyal)": ["Fatehpur Thakiala (Nakyal)"]
+    },
+    "Mirpur": {
+      "Mirpur": ["Mirpur"],
+      "Dadyal": ["Dadyal"],
+      "Chakswari": ["Chakswari"]
+    },
+    "Poonch": {
+      "Rawalakot": ["Rawalakot"],
+      "Hajira": ["Hajira"],
+      "Abbaspur": ["Abbaspur"],
+      "Thorar": ["Thorar"]
+    },
+    "Bagh": {
+      "Bagh": ["Bagh"],
+      "Dhirkot": ["Dhirkot"],
+      "Hari Ghel": ["Hari Ghel"]
+    },
+    "Haveli": {
+      "Khurshidabad": ["Khurshidabad"],
+      "Forward Kahuta": ["Forward Kahuta"],
+      "Mandi": ["Mandi"]
+    },
+    "Sudhnoti": {
+      "Pallandri": ["Pallandri"],
+      "Mang": ["Mang"],
+      "Tarar Khel": ["Tarar Khel"],
+      "Balouch": ["Balouch"]
+    }
+  },
+  "Islamabad": {
+    "Islamabad": {
+      "Islamabad Urban": [
+        "G-5",
+        "G-6",
+        "G-7",
+        "G-8",
+        "G-9",
+        "G-10",
+        "F-6",
+        "F-7",
+        "F-8",
+        "F-9"
+      ],
+      "Islamabad Rural": [
+        "Bani Gala",
+        "Bara Kahu",
+        "Chak Shahzad",
+        "Tarlai Kalan",
+        "Tarlai Khurd",
+        "Dhok Hassu",
+        "Rawat",
+        "Sihala",
+        "Golra Sharif",
+        "Shah Allah Ditta",
+        "Bhara Kahu",
+        "Malpur",
+        "Naupur",
+        "Pind Begwal",
+        "Bara Pind",
+        "Talhar",
+        "Kahuta Road",
+        "Phulgran",
+        "Kuri",
+        "Dhok Maira"
+      ]
     }
   }
 }

@@ -191,7 +191,7 @@ async def register_tutor(
         ])
 
         return {
-            "message": "✅ Tutor registered successfully!",
+            "message": "Tutor registered successfully!",
             "image_url": image_url,
             "province": province,
             "district": district,
