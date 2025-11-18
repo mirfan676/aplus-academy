@@ -280,26 +280,28 @@ const TeacherDirectory = () => {
                 }}
               >
                 <Card
-  sx={{
-    p: 3,
-    borderRadius: 3,
-    boxShadow: 3,
-    width: "100%",
-    Width: "320px",
-    minWidth: "260px",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    textAlign: "center",
-    height: "100%",
-    transition: "transform 0.25s ease, box-shadow 0.25s ease",
-    "&:hover": {
-      transform: "translateY(-6px)",
-      boxShadow: 6,
-    },
-  }}
->
+                    sx={{
+                      p: 3,
+                      borderRadius: 3,
+                      boxShadow: 3,
+                      width: {
+                        xs: "95%",   // Mobile
+                        sm: "280px", // Small screens
+                        md: "320px", // Tablets
+                        lg: "340px", // Desktop
+                      },
+                      maxWidth: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      textAlign: "center",
+                      transition: "transform 0.25s ease, box-shadow 0.25s ease",
+                      "&:hover": {
+                        transform: "translateY(-6px)",
+                        boxShadow: 6,
+                      },
+                    }}
+                  >
                     {/* --- Top: Avatar + Verified --- */}
                     <Box sx={{ mb: 2 }}>
                       <Avatar

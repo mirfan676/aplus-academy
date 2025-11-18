@@ -139,7 +139,9 @@ async def register_tutor(
             response = requests.post("https://api.imgbb.com/1/upload", data=payload)
             result = response.json()
             if result.get("success"):
-                image_url = result["data"]["url"]
+                raw_url = result["data"]["url"]
+                image_url = f"https://cold-truth-e620.irfan-karor-mi.workers.dev/?url={raw_url}"
+
 
         # --- Determine default areas if missing ---
         default_areas = pakistan_data.get(province, {}).get(district, {}).get(tehsil, [])
