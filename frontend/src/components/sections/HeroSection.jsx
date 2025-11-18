@@ -4,20 +4,8 @@ import { Link } from "react-router-dom";
 
 export default function HeroSection() {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // <600px
-  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md")); // 600px-900px
-
-  const glassFrame = {
-    position: "absolute",
-    bottom: isMobile ? "-15px" : "-25px",
-    right: isMobile ? "-10px" : "-30px",
-    padding: isMobile ? "6px" : "10px",
-    borderRadius: "20px",
-    backdropFilter: "blur(10px)",
-    background: "rgba(255, 255, 255, 0.25)",
-    border: "1px solid rgba(255, 255, 255, 0.35)",
-    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
-  };
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
 
   const whiteFrame = {
     position: "absolute",
@@ -45,6 +33,7 @@ export default function HeroSection() {
         position: "relative",
       }}
     >
+
       {/* LEFT TEXT */}
       <Box sx={{ maxWidth: { xs: "100%", sm: 450, md: 520 }, textAlign: { xs: "center", md: "left" } }}>
         <Typography
@@ -66,7 +55,7 @@ export default function HeroSection() {
             color: "#555",
           }}
         >
-          Expert one‑to‑one tutoring at your home — trusted by parents, students, and teachers.
+          Expert one-to-one tutoring at your home — trusted by parents, students, and teachers.
         </Typography>
 
         <Button
@@ -99,11 +88,22 @@ export default function HeroSection() {
           justifyContent: { xs: "center", md: "flex-end" },
         }}
       >
-        {/* MAIN IMAGE */}
+
+        {/* MAIN (LCP) IMAGE - OPTIMIZED */}
         <Box
           component="img"
-          src="assets/hero-main.webp"
+          src="/assets/hero-main-430.webp"
+          srcSet="/assets/hero-main-430.webp 430w,
+                  /assets/hero-main-350.webp 350w,
+                  /assets/hero-main-260.webp 260w"
+          sizes="(max-width: 600px) 260px,
+                 (max-width: 900px) 350px,
+                 430px"
           alt="Students"
+          width="430"
+          height="323"
+          fetchpriority="high"
+          loading="eager"
           sx={{
             width: { xs: 260, sm: 350, md: 430 },
             height: "auto",
@@ -114,12 +114,21 @@ export default function HeroSection() {
           }}
         />
 
-        {/* SMALL OVERLAPPING IMAGE WITH GLASS FRAME */}
+        {/* SMALL IMAGE - OPTIMIZED */}
         <Box sx={whiteFrame}>
           <Box
             component="img"
-            src="assets/hero-small.webp"
+            src="/assets/hero-small-150.webp"
+            srcSet="/assets/hero-small-150.webp 150w,
+                    /assets/hero-small-120.webp 120w,
+                    /assets/hero-small-100.webp 100w"
+            sizes="(max-width: 600px) 100px,
+                   (max-width: 900px) 120px,
+                   150px"
             alt="Tutor"
+            width="150"
+            height="150"
+            loading="lazy"
             sx={{
               width: { xs: 100, sm: 120, md: 150 },
               height: "auto",
@@ -129,6 +138,7 @@ export default function HeroSection() {
           />
         </Box>
       </Box>
+
     </Box>
   );
 }
