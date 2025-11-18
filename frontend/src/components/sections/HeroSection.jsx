@@ -34,7 +34,7 @@ export default function HeroSection() {
     <Box
       sx={{
         width: "100%",
-        minHeight: { xs: "60vh", sm: "75vh", md: "85vh" },
+        minHeight: { xs: "70vh", sm: "75vh", md: "85vh" },
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -130,6 +130,8 @@ export default function HeroSection() {
             component="img"
             src="assets/hero-small.webp"
             alt="Tutor"
+            width={150}  
+            height={112} 
             sx={{
               width: { xs: 100, sm: 120, md: 150 },
               height: "auto",
