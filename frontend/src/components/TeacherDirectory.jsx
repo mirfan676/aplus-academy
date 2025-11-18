@@ -263,6 +263,7 @@ const TeacherDirectory = () => {
             alignItems="stretch"
             sx={{
               rowGap: 3,
+              pt: { xs: 4, sm: 6 },
             }}
           >
             {filtered.slice(0, visibleCount).map((t) => (
@@ -284,7 +285,7 @@ const TeacherDirectory = () => {
     borderRadius: 3,
     boxShadow: 3,
     width: "100%",
-    maxWidth: "320px",
+    Width: "320px",
     minWidth: "260px",
     display: "flex",
     flexDirection: "column",
