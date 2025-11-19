@@ -144,6 +144,8 @@ export default function TutorRegistration() {
     area3: "",
   });
 
+  const [coords, setCoords] = useState({ lat: "", lng: "" });
+
   const [districtsList, setDistrictsList] = useState([]);
   const [tehsilsList, setTehsilsList] = useState([]);
   const [areasList, setAreasList] = useState([]);
@@ -152,6 +154,21 @@ export default function TutorRegistration() {
   const [loading, setLoading] = useState(false);
   const [captchaVerified, setCaptchaVerified] = useState(false);
   const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCoords({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+      },
+      (error) => console.log("Location access denied")
+    );
+  }
+}, []);
+
 
   // --- Fetch locations ---
   useEffect(() => {
@@ -252,6 +269,9 @@ export default function TutorRegistration() {
       const submissionData = new FormData();
       Object.entries(formData).forEach(([k, v]) => submissionData.append(k, v));
       Object.entries(location).forEach(([k, v]) => submissionData.append(k, v));
+
+      submissionData.append("lat", coords.lat);
+      submissionData.append("lng", coords.lng);
 
       const res = await api.post("/tutors/register", submissionData, {
         headers: { "Content-Type": "multipart/form-data" },
