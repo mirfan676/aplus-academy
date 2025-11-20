@@ -1,7 +1,8 @@
 import { Box, Typography } from "@mui/material";
+import { useRef } from "react";
 import { motion } from "framer-motion";
 
-// ============ FEATURES ============
+// FEATURES
 const features = [
   {
     icon: "/icons/experienced.jpg",
@@ -21,6 +22,20 @@ const features = [
 ];
 
 const WhyChooseUs = () => {
+  const scrollRef = useRef(null);
+
+  const scrollLeft = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: -300, behavior: "smooth" });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 300, behavior: "smooth" });
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -44,7 +59,7 @@ const WhyChooseUs = () => {
         Why Choose APlus Home Tutors?
       </Typography>
 
-      {/* ================= DESKTOP GRID ================= */}
+      {/* DESKTOP GRID */}
       <Box
         sx={{
           display: { xs: "none", md: "grid" },
@@ -57,7 +72,8 @@ const WhyChooseUs = () => {
             key={i}
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
           >
             <Box
               sx={{
@@ -68,7 +84,6 @@ const WhyChooseUs = () => {
                 background: "rgba(255,255,255,0.25)",
                 backdropFilter: "blur(12px)",
                 boxShadow: "0 12px 28px rgba(0,0,0,0.15)",
-                overflow: "hidden",
 
                 "&::before": {
                   content: '""',
@@ -77,19 +92,13 @@ const WhyChooseUs = () => {
                   padding: "2px",
                   borderRadius: "22px",
                   background:
-                    "linear-gradient(120deg, #00a6ff, #00ff8f, #00a6ff)",
+                    "linear-gradient(120deg,#00a6ff,#00ff8f,#00a6ff)",
                   backgroundSize: "200% 200%",
                   animation: "gradientMove 4s linear infinite",
                   WebkitMask:
-                    "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                    "linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0)",
                   WebkitMaskComposite: "xor",
                   maskComposite: "exclude",
-                },
-
-                "@keyframes gradientMove": {
-                  "0%": { backgroundPosition: "0% 50%" },
-                  "50%": { backgroundPosition: "100% 50%" },
-                  "100%": { backgroundPosition: "0% 50%" },
                 },
               }}
             >
@@ -99,18 +108,14 @@ const WhyChooseUs = () => {
                 alt={f.title}
                 sx={{
                   width: "100%",
-                  height: 180,
+                  aspectRatio: "16/9",
+                  borderRadius: "12px",
                   objectFit: "cover",
-                  borderRadius: 3,
                   mb: 2,
                 }}
               />
 
-              <Typography
-                variant="h6"
-                fontWeight={700}
-                sx={{ color: "#004aad" }}
-              >
+              <Typography variant="h6" fontWeight={700} sx={{ color: "#004aad" }}>
                 {f.title}
               </Typography>
 
@@ -122,90 +127,114 @@ const WhyChooseUs = () => {
         ))}
       </Box>
 
-      {/* ================= MOBILE CLEAN SCROLLER ================= */}
+      {/* MOBILE SLIDER */}
       <Box
         sx={{
-          display: { xs: "flex", md: "none" },
-          overflowX: "auto",
-          gap: 3,
-          scrollBehavior: "smooth",
-          scrollbarWidth: "none",
-          "&::-webkit-scrollbar": { display: "none" },
-          pb: 2,
+          position: "relative",
+          display: { xs: "block", md: "none" },
         }}
       >
-        {features.map((f, i) => (
-          <Box
-            key={i}
-            sx={{
-              minWidth: "85vw",
-              borderRadius: "22px",
-              position: "relative",
-              background: "rgba(255,255,255,0.25)",
-              backdropFilter: "blur(12px)",
-              boxShadow: "0 12px 28px rgba(0,0,0,0.15)",
-              p: 3,
-              overflow: "hidden",
+        {/* LEFT ARROW */}
+        <Box
+          onClick={scrollLeft}
+          sx={{
+            position: "absolute",
+            top: "45%",
+            left: -5,
+            zIndex: 20,
+            width: 44,
+            height: 44,
+            borderRadius: "50%",
+            background: "rgba(255,255,255,0.3)",
+            backdropFilter: "blur(10px)",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.15)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            cursor: "pointer",
+          }}
+        >
+          <Typography fontSize={"1.8rem"} color="#004aad">
+            ←
+          </Typography>
+        </Box>
 
-              "&::before": {
-                content: '""',
-                position: "absolute",
-                inset: 0,
-                padding: "2px",
-                borderRadius: "22px",
-                background:
-                  "linear-gradient(120deg, #00a6ff, #00ff8f, #00a6ff)",
-                backgroundSize: "200% 200%",
-                animation: "gradientMove 4s linear infinite",
-                WebkitMask:
-                  "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                WebkitMaskComposite: "xor",
-                maskComposite: "exclude",
-              },
-            }}
-          >
+        {/* RIGHT ARROW */}
+        <Box
+          onClick={scrollRight}
+          sx={{
+            position: "absolute",
+            top: "45%",
+            right: -5,
+            zIndex: 20,
+            width: 44,
+            height: 44,
+            borderRadius: "50%",
+            background: "rgba(255,255,255,0.3)",
+            backdropFilter: "blur(10px)",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.15)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            cursor: "pointer",
+          }}
+        >
+          <Typography fontSize={"1.8rem"} color="#004aad">
+            →
+          </Typography>
+        </Box>
+
+        {/* MOBILE SCROLL WRAPPER */}
+        <Box
+          ref={scrollRef}
+          sx={{
+            overflowX: "scroll",
+            display: "flex",
+            gap: 3,
+            px: 1,
+            py: 2,
+            scrollbarWidth: "none",
+            "&::-webkit-scrollbar": { display: "none" },
+          }}
+        >
+          {features.map((f, i) => (
             <Box
-              component="img"
-              src={f.icon}
-              alt={f.title}
+              key={i}
               sx={{
-                width: "100%",
-                height: 200,
-                objectFit: "cover",
-                borderRadius: 3,
-                mb: 2,
+                position: "relative",
+                minWidth: "78%", // shows next card shadow
+                p: 3,
+                borderRadius: "20px",
+                background: "rgba(255,255,255,0.25)",
+                backdropFilter: "blur(12px)",
+                boxShadow: "0 10px 25px rgba(0,0,0,0.12)",
               }}
-            />
-
-            <Typography
-              variant="h6"
-              fontWeight={700}
-              sx={{ color: "#004aad" }}
             >
-              {f.title}
-            </Typography>
+              {/* MOBILE IMAGE FIX */}
+              <Box
+                component="img"
+                src={f.icon}
+                alt={f.title}
+                sx={{
+                  width: "100%",
+                  aspectRatio: "16/9",
+                  borderRadius: "12px",
+                  objectFit: "cover",
+                  mb: 2,
+                }}
+              />
 
-            <Typography sx={{ mt: 1, color: "#333", fontSize: "0.9rem" }}>
-              {f.desc}
-            </Typography>
-          </Box>
-        ))}
+              <Typography variant="h6" fontWeight={700} sx={{ color: "#004aad" }}>
+                {f.title}
+              </Typography>
+
+              <Typography sx={{ mt: 1, color: "#333", fontSize: "0.9rem" }}>
+                {f.desc}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
       </Box>
-
-      {/* RIGHT FADE — SHOW THAT SLIDER CONTINUES */}
-      <Box
-        sx={{
-          display: { xs: "block", md: "none" },
-          position: "absolute",
-          right: 0,
-          top: "30%",
-          width: 50,
-          height: "40%",
-          pointerEvents: "none",
-          background:
-            "linear-gradient(to left, rgba(232,242,255,1), rgba(232,242,255,0))",
-        }}
-      />
     </Box>
   );
 };
