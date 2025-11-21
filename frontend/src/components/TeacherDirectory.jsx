@@ -395,38 +395,6 @@ const TeacherDirectory = () => {
       </Box>
     </Box>
   )}
-
-  {/* --- Preferred Areas Section --- */}
-  <Box>
-    <Typography
-      variant="subtitle2"
-      fontWeight={700}
-      sx={{ mb: 0.5, color: "text.primary" }}
-    >
-      Preferred Areas
-    </Typography>
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 0.3,
-        minHeight: 40, // 👈 keeps alignment
-      }}
-    >
-      {[t.Area1, t.Area2, t.Area3]
-        .filter(Boolean)
-        .map((a, i) => (
-          <Typography
-            key={i}
-            variant="body2"
-            sx={{ fontSize: "0.85rem", lineHeight: 1.3 }}
-          >
-            📍 {a}
-          </Typography>
-        ))}
-    </Box>
-  </Box>
 </Box>
 
 
