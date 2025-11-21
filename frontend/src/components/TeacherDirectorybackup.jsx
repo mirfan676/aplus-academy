@@ -66,7 +66,7 @@ const TeacherDirectory = () => {
             subject: String(t["Subject"] || ""),
             qualification: t["Qualification"] || "",
             experience: t["Experience"] || "",
-            city: t["District"] || "",
+            city: t["City"] || "",
             bio: t["Bio"] || "",
             imageUrl: t["Image URL"] || "",
             Area1: t["Area1"] || "",

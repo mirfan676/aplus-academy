@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import {
   Box,
   Grid,
@@ -24,20 +23,21 @@ const RECAPTCHA_SITE_KEY = "6LcTdf8rAAAAAHUIrbcURlFEKtL4-4siGvJgYpxl";
 // --- Lists ---
 const qualificationsList = [
   "Matric / SSC",
-  "O‑Level / IGCSE",
-  "Intermediate / HSSC (FSc‑Pre‑Medical)",
-  "Intermediate / HSSC (FSc‑Pre‑Engineering)",
+  "O-Level / IGCSE",
+  "Intermediate / HSSC (FSc-Pre-Medical)",
+  "Intermediate / HSSC (FSc-Pre-Engineering)",
   "Intermediate / HSSC (F.A)",
   "Intermediate / HSSC (I.Com)",
-  "Associate Degree (2‑year)",
+  "Associate Degree (2-year)",
   "BA / BSc (Pass)",
-  "BS (4‑year)",
+  "BS (4-year)",
   "MSc",
+  "MA",
   "MS / MPhil",
   "PhD",
 ];
 
-const higherEducation = ["BS (4‑year)", "MSc", "MA", "MS/MPhil", "PhD"];
+const higherEducation = ["BS (4-year)", "MSc", "MA", "MS / MPhil", "PhD"];
 
 const subjectsList = [
   "Mathematics",
@@ -121,8 +121,8 @@ export default function TutorRegistration() {
   const [formData, setFormData] = useState({
     name: "",
     qualification: "",
-    subject: "",
-    major_subjects: "",
+    subject: "", // will hold single Master/higher subject when selected
+    major_subjects: "", // raw text (kept for storing on backend)
     experience: "",
     phone: "",
     bio: "",
@@ -130,8 +130,12 @@ export default function TutorRegistration() {
     agree: false,
   });
 
-  const [majorSubjectsList, setMajorSubjectsList] = useState([]);
-  const [showSubjectDropdown, setShowSubjectDropdown] = useState(false);
+  // major subjects chips (derived from major_subjects text)
+  const [majorSubjects, setMajorSubjects] = useState([]);
+
+
+  // single subject for Master-or-higher UI
+  const [selectedHigherSubject, setSelectedHigherSubject] = useState("");
 
   const [locationsData, setLocationsData] = useState({});
   const [location, setLocation] = useState({
@@ -145,7 +149,6 @@ export default function TutorRegistration() {
   });
 
   const [coords, setCoords] = useState({ lat: "", lng: "" });
-
   const [districtsList, setDistrictsList] = useState([]);
   const [tehsilsList, setTehsilsList] = useState([]);
   const [areasList, setAreasList] = useState([]);
@@ -155,22 +158,22 @@ export default function TutorRegistration() {
   const [captchaVerified, setCaptchaVerified] = useState(false);
   const [imageError, setImageError] = useState(false);
 
+  // get browser geolocation
   useEffect(() => {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setCoords({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
-      },
-      (error) => console.log("Location access denied")
-    );
-  }
-}, []);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setCoords({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        () => console.log("Location access denied")
+      );
+    }
+  }, []);
 
-
-  // --- Fetch locations ---
+  // fetch locations
   useEffect(() => {
     api
       .get("/locations")
@@ -180,74 +183,74 @@ export default function TutorRegistration() {
       .catch((err) => console.error("Error fetching locations:", err));
   }, []);
 
-  // --- Subject type based on qualification ---
+  // When qualification changes:
+  // - show/hide higher subject dropdown
+  // - if not higher, clear selectedHigherSubject and formData.subject
   useEffect(() => {
-    setShowSubjectDropdown(higherEducation.includes(formData.qualification));
     if (!higherEducation.includes(formData.qualification)) {
-      setFormData({ ...formData, subject: "" });
+      setSelectedHigherSubject("");
+      setFormData((prev) => ({ ...prev, subject: "" }));
+    } else {
+      // keep major_subjects intact; only show the higher subject dropdown
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.qualification]);
 
-  // --- Dependent dropdowns ---
+  // dependent dropdowns for location
   useEffect(() => {
     if (location.province && locationsData[location.province]) {
       setDistrictsList(Object.keys(locationsData[location.province]));
-    } else setDistrictsList([]);
-    setLocation((prev) => ({ ...prev, district: "", tehsil: "", area1: "", area2: "", area3: "" }));
+    } else {
+      setDistrictsList([]);
+    }
     setTehsilsList([]);
     setAreasList([]);
+    setLocation((p) => ({ ...p, district: "", tehsil: "", area1: "", area2: "", area3: "" }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.province, locationsData]);
 
   useEffect(() => {
     if (location.province && location.district) {
       setTehsilsList(Object.keys(locationsData[location.province][location.district] || {}));
-    } else setTehsilsList([]);
-    setLocation((prev) => ({ ...prev, tehsil: "", area1: "", area2: "", area3: "" }));
+    } else {
+      setTehsilsList([]);
+    }
     setAreasList([]);
-  }, [location.district, location.province, locationsData]);
+    setLocation((p) => ({ ...p, tehsil: "", area1: "", area2: "", area3: "" }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.district]);
 
   useEffect(() => {
     if (location.province && location.district && location.tehsil) {
       const areas = locationsData[location.province][location.district][location.tehsil] || [];
       setAreasList(areas);
-      setLocation((prev) => ({
-        ...prev,
+      setLocation((p) => ({
+        ...p,
         area1: areas[0] || "",
         area2: areas[1] || areas[0] || "",
         area3: areas[2] || areas[0] || "",
       }));
     } else {
       setAreasList([]);
-      setLocation((prev) => ({ ...prev, area1: "", area2: "", area3: "" }));
+      setLocation((p) => ({ ...p, area1: "", area2: "", area3: "" }));
     }
-  }, [location.tehsil, location.district, location.province, locationsData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.tehsil]);
 
   const handleCaptcha = (value) => setCaptchaVerified(!!value);
 
   const handleChange = (e) => {
     const { name, value, files, checked, type } = e.target;
     if (files) {
-      setFormData({ ...formData, image: files[0] });
+      setFormData((p) => ({ ...p, image: files[0] }));
       setImageError(false);
     } else if (type === "checkbox") {
-      setFormData({ ...formData, [name]: checked });
+      setFormData((p) => ({ ...p, [name]: checked }));
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData((p) => ({ ...p, [name]: value }));
     }
   };
 
-  const handleMajorSubjectsChange = (e) => {
-    const inputValue = e.target.value;
-    setFormData({ ...formData, major_subjects: inputValue });
-
-    const words = inputValue
-      .split(/[\s,]+/)
-      .map((w) => w.trim())
-      .filter((w) => w)
-      .slice(0, 5);
-
-    setMajorSubjectsList(words);
-  };
 
   const handleLocationChange = (name, value) => {
     setLocation((prev) => ({ ...prev, [name]: value }));
@@ -266,12 +269,25 @@ export default function TutorRegistration() {
 
     setLoading(true);
     try {
-      const submissionData = new FormData();
-      Object.entries(formData).forEach(([k, v]) => submissionData.append(k, v));
-      Object.entries(location).forEach(([k, v]) => submissionData.append(k, v));
+      // If selectedHigherSubject is present, use it; otherwise formData.subject may be empty.
+      const subjectToSend = selectedHigherSubject || formData.subject || "";
 
-      submissionData.append("lat", coords.lat);
-      submissionData.append("lng", coords.lng);
+      // build form data
+      const submissionData = new FormData();
+      // send formData fields but overwrite subject with subjectToSend
+      Object.entries({ ...formData, subject: subjectToSend }).forEach(([k, v]) => {
+        if (k === "image") {
+          if (v) submissionData.append("image", v); 
+        } else {
+          submissionData.append(k, v ?? "");
+        }
+      });
+
+
+      // send locations and coords
+      Object.entries(location).forEach(([k, v]) => submissionData.append(k, v ?? ""));
+      submissionData.append("lat", coords.lat ?? "");
+      submissionData.append("lng", coords.lng ?? "");
 
       const res = await api.post("/tutors/register", submissionData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -290,7 +306,9 @@ export default function TutorRegistration() {
           image: null,
           agree: false,
         });
-        setMajorSubjectsList([]);
+
+        setMajorSubjects([]);          
+        setSelectedHigherSubject("");  
         setLocation({
           province: "",
           district: "",
@@ -300,7 +318,9 @@ export default function TutorRegistration() {
           area2: "",
           area3: "",
         });
-      } else setMessage("⚠️ Failed to submit. Try again.");
+      } else {
+        setMessage("⚠️ Failed to submit. Try again.");
+      }
     } catch (err) {
       console.error(err);
       setMessage("❌ Error submitting form. Server might be down.");
@@ -311,18 +331,29 @@ export default function TutorRegistration() {
 
   return (
     <Box sx={{ bgcolor: "#f9f9f9", minHeight: "100vh", py: 6 }}>
-      <Box sx={{ textAlign: "center", mb: 5, py: 6, color: "white", background: "linear-gradient(135deg, #a8e063, #56ab2f)" }}>
-        <Typography variant="h4" fontWeight={700}>Tutor Registration</Typography>
+      <Box
+        sx={{
+          textAlign: "center",
+          mb: 5,
+          py: 6,
+          color: "white",
+          background: "linear-gradient(135deg, #a8e063, #56ab2f)",
+        }}
+      >
+        <Typography variant="h4" fontWeight={700}>
+          Tutor Registration
+        </Typography>
         <Typography variant="subtitle1">Join A+ Academy and connect with students across Pakistan</Typography>
       </Box>
 
       <Grid container justifyContent="center">
         <Grid item xs={12} md={6}>
           <Paper elevation={4} sx={{ p: 4, borderRadius: 3 }}>
-            <Typography variant="h5" color="#0d6efd" fontWeight={700} textAlign="center" mb={3}>Register as Tutor</Typography>
+            <Typography variant="h5" color="#0d6efd" fontWeight={700} textAlign="center" mb={3}>
+              Register as Tutor
+            </Typography>
 
             <Box component="form" onSubmit={handleSubmit}>
-
               {/* Upload Image */}
               <Box textAlign="center" mb={2}>
                 <Button
@@ -335,7 +366,9 @@ export default function TutorRegistration() {
                   <input type="file" hidden accept="image/*" name="image" onChange={handleChange} />
                 </Button>
 
-                {formData.image && <Avatar src={URL.createObjectURL(formData.image)} alt="Preview" sx={{ width: 100, height: 100, mx: "auto", mt: 2 }} />}
+                {formData.image && (
+                  <Avatar src={URL.createObjectURL(formData.image)} alt="Preview" sx={{ width: 100, height: 100, mx: "auto", mt: 2 }} />
+                )}
               </Box>
 
               {/* Full Name */}
@@ -345,47 +378,90 @@ export default function TutorRegistration() {
               <Autocomplete
                 options={qualificationsList}
                 value={formData.qualification || null}
-                onChange={(e, newValue) => setFormData({ ...formData, qualification: newValue || "" })}
+                onChange={(e, newValue) => setFormData((p) => ({ ...p, qualification: newValue || "" }))}
                 renderInput={(params) => <TextField {...params} label="Qualification" margin="normal" required fullWidth />}
               />
 
-              {/* Subject / Major Subjects */}
-              {showSubjectDropdown ? (
+              {/* --- Single subject dropdown for Master-or-higher (visible only when selected) --- */}
+              {higherEducation.includes(formData.qualification) && (
                 <Autocomplete
                   options={subjectsList}
-                  value={formData.subject || null}
-                  onChange={(e, newValue) => setFormData({ ...formData, subject: newValue || "" })}
-                  renderInput={(params) => <TextField {...params} label="Subject" margin="normal" required fullWidth />}
+                  value={selectedHigherSubject || null}
+                  onChange={(e, newValue) => {
+                    setSelectedHigherSubject(newValue || "");
+                    // keep formData.subject updated too (optional, but keeps state consistent)
+                    setFormData((p) => ({ ...p, subject: newValue || "" }));
+                  }}
+                  renderInput={(params) => <TextField {...params} label="Higher Qualification Subject (single)" margin="normal" fullWidth />}
                 />
-              ) : (
-                <Box>
-                  <TextField
-                    label="Major Subjects (Max 5 words)"
-                    name="major_subjects"
-                    value={formData.major_subjects}
-                    onChange={handleMajorSubjectsChange}
-                    fullWidth
-                    required
-                    margin="normal"
-                  />
-                  <Box sx={{ mt: 1, display: "flex", gap: 1, flexWrap: "wrap" }}>
-                    {majorSubjectsList.map((word, idx) => (
-                      <Chip key={idx} label={word} color="primary" size="small" />
-                    ))}
-                  </Box>
-                </Box>
               )}
 
+              {/* --- Major Subjects text input + chips (available for ALL qualifications) --- */}
+              <Autocomplete
+                multiple
+                options={subjectsList}   // subjects come ONLY from this list
+                value={majorSubjects}
+                onChange={(e, newValue) => {
+                  if (newValue.length > 5) return; 
+
+                  setMajorSubjects(newValue);
+                  setFormData({
+                    ...formData,
+                    major_subjects: newValue.join(", "),
+                  });
+                }}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip
+                      label={option}
+                      {...getTagProps({ index })}
+                      color="primary"
+                      variant="outlined"
+                    />
+                  ))
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Select Major Subjects"
+                    margin="normal"
+                    fullWidth
+                    required
+                  />
+                )}
+                disableCloseOnSelect
+              />
+
+
               {/* Experience */}
-              <TextField label="Experience (Years)" name="experience" type="number" value={formData.experience} onChange={handleChange} required fullWidth margin="normal" />
+              <TextField
+                label="Experience (Years)"
+                name="experience"
+                type="number"
+                inputProps={{ min: 0, max: 40 }}
+                value={formData.experience}
+                onChange={(e) => {
+                  let val = Number(e.target.value);
+
+                  // clamp value between 0 and 40
+                  if (val < 0) val = 0;
+                  if (val > 40) val = 40;
+
+                  setFormData({ ...formData, experience: val });
+                }}
+                required
+                fullWidth
+                margin="normal"
+              />
 
               {/* Phone */}
               <TextField label="Contact Number" name="phone" value={formData.phone} onChange={handleChange} required fullWidth margin="normal" />
 
               {/* Location Autocomplete Dropdowns */}
-              <Typography variant="subtitle1" fontWeight={700} mt={2} mb={1}>📍 Location</Typography>
+              <Typography variant="subtitle1" fontWeight={700} mt={2} mb={1}>
+                📍 Location
+              </Typography>
 
-              {/* Province */}
               <Autocomplete
                 options={Object.keys(locationsData)}
                 value={location.province || null}
@@ -393,7 +469,6 @@ export default function TutorRegistration() {
                 renderInput={(params) => <TextField {...params} label="Province" margin="normal" required fullWidth />}
               />
 
-              {/* District */}
               <Autocomplete
                 options={districtsList}
                 value={location.district || null}
@@ -402,7 +477,6 @@ export default function TutorRegistration() {
                 disabled={!districtsList.length}
               />
 
-              {/* Tehsil */}
               <Autocomplete
                 options={tehsilsList}
                 value={location.tehsil || null}
@@ -411,16 +485,14 @@ export default function TutorRegistration() {
                 disabled={!tehsilsList.length}
               />
 
-              {/* City */}
               <Autocomplete
-                options={(location.province && location.district && location.tehsil) ? locationsData[location.province][location.district][location.tehsil] : []}
+                options={location.province && location.district && location.tehsil ? locationsData[location.province][location.district][location.tehsil] : []}
                 value={location.city || null}
                 onChange={(e, newValue) => handleLocationChange("city", newValue || "")}
                 renderInput={(params) => <TextField {...params} label="City / Town" margin="normal" required fullWidth />}
                 disabled={!location.tehsil}
               />
 
-              {/* Areas */}
               <Autocomplete
                 options={areasList}
                 value={location.area1 || null}
@@ -464,21 +536,23 @@ export default function TutorRegistration() {
               {/* Terms */}
               <FormControlLabel
                 control={<Checkbox checked={formData.agree} onChange={handleChange} name="agree" color="success" />}
-                label={<Typography variant="body2">I agree to the <MuiLink href="/terms" target="_blank">Terms</MuiLink> and <MuiLink href="/privacy" target="_blank">Privacy Policy</MuiLink>.</Typography>}
+                label={
+                  <Typography variant="body2">
+                    I agree to the <MuiLink href="/terms" target="_blank">Terms</MuiLink> and <MuiLink href="/privacy" target="_blank">Privacy Policy</MuiLink>.
+                  </Typography>
+                }
               />
 
               <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }} disabled={loading}>
                 {loading ? <CircularProgress size={24} color="inherit" /> : "Submit Registration"}
               </Button>
-
             </Box>
 
             {message && (
-              <Alert severity={message.includes("✅") ? "success" : message.includes("❌") ? "error" : "info"} sx={{ mt: 3, textAlign: "center" }}>
+              <Alert severity={message.includes("success") ? "success" : message.startsWith("❌") ? "error" : "info"} sx={{ mt: 3, textAlign: "center" }}>
                 {message}
               </Alert>
             )}
-
           </Paper>
         </Grid>
       </Grid>
