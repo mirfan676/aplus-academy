@@ -11,7 +11,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from google.oauth2.service_account import Credentials
 from datetime import datetime, timedelta
 
-
 app = FastAPI(title="APlus Home Tutors API", version="3.0.0")
 
 # --- CORS CONFIG ---
@@ -34,7 +33,6 @@ sheet = gspread_client.open_by_key(SHEET_ID).sheet1
 cached_tutors = []
 last_fetch_time = datetime.min
 CACHE_DURATION = timedelta(minutes=5)
-
 
 # --- IMGBB CONFIG ---
 IMGBB_API_KEY = os.environ.get("IMGBB_API_KEY", "")
@@ -109,8 +107,8 @@ def get_areas(province: str = Query(...), district: str = Query(...), tehsil: st
 async def register_tutor(
     request: Request,
     name: str = Form(...),
-    subject: str = Form(...),
-    major_subjects: str = Form(None),
+    subject: str = Form(None),  # single higher subject
+    major_subjects: str = Form(None),  # comma-separated
     qualification: str = Form(...),
     experience: int = Form(...),
     province: str = Form(...),
@@ -130,8 +128,7 @@ async def register_tutor(
 ):
     try:
         image_url = "N/A"
-
-        # --- Upload image to ImgBB ---
+        # --- Upload image ---
         if image and image.filename:
             image_bytes = await image.read()
             encoded_image = base64.b64encode(image_bytes).decode("utf-8")
@@ -142,8 +139,7 @@ async def register_tutor(
                 raw_url = result["data"]["url"]
                 image_url = f"https://cold-truth-e620.irfan-karor-mi.workers.dev/?url={raw_url}"
 
-
-        # --- Determine default areas if missing ---
+        # --- Determine default areas ---
         default_areas = pakistan_data.get(province, {}).get(district, {}).get(tehsil, [])
         if not area1:
             area1 = default_areas[0] if len(default_areas) > 0 else city
@@ -166,11 +162,16 @@ async def register_tutor(
                     province = ip_region
             latitude, longitude = random_point_within_radius(base_lat, base_lng, 800) if base_lat else (None, None)
 
-        # --- Save to Google Sheet ---
+        # --- Combine Qualification + higher subject ---
+        qualification_value = f"{qualification} {subject}" if subject else qualification
+        major_subjects_str = major_subjects or ""
+
+        # --- Append row to Google Sheet ---
         sheet.append_row([
             name,
-            subject if subject else major_subjects,
-            qualification,
+            subject or "",            # Subject column
+            qualification_value,      # Qualification column (with higher subject)
+            major_subjects_str,       # Major Subjects column
             experience,
             province,
             district,
@@ -185,8 +186,8 @@ async def register_tutor(
             image_url,
             latitude or "",
             longitude or "",
-            "No",  # Verified by default
-            "",    # Date Added
+            "No",  # Verified
+            datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
             profile_url or ""
         ])
 
@@ -210,25 +211,28 @@ async def register_tutor(
 @app.get("/tutors")
 def get_tutors():
     global cached_tutors, last_fetch_time
-
     now = datetime.utcnow()
     if now - last_fetch_time < CACHE_DURATION:
-        return cached_tutors   # return fast 0.01s
-
-    # Fetch fresh data from sheet
+        return cached_tutors
     try:
         records = sheet.get_all_records(empty2zero=False, head=1)
         verified = []
-
         for r in records:
             if str(r.get("Verified", "")).strip().lower() != "yes":
                 continue
-
             def safe_str(v): return str(v).strip() if v else ""
+
+            # Combine Subject + Major Subjects
+            subjects_list = []
+            if safe_str(r.get("Subject")):
+                subjects_list.append(safe_str(r.get("Subject")))
+            if safe_str(r.get("Major Subjects")):
+                majors = [s.strip() for s in safe_str(r.get("Major Subjects")).split(",") if s.strip()]
+                subjects_list.extend(majors)
 
             verified.append({
                 "Name": safe_str(r.get("Name")),
-                "Subject": safe_str(r.get("Subject")),
+                "Subjects": subjects_list,
                 "Qualification": safe_str(r.get("Qualification")),
                 "Experience": safe_str(r.get("Experience")),
                 "Province": safe_str(r.get("Province")),
@@ -246,11 +250,9 @@ def get_tutors():
                 "Profile URL": safe_str(r.get("Profile URL")),
                 "Verified": "Yes"
             })
-
         cached_tutors = verified
         last_fetch_time = now
         return verified
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -267,13 +269,20 @@ def get_teacher(teacher_id: int):
                 break
         if not teacher:
             raise HTTPException(status_code=404, detail="Teacher not found")
-
         def safe_str(val):
             return str(val).strip() if val is not None else ""
 
+        # Combine Subject + Major Subjects
+        subjects_list = []
+        if safe_str(teacher.get("Subject")):
+            subjects_list.append(safe_str(teacher.get("Subject")))
+        if safe_str(teacher.get("Major Subjects")):
+            majors = [s.strip() for s in safe_str(teacher.get("Major Subjects")).split(",") if s.strip()]
+            subjects_list.extend(majors)
+
         return {
             "Name": safe_str(teacher.get("Name")),
-            "Subject": safe_str(teacher.get("Subject")),
+            "Subjects": subjects_list,
             "Qualification": safe_str(teacher.get("Qualification")),
             "Experience": safe_str(teacher.get("Experience")),
             "Province": safe_str(teacher.get("Province")),
@@ -291,6 +300,5 @@ def get_teacher(teacher_id: int):
             "Profile URL": safe_str(teacher.get("Profile URL")),
             "Verified": safe_str(teacher.get("Verified")),
         }
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

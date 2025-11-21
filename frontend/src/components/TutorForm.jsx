@@ -257,77 +257,100 @@ export default function TutorRegistration() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMessage("");
+  e.preventDefault();
+  setMessage("");
 
-    if (!captchaVerified) return setMessage("⚠️ Please verify CAPTCHA.");
-    if (!formData.agree) return setMessage("⚠️ Please agree to Terms.");
-    if (!formData.image) {
-      setImageError(true);
-      return setMessage("⚠️ Please upload a profile picture.");
-    }
+  // --- Basic validations ---
+  if (!captchaVerified) {
+    setMessage("⚠️ Please verify CAPTCHA.");
+    return;
+  }
+  if (!formData.agree) {
+    setMessage("⚠️ Please agree to Terms.");
+    return;
+  }
+  if (!formData.image) {
+    setImageError(true);
+    setMessage("⚠️ Please upload a profile picture.");
+    return;
+  }
 
-    setLoading(true);
-    try {
-      // If selectedHigherSubject is present, use it; otherwise formData.subject may be empty.
-      const subjectToSend = selectedHigherSubject || formData.subject || "";
+  // --- Subject validation ---
+  if (!selectedHigherSubject && majorSubjects.length === 0) {
+    setMessage("⚠️ Please select at least one subject.");
+    return;
+  }
 
-      // build form data
-      const submissionData = new FormData();
-      // send formData fields but overwrite subject with subjectToSend
-      Object.entries({ ...formData, subject: subjectToSend }).forEach(([k, v]) => {
-        if (k === "image") {
-          if (v) submissionData.append("image", v); 
-        } else {
-          submissionData.append(k, v ?? "");
-        }
-      });
+  setLoading(true);
 
+  try {
+    // Determine subject to send
+    const subjectToSend = selectedHigherSubject || ""; // single higher subject
+    const majorSubjectsToSend = majorSubjects.join(", "); // multiple subjects
 
-      // send locations and coords
-      Object.entries(location).forEach(([k, v]) => submissionData.append(k, v ?? ""));
-      submissionData.append("lat", coords.lat ?? "");
-      submissionData.append("lng", coords.lng ?? "");
+    // Build form data
+    const submissionData = new FormData();
+    const dataToSend = {
+      ...formData,
+      subject: subjectToSend,
+      major_subjects: majorSubjectsToSend,
+    };
 
-      const res = await api.post("/tutors/register", submissionData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      if (res.status === 200) {
-        setMessage("Tutor registered successfully!");
-        setFormData({
-          name: "",
-          qualification: "",
-          subject: "",
-          major_subjects: "",
-          experience: "",
-          phone: "",
-          bio: "",
-          image: null,
-          agree: false,
-        });
-
-        setMajorSubjects([]);          
-        setSelectedHigherSubject("");  
-        setLocation({
-          province: "",
-          district: "",
-          tehsil: "",
-          city: "",
-          area1: "",
-          area2: "",
-          area3: "",
-        });
+    Object.entries(dataToSend).forEach(([k, v]) => {
+      if (k === "image" && v) {
+        submissionData.append("image", v);
       } else {
-        setMessage("⚠️ Failed to submit. Try again.");
+        submissionData.append(k, v ?? "");
       }
-    } catch (err) {
-      console.error(err);
-      setMessage("❌ Error submitting form. Server might be down.");
-    } finally {
-      setLoading(false);
+    });
+
+    // Append location and coordinates
+    Object.entries(location).forEach(([k, v]) => submissionData.append(k, v ?? ""));
+    submissionData.append("lat", coords.lat ?? "");
+    submissionData.append("lng", coords.lng ?? "");
+
+    // Send API request
+    const res = await api.post("/tutors/register", submissionData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    if (res.status === 200) {
+      setMessage("✅ Tutor registered successfully!");
+
+      // Reset form
+      setFormData({
+        name: "",
+        qualification: "",
+        subject: "",
+        major_subjects: "",
+        experience: "",
+        phone: "",
+        bio: "",
+        image: null,
+        agree: false,
+      });
+      setMajorSubjects([]);
+      setSelectedHigherSubject("");
+      setLocation({
+        province: "",
+        district: "",
+        tehsil: "",
+        city: "",
+        area1: "",
+        area2: "",
+        area3: "",
+      });
+    } else {
+      setMessage("⚠️ Failed to submit. Try again.");
     }
-  };
+  } catch (err) {
+    console.error(err);
+    setMessage("❌ Error submitting form. Server might be down.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <Box sx={{ bgcolor: "#f9f9f9", minHeight: "100vh", py: 6 }}>
@@ -426,7 +449,6 @@ export default function TutorRegistration() {
                     label="Select Major Subjects"
                     margin="normal"
                     fullWidth
-                    required
                   />
                 )}
                 disableCloseOnSelect
