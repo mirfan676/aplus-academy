@@ -10,6 +10,9 @@ from fastapi import FastAPI, Form, File, Query, UploadFile, HTTPException, Reque
 from fastapi.middleware.cors import CORSMiddleware
 from google.oauth2.service_account import Credentials
 from datetime import datetime, timedelta
+from geopy.geocoders import Nominatim
+
+geolocator = Nominatim(user_agent="APlusAcademy/1.0")
 
 app = FastAPI(title="APlus Home Tutors API", version="3.0.0")
 
@@ -103,23 +106,17 @@ def get_areas(province: str = Query(...), district: str = Query(...), tehsil: st
     return {"areas": pakistan_data.get(province, {}).get(district, {}).get(tehsil, [])}
 
 # --- Tutor Registration Endpoint ---
+
 @app.post("/tutors/register")
 async def register_tutor(
     request: Request,
     name: str = Form(...),
-    subject: str = Form(None),  # single higher subject
-    major_subjects: str = Form(None),  # comma-separated
+    subject: str = Form(None),
+    major_subjects: str = Form(None),
     qualification: str = Form(...),
     experience: int = Form(...),
-    province: str = Form(...),
-    district: str = Form(...),
-    tehsil: str = Form(...),
-    city: str = Form(...),
     phone: str = Form(...),
     bio: str = Form(...),
-    area1: str = Form(None),
-    area2: str = Form(None),
-    area3: str = Form(None),
     exactLocation: str = Form(None),
     lat: str = Form(None),
     lng: str = Form(None),
@@ -127,8 +124,8 @@ async def register_tutor(
     profile_url: str = Form(None),
 ):
     try:
-        image_url = "N/A"
         # --- Upload image ---
+        image_url = "N/A"
         if image and image.filename:
             image_bytes = await image.read()
             encoded_image = base64.b64encode(image_bytes).decode("utf-8")
@@ -139,39 +136,43 @@ async def register_tutor(
                 raw_url = result["data"]["url"]
                 image_url = f"https://cold-truth-e620.irfan-karor-mi.workers.dev/?url={raw_url}"
 
-        # --- Determine default areas ---
-        default_areas = pakistan_data.get(province, {}).get(district, {}).get(tehsil, [])
-        if not area1:
-            area1 = default_areas[0] if len(default_areas) > 0 else city
-        if not area2:
-            area2 = default_areas[1] if len(default_areas) > 1 else area1
-        if not area3:
-            area3 = default_areas[2] if len(default_areas) > 2 else area1
-
-        # --- Location logic ---
+        # --- Determine coordinates ---
         if lat and lng:
             latitude, longitude = float(lat), float(lng)
         else:
-            base_lat, base_lng = get_area_coordinates(exactLocation or area1, city, province)
-            if not base_lat or not base_lng:
-                client_ip = request.client.host
-                base_lat, base_lng, ip_city, ip_region = get_ip_geolocation(client_ip)
-                if not city and ip_city:
-                    city = ip_city
-                if not province and ip_region:
-                    province = ip_region
-            latitude, longitude = random_point_within_radius(base_lat, base_lng, 800) if base_lat else (None, None)
+            # fallback: try to geocode from exactLocation
+            if exactLocation:
+                latitude, longitude = get_area_coordinates(exactLocation, "", "")
+            else:
+                latitude = longitude = None
 
-        # --- Combine Qualification + higher subject ---
+        # --- Reverse Geocoding: Get city, district, province, tehsil ---
+        city = district = province = tehsil = ""
+        if latitude and longitude:
+            try:
+                location = geolocator.reverse(f"{latitude}, {longitude}", language="en", exactly_one=True)
+                address = location.raw.get("address", {})
+                city = address.get("city") or address.get("town") or address.get("village") or ""
+                district = address.get("county") or ""
+                province = address.get("state") or ""
+                tehsil = address.get("suburb") or ""
+            except Exception as e:
+                print("⚠️ Reverse geocoding failed:", e)
+
+        # --- Default Areas ---
+        default_areas = [city, city, city]  # fallback to city for area1/2/3
+        area1, area2, area3 = default_areas
+
+        # --- Combine qualification + subject ---
         qualification_value = f"{qualification} {subject}" if subject else qualification
         major_subjects_str = major_subjects or ""
 
         # --- Append row to Google Sheet ---
         sheet.append_row([
             name,
-            subject or "",            # Subject column
-            qualification_value,      # Qualification column (with higher subject)
-            major_subjects_str,       # Major Subjects column
+            subject or "",
+            qualification_value,
+            major_subjects_str,
             experience,
             province,
             district,
@@ -197,6 +198,7 @@ async def register_tutor(
             "province": province,
             "district": district,
             "tehsil": tehsil,
+            "city": city,
             "areas": [area1, area2, area3],
             "coordinates": {"lat": latitude, "lng": longitude},
             "profile_url": profile_url or ""
@@ -206,6 +208,7 @@ async def register_tutor(
         print("❌ Error submitting tutor form:", e)
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+
 
 # --- Get All Verified Tutors ---
 @app.get("/tutors")
