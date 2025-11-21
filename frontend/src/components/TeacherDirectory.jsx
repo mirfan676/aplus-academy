@@ -137,7 +137,7 @@ const TeacherDirectory = () => {
         {/* Map */}
         <Box
           sx={{
-            height: { xs: "250px", md: "350px" },
+            height: { xs: "250px", md: "280px" },
             borderRadius: 3,
             overflow: "hidden",
             mb: 3,
