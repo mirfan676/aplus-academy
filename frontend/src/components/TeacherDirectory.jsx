@@ -137,7 +137,7 @@ const TeacherDirectory = () => {
         {/* Map */}
         <Box
           sx={{
-            height: { xs: "250px", md: "280px" },
+            height: { xs: "250px", md: "350px" },
             borderRadius: 3,
             overflow: "hidden",
             mb: 3,
@@ -356,7 +356,7 @@ const TeacherDirectory = () => {
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
-    minHeight: 160, // 👈 ensures equal vertical space
+    minHeight: 90, // 👈 ensures equal vertical space
   }}
 >
   {/* --- Subjects Section --- */}
