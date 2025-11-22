@@ -1,0 +1,20 @@
+{
+  "Punjab": {
+    "lat": 31.0,
+    "lng": 72.0,
+    "Lahore": {
+      "lat": 31.582045,
+      "lng": 74.329376,
+      "Raiwind": {
+        "lat": 31.245659,
+        "lng": 74.212891,
+        "areas": {
+          "Raiwind": {"lat": 31.245659, "lng": 74.212891},
+          "Chak Boota": {"lat": 31.24, "lng": 74.21},
+          "Ghangh Sharif": {"lat": 31.23, "lng": 74.22},
+          "Ladhy Kay Uchay": {"lat": 31.25, "lng": 74.23}
+        }
+      }
+    }
+  }
+}

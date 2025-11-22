@@ -15,10 +15,10 @@ import {
   FormControl,
   InputLabel,
   Select,
-  Chip,
   Paper,
 } from "@mui/material";
-import { CheckCircle } from "@mui/icons-material";
+import { motion } from "framer-motion";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -32,7 +32,7 @@ const personIcon = new L.Icon({
 });
 
 const CACHE_KEY = "aplus_tutors_cache";
-const CACHE_DURATION = 24 * 60 * 60 * 1000; // 1 day
+const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
 const TeacherDirectory = () => {
   const [teachers, setTeachers] = useState([]);
@@ -63,396 +63,301 @@ const TeacherDirectory = () => {
           const mapped = res.data.map((t, i) => ({
             id: i,
             name: t["Name"] || "Unknown",
-            subject: String(t["Subject"] || ""),
+            subjects: Array.isArray(t["Subjects"]) ? t["Subjects"] : [],
             qualification: t["Qualification"] || "",
             experience: t["Experience"] || "",
-            city: t["District"] || "",
+            city: t["District"] ? String(t["District"]) : "",
             bio: t["Bio"] || "",
+            price: t["Price"] || "Rs 2000",
             imageUrl: t["Image URL"] || "",
-            Area1: t["Area1"] || "",
-            Area2: t["Area2"] || "",
-            Area3: t["Area3"] || "",
-            lat: parseFloat(t["Latitude"]) || 31.5204,
-            lng: parseFloat(t["Longitude"]) || 74.3587,
+            lat: isNaN(parseFloat(t["Latitude"])) ? 31.5204 : parseFloat(t["Latitude"]),
+            lng: isNaN(parseFloat(t["Longitude"])) ? 74.3587 : parseFloat(t["Longitude"]),
             verified: t["Verified"]?.trim(),
           }));
 
-          localStorage.setItem(
-            CACHE_KEY,
-            JSON.stringify({ data: mapped, timestamp: Date.now() })
-          );
+          localStorage.setItem(CACHE_KEY, JSON.stringify({ data: mapped, timestamp: Date.now() }));
           setTeachers(mapped);
         }
-      } catch (err) {
-        console.error(err);
+      } catch {
         setError("Unable to fetch teacher data.");
       } finally {
         setLoading(false);
       }
     };
-
     fetchTutors();
   }, []);
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (pos) => setUserLocation([pos.coords.latitude, pos.coords.longitude]),
-      () => console.warn("Geolocation not allowed — using fallback")
+      () => {}
     );
   }, []);
 
-  const subjects = useMemo(() => {
-    return [
-      ...new Set(
-        teachers.flatMap((t) => t.subject?.split(",").map((s) => s.trim()) || [])
-      ),
-    ];
-  }, [teachers]);
-
-  const cities = useMemo(() => {
-    return [...new Set(teachers.map((t) => t.city).filter(Boolean))];
-  }, [teachers]);
+  const subjects = useMemo(() => [...new Set(teachers.flatMap((t) => t.subjects || []))], [teachers]);
+  const cities = useMemo(() => [...new Set(teachers.map((t) => t.city).filter(Boolean))], [teachers]);
 
   const filtered = useMemo(() => {
     let list = [...teachers];
-    if (selectedCity)
-      list = list.filter((t) => t.city.toLowerCase() === selectedCity.toLowerCase());
-    if (selectedSubject)
-      list = list.filter((t) =>
-        t.subject.toLowerCase().includes(selectedSubject.toLowerCase())
-      );
+    if (selectedCity) list = list.filter((t) => t.city?.toLowerCase() === selectedCity.toLowerCase());
+    if (selectedSubject) list = list.filter((t) => t.subjects.includes(selectedSubject));
     list.sort(
-      (a, b) =>
-        Math.hypot(a.lat - userLocation[0], a.lng - userLocation[1]) -
-        Math.hypot(b.lat - userLocation[0], b.lng - userLocation[1])
+      (a, b) => Math.hypot(a.lat - userLocation[0], a.lng - userLocation[1]) - Math.hypot(b.lat - userLocation[0], b.lng - userLocation[1])
     );
     return list;
   }, [selectedCity, selectedSubject, teachers, userLocation]);
 
-  const handleLoadMore = () => setVisibleCount((prev) => prev + 6);
+  const handleLoadMore = () => setVisibleCount((v) => v + 6);
+
+  const [showMoreSubjects, setShowMoreSubjects] = useState({});
+
+  const handleToggleSubjects = (id) => {
+    setShowMoreSubjects(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const [showMoreBio, setShowMoreBio] = useState({});
+
+  const handleToggleBio = (id) => {
+    setShowMoreBio(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+
 
   return (
-    <Box sx={{ bgcolor: "#f9f9f9", py: 4 }}>
+    <Box sx={{ background: "#e8f2ff", py: 6, px: { xs: 2, md: 4 } }}>
       <Container maxWidth="lg">
+        <Typography variant="h4" fontWeight={700} align="center" sx={{ mb: 5, color: "#004aad" }}>
+          Find Teachers Near You
+        </Typography>
+
         {/* Map */}
-        <Box
-          sx={{
-            height: { xs: "250px", md: "350px" },
-            borderRadius: 3,
-            overflow: "hidden",
-            mb: 3,
-            boxShadow: 3,
-          }}
-          onMouseEnter={() => !mapVisible && setMapVisible(true)}
-        >
+        <Box sx={{ height: { xs: "240px", md: "340px" }, borderRadius: "22px", overflow: "hidden", mb: 4 }}>
           {mapVisible ? (
             <Suspense fallback={<CircularProgress />}>
-              <LazyMap
-                userLocation={userLocation}
-                filtered={filtered}
-                personIcon={personIcon}
-              />
+              <LazyMap userLocation={userLocation} filtered={filtered} personIcon={personIcon} />
             </Suspense>
           ) : (
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                height: "100%",
-                color: "#6c757d",
-              }}
-            >
+            <Box onMouseEnter={() => setMapVisible(true)} sx={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
               Hover to load map 🗺️
             </Box>
           )}
         </Box>
 
-        <Typography
-          variant="h5"
-          fontWeight={700}
-          color="#0d6efd"
-          align="center"
-          sx={{ mb: 3 }}
-        >
-          Find Teachers Near You
-        </Typography>
+        {/* Filters */}
+        <Paper sx={{ p: 3, mb: 4, borderRadius: "22px", background: "rgba(255,255,255,0.25)", backdropFilter: "blur(12px)" }}>
+          <Grid container spacing={2} justifyContent="center">
+            <Grid item xs={12} md={6} sx={{ minWidth: "240px" }} >
+              <FormControl fullWidth>
+                <InputLabel>Select City</InputLabel>
+                <Select value={selectedCity} label="Select City" onChange={(e) => setSelectedCity(e.target.value)}>
+                  <MenuItem value=""><em>All Cities</em></MenuItem>
+                  {cities.map((city, i) => <MenuItem key={i} value={city}>{city}</MenuItem>)}
+                </Select>
+              </FormControl>
+            </Grid>
 
-        {/* Sticky Filters */}
-<Paper
-  elevation={3}
-  className="filter-container"
-  sx={{
-    position: "sticky",
-    top: 60,
-    zIndex: 20,
-    p: 2,
-    borderRadius: 3,
-    backgroundColor: "rgba(255, 255, 255, 0.15)", // light transparent white
-    backdropFilter: "blur(10px)", // frosted glass effect
-    WebkitBackdropFilter: "blur(10px)", // Safari support
-    border: "1px solid rgba(255, 255, 255, 0.3)",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-  }}
->
-  <Grid
-    container
-    spacing={2}
-    justifyContent="center"
-    sx={{
-      "& .MuiFormControl-root": { minWidth: "240px" },
-    }}
-  >
-    <Grid item xs={12} sm={6} md={4}>
-      <FormControl fullWidth>
-        <InputLabel>Select City</InputLabel>
-        <Select
-          value={selectedCity}
-          onChange={(e) => setSelectedCity(e.target.value)}
-        >
-          <MenuItem value="">
-            <em>All Cities</em>
-          </MenuItem>
-          {cities.map((city, i) => (
-            <MenuItem key={i} value={city}>
-              {city}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </Grid>
-
-    <Grid item xs={12} sm={6} md={4}>
-      <FormControl fullWidth>
-        <InputLabel>Select Subject</InputLabel>
-        <Select
-          value={selectedSubject}
-          onChange={(e) => setSelectedSubject(e.target.value)}
-        >
-          <MenuItem value="">
-            <em>All Subjects</em>
-          </MenuItem>
-          {subjects.map((s, i) => (
-            <MenuItem key={i} value={s}>
-              {s}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </Grid>
-  </Grid>
-</Paper>
-
-
+            <Grid item xs={12} md={6} sx={{ minWidth: "240px" }}>
+              <FormControl fullWidth>
+                <InputLabel>Select Subject</InputLabel>
+                <Select value={selectedSubject} label="Select Subject" onChange={(e) => setSelectedSubject(e.target.value)}>
+                  <MenuItem value=""><em>All Subjects</em></MenuItem>
+                  {subjects.map((s, i) => <MenuItem key={i} value={s}>{s}</MenuItem>)}
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+        </Paper>
 
         {error && <Alert severity="error">{error}</Alert>}
 
-        {loading ? (
-          <Box sx={{ textAlign: "center", py: 5 }}>
-            <CircularProgress />
-          </Box>
-        ) : filtered.length === 0 ? (
-          <Typography align="center" color="text.secondary" sx={{ mt: 3 }}>
-            No teachers found matching your filters.
-          </Typography>
-        ) : (
-          <Grid
-            container
-            spacing={3}
-            justifyContent="center"
-            alignItems="stretch"
+        {/* Cards */}
+        <Grid container spacing={3} sx={{ width: "100%", maxWidth: "xl" }} justifyContent="center">
+  {filtered.slice(0, visibleCount).map((t) => (
+    <Grid item key={t.id} xs={12} sm={6} md={4} sx={{ display: "flex" }}>
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+         style={{ flex: 1, display: "flex", flexDirection: "column" }}
+      >
+        <Card
+          sx={{
+            p: 0,
+            borderRadius: "22px",
+            display: "flex",
+            flexDirection: "column",
+            position: "relative",
+            flex: 1,         
+            minHeight: 400,  
+            minWidth: 320,
+            maxWidth: 320,
+          }}
+        >
+          {/* Floating Badge */}
+          <Box
             sx={{
-              rowGap: 3,
-              pt: { xs: 4, sm: 6 },
+              position: "absolute",
+              top: 10,
+              right: 10,
+              background: "#00a6ff",
+              color: "white",
+              px: 2,
+              py: 0.5,
+              borderRadius: "16px",
+              fontSize: "0.75rem",
+              fontWeight: 700,
             }}
           >
-            {filtered.slice(0, visibleCount).map((t) => (
-              <Grid
-                item
-                xs={12}
-                sm={6}
-                md={4}
-                lg={3}
-                key={t.id}
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                <Card
-                    sx={{
-                      p: 3,
-                      borderRadius: 3,
-                      boxShadow: 3,
-                      width: {
-                        xs: "95%",   // Mobile
-                        sm: "280px", // Small screens
-                        md: "320px", // Tablets
-                        lg: "340px", // Desktop
-                      },
-                      maxWidth: "100%",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      textAlign: "center",
-                      transition: "transform 0.25s ease, box-shadow 0.25s ease",
-                      "&:hover": {
-                        transform: "translateY(-6px)",
-                        boxShadow: 6,
-                      },
-                    }}
-                  >
-                    {/* --- Top: Avatar + Verified --- */}
-                    <Box sx={{ mb: 2 }}>
-                      <Avatar
-                        src={t.imageUrl || ""}
-                        alt={t.name}
-                        sx={{
-                          width: 90,
-                          height: 90,
-                          border: "3px solid #0d6efd",
-                          mx: "auto",
-                          mb: 1,
-                        }}
-                      />
-                      {t.verified?.toLowerCase() === "yes" && (
-                        <Chip
-                          icon={<CheckCircle />}
-                          label="Verified"
-                          color="success"
-                          size="small"
-                          sx={{ fontSize: "0.75rem" }}
-                        />
-                      )}
-                    </Box>
+            Featured
+          </Box>
 
-                    {/* --- Middle: Name / Info --- */}
-                    <Box sx={{ flexGrow: 1, mb: 2 }}>
-                      <Typography
-                        variant="h6"
-                        fontWeight={700}
-                        color="#0d6efd"
-                        sx={{ lineHeight: 1.2 }}
-                      >
-                        {t.name}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mt: 0.5, fontWeight: 500 }}
-                      >
-                        {t.qualification}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        📍 {t.city}
-                      </Typography>
-                    </Box>
-
-                   {/* --- Subjects & Areas Container --- */}
-<Box
-  sx={{
-    flexGrow: 1,
-    width: "100%",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    minHeight: 90, // 👈 ensures equal vertical space
-  }}
->
-  {/* --- Subjects Section --- */}
-  {t.subject && (
-    <Box sx={{ mb: 1 }}>
-      <Typography
-        variant="subtitle2"
-        fontWeight={700}
-        sx={{ mb: 0.5, color: "text.primary" }}
-      >
-        Subjects
-      </Typography>
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          gap: 0.5,
-          minHeight: 40, // 👈 ensures all headings align
-        }}
-      >
-        {t.subject
-          ?.split(",")
-          .map((s, i) => (
-            <Chip
-              key={i}
-              label={s.trim()}
-              color="primary"
-              variant="outlined"
-              size="small"
-              sx={{
-                fontSize: "0.7rem",
-              }}
+          {/* Top Section */}
+          <Box
+            sx={{
+              display: "flex",
+              p: 2,
+              background: "rgba(0,80,200,0.25)",
+              backdropFilter: "blur(12px)",
+              borderTopLeftRadius: "22px",
+              borderTopRightRadius: "22px",
+              gap: 2,
+            }}
+          >
+            <Avatar
+              src={t.imageUrl}
+              alt={t.name}
+              sx={{ width: 70, height: 70, borderRadius: "14px" }}
             />
-          ))}
-      </Box>
-    </Box>
+            <Box sx={{ textAlign: "left" }}>
+              {t.verified?.toLowerCase() === "yes" && (
+                <Typography
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 0.5,
+                    fontWeight: 700,
+                    maxWidth: 180,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  <CheckCircleIcon fontSize="small" color="success" />
+                  {t.name}
+                </Typography>
+              )}
+              <Typography
+                sx={{ fontSize: "0.85rem", color: "#004aad", fontWeight: 700 }}
+              >
+                {t.qualification}
+              </Typography>
+              <Typography sx={{ fontSize: "0.8rem", color: "gold" }}>
+                ★★★★★
+              </Typography>
+              <Typography sx={{ fontSize: "0.75rem", color: "green" }}>
+                {t.city}
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* Middle Section */}
+          <Box sx={{ p: 2, flexGrow: 1 }}>
+            {/* Subjects */}
+<Typography sx={{ mt: 1, fontWeight: 700 }}>Subjects:</Typography>
+<Box sx={{ fontSize: "0.85rem", mt: 0.5 }}>
+  {(showMoreSubjects[t.id] ? t.subjects : t.subjects.slice(0, 2)).map(
+    (subject, i) => (
+      <Typography key={i} sx={{ lineHeight: 1.5 }}>
+        {subject}
+      </Typography>
+    )
+  )}
+  {t.subjects.length > 2 && (
+    <Button
+      size="small"
+      onClick={() => handleToggleSubjects(t.id)}
+      sx={{ mt: 0.5, textTransform: "none", fontSize: "0.75rem" }}
+    >
+      {showMoreSubjects[t.id] ? "See less" : "See more"}
+    </Button>
+  )}
+</Box>
+
+{/* Bio */}
+<Typography sx={{ mt: 1, fontWeight: 700 }}>Bio:</Typography>
+<Box sx={{ fontSize: "0.85rem", mt: 0.5 }}>
+  <Typography
+    sx={{
+      lineHeight: 1.5,
+      display: "-webkit-box",
+      WebkitLineClamp: showMoreBio[t.id] ? "none" : 3, // 3 lines initially
+      WebkitBoxOrient: "vertical",
+      overflow: "hidden",
+      wordBreak: "break-word", // <--- ensures long words wrap
+      width: "100%",            // <--- take full card width
+    }}
+  >
+    {showMoreBio[t.id]
+      ? t.bio.split(" ").slice(0, 40).join(" ")
+      : t.bio.split(" ").slice(0, 40).join(" ")}
+  </Typography>
+  {t.bio.split(" ").length > 40 && (
+    <Button
+      size="small"
+      onClick={() => handleToggleBio(t.id)}
+      sx={{ mt: 0.5, textTransform: "none", fontSize: "0.75rem" }}
+    >
+      {showMoreBio[t.id] ? "See less" : "See more"}
+    </Button>
   )}
 </Box>
 
 
-                    {/* --- Bottom: Buttons --- */}
-                    <Box
-                      sx={{
-                        mt: "auto",
-                        display: "flex",
-                        gap: 1,
-                        flexWrap: "wrap",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Button
-                        component={Link}
-                        to={`/teacher/${t.id}`}
-                        variant="contained"
-                        sx={{
-                          backgroundColor: "#0d6efd",
-                          "&:hover": { backgroundColor: "#0b5ed7" },
-                          fontWeight: 700,
-                          px: 2.5,
-                        }}
-                      >
-                        View Profile
-                      </Button>
-                      <Button
-                        component={Link}
-                        to={`/hire/${t.id}`}
-                        state={{ teacherId: t.id, teacherName: t.name }}
-                        variant="contained"
-                        sx={{
-                          backgroundColor: "#29b554",
-                          "&:hover": { backgroundColor: "#218838" },
-                          fontWeight: 700,
-                          px: 2.5,
-                        }}
-                      >
-                        Hire Me
-                      </Button>
-                    </Box>
-                  </Card>
-              </Grid>
-            ))}
-          </Grid>
+          </Box>
 
-        )}
+          {/* Footer Price */}
+          <Box
+            sx={{
+              background: "rgba(0,200,100,0.25)",
+              backdropFilter: "blur(8px)",
+              textAlign: "center",
+              py: 1,
+              fontWeight: 700,
+            }}
+          >
+            1500/hr
+          </Box>
+
+          {/* Buttons */}
+          <Box sx={{ p: 2, display: "flex", justifyContent: "space-between" }}>
+            <Button
+              component={Link}
+              to={`/teacher/${t.id}`}
+              variant="contained"
+              sx={{ flex: 1, mr: 1 }}
+            >
+              View Profile
+            </Button>
+            <Button
+              component={Link}
+              to={`/hire/${t.id}`}
+              variant="contained"
+              sx={{ flex: 1, backgroundColor: "#29b554" }}
+            >
+              Hire Me
+            </Button>
+          </Box>
+        </Card>
+      </motion.div>
+    </Grid>
+  ))}
+</Grid>
+
 
         {!loading && visibleCount < filtered.length && (
           <Box sx={{ textAlign: "center", mt: 4 }}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleLoadMore}
-              sx={{ fontWeight: 700 }}
-            >
-              Load More
-            </Button>
+            <Button variant="contained" onClick={handleLoadMore}>Load More</Button>
           </Box>
         )}
       </Container>
