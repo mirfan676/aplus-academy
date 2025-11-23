@@ -17,7 +17,7 @@ from geopy.geocoders import Nominatim
 geolocator = Nominatim(user_agent="APlusAcademy/1.0")
 
 # --- FASTAPI APP ---
-app = FastAPI(title="APlus Home Tutors API", version="4.0.0")
+app = FastAPI(title="APlus Home Tutors API", version="4.1.0")
 
 # --- CORS CONFIG ---
 app.add_middleware(
@@ -32,10 +32,9 @@ app.add_middleware(
 #           GOOGLE SHEETS SETUP
 # -----------------------------------------
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-creds_dict = json.loads(os.environ["GOOGLE_CREDENTIALS"])
-creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
+GOOGLE_SHEETS_SERVICE_ACCOUNT = json.loads(os.environ["SERVICE_ACCOUNT_JSON"])
+creds = Credentials.from_service_account_info(GOOGLE_SHEETS_SERVICE_ACCOUNT, scopes=SCOPES)
 gspread_client = gspread.authorize(creds)
-
 SHEET_ID = "1wBmbImTrliHEIKk5YxM5PN4eOfkz6XLS28bjxRjmZvY"
 sheet = gspread_client.open_by_key(SHEET_ID).sheet1
 cached_tutors = []
@@ -59,34 +58,21 @@ with open(LOCATIONS_FILE, "r", encoding="utf-8") as f:
 # -----------------------------------------
 RECAPTCHA_PROJECT_ID = os.environ.get("GCLOUD_PROJECT_ID")
 RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY")
+RECAPTCHA_SERVICE_ACCOUNT = json.loads(os.environ["RECAPTCHA_API_KEY_JSON"])
 
-recaptcha_credentials = Credentials.from_service_account_info(
-    json.loads(os.environ["RECAPTCHA_API_KEY_JSON"])
+recaptcha_client = recaptchaenterprise_v1.RecaptchaEnterpriseServiceClient.from_service_account_info(
+    RECAPTCHA_SERVICE_ACCOUNT
 )
-
-recaptcha_client = recaptchaenterprise_v1.RecaptchaEnterpriseServiceClient(
-    credentials=recaptcha_credentials
-)
-
 
 # --------------------------
-# Generate token for frontend
+# Generate token placeholder for frontend
 # --------------------------
 @app.get("/recaptcha/token")
 def generate_recaptcha_token(action: str = Query(...)):
     """
-    Generate reCAPTCHA token for frontend usage.
-    The frontend will send this token when submitting forms.
+    Return SITE_KEY for frontend. The frontend JS SDK will use this.
     """
-    try:
-        # Use the Enterprise API to generate a token
-        # In practice, frontend usually uses the site key with the JS SDK
-        # But here we can return the SITE_KEY + action for the frontend
-        return {"site_key": RECAPTCHA_SITE_KEY, "token": f"placeholder-token-for-{action}"}
-    except Exception as e:
-        print("❌ Failed to generate reCAPTCHA token:", e)
-        raise HTTPException(status_code=500, detail="Failed to generate token")
-
+    return {"site_key": RECAPTCHA_SITE_KEY, "token": f"placeholder-token-for-{action}"}
 
 # --------------------------
 # Verify reCAPTCHA token
@@ -105,19 +91,15 @@ def verify_recaptcha(token: str, expected_action: str):
                 status_code=400,
                 detail=f"Invalid reCAPTCHA token: {response.token_properties.invalid_reason}",
             )
-
         if response.token_properties.action != expected_action:
             raise HTTPException(status_code=400, detail="Invalid reCAPTCHA action")
-
-        score = response.risk_analysis.score
-        if score < 0.5:
+        if response.risk_analysis.score < 0.5:
             raise HTTPException(status_code=400, detail="reCAPTCHA verification failed (bot detected)")
 
         return True
     except Exception as e:
         print("⚠️ reCAPTCHA validation error:", e)
         raise HTTPException(status_code=400, detail="reCAPTCHA validation error")
-
 
 # -----------------------------------------
 #      UTILITY FUNCTIONS
@@ -131,7 +113,6 @@ def random_point_within_radius(center_lat, center_lng, radius_m=1000):
     lat_offset = w * math.cos(t)
     lng_offset = w * math.sin(t) / math.cos(math.radians(center_lat))
     return round(center_lat + lat_offset, 6), round(center_lng + lng_offset, 6)
-
 
 def get_area_coordinates(area_name: str, city: str, province: str):
     try:
@@ -148,7 +129,6 @@ def get_area_coordinates(area_name: str, city: str, province: str):
         print(f"⚠️ Error fetching coordinates for {area_name}: {e}")
     return None, None
 
-
 # -----------------------------------------
 #           ROUTES
 # -----------------------------------------
@@ -156,26 +136,21 @@ def get_area_coordinates(area_name: str, city: str, province: str):
 def home():
     return {"message": "APlus API running with reCAPTCHA Enterprise!"}
 
-
 @app.get("/locations")
 def get_locations():
     return pakistan_data
-
 
 @app.get("/districts")
 def get_districts(province: str = Query(...)):
     return {"districts": list(pakistan_data.get(province, {}).keys())}
 
-
 @app.get("/tehsils")
 def get_tehsils(province: str = Query(...), district: str = Query(...)):
     return {"tehsils": list(pakistan_data.get(province, {}).get(district, {}).keys())}
 
-
 @app.get("/areas")
 def get_areas(province: str = Query(...), district: str = Query(...), tehsil: str = Query(...)):
     return {"areas": pakistan_data.get(province, {}).get(district, {}).get(tehsil, [])}
-
 
 # --------------------------
 # TUTOR REGISTRATION
@@ -218,7 +193,7 @@ async def register_tutor(
         else:
             latitude, longitude = (None, None)
             if exactLocation:
-                latitude, longitude = None, None  # Could call geocoding if needed
+                latitude, longitude = None, None  # Can implement geocoding
 
         # --- Reverse geocode ---
         city = district = province = tehsil = ""
@@ -279,9 +254,8 @@ async def register_tutor(
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
-
 # ---------------------------------------------------------
-# 2️⃣ GET VERIFIED TUTORS
+# GET VERIFIED TUTORS
 # ---------------------------------------------------------
 @app.get("/tutors")
 def get_tutors():
@@ -332,9 +306,8 @@ def get_tutors():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 # ---------------------------------------------------------
-# 3️⃣ GET SINGLE TEACHER
+# GET SINGLE TEACHER
 # ---------------------------------------------------------
 @app.get("/tutors/{teacher_id}")
 def get_teacher(teacher_id: int):
@@ -379,4 +352,3 @@ def get_teacher(teacher_id: int):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
