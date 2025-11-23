@@ -79,6 +79,7 @@ def generate_recaptcha_token(action: str = Query(...)):
 # --------------------------
 def verify_recaptcha(token: str, expected_action: str):
     try:
+        # Create the Event object
         event = recaptchaenterprise_v1.Event(token=token, site_key=RECAPTCHA_SITE_KEY)
         assessment = recaptchaenterprise_v1.Assessment(event=event)
         request = recaptchaenterprise_v1.CreateAssessmentRequest(
@@ -86,6 +87,7 @@ def verify_recaptcha(token: str, expected_action: str):
         )
         response = recaptcha_client.create_assessment(request=request)
 
+        # Validate token
         if not response.token_properties.valid:
             raise HTTPException(
                 status_code=400,
@@ -100,6 +102,7 @@ def verify_recaptcha(token: str, expected_action: str):
     except Exception as e:
         print("⚠️ reCAPTCHA validation error:", e)
         raise HTTPException(status_code=400, detail="reCAPTCHA validation error")
+
 
 # -----------------------------------------
 #      UTILITY FUNCTIONS

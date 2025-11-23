@@ -114,61 +114,75 @@ export default function TutorRegistration() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMessage("");
+  e.preventDefault();
+  setMessage("");
 
-    if (!formData.agree) return setMessage("⚠️ Please agree to Terms.");
-    if (!formData.image) {
-      setImageError(true);
-      return setMessage("⚠️ Please upload a profile picture.");
-    }
-    if (higherEducation.includes(formData.qualification) && !selectedHigherSubject) {
-      return setMessage("⚠️ Please select your subject for higher qualification.");
-    }
+  // Validation checks...
+  if (!formData.agree) {
+    setMessage("⚠️ Please agree to Terms.");
+    return;
+  }
+  if (!formData.image) {
+    setImageError(true);
+    setMessage("⚠️ Please upload a profile picture.");
+    return;
+  }
+  if (higherEducation.includes(formData.qualification) && !selectedHigherSubject) {
+    setMessage("⚠️ Please select your subject for higher qualification.");
+    return;
+  }
 
-    setLoading(true);
-    setTokenLoading(true);
+  setLoading(true);
 
-    try {
-      // --- get token ---
-      const recaptchaRes = await api.get("/recaptcha/token", { params: { action: "tutor_register" } });
-      const token = recaptchaRes.data.token;
-      setTokenLoading(false);
-      if (!token) return setMessage("⚠️ Failed to get verification token.");
+  try {
+    // ✅ Generate reCAPTCHA token using real Enterprise SDK
+    const token = await window.grecaptcha.enterprise.execute(
+      RECAPTCHA_SITE_KEY,
+      { action: "tutor_register" }
+    );
 
-      // --- prepare FormData ---
-      const submissionData = new FormData();
-      submissionData.append("name", formData.name);
-      submissionData.append("qualification", formData.qualification);
-      submissionData.append("subject", selectedHigherSubject || "");
-      submissionData.append("major_subjects", majorSubjects.join(","));
-      submissionData.append("experience", formData.experience);
-      submissionData.append("phone", formData.phone);
-      submissionData.append("bio", formData.bio);
-      submissionData.append("image", formData.image);
-      submissionData.append("lat", coords.lat ?? "");
-      submissionData.append("lng", coords.lng ?? "");
-      submissionData.append("recaptcha_token", token);
-
-      // --- POST request ---
-      const res = await api.post("/tutors/register", submissionData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      if (res.status === 200) {
-        setMessage("✅ Tutor registered successfully!");
-        setFormData({ name:"", qualification:"", subject:"", major_subjects:"", experience:"", phone:"", bio:"", image:null, agree:false });
-        setMajorSubjects([]);
-        setSelectedHigherSubject("");
-      } else setMessage("⚠️ Failed to submit. Try again.");
-    } catch (err) {
-      console.error("Error submitting form:", err);
-      setMessage("❌ Error submitting form. Server might be down or invalid data.");
-    } finally {
+    if (!token) {
+      setMessage("⚠️ Failed to get verification token. Try again.");
       setLoading(false);
-      setTokenLoading(false);
+      return;
     }
-  };
+
+    const submissionData = new FormData();
+    const subjectToSend = selectedHigherSubject || "";
+    const majorSubjectsToSend = majorSubjects.join(",");
+
+    const dataToSend = { ...formData, subject: subjectToSend, major_subjects: majorSubjectsToSend };
+    Object.entries(dataToSend).forEach(([k, v]) => {
+      if (k === "image" && v) submissionData.append("image", v);
+      else submissionData.append(k, v ?? "");
+    });
+
+    submissionData.append("lat", coords.lat ?? "");
+    submissionData.append("lng", coords.lng ?? "");
+    submissionData.append("recaptcha_token", token);
+
+    // Send to backend
+    const res = await api.post("/tutors/register", submissionData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    if (res.status === 200) {
+      setMessage("✅ Tutor registered successfully!");
+      // Reset form
+      setFormData({ name: "", qualification: "", subject: "", major_subjects: "", experience: "", phone: "", bio: "", image: null, agree: false });
+      setMajorSubjects([]);
+      setSelectedHigherSubject("");
+    } else {
+      setMessage("⚠️ Failed to submit. Try again.");
+    }
+  } catch (err) {
+    console.error("Error submitting form:", err);
+    setMessage("❌ Error submitting form. Server might be down.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <Box sx={{ bgcolor: "#f9f9f9", minHeight: "100vh", py: 6 }}>
