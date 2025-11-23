@@ -12,9 +12,14 @@ from google.oauth2.service_account import Credentials
 from datetime import datetime, timedelta
 from geopy.geocoders import Nominatim
 
+# --- GOOGLE RECAPTCHA ENTERPRISE ---
+from google.cloud import recaptchaenterprise_v1
+from google.oauth2 import service_account
+
+# --- GEOLOCATOR ---
 geolocator = Nominatim(user_agent="APlusAcademy/1.0")
 
-app = FastAPI(title="APlus Home Tutors API", version="3.0.0")
+app = FastAPI(title="APlus Home Tutors API", version="4.0.0")
 
 # --- CORS CONFIG ---
 app.add_middleware(
@@ -25,7 +30,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- GOOGLE SHEETS SETUP ---
+# -----------------------------------------
+#           GOOGLE SHEETS SETUP
+# -----------------------------------------
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 creds_dict = json.loads(os.environ["GOOGLE_CREDENTIALS"])
 creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
@@ -37,15 +44,77 @@ cached_tutors = []
 last_fetch_time = datetime.min
 CACHE_DURATION = timedelta(minutes=5)
 
-# --- IMGBB CONFIG ---
+# -----------------------------------------
+#              IMGBB CONFIG
+# -----------------------------------------
 IMGBB_API_KEY = os.environ.get("IMGBB_API_KEY", "")
 
-# --- LOAD LOCATIONS JSON ---
+# -----------------------------------------
+#      LOCATION JSON (province > district > tehsil)
+# -----------------------------------------
 LOCATIONS_FILE = os.path.join(os.path.dirname(__file__), "locations.json")
 with open(LOCATIONS_FILE, "r", encoding="utf-8") as f:
     pakistan_data = json.load(f)
 
-# --- Utility: Random nearby point ---
+# -----------------------------------------
+#       GOOGLE RECAPTCHA ENTERPRISE
+# -----------------------------------------
+RECAPTCHA_PROJECT_ID = os.environ.get("GCLOUD_PROJECT_ID")
+RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY")
+
+recaptcha_credentials = service_account.Credentials.from_service_account_info(
+    json.loads(os.environ["RECAPTCHA_API_KEY_JSON"])
+)
+
+recaptcha_client = recaptchaenterprise_v1.RecaptchaEnterpriseServiceClient(
+    credentials=recaptcha_credentials
+)
+
+def verify_recaptcha(token: str, expected_action: str):
+    """ Validate Google reCAPTCHA Enterprise Server-Side """
+    try:
+        event = recaptchaenterprise_v1.Event(
+            token=token,
+            site_key=RECAPTCHA_SITE_KEY
+        )
+
+        assessment = recaptchaenterprise_v1.Assessment(event=event)
+
+        request = recaptchaenterprise_v1.CreateAssessmentRequest(
+            parent=f"projects/{RECAPTCHA_PROJECT_ID}",
+            assessment=assessment
+        )
+
+        response = recaptcha_client.create_assessment(request)
+
+        if not response.token_properties.valid:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid reCAPTCHA token: {response.token_properties.invalid_reason}"
+            )
+
+        if response.token_properties.action != expected_action:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid reCAPTCHA action"
+            )
+
+        score = response.risk_analysis.score
+        if score < 0.5:
+            raise HTTPException(
+                status_code=400,
+                detail="reCAPTCHA verification failed (bot detected)"
+            )
+        return True
+
+    except Exception as e:
+        print("reCAPTCHA validation error:", e)
+        raise HTTPException(status_code=400, detail="reCAPTCHA validation error")
+
+
+# -----------------------------------------
+#      UTILITY: RANDOM GEO POINT
+# -----------------------------------------
 def random_point_within_radius(center_lat, center_lng, radius_m=1000):
     radius_in_degrees = radius_m / 111320.0
     u = random.random()
@@ -56,7 +125,10 @@ def random_point_within_radius(center_lat, center_lng, radius_m=1000):
     lng_offset = w * math.sin(t) / math.cos(math.radians(center_lat))
     return round(center_lat + lat_offset, 6), round(center_lng + lng_offset, 6)
 
-# --- Utility: Get coordinates from OpenStreetMap ---
+
+# -----------------------------------------
+#      UTILITY: GEOCODE AREA NAME
+# -----------------------------------------
 def get_area_coordinates(area_name: str, city: str, province: str):
     try:
         query = f"{area_name}, {city}, {province}, Pakistan"
@@ -72,44 +144,42 @@ def get_area_coordinates(area_name: str, city: str, province: str):
         print(f"⚠️ Error fetching coordinates for {area_name}: {e}")
     return None, None
 
-# --- Utility: Fallback IP-based geolocation ---
-def get_ip_geolocation(ip: str):
-    try:
-        url = f"https://ipapi.co/{ip}/json/"
-        res = requests.get(url, timeout=8)
-        if res.status_code == 200:
-            data = res.json()
-            return data.get("latitude"), data.get("longitude"), data.get("city"), data.get("region")
-    except Exception as e:
-        print("⚠️ IP geolocation error:", e)
-    return None, None, None, None
 
-# --- ROUTES ---
+# -----------------------------------------
+#           ROUTES
+# -----------------------------------------
 @app.get("/")
 def home():
-    return {"message": "APlus Home Tutors API is running with province-district-tehsil support!"}
+    return {"message": "APlus API running with reCAPTCHA Enterprise!"}
+
 
 @app.get("/locations")
 def get_locations():
     return pakistan_data
 
+
 @app.get("/districts")
 def get_districts(province: str = Query(...)):
     return {"districts": list(pakistan_data.get(province, {}).keys())}
+
 
 @app.get("/tehsils")
 def get_tehsils(province: str = Query(...), district: str = Query(...)):
     return {"tehsils": list(pakistan_data.get(province, {}).get(district, {}).keys())}
 
+
 @app.get("/areas")
 def get_areas(province: str = Query(...), district: str = Query(...), tehsil: str = Query(...)):
     return {"areas": pakistan_data.get(province, {}).get(district, {}).get(tehsil, [])}
 
-# --- Tutor Registration Endpoint ---
-
+# ---------------------------------------------------------
+#                TUTOR REGISTRATION (WITH RECAPTCHA)
+# ---------------------------------------------------------
 @app.post("/tutors/register")
 async def register_tutor(
     request: Request,
+    recaptcha_token: str = Form(...),
+
     name: str = Form(...),
     subject: str = Form(None),
     major_subjects: str = Form(None),
@@ -124,6 +194,9 @@ async def register_tutor(
     profile_url: str = Form(None),
 ):
     try:
+        # --- Verify reCAPTCHA ---
+        verify_recaptcha(recaptcha_token, "tutor_register")
+        
         # --- Upload image ---
         image_url = "N/A"
         if image and image.filename:
@@ -136,17 +209,15 @@ async def register_tutor(
                 raw_url = result["data"]["url"]
                 image_url = f"https://cold-truth-e620.irfan-karor-mi.workers.dev/?url={raw_url}"
 
-        # --- Determine coordinates ---
+        # Determine coordinates
         if lat and lng:
             latitude, longitude = float(lat), float(lng)
         else:
-            # fallback: try to geocode from exactLocation
+            latitude = longitude = None
             if exactLocation:
                 latitude, longitude = get_area_coordinates(exactLocation, "", "")
-            else:
-                latitude = longitude = None
 
-        # --- Reverse Geocoding: Get city, district, province, tehsil ---
+        # Reverse geocode
         city = district = province = tehsil = ""
         if latitude and longitude:
             try:
@@ -156,18 +227,15 @@ async def register_tutor(
                 district = address.get("county") or ""
                 province = address.get("state") or ""
                 tehsil = address.get("suburb") or ""
-            except Exception as e:
-                print("⚠️ Reverse geocoding failed:", e)
+            except Exception:
+                pass
 
-        # --- Default Areas ---
-        default_areas = [city, city, city]  # fallback to city for area1/2/3
-        area1, area2, area3 = default_areas
+        area1 = area2 = area3 = city
 
-        # --- Combine qualification + subject ---
         qualification_value = f"{qualification} {subject}" if subject else qualification
         major_subjects_str = major_subjects or ""
 
-        # --- Append row to Google Sheet ---
+        # Store in Google Sheet
         sheet.append_row([
             name,
             subject or "",
@@ -187,7 +255,7 @@ async def register_tutor(
             image_url,
             latitude or "",
             longitude or "",
-            "No",  # Verified
+            "No",
             datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
             profile_url or ""
         ])
@@ -210,22 +278,27 @@ async def register_tutor(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# --- Get All Verified Tutors ---
+# ---------------------------------------------------------
+#                   GET VERIFIED TUTORS
+# ---------------------------------------------------------
 @app.get("/tutors")
 def get_tutors():
     global cached_tutors, last_fetch_time
     now = datetime.utcnow()
+
     if now - last_fetch_time < CACHE_DURATION:
         return cached_tutors
+
     try:
         records = sheet.get_all_records(empty2zero=False, head=1)
         verified = []
+
         for r in records:
             if str(r.get("Verified", "")).strip().lower() != "yes":
                 continue
+
             def safe_str(v): return str(v).strip() if v else ""
 
-            # Combine Subject + Major Subjects
             subjects_list = []
             if safe_str(r.get("Subject")):
                 subjects_list.append(safe_str(r.get("Subject")))
@@ -253,14 +326,18 @@ def get_tutors():
                 "Profile URL": safe_str(r.get("Profile URL")),
                 "Verified": "Yes"
             })
+
         cached_tutors = verified
         last_fetch_time = now
         return verified
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# --- Get Single Teacher ---
+# ---------------------------------------------------------
+#                    GET SINGLE TEACHER
+# ---------------------------------------------------------
 @app.get("/tutors/{teacher_id}")
 def get_teacher(teacher_id: int):
     try:
@@ -270,12 +347,13 @@ def get_teacher(teacher_id: int):
             if idx == teacher_id:
                 teacher = r
                 break
+
         if not teacher:
             raise HTTPException(status_code=404, detail="Teacher not found")
+
         def safe_str(val):
             return str(val).strip() if val is not None else ""
 
-        # Combine Subject + Major Subjects
         subjects_list = []
         if safe_str(teacher.get("Subject")):
             subjects_list.append(safe_str(teacher.get("Subject")))
@@ -303,5 +381,6 @@ def get_teacher(teacher_id: int):
             "Profile URL": safe_str(teacher.get("Profile URL")),
             "Verified": safe_str(teacher.get("Verified")),
         }
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Grid,
@@ -15,12 +15,11 @@ import {
   Link as MuiLink,
   Autocomplete,
 } from "@mui/material";
-import ReCAPTCHA from "react-google-recaptcha";
 import api from "../api";
 
 const RECAPTCHA_SITE_KEY = "6LcTdf8rAAAAAHUIrbcURlFEKtL4-4siGvJgYpxl";
 
-// --- Lists ---
+// --- Qualification & Subjects ---
 const qualificationsList = [
   "Matric / SSC",
   "O-Level / IGCSE",
@@ -40,81 +39,16 @@ const qualificationsList = [
 const higherEducation = ["BS (4-year)", "MSc", "MA", "MS / MPhil", "PhD"];
 
 const subjectsList = [
-  "Mathematics",
-  "Additional Mathematics",
-  "Physics",
-  "Chemistry",
-  "Biology",
-  "Applied Mathematics",
-  "Environmental Science",
-  "Statistics",
-  "Computer Science / IT",
-  "Information Technology",
-  "Software Development",
-  "Artificial Intelligence / AI",
-  "Robotics",
-  "Biochemistry",
-  "Anatomy",
-  "Physiology",
-  "Pharmacology",
-  "Pathology",
-  "Microbiology",
-  "Nursing",
-  "Medical Terminology",
-  "Health Sciences",
-  "First Aid / Emergency Care",
-  "Engineering Mathematics",
-  "Mechanical Engineering",
-  "Electrical Engineering",
-  "Civil Engineering",
-  "Electronics",
-  "Computer Engineering",
-  "Web Development",
-  "Programming (Python, C++, Java, etc.)",
-  "Data Science / Machine Learning",
-  "Economics",
-  "Microeconomics",
-  "Macroeconomics",
-  "Accounting",
-  "Finance",
-  "Business Studies",
-  "Commerce",
-  "Marketing",
-  "Management",
-  "Entrepreneurship",
-  "English Language",
-  "English Literature",
-  "Urdu",
-  "Urdu Literature",
-  "Arabic",
-  "Persian",
-  "French",
-  "German",
-  "Spoken English",
-  "Creative Writing",
-  "Psychology",
-  "Sociology",
-  "History",
-  "Geography",
-  "Political Science / Civics",
-  "Philosophy",
-  "Islamic Studies / Islamiat",
-  "Pakistan Studies",
-  "Art & Design",
-  "Fine Arts",
-  "Music",
-  "Drama / Theater",
-  "Food & Nutrition / Home Economics",
-  "Fashion Design",
-  "Photography",
-  "Calligraphy",
-  "Graphic Design",
-  "Public Speaking",
-  "Critical Thinking",
-  "Soft Skills",
-  "Time Management",
-  "Career Counseling",
-  "Personality Development",
+  "Mathematics", "Physics", "Chemistry", "Biology", "Computer Science / IT",
+  "Software Development", "Artificial Intelligence / AI", "Robotics",
+  "Economics", "Accounting", "Finance", "Business Studies", "Marketing",
+  "English Language", "English Literature", "Urdu", "Arabic", "French",
+  "German", "Psychology", "Sociology", "History", "Geography",
+  "Political Science / Civics", "Philosophy", "Islamic Studies / Islamiat",
+  "Pakistan Studies", "Art & Design", "Music", "Drama / Theater",
+  "Food & Nutrition / Home Economics", "Fashion Design", "Photography",
+  "Graphic Design", "Public Speaking", "Critical Thinking", "Soft Skills",
+  "Time Management", "Career Counseling", "Personality Development",
 ];
 
 export default function TutorRegistration() {
@@ -129,17 +63,16 @@ export default function TutorRegistration() {
     image: null,
     agree: false,
   });
-
   const [majorSubjects, setMajorSubjects] = useState([]);
   const [selectedHigherSubject, setSelectedHigherSubject] = useState("");
   const [coords, setCoords] = useState({ lat: "", lng: "" });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [captchaVerified, setCaptchaVerified] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [locationBlocked, setLocationBlocked] = useState(false);
 
-  // get browser geolocation on mount
+  const recaptchaRef = useRef(null);
+
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -150,22 +83,19 @@ export default function TutorRegistration() {
           });
           setLocationBlocked(false);
         },
-        () => setLocationBlocked(true) // show Find Me button if blocked
+        () => setLocationBlocked(true)
       );
     } else {
       setLocationBlocked(true);
     }
   }, []);
 
-  // When qualification changes, handle higher subjects
   useEffect(() => {
     if (!higherEducation.includes(formData.qualification)) {
       setSelectedHigherSubject("");
-      setFormData((prev) => ({ ...prev, subject: "" }));
+      setFormData((p) => ({ ...p, subject: "" }));
     }
   }, [formData.qualification]);
-
-  const handleCaptcha = (value) => setCaptchaVerified(!!value);
 
   const handleChange = (e) => {
     const { name, value, files, checked, type } = e.target;
@@ -179,7 +109,6 @@ export default function TutorRegistration() {
     }
   };
 
-  // Manual Find My Location button handler
   const handleFindMe = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -200,10 +129,6 @@ export default function TutorRegistration() {
     setMessage("");
 
     // Basic validations
-    if (!captchaVerified) {
-      setMessage("⚠️ Please verify CAPTCHA.");
-      return;
-    }
     if (!formData.agree) {
       setMessage("⚠️ Please agree to Terms.");
       return;
@@ -221,10 +146,15 @@ export default function TutorRegistration() {
     setLoading(true);
 
     try {
+      // --- Generate reCAPTCHA Enterprise token using useRef ---
+      const token = await window.grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, {
+        action: "submit_tutor_form",
+      });
+
+      const submissionData = new FormData();
       const subjectToSend = selectedHigherSubject || "";
       const majorSubjectsToSend = majorSubjects.join(", ");
 
-      const submissionData = new FormData();
       const dataToSend = {
         ...formData,
         subject: subjectToSend,
@@ -241,6 +171,7 @@ export default function TutorRegistration() {
 
       submissionData.append("lat", coords.lat ?? "");
       submissionData.append("lng", coords.lng ?? "");
+      submissionData.append("recaptcha_token", token);
 
       const res = await api.post("/tutors/register", submissionData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -322,7 +253,6 @@ export default function TutorRegistration() {
                     onChange={handleChange}
                   />
                 </Button>
-
                 {formData.image && (
                   <Avatar
                     src={URL.createObjectURL(formData.image)}
@@ -351,17 +281,11 @@ export default function TutorRegistration() {
                   setFormData((p) => ({ ...p, qualification: newValue || "" }))
                 }
                 renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Qualification"
-                    margin="normal"
-                    required
-                    fullWidth
-                  />
+                  <TextField {...params} label="Qualification" margin="normal" required fullWidth />
                 )}
               />
 
-              {/* Higher subject dropdown */}
+              {/* Higher subject */}
               {higherEducation.includes(formData.qualification) && (
                 <Autocomplete
                   options={subjectsList}
@@ -371,12 +295,7 @@ export default function TutorRegistration() {
                     setFormData((p) => ({ ...p, subject: newValue || "" }));
                   }}
                   renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Higher Qualification Subject (single)"
-                      margin="normal"
-                      fullWidth
-                    />
+                    <TextField {...params} label="Higher Qualification Subject" margin="normal" fullWidth />
                   )}
                 />
               )}
@@ -389,28 +308,15 @@ export default function TutorRegistration() {
                 onChange={(e, newValue) => {
                   if (newValue.length > 5) return;
                   setMajorSubjects(newValue);
-                  setFormData({
-                    ...formData,
-                    major_subjects: newValue.join(", "),
-                  });
+                  setFormData({ ...formData, major_subjects: newValue.join(", ") });
                 }}
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => (
-                    <Chip
-                      label={option}
-                      {...getTagProps({ index })}
-                      color="primary"
-                      variant="outlined"
-                    />
+                    <Chip label={option} {...getTagProps({ index })} color="primary" variant="outlined" />
                   ))
                 }
                 renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Select Major Subjects"
-                    margin="normal"
-                    fullWidth
-                  />
+                  <TextField {...params} label="Select Major Subjects" margin="normal" fullWidth />
                 )}
                 disableCloseOnSelect
               />
@@ -466,32 +372,14 @@ export default function TutorRegistration() {
                 </Box>
               )}
 
-              {/* CAPTCHA */}
-              <Box textAlign="center" mt={3} mb={2}>
-                <ReCAPTCHA sitekey={RECAPTCHA_SITE_KEY} onChange={handleCaptcha} />
-              </Box>
-
               {/* Terms */}
               <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={formData.agree}
-                    onChange={handleChange}
-                    name="agree"
-                    color="success"
-                  />
-                }
+                control={<Checkbox checked={formData.agree} onChange={handleChange} name="agree" color="success" />}
                 label={
                   <Typography variant="body2">
                     I agree to the{" "}
-                    <MuiLink href="/terms" target="_blank">
-                      Terms
-                    </MuiLink>{" "}
-                    and{" "}
-                    <MuiLink href="/privacy" target="_blank">
-                      Privacy Policy
-                    </MuiLink>
-                    .
+                    <MuiLink href="/terms" target="_blank">Terms</MuiLink> and{" "}
+                    <MuiLink href="/privacy" target="_blank">Privacy Policy</MuiLink>.
                   </Typography>
                 }
               />
@@ -507,23 +395,17 @@ export default function TutorRegistration() {
               >
                 {loading ? <CircularProgress size={24} color="inherit" /> : "Submit Registration"}
               </Button>
-            </Box>
 
-            {/* Messages */}
-            {message && (
-              <Alert
-                severity={
-                  message.includes("success")
-                    ? "success"
-                    : message.startsWith("❌")
-                    ? "error"
-                    : "info"
-                }
-                sx={{ mt: 3, textAlign: "center" }}
-              >
-                {message}
-              </Alert>
-            )}
+              {/* Message */}
+              {message && (
+                <Alert
+                  severity={message.includes("success") ? "success" : message.startsWith("❌") ? "error" : "info"}
+                  sx={{ mt: 3, textAlign: "center" }}
+                >
+                  {message}
+                </Alert>
+              )}
+            </Box>
           </Paper>
         </Grid>
       </Grid>
