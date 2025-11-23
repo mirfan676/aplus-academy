@@ -8,7 +8,7 @@ import random
 import math
 from fastapi import FastAPI, Form, File, Query, UploadFile, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from google.oauth2.service_account import Credentials, service_account
+from google.oauth2.service_account import Credentials
 from google.cloud import recaptchaenterprise_v1
 from datetime import datetime, timedelta
 from geopy.geocoders import Nominatim
