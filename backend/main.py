@@ -70,20 +70,16 @@ recaptcha_client = recaptchaenterprise_v1.RecaptchaEnterpriseServiceClient(
 
 
 def verify_recaptcha(token: str, expected_action: str):
-    """Validate Google reCAPTCHA Enterprise using v1 API (1.29.0 compatible)"""
     try:
         event = recaptchaenterprise_v1.Event(
             token=token,
             site_key=RECAPTCHA_SITE_KEY
         )
-
         assessment = recaptchaenterprise_v1.Assessment(event=event)
-
         request = recaptchaenterprise_v1.CreateAssessmentRequest(
             parent=f"projects/{RECAPTCHA_PROJECT_ID}",
             assessment=assessment
         )
-
         response = recaptcha_client.create_assessment(request=request)
 
         if not response.token_properties.valid:
@@ -111,8 +107,9 @@ def verify_recaptcha(token: str, expected_action: str):
         print("⚠️ reCAPTCHA validation error:", e)
         raise HTTPException(status_code=400, detail="reCAPTCHA validation error")
 
+
 # -----------------------------------------
-#      UTILITY: RANDOM GEO POINT
+#      UTILITY FUNCTIONS
 # -----------------------------------------
 def random_point_within_radius(center_lat, center_lng, radius_m=1000):
     radius_in_degrees = radius_m / 111320.0
@@ -125,9 +122,6 @@ def random_point_within_radius(center_lat, center_lng, radius_m=1000):
     return round(center_lat + lat_offset, 6), round(center_lng + lng_offset, 6)
 
 
-# -----------------------------------------
-#      UTILITY: GEOCODE AREA NAME
-# -----------------------------------------
 def get_area_coordinates(area_name: str, city: str, province: str):
     try:
         query = f"{area_name}, {city}, {province}, Pakistan"
@@ -143,17 +137,13 @@ def get_area_coordinates(area_name: str, city: str, province: str):
         print(f"⚠️ Error fetching coordinates for {area_name}: {e}")
     return None, None
 
+
 # -----------------------------------------
 #           ROUTES
 # -----------------------------------------
 @app.get("/")
 def home():
     return {"message": "APlus API running with reCAPTCHA Enterprise!"}
-
-# ... keep the rest of your endpoints the same ...
-# /locations, /districts, /tehsils, /areas, /tutors/register, /tutors, /tutors/{teacher_id}
-# no other changes needed since reCAPTCHA usage is now compatible
-
 
 
 @app.get("/locations")
@@ -177,7 +167,7 @@ def get_areas(province: str = Query(...), district: str = Query(...), tehsil: st
 
 
 # ---------------------------------------------------------
-#                TUTOR REGISTRATION (WITH RECAPTCHA)
+# 1️⃣ TUTOR REGISTRATION (must come BEFORE /tutors/{teacher_id})
 # ---------------------------------------------------------
 @app.post("/tutors/register")
 async def register_tutor(
@@ -197,10 +187,10 @@ async def register_tutor(
     profile_url: str = Form(None),
 ):
     try:
-        # --- Verify reCAPTCHA ---
+        # ✅ Verify reCAPTCHA action matches frontend
         verify_recaptcha(recaptcha_token, "tutor_register")
 
-        # --- Upload image ---
+        # Upload image to ImgBB
         image_url = "N/A"
         if image and image.filename:
             image_bytes = await image.read()
@@ -216,7 +206,7 @@ async def register_tutor(
         if lat and lng:
             latitude, longitude = float(lat), float(lng)
         else:
-            latitude = longitude = None
+            latitude, longitude = (None, None)
             if exactLocation:
                 latitude, longitude = get_area_coordinates(exactLocation, "", "")
 
@@ -237,7 +227,7 @@ async def register_tutor(
         qualification_value = f"{qualification} {subject}" if subject else qualification
         major_subjects_str = major_subjects or ""
 
-        # Store in Google Sheet
+        # Append row in Google Sheet
         sheet.append_row([
             name,
             subject or "",
@@ -281,32 +271,28 @@ async def register_tutor(
 
 
 # ---------------------------------------------------------
-#                   GET VERIFIED TUTORS
+# 2️⃣ GET VERIFIED TUTORS
 # ---------------------------------------------------------
 @app.get("/tutors")
 def get_tutors():
     global cached_tutors, last_fetch_time
     now = datetime.utcnow()
-
     if now - last_fetch_time < CACHE_DURATION:
         return cached_tutors
 
     try:
         records = sheet.get_all_records(empty2zero=False, head=1)
         verified = []
-
         for r in records:
             if str(r.get("Verified", "")).strip().lower() != "yes":
                 continue
 
             def safe_str(v): return str(v).strip() if v else ""
-
             subjects_list = []
             if safe_str(r.get("Subject")):
                 subjects_list.append(safe_str(r.get("Subject")))
             if safe_str(r.get("Major Subjects")):
-                majors = [s.strip() for s in safe_str(r.get("Major Subjects")).split(",") if s.strip()]
-                subjects_list.extend(majors)
+                subjects_list.extend([s.strip() for s in safe_str(r.get("Major Subjects")).split(",") if s.strip()])
 
             verified.append({
                 "Name": safe_str(r.get("Name")),
@@ -338,7 +324,7 @@ def get_tutors():
 
 
 # ---------------------------------------------------------
-#                    GET SINGLE TEACHER
+# 3️⃣ GET SINGLE TEACHER
 # ---------------------------------------------------------
 @app.get("/tutors/{teacher_id}")
 def get_teacher(teacher_id: int):
@@ -353,15 +339,12 @@ def get_teacher(teacher_id: int):
         if not teacher:
             raise HTTPException(status_code=404, detail="Teacher not found")
 
-        def safe_str(val):
-            return str(val).strip() if val is not None else ""
-
+        def safe_str(val): return str(val).strip() if val is not None else ""
         subjects_list = []
         if safe_str(teacher.get("Subject")):
             subjects_list.append(safe_str(teacher.get("Subject")))
         if safe_str(teacher.get("Major Subjects")):
-            majors = [s.strip() for s in safe_str(teacher.get("Major Subjects")).split(",") if s.strip()]
-            subjects_list.extend(majors)
+            subjects_list.extend([s.strip() for s in safe_str(teacher.get("Major Subjects")).split(",") if s.strip()])
 
         return {
             "Name": safe_str(teacher.get("Name")),

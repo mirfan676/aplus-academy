@@ -151,7 +151,7 @@ export default function TutorRegistration() {
       // ✅ Safe reCAPTCHA Enterprise execution
       let token = "";
       if (window.grecaptcha && window.grecaptcha.enterprise) {
-        token = await window.grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, { action: "submit_tutor_form" });
+        token = await window.grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, { action: "tutor_register" });
       }
 
       if (!token) {
