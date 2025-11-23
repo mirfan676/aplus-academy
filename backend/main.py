@@ -8,17 +8,15 @@ import random
 import math
 from fastapi import FastAPI, Form, File, Query, UploadFile, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from google.oauth2.service_account import Credentials
+from google.oauth2.service_account import Credentials, service_account
+from google.cloud import recaptchaenterprise
 from datetime import datetime, timedelta
 from geopy.geocoders import Nominatim
-
-# --- GOOGLE RECAPTCHA ENTERPRISE ---
-from google.cloud import recaptchaenterprise
-from google.oauth2 import service_account
 
 # --- GEOLOCATOR ---
 geolocator = Nominatim(user_agent="APlusAcademy/1.0")
 
+# --- FASTAPI APP ---
 app = FastAPI(title="APlus Home Tutors API", version="4.0.0")
 
 # --- CORS CONFIG ---
@@ -72,7 +70,7 @@ recaptcha_client = recaptchaenterprise.RecaptchaEnterpriseServiceClient(
 
 
 def verify_recaptcha(token: str, expected_action: str):
-    """ Validate Google reCAPTCHA Enterprise Server-Side """
+    """Validate Google reCAPTCHA Enterprise using v2 style objects"""
     try:
         event = recaptchaenterprise.Event(
             token=token,
@@ -86,7 +84,7 @@ def verify_recaptcha(token: str, expected_action: str):
             assessment=assessment
         )
 
-        response = recaptcha_client.create_assessment(request)
+        response = recaptcha_client.create_assessment(request=request)
 
         if not response.token_properties.valid:
             raise HTTPException(
@@ -106,10 +104,11 @@ def verify_recaptcha(token: str, expected_action: str):
                 status_code=400,
                 detail="reCAPTCHA verification failed (bot detected)"
             )
+
         return True
 
     except Exception as e:
-        print("reCAPTCHA validation error:", e)
+        print("⚠️ reCAPTCHA validation error:", e)
         raise HTTPException(status_code=400, detail="reCAPTCHA validation error")
 
 
@@ -173,6 +172,7 @@ def get_tehsils(province: str = Query(...), district: str = Query(...)):
 def get_areas(province: str = Query(...), district: str = Query(...), tehsil: str = Query(...)):
     return {"areas": pakistan_data.get(province, {}).get(district, {}).get(tehsil, [])}
 
+
 # ---------------------------------------------------------
 #                TUTOR REGISTRATION (WITH RECAPTCHA)
 # ---------------------------------------------------------
@@ -180,7 +180,6 @@ def get_areas(province: str = Query(...), district: str = Query(...), tehsil: st
 async def register_tutor(
     request: Request,
     recaptcha_token: str = Form(...),
-
     name: str = Form(...),
     subject: str = Form(None),
     major_subjects: str = Form(None),
@@ -232,7 +231,6 @@ async def register_tutor(
                 pass
 
         area1 = area2 = area3 = city
-
         qualification_value = f"{qualification} {subject}" if subject else qualification
         major_subjects_str = major_subjects or ""
 
