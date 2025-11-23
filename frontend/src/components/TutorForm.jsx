@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Grid,
@@ -16,8 +16,6 @@ import {
   Autocomplete,
 } from "@mui/material";
 import api from "../api";
-
-const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
 // --- Qualification & Subjects ---
 const qualificationsList = [
@@ -63,6 +61,7 @@ export default function TutorRegistration() {
     image: null,
     agree: false,
   });
+
   const [majorSubjects, setMajorSubjects] = useState([]);
   const [selectedHigherSubject, setSelectedHigherSubject] = useState("");
   const [coords, setCoords] = useState({ lat: "", lng: "" });
@@ -70,28 +69,7 @@ export default function TutorRegistration() {
   const [loading, setLoading] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [locationBlocked, setLocationBlocked] = useState(false);
-
-  const recaptchaReady = useRef(false);
-
-  // --- Load reCAPTCHA dynamically ---
-  useEffect(() => {
-    if (!window.grecaptcha) {
-      const script = document.createElement("script");
-      script.src = `https://www.google.com/recaptcha/enterprise.js?render=${RECAPTCHA_SITE_KEY}`;
-      script.async = true;
-      script.defer = true;
-      script.onload = () => {
-        console.log("✅ reCAPTCHA loaded");
-        recaptchaReady.current = true;
-      };
-      script.onerror = () => {
-        console.error("❌ Failed to load reCAPTCHA");
-      };
-      document.body.appendChild(script);
-    } else {
-      recaptchaReady.current = true;
-    }
-  }, []);
+  const [tokenLoading, setTokenLoading] = useState(false); // ✅ new state
 
   // --- Get geolocation ---
   useEffect(() => {
@@ -164,28 +142,26 @@ export default function TutorRegistration() {
       return;
     }
 
-    if (!recaptchaReady.current) {
-      setMessage("⚠️ reCAPTCHA not loaded yet. Try refreshing the page.");
-      return;
-    }
-
     setLoading(true);
+    setTokenLoading(true); // start token loading
 
     try {
-      const token = await window.grecaptcha.enterprise.execute(
-        RECAPTCHA_SITE_KEY,
-        { action: "tutor_register" }
-      );
+      // --- Fetch token from backend ---
+      const recaptchaRes = await api.get("/recaptcha/token", {
+        params: { action: "tutor_register" },
+      });
+      const token = recaptchaRes.data.token;
+      setTokenLoading(false); // token is ready
 
       if (!token) {
-        setMessage("⚠️ Unable to verify reCAPTCHA. Please try again.");
+        setMessage("⚠️ Failed to get verification token. Try again.");
         setLoading(false);
         return;
       }
 
       const submissionData = new FormData();
       const subjectToSend = selectedHigherSubject || "";
-      const majorSubjectsToSend = majorSubjects.join(", ");
+      const majorSubjectsToSend = majorSubjects.join(",");
 
       const dataToSend = {
         ...formData,
@@ -194,11 +170,8 @@ export default function TutorRegistration() {
       };
 
       Object.entries(dataToSend).forEach(([k, v]) => {
-        if (k === "image" && v) {
-          submissionData.append("image", v);
-        } else {
-          submissionData.append(k, v ?? "");
-        }
+        if (k === "image" && v) submissionData.append("image", v);
+        else submissionData.append(k, v ?? "");
       });
 
       submissionData.append("lat", coords.lat ?? "");
@@ -232,6 +205,7 @@ export default function TutorRegistration() {
       setMessage("❌ Error submitting form. Server might be down.");
     } finally {
       setLoading(false);
+      setTokenLoading(false);
     }
   };
 
@@ -423,9 +397,9 @@ export default function TutorRegistration() {
                 color="primary"
                 fullWidth
                 sx={{ mt: 2 }}
-                disabled={loading}
+                disabled={loading || tokenLoading} // ✅ disable while token loading
               >
-                {loading ? <CircularProgress size={24} color="inherit" /> : "Submit Registration"}
+                {(loading || tokenLoading) ? <CircularProgress size={24} color="inherit" /> : "Submit Registration"}
               </Button>
 
               {/* Message */}
