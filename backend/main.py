@@ -369,3 +369,37 @@ def get_teacher(teacher_id: int):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# -----------------------------
+# 4 GOOGLE RECAPTCHA ENTERPRISE TOKEN GENERATION
+# -----------------------------
+from google.protobuf import field_mask_pb2
+
+@app.get("/recaptcha/token")
+def get_recaptcha_token(action: str = "tutor_register"):
+    """
+    Generate a reCAPTCHA Enterprise token for the frontend.
+    The frontend will call this endpoint and use the returned token in form submission.
+    """
+    try:
+        # Create an assessment with only the event for token generation
+        event = recaptchaenterprise_v1.Event(
+            site_key=RECAPTCHA_SITE_KEY,
+            expected_action=action,
+        )
+
+        assessment = recaptchaenterprise_v1.Assessment(event=event)
+        request = recaptchaenterprise_v1.CreateAssessmentRequest(
+            parent=f"projects/{RECAPTCHA_PROJECT_ID}",
+            assessment=assessment
+        )
+
+        response = recaptcha_client.create_assessment(request=request)
+
+        # Return the token for frontend
+        return {"token": response.name.split("/")[-1], "action": action}
+
+    except Exception as e:
+        print("❌ Error generating reCAPTCHA token:", e)
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="Failed to generate reCAPTCHA token")
