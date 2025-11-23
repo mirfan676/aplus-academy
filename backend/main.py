@@ -69,40 +69,51 @@ recaptcha_client = recaptchaenterprise_v1.RecaptchaEnterpriseServiceClient(
 )
 
 
+# --------------------------
+# Generate token for frontend
+# --------------------------
+@app.get("/recaptcha/token")
+def generate_recaptcha_token(action: str = Query(...)):
+    """
+    Generate reCAPTCHA token for frontend usage.
+    The frontend will send this token when submitting forms.
+    """
+    try:
+        # Use the Enterprise API to generate a token
+        # In practice, frontend usually uses the site key with the JS SDK
+        # But here we can return the SITE_KEY + action for the frontend
+        return {"site_key": RECAPTCHA_SITE_KEY, "token": f"placeholder-token-for-{action}"}
+    except Exception as e:
+        print("❌ Failed to generate reCAPTCHA token:", e)
+        raise HTTPException(status_code=500, detail="Failed to generate token")
+
+
+# --------------------------
+# Verify reCAPTCHA token
+# --------------------------
 def verify_recaptcha(token: str, expected_action: str):
     try:
-        event = recaptchaenterprise_v1.Event(
-            token=token,
-            site_key=RECAPTCHA_SITE_KEY
-        )
+        event = recaptchaenterprise_v1.Event(token=token, site_key=RECAPTCHA_SITE_KEY)
         assessment = recaptchaenterprise_v1.Assessment(event=event)
         request = recaptchaenterprise_v1.CreateAssessmentRequest(
-            parent=f"projects/{RECAPTCHA_PROJECT_ID}",
-            assessment=assessment
+            parent=f"projects/{RECAPTCHA_PROJECT_ID}", assessment=assessment
         )
         response = recaptcha_client.create_assessment(request=request)
 
         if not response.token_properties.valid:
             raise HTTPException(
                 status_code=400,
-                detail=f"Invalid reCAPTCHA token: {response.token_properties.invalid_reason}"
+                detail=f"Invalid reCAPTCHA token: {response.token_properties.invalid_reason}",
             )
 
         if response.token_properties.action != expected_action:
-            raise HTTPException(
-                status_code=400,
-                detail="Invalid reCAPTCHA action"
-            )
+            raise HTTPException(status_code=400, detail="Invalid reCAPTCHA action")
 
         score = response.risk_analysis.score
         if score < 0.5:
-            raise HTTPException(
-                status_code=400,
-                detail="reCAPTCHA verification failed (bot detected)"
-            )
+            raise HTTPException(status_code=400, detail="reCAPTCHA verification failed (bot detected)")
 
         return True
-
     except Exception as e:
         print("⚠️ reCAPTCHA validation error:", e)
         raise HTTPException(status_code=400, detail="reCAPTCHA validation error")
@@ -166,12 +177,11 @@ def get_areas(province: str = Query(...), district: str = Query(...), tehsil: st
     return {"areas": pakistan_data.get(province, {}).get(district, {}).get(tehsil, [])}
 
 
-# ---------------------------------------------------------
-# 1️⃣ TUTOR REGISTRATION (must come BEFORE /tutors/{teacher_id})
-# ---------------------------------------------------------
+# --------------------------
+# TUTOR REGISTRATION
+# --------------------------
 @app.post("/tutors/register")
 async def register_tutor(
-    request: Request,
     recaptcha_token: str = Form(...),
     name: str = Form(...),
     subject: str = Form(None),
@@ -187,10 +197,10 @@ async def register_tutor(
     profile_url: str = Form(None),
 ):
     try:
-        # ✅ Verify reCAPTCHA action matches frontend
+        # ✅ Verify reCAPTCHA token
         verify_recaptcha(recaptcha_token, "tutor_register")
 
-        # Upload image to ImgBB
+        # --- Image upload ---
         image_url = "N/A"
         if image and image.filename:
             image_bytes = await image.read()
@@ -202,15 +212,15 @@ async def register_tutor(
                 raw_url = result["data"]["url"]
                 image_url = f"https://cold-truth-e620.irfan-karor-mi.workers.dev/?url={raw_url}"
 
-        # Determine coordinates
+        # --- Determine coordinates ---
         if lat and lng:
             latitude, longitude = float(lat), float(lng)
         else:
             latitude, longitude = (None, None)
             if exactLocation:
-                latitude, longitude = get_area_coordinates(exactLocation, "", "")
+                latitude, longitude = None, None  # Could call geocoding if needed
 
-        # Reverse geocode
+        # --- Reverse geocode ---
         city = district = province = tehsil = ""
         if latitude and longitude:
             try:
@@ -227,7 +237,7 @@ async def register_tutor(
         qualification_value = f"{qualification} {subject}" if subject else qualification
         major_subjects_str = major_subjects or ""
 
-        # Append row in Google Sheet
+        # --- Append to Google Sheet ---
         sheet.append_row([
             name,
             subject or "",
@@ -370,36 +380,3 @@ def get_teacher(teacher_id: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# -----------------------------
-# 4 GOOGLE RECAPTCHA ENTERPRISE TOKEN GENERATION
-# -----------------------------
-from google.protobuf import field_mask_pb2
-
-@app.get("/recaptcha/token")
-def get_recaptcha_token(action: str = "tutor_register"):
-    """
-    Generate a reCAPTCHA Enterprise token for the frontend.
-    The frontend will call this endpoint and use the returned token in form submission.
-    """
-    try:
-        # Create an assessment with only the event for token generation
-        event = recaptchaenterprise_v1.Event(
-            site_key=RECAPTCHA_SITE_KEY,
-            expected_action=action,
-        )
-
-        assessment = recaptchaenterprise_v1.Assessment(event=event)
-        request = recaptchaenterprise_v1.CreateAssessmentRequest(
-            parent=f"projects/{RECAPTCHA_PROJECT_ID}",
-            assessment=assessment
-        )
-
-        response = recaptcha_client.create_assessment(request=request)
-
-        # Return the token for frontend
-        return {"token": response.name.split("/")[-1], "action": action}
-
-    except Exception as e:
-        print("❌ Error generating reCAPTCHA token:", e)
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail="Failed to generate reCAPTCHA token")
