@@ -48,9 +48,9 @@ const subjectsList = [
   "Time Management", "Career Counseling", "Personality Development",
 ];
 
-export default function TutorRegistration() {
-  const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
+export default function TutorRegistration() {
   const [formData, setFormData] = useState({
     name: "",
     qualification: "",
@@ -70,18 +70,22 @@ export default function TutorRegistration() {
   const [loading, setLoading] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [locationBlocked, setLocationBlocked] = useState(false);
-  const recaptchaRef = useRef(null);
+  const recaptchaReady = useRef(false);
 
-  // Dynamically load reCAPTCHA script
+  // Load reCAPTCHA dynamically
   useEffect(() => {
     if (!window.grecaptcha) {
       const script = document.createElement("script");
       script.src = `https://www.google.com/recaptcha/enterprise.js?render=${RECAPTCHA_SITE_KEY}`;
       script.async = true;
-      script.onload = () => console.log("reCAPTCHA loaded");
+      script.onload = () => {
+        recaptchaReady.current = true;
+      };
       document.body.appendChild(script);
+    } else {
+      recaptchaReady.current = true;
     }
-  }, [RECAPTCHA_SITE_KEY]);
+  }, []);
 
   // Get geolocation
   useEffect(() => {
@@ -131,8 +135,7 @@ export default function TutorRegistration() {
           });
           setLocationBlocked(false);
         },
-        () =>
-          setMessage("⚠️ Unable to fetch location. Please allow location access.")
+        () => setMessage("⚠️ Unable to fetch location. Please allow location access.")
       );
     }
   };
@@ -141,31 +144,35 @@ export default function TutorRegistration() {
     e.preventDefault();
     setMessage("");
 
-    // Validations
-    if (!formData.agree) return setMessage("⚠️ Please agree to Terms.");
+    if (!formData.agree) {
+      setMessage("⚠️ Please agree to Terms.");
+      return;
+    }
     if (!formData.image) {
       setImageError(true);
-      return setMessage("⚠️ Please upload a profile picture.");
+      setMessage("⚠️ Please upload a profile picture.");
+      return;
     }
     if (higherEducation.includes(formData.qualification) && !selectedHigherSubject) {
-      return setMessage("⚠️ Please select your subject for higher qualification.");
+      setMessage("⚠️ Please select your subject for higher qualification.");
+      return;
+    }
+
+    if (!recaptchaReady.current) {
+      setMessage("⚠️ reCAPTCHA not loaded yet. Try refreshing the page.");
+      return;
     }
 
     setLoading(true);
 
     try {
-      if (!window.grecaptcha || !window.grecaptcha.enterprise) {
-        setMessage("⚠️ reCAPTCHA not loaded yet. Try refreshing the page.");
-        setLoading(false);
-        return;
+      let token = "";
+      if (window.grecaptcha && window.grecaptcha.enterprise) {
+        token = await window.grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, { action: "tutor_register" });
       }
 
-      const token = await window.grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, {
-        action: "tutor_register",
-      });
-
       if (!token) {
-        setMessage("⚠️ Unable to verify reCAPTCHA. Please try again.");
+        setMessage("⚠️ Unable to verify reCAPTCHA. Try refreshing the page.");
         setLoading(false);
         return;
       }
@@ -174,11 +181,18 @@ export default function TutorRegistration() {
       const subjectToSend = selectedHigherSubject || "";
       const majorSubjectsToSend = majorSubjects.join(", ");
 
-      const dataToSend = { ...formData, subject: subjectToSend, major_subjects: majorSubjectsToSend };
+      const dataToSend = {
+        ...formData,
+        subject: subjectToSend,
+        major_subjects: majorSubjectsToSend,
+      };
 
       Object.entries(dataToSend).forEach(([k, v]) => {
-        if (k === "image" && v) submissionData.append("image", v);
-        else submissionData.append(k, v ?? "");
+        if (k === "image" && v) {
+          submissionData.append("image", v);
+        } else {
+          submissionData.append(k, v ?? "");
+        }
       });
 
       submissionData.append("lat", coords.lat ?? "");
@@ -227,21 +241,13 @@ export default function TutorRegistration() {
         }}
       >
         <Typography variant="h4" fontWeight={700}>Tutor Registration</Typography>
-        <Typography variant="subtitle1">
-          Join A+ Academy and connect with students across Pakistan
-        </Typography>
+        <Typography variant="subtitle1">Join A+ Academy and connect with students across Pakistan</Typography>
       </Box>
 
       <Grid container justifyContent="center">
         <Grid item xs={12} md={6}>
           <Paper elevation={4} sx={{ p: 4, borderRadius: 3 }}>
-            <Typography
-              variant="h5"
-              color="#0d6efd"
-              fontWeight={700}
-              textAlign="center"
-              mb={3}
-            >
+            <Typography variant="h5" color="#0d6efd" fontWeight={700} textAlign="center" mb={3}>
               Register as Tutor
             </Typography>
 
@@ -267,26 +273,14 @@ export default function TutorRegistration() {
               </Box>
 
               {/* Full Name */}
-              <TextField
-                label="Full Name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                fullWidth
-                margin="normal"
-              />
+              <TextField label="Full Name" name="name" value={formData.name} onChange={handleChange} required fullWidth margin="normal" />
 
               {/* Qualification */}
               <Autocomplete
                 options={qualificationsList}
                 value={formData.qualification || null}
-                onChange={(e, newValue) =>
-                  setFormData((p) => ({ ...p, qualification: newValue || "" }))
-                }
-                renderInput={(params) => (
-                  <TextField {...params} label="Qualification" margin="normal" required fullWidth />
-                )}
+                onChange={(e, newValue) => setFormData((p) => ({ ...p, qualification: newValue || "" }))}
+                renderInput={(params) => <TextField {...params} label="Qualification" margin="normal" required fullWidth />}
               />
 
               {/* Higher subject */}
@@ -298,9 +292,7 @@ export default function TutorRegistration() {
                     setSelectedHigherSubject(newValue || "");
                     setFormData((p) => ({ ...p, subject: newValue || "" }));
                   }}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Higher Qualification Subject" margin="normal" fullWidth />
-                  )}
+                  renderInput={(params) => <TextField {...params} label="Higher Qualification Subject" margin="normal" fullWidth />}
                 />
               )}
 
@@ -319,9 +311,7 @@ export default function TutorRegistration() {
                     <Chip label={option} {...getTagProps({ index })} color="primary" variant="outlined" />
                   ))
                 }
-                renderInput={(params) => (
-                  <TextField {...params} label="Select Major Subjects" margin="normal" fullWidth />
-                )}
+                renderInput={(params) => <TextField {...params} label="Select Major Subjects" margin="normal" fullWidth />}
                 disableCloseOnSelect
               />
 
@@ -344,35 +334,15 @@ export default function TutorRegistration() {
               />
 
               {/* Phone */}
-              <TextField
-                label="Contact Number"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                required
-                fullWidth
-                margin="normal"
-              />
+              <TextField label="Contact Number" name="phone" value={formData.phone} onChange={handleChange} required fullWidth margin="normal" />
 
               {/* Bio */}
-              <TextField
-                name="bio"
-                label="Tutor Bio"
-                multiline
-                rows={4}
-                value={formData.bio}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                placeholder="Describe your teaching experience"
-              />
+              <TextField name="bio" label="Tutor Bio" multiline rows={4} value={formData.bio} onChange={handleChange} fullWidth margin="normal" placeholder="Describe your teaching experience" />
 
-              {/* Find Me */}
+              {/* Conditional Find Me Button */}
               {locationBlocked && (
                 <Box textAlign="center" mb={2}>
-                  <Button variant="outlined" color="secondary" onClick={handleFindMe}>
-                    📍 Find My Location
-                  </Button>
+                  <Button variant="outlined" color="secondary" onClick={handleFindMe}>📍 Find My Location</Button>
                 </Box>
               )}
 
@@ -381,22 +351,13 @@ export default function TutorRegistration() {
                 control={<Checkbox checked={formData.agree} onChange={handleChange} name="agree" color="success" />}
                 label={
                   <Typography variant="body2">
-                    I agree to the{" "}
-                    <MuiLink href="/terms" target="_blank">Terms</MuiLink> and{" "}
-                    <MuiLink href="/privacy" target="_blank">Privacy Policy</MuiLink>.
+                    I agree to the <MuiLink href="/terms" target="_blank">Terms</MuiLink> and <MuiLink href="/privacy" target="_blank">Privacy Policy</MuiLink>.
                   </Typography>
                 }
               />
 
               {/* Submit */}
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                fullWidth
-                sx={{ mt: 2 }}
-                disabled={loading}
-              >
+              <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }} disabled={loading}>
                 {loading ? <CircularProgress size={24} color="inherit" /> : "Submit Registration"}
               </Button>
 
