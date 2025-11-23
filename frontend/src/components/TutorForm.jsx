@@ -17,9 +17,6 @@ import {
 } from "@mui/material";
 import api from "../api";
 
-const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
-
-// --- Qualification & Subjects ---
 const qualificationsList = [
   "Matric / SSC",
   "O-Level / IGCSE",
@@ -52,6 +49,8 @@ const subjectsList = [
 ];
 
 export default function TutorRegistration() {
+  const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+
   const [formData, setFormData] = useState({
     name: "",
     qualification: "",
@@ -63,6 +62,7 @@ export default function TutorRegistration() {
     image: null,
     agree: false,
   });
+
   const [majorSubjects, setMajorSubjects] = useState([]);
   const [selectedHigherSubject, setSelectedHigherSubject] = useState("");
   const [coords, setCoords] = useState({ lat: "", lng: "" });
@@ -70,8 +70,18 @@ export default function TutorRegistration() {
   const [loading, setLoading] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [locationBlocked, setLocationBlocked] = useState(false);
-
   const recaptchaRef = useRef(null);
+
+  // Dynamically load reCAPTCHA script
+  useEffect(() => {
+    if (!window.grecaptcha) {
+      const script = document.createElement("script");
+      script.src = `https://www.google.com/recaptcha/enterprise.js?render=${RECAPTCHA_SITE_KEY}`;
+      script.async = true;
+      script.onload = () => console.log("reCAPTCHA loaded");
+      document.body.appendChild(script);
+    }
+  }, [RECAPTCHA_SITE_KEY]);
 
   // Get geolocation
   useEffect(() => {
@@ -121,7 +131,8 @@ export default function TutorRegistration() {
           });
           setLocationBlocked(false);
         },
-        () => setMessage("⚠️ Unable to fetch location. Please allow location access.")
+        () =>
+          setMessage("⚠️ Unable to fetch location. Please allow location access.")
       );
     }
   };
@@ -130,30 +141,28 @@ export default function TutorRegistration() {
     e.preventDefault();
     setMessage("");
 
-    // Basic validations
-    if (!formData.agree) {
-      setMessage("⚠️ Please agree to Terms.");
-      return;
-    }
+    // Validations
+    if (!formData.agree) return setMessage("⚠️ Please agree to Terms.");
     if (!formData.image) {
       setImageError(true);
-      setMessage("⚠️ Please upload a profile picture.");
-      return;
+      return setMessage("⚠️ Please upload a profile picture.");
     }
     if (higherEducation.includes(formData.qualification) && !selectedHigherSubject) {
-      setMessage("⚠️ Please select your subject for higher qualification.");
-      return;
+      return setMessage("⚠️ Please select your subject for higher qualification.");
     }
 
     setLoading(true);
 
     try {
-      // ✅ reCAPTCHA Enterprise execution
-      let token = "";
-      if (window.grecaptcha && window.grecaptcha.enterprise) {
-        token = await window.grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, { action: "tutor_register" });
+      if (!window.grecaptcha || !window.grecaptcha.enterprise) {
+        setMessage("⚠️ reCAPTCHA not loaded yet. Try refreshing the page.");
+        setLoading(false);
+        return;
       }
-      console.log("reCAPTCHA token:", token);
+
+      const token = await window.grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, {
+        action: "tutor_register",
+      });
 
       if (!token) {
         setMessage("⚠️ Unable to verify reCAPTCHA. Please try again.");
@@ -165,35 +174,20 @@ export default function TutorRegistration() {
       const subjectToSend = selectedHigherSubject || "";
       const majorSubjectsToSend = majorSubjects.join(", ");
 
-      const dataToSend = {
-        ...formData,
-        subject: subjectToSend,
-        major_subjects: majorSubjectsToSend,
-      };
+      const dataToSend = { ...formData, subject: subjectToSend, major_subjects: majorSubjectsToSend };
 
       Object.entries(dataToSend).forEach(([k, v]) => {
-        if (k === "image" && v) {
-          submissionData.append("image", v);
-        } else {
-          submissionData.append(k, v ?? "");
-        }
+        if (k === "image" && v) submissionData.append("image", v);
+        else submissionData.append(k, v ?? "");
       });
 
       submissionData.append("lat", coords.lat ?? "");
       submissionData.append("lng", coords.lng ?? "");
       submissionData.append("recaptcha_token", token);
 
-      // Debug FormData
-      console.log("FormData entries:");
-      for (let pair of submissionData.entries()) {
-        console.log(pair[0], pair[1]);
-      }
-
       const res = await api.post("/tutors/register", submissionData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
-      console.log("Response:", res);
 
       if (res.status === 200) {
         setMessage("✅ Tutor registered successfully!");
@@ -215,10 +209,7 @@ export default function TutorRegistration() {
       }
     } catch (err) {
       console.error("Error submitting form:", err);
-      console.error("Error response data:", err.response?.data);
-      console.error("Error status:", err.response?.status);
-      console.error("Error headers:", err.response?.headers);
-      setMessage("❌ Error submitting form. Check console for details.");
+      setMessage("❌ Error submitting form. Server might be down.");
     } finally {
       setLoading(false);
     }
@@ -235,9 +226,7 @@ export default function TutorRegistration() {
           background: "linear-gradient(135deg, #a8e063, #56ab2f)",
         }}
       >
-        <Typography variant="h4" fontWeight={700}>
-          Tutor Registration
-        </Typography>
+        <Typography variant="h4" fontWeight={700}>Tutor Registration</Typography>
         <Typography variant="subtitle1">
           Join A+ Academy and connect with students across Pakistan
         </Typography>
@@ -266,13 +255,7 @@ export default function TutorRegistration() {
                   sx={{ animation: imageError ? "shake 0.5s" : "none", mb: 1 }}
                 >
                   Upload Profile Picture
-                  <input
-                    type="file"
-                    hidden
-                    accept="image/*"
-                    name="image"
-                    onChange={handleChange}
-                  />
+                  <input type="file" hidden accept="image/*" name="image" onChange={handleChange} />
                 </Button>
                 {formData.image && (
                   <Avatar
@@ -384,7 +367,7 @@ export default function TutorRegistration() {
                 placeholder="Describe your teaching experience"
               />
 
-              {/* Conditional Find Me Button */}
+              {/* Find Me */}
               {locationBlocked && (
                 <Box textAlign="center" mb={2}>
                   <Button variant="outlined" color="secondary" onClick={handleFindMe}>
