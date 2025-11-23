@@ -17,6 +17,9 @@ import {
 } from "@mui/material";
 import api from "../api";
 
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+
+// --- Qualification & Subjects ---
 const qualificationsList = [
   "Matric / SSC",
   "O-Level / IGCSE",
@@ -48,8 +51,6 @@ const subjectsList = [
   "Time Management", "Career Counseling", "Personality Development",
 ];
 
-const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
-
 export default function TutorRegistration() {
   const [formData, setFormData] = useState({
     name: "",
@@ -62,7 +63,6 @@ export default function TutorRegistration() {
     image: null,
     agree: false,
   });
-
   const [majorSubjects, setMajorSubjects] = useState([]);
   const [selectedHigherSubject, setSelectedHigherSubject] = useState("");
   const [coords, setCoords] = useState({ lat: "", lng: "" });
@@ -70,16 +70,22 @@ export default function TutorRegistration() {
   const [loading, setLoading] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [locationBlocked, setLocationBlocked] = useState(false);
+
   const recaptchaReady = useRef(false);
 
-  // Load reCAPTCHA dynamically
+  // --- Load reCAPTCHA dynamically ---
   useEffect(() => {
     if (!window.grecaptcha) {
       const script = document.createElement("script");
       script.src = `https://www.google.com/recaptcha/enterprise.js?render=${RECAPTCHA_SITE_KEY}`;
       script.async = true;
+      script.defer = true;
       script.onload = () => {
+        console.log("✅ reCAPTCHA loaded");
         recaptchaReady.current = true;
+      };
+      script.onerror = () => {
+        console.error("❌ Failed to load reCAPTCHA");
       };
       document.body.appendChild(script);
     } else {
@@ -87,7 +93,7 @@ export default function TutorRegistration() {
     }
   }, []);
 
-  // Get geolocation
+  // --- Get geolocation ---
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -105,7 +111,7 @@ export default function TutorRegistration() {
     }
   }, []);
 
-  // Reset higher subject if qualification changes
+  // --- Reset higher subject if qualification changes ---
   useEffect(() => {
     if (!higherEducation.includes(formData.qualification)) {
       setSelectedHigherSubject("");
@@ -166,13 +172,13 @@ export default function TutorRegistration() {
     setLoading(true);
 
     try {
-      let token = "";
-      if (window.grecaptcha && window.grecaptcha.enterprise) {
-        token = await window.grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, { action: "tutor_register" });
-      }
+      const token = await window.grecaptcha.enterprise.execute(
+        RECAPTCHA_SITE_KEY,
+        { action: "tutor_register" }
+      );
 
       if (!token) {
-        setMessage("⚠️ Unable to verify reCAPTCHA. Try refreshing the page.");
+        setMessage("⚠️ Unable to verify reCAPTCHA. Please try again.");
         setLoading(false);
         return;
       }
@@ -240,14 +246,24 @@ export default function TutorRegistration() {
           background: "linear-gradient(135deg, #a8e063, #56ab2f)",
         }}
       >
-        <Typography variant="h4" fontWeight={700}>Tutor Registration</Typography>
-        <Typography variant="subtitle1">Join A+ Academy and connect with students across Pakistan</Typography>
+        <Typography variant="h4" fontWeight={700}>
+          Tutor Registration
+        </Typography>
+        <Typography variant="subtitle1">
+          Join A+ Academy and connect with students across Pakistan
+        </Typography>
       </Box>
 
       <Grid container justifyContent="center">
         <Grid item xs={12} md={6}>
           <Paper elevation={4} sx={{ p: 4, borderRadius: 3 }}>
-            <Typography variant="h5" color="#0d6efd" fontWeight={700} textAlign="center" mb={3}>
+            <Typography
+              variant="h5"
+              color="#0d6efd"
+              fontWeight={700}
+              textAlign="center"
+              mb={3}
+            >
               Register as Tutor
             </Typography>
 
@@ -261,7 +277,13 @@ export default function TutorRegistration() {
                   sx={{ animation: imageError ? "shake 0.5s" : "none", mb: 1 }}
                 >
                   Upload Profile Picture
-                  <input type="file" hidden accept="image/*" name="image" onChange={handleChange} />
+                  <input
+                    type="file"
+                    hidden
+                    accept="image/*"
+                    name="image"
+                    onChange={handleChange}
+                  />
                 </Button>
                 {formData.image && (
                   <Avatar
@@ -273,14 +295,26 @@ export default function TutorRegistration() {
               </Box>
 
               {/* Full Name */}
-              <TextField label="Full Name" name="name" value={formData.name} onChange={handleChange} required fullWidth margin="normal" />
+              <TextField
+                label="Full Name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                fullWidth
+                margin="normal"
+              />
 
               {/* Qualification */}
               <Autocomplete
                 options={qualificationsList}
                 value={formData.qualification || null}
-                onChange={(e, newValue) => setFormData((p) => ({ ...p, qualification: newValue || "" }))}
-                renderInput={(params) => <TextField {...params} label="Qualification" margin="normal" required fullWidth />}
+                onChange={(e, newValue) =>
+                  setFormData((p) => ({ ...p, qualification: newValue || "" }))
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label="Qualification" margin="normal" required fullWidth />
+                )}
               />
 
               {/* Higher subject */}
@@ -292,7 +326,9 @@ export default function TutorRegistration() {
                     setSelectedHigherSubject(newValue || "");
                     setFormData((p) => ({ ...p, subject: newValue || "" }));
                   }}
-                  renderInput={(params) => <TextField {...params} label="Higher Qualification Subject" margin="normal" fullWidth />}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Higher Qualification Subject" margin="normal" fullWidth />
+                  )}
                 />
               )}
 
@@ -311,7 +347,9 @@ export default function TutorRegistration() {
                     <Chip label={option} {...getTagProps({ index })} color="primary" variant="outlined" />
                   ))
                 }
-                renderInput={(params) => <TextField {...params} label="Select Major Subjects" margin="normal" fullWidth />}
+                renderInput={(params) => (
+                  <TextField {...params} label="Select Major Subjects" margin="normal" fullWidth />
+                )}
                 disableCloseOnSelect
               />
 
@@ -334,15 +372,35 @@ export default function TutorRegistration() {
               />
 
               {/* Phone */}
-              <TextField label="Contact Number" name="phone" value={formData.phone} onChange={handleChange} required fullWidth margin="normal" />
+              <TextField
+                label="Contact Number"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+                fullWidth
+                margin="normal"
+              />
 
               {/* Bio */}
-              <TextField name="bio" label="Tutor Bio" multiline rows={4} value={formData.bio} onChange={handleChange} fullWidth margin="normal" placeholder="Describe your teaching experience" />
+              <TextField
+                name="bio"
+                label="Tutor Bio"
+                multiline
+                rows={4}
+                value={formData.bio}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                placeholder="Describe your teaching experience"
+              />
 
               {/* Conditional Find Me Button */}
               {locationBlocked && (
                 <Box textAlign="center" mb={2}>
-                  <Button variant="outlined" color="secondary" onClick={handleFindMe}>📍 Find My Location</Button>
+                  <Button variant="outlined" color="secondary" onClick={handleFindMe}>
+                    📍 Find My Location
+                  </Button>
                 </Box>
               )}
 
@@ -351,13 +409,22 @@ export default function TutorRegistration() {
                 control={<Checkbox checked={formData.agree} onChange={handleChange} name="agree" color="success" />}
                 label={
                   <Typography variant="body2">
-                    I agree to the <MuiLink href="/terms" target="_blank">Terms</MuiLink> and <MuiLink href="/privacy" target="_blank">Privacy Policy</MuiLink>.
+                    I agree to the{" "}
+                    <MuiLink href="/terms" target="_blank">Terms</MuiLink> and{" "}
+                    <MuiLink href="/privacy" target="_blank">Privacy Policy</MuiLink>.
                   </Typography>
                 }
               />
 
               {/* Submit */}
-              <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }} disabled={loading}>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                fullWidth
+                sx={{ mt: 2 }}
+                disabled={loading}
+              >
                 {loading ? <CircularProgress size={24} color="inherit" /> : "Submit Registration"}
               </Button>
 
