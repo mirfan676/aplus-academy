@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from geopy.geocoders import Nominatim
 
 # --- GOOGLE RECAPTCHA ENTERPRISE ---
-from google.cloud import recaptchaenterprise_v1
+from google.cloud import recaptchaenterprise
 from google.oauth2 import service_account
 
 # --- GEOLOCATOR ---
@@ -66,21 +66,22 @@ recaptcha_credentials = service_account.Credentials.from_service_account_info(
     json.loads(os.environ["RECAPTCHA_API_KEY_JSON"])
 )
 
-recaptcha_client = recaptchaenterprise_v1.RecaptchaEnterpriseServiceClient(
+recaptcha_client = recaptchaenterprise.RecaptchaEnterpriseServiceClient(
     credentials=recaptcha_credentials
 )
+
 
 def verify_recaptcha(token: str, expected_action: str):
     """ Validate Google reCAPTCHA Enterprise Server-Side """
     try:
-        event = recaptchaenterprise_v1.Event(
+        event = recaptchaenterprise.Event(
             token=token,
             site_key=RECAPTCHA_SITE_KEY
         )
 
-        assessment = recaptchaenterprise_v1.Assessment(event=event)
+        assessment = recaptchaenterprise.Assessment(event=event)
 
-        request = recaptchaenterprise_v1.CreateAssessmentRequest(
+        request = recaptchaenterprise.CreateAssessmentRequest(
             parent=f"projects/{RECAPTCHA_PROJECT_ID}",
             assessment=assessment
         )
@@ -196,7 +197,7 @@ async def register_tutor(
     try:
         # --- Verify reCAPTCHA ---
         verify_recaptcha(recaptcha_token, "tutor_register")
-        
+
         # --- Upload image ---
         image_url = "N/A"
         if image and image.filename:
