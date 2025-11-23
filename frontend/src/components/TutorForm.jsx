@@ -148,11 +148,12 @@ export default function TutorRegistration() {
     setLoading(true);
 
     try {
-      // ✅ Safe reCAPTCHA Enterprise execution
+      // ✅ reCAPTCHA Enterprise execution
       let token = "";
       if (window.grecaptcha && window.grecaptcha.enterprise) {
         token = await window.grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, { action: "tutor_register" });
       }
+      console.log("reCAPTCHA token:", token);
 
       if (!token) {
         setMessage("⚠️ Unable to verify reCAPTCHA. Please try again.");
@@ -182,9 +183,17 @@ export default function TutorRegistration() {
       submissionData.append("lng", coords.lng ?? "");
       submissionData.append("recaptcha_token", token);
 
+      // Debug FormData
+      console.log("FormData entries:");
+      for (let pair of submissionData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
       const res = await api.post("/tutors/register", submissionData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
+      console.log("Response:", res);
 
       if (res.status === 200) {
         setMessage("✅ Tutor registered successfully!");
@@ -205,8 +214,11 @@ export default function TutorRegistration() {
         setMessage("⚠️ Failed to submit. Try again.");
       }
     } catch (err) {
-      console.error(err);
-      setMessage("❌ Error submitting form. Server might be down.");
+      console.error("Error submitting form:", err);
+      console.error("Error response data:", err.response?.data);
+      console.error("Error status:", err.response?.status);
+      console.error("Error headers:", err.response?.headers);
+      setMessage("❌ Error submitting form. Check console for details.");
     } finally {
       setLoading(false);
     }
