@@ -9,7 +9,7 @@ import math
 from fastapi import FastAPI, Form, File, Query, UploadFile, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from google.oauth2.service_account import Credentials, service_account
-from google.cloud import recaptchaenterprise
+from google.cloud import recaptchaenterprise_v1
 from datetime import datetime, timedelta
 from geopy.geocoders import Nominatim
 
@@ -64,22 +64,22 @@ recaptcha_credentials = service_account.Credentials.from_service_account_info(
     json.loads(os.environ["RECAPTCHA_API_KEY_JSON"])
 )
 
-recaptcha_client = recaptchaenterprise.RecaptchaEnterpriseServiceClient(
+recaptcha_client = recaptchaenterprise_v1.RecaptchaEnterpriseServiceClient(
     credentials=recaptcha_credentials
 )
 
 
 def verify_recaptcha(token: str, expected_action: str):
-    """Validate Google reCAPTCHA Enterprise using v2 style objects"""
+    """Validate Google reCAPTCHA Enterprise using v1 API (1.29.0 compatible)"""
     try:
-        event = recaptchaenterprise.Event(
+        event = recaptchaenterprise_v1.Event(
             token=token,
             site_key=RECAPTCHA_SITE_KEY
         )
 
-        assessment = recaptchaenterprise.Assessment(event=event)
+        assessment = recaptchaenterprise_v1.Assessment(event=event)
 
-        request = recaptchaenterprise.CreateAssessmentRequest(
+        request = recaptchaenterprise_v1.CreateAssessmentRequest(
             parent=f"projects/{RECAPTCHA_PROJECT_ID}",
             assessment=assessment
         )
@@ -110,7 +110,6 @@ def verify_recaptcha(token: str, expected_action: str):
     except Exception as e:
         print("⚠️ reCAPTCHA validation error:", e)
         raise HTTPException(status_code=400, detail="reCAPTCHA validation error")
-
 
 # -----------------------------------------
 #      UTILITY: RANDOM GEO POINT
@@ -144,13 +143,17 @@ def get_area_coordinates(area_name: str, city: str, province: str):
         print(f"⚠️ Error fetching coordinates for {area_name}: {e}")
     return None, None
 
-
 # -----------------------------------------
 #           ROUTES
 # -----------------------------------------
 @app.get("/")
 def home():
     return {"message": "APlus API running with reCAPTCHA Enterprise!"}
+
+# ... keep the rest of your endpoints the same ...
+# /locations, /districts, /tehsils, /areas, /tutors/register, /tutors, /tutors/{teacher_id}
+# no other changes needed since reCAPTCHA usage is now compatible
+
 
 
 @app.get("/locations")
