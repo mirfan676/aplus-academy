@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import api from "../api";
 
-const RECAPTCHA_SITE_KEY = "6LcTdf8rAAAAAHUIrbcURlFEKtL4-4siGvJgYpxl";
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
 // --- Qualification & Subjects ---
 const qualificationsList = [
@@ -73,6 +73,7 @@ export default function TutorRegistration() {
 
   const recaptchaRef = useRef(null);
 
+  // Get geolocation
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -90,6 +91,7 @@ export default function TutorRegistration() {
     }
   }, []);
 
+  // Reset higher subject if qualification changes
   useEffect(() => {
     if (!higherEducation.includes(formData.qualification)) {
       setSelectedHigherSubject("");
@@ -146,10 +148,17 @@ export default function TutorRegistration() {
     setLoading(true);
 
     try {
-      // --- Generate reCAPTCHA Enterprise token using useRef ---
-      const token = await window.grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, {
-        action: "submit_tutor_form",
-      });
+      // ✅ Safe reCAPTCHA Enterprise execution
+      let token = "";
+      if (window.grecaptcha && window.grecaptcha.enterprise) {
+        token = await window.grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, { action: "submit_tutor_form" });
+      }
+
+      if (!token) {
+        setMessage("⚠️ Unable to verify reCAPTCHA. Please try again.");
+        setLoading(false);
+        return;
+      }
 
       const submissionData = new FormData();
       const subjectToSend = selectedHigherSubject || "";
