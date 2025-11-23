@@ -60,7 +60,7 @@ with open(LOCATIONS_FILE, "r", encoding="utf-8") as f:
 RECAPTCHA_PROJECT_ID = os.environ.get("GCLOUD_PROJECT_ID")
 RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY")
 
-recaptcha_credentials = service_account.Credentials.from_service_account_info(
+recaptcha_credentials = Credentials.from_service_account_info(
     json.loads(os.environ["RECAPTCHA_API_KEY_JSON"])
 )
 
