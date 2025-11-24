@@ -39,16 +39,46 @@ const qualificationsList = [
 const higherEducation = ["BS (4-year)", "MSc", "MA", "MS / MPhil", "PhD"];
 
 const subjectsList = [
-  "Mathematics", "Physics", "Chemistry", "Biology", "Computer Science / IT",
-  "Software Development", "Artificial Intelligence / AI", "Robotics",
-  "Economics", "Accounting", "Finance", "Business Studies", "Marketing",
-  "English Language", "English Literature", "Urdu", "Arabic", "French",
-  "German", "Psychology", "Sociology", "History", "Geography",
-  "Political Science / Civics", "Philosophy", "Islamic Studies / Islamiat",
-  "Pakistan Studies", "Art & Design", "Music", "Drama / Theater",
-  "Food & Nutrition / Home Economics", "Fashion Design", "Photography",
-  "Graphic Design", "Public Speaking", "Critical Thinking", "Soft Skills",
-  "Time Management", "Career Counseling", "Personality Development",
+  "Mathematics",
+  "Physics",
+  "Chemistry",
+  "Biology",
+  "Computer Science / IT",
+  "Software Development",
+  "Artificial Intelligence / AI",
+  "Robotics",
+  "Economics",
+  "Accounting",
+  "Finance",
+  "Business Studies",
+  "Marketing",
+  "English Language",
+  "English Literature",
+  "Urdu",
+  "Arabic",
+  "French",
+  "German",
+  "Psychology",
+  "Sociology",
+  "History",
+  "Geography",
+  "Political Science / Civics",
+  "Philosophy",
+  "Islamic Studies / Islamiat",
+  "Pakistan Studies",
+  "Art & Design",
+  "Music",
+  "Drama / Theater",
+  "Food & Nutrition / Home Economics",
+  "Fashion Design",
+  "Photography",
+  "Graphic Design",
+  "Public Speaking",
+  "Critical Thinking",
+  "Soft Skills",
+  "Time Management",
+  "Career Counseling",
+  "Personality Development",
 ];
 
 export default function TutorRegistration() {
@@ -72,6 +102,19 @@ export default function TutorRegistration() {
   const [imageError, setImageError] = useState(false);
   const [locationBlocked, setLocationBlocked] = useState(false);
 
+  // ------------------- Load reCAPTCHA dynamically -------------------
+  useEffect(() => {
+    if (!window.grecaptcha) {
+      const script = document.createElement("script");
+      script.src = `https://www.google.com/recaptcha/enterprise.js?render=${RECAPTCHA_SITE_KEY}`;
+      script.async = true;
+      script.defer = true;
+      script.onload = () => console.log("✅ reCAPTCHA loaded");
+      script.onerror = () => console.error("❌ Failed to load reCAPTCHA script");
+      document.body.appendChild(script);
+    }
+  }, []);
+
   // Geo Location
   useEffect(() => {
     if (!navigator.geolocation) return setLocationBlocked(true);
@@ -89,19 +132,6 @@ export default function TutorRegistration() {
       setFormData((p) => ({ ...p, subject: "" }));
     }
   }, [formData.qualification]);
-
-
-  // ------------------- Load reCAPTCHA dynamically -------------------
-useEffect(() => {
-  if (!window.grecaptcha) {
-    const script = document.createElement("script");
-    script.src = `https://www.google.com/recaptcha/enterprise.js?render=${RECAPTCHA_SITE_KEY}`;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => console.log("✅ reCAPTCHA loaded");
-    document.body.appendChild(script);
-  }
-}, []);
 
   const handleChange = (e) => {
     const { name, value, files, checked, type } = e.target;
@@ -129,85 +159,82 @@ useEffect(() => {
   };
 
   // ------------------- Form Submit -------------------
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setMessage("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage("");
 
-  if (!formData.agree) return setMessage("⚠️ Please agree to Terms.");
-  if (!formData.image) {
-    setImageError(true);
-    return setMessage("⚠️ Please upload a profile picture.");
-  }
-  if (higherEducation.includes(formData.qualification) && !selectedHigherSubject)
-    return setMessage("⚠️ Please select your subject for higher qualification.");
-
-  setLoading(true);
-
-  try {
-    if (!window.grecaptcha?.enterprise)
-      throw new Error("reCAPTCHA not loaded");
-
-    // Use callback properly
-    const token = await new Promise((resolve, reject) => {
-      window.grecaptcha.enterprise.ready(() => {
-        window.grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, {
-          action: "tutor_register",
-        }).then(resolve).catch(reject);
-      });
-    });
-
-    if (!token) throw new Error("Failed to get verification token");
-
-    // Prepare FormData
-    const submissionData = new FormData();
-    const subjectToSend = selectedHigherSubject || "";
-    const majorSubjectsToSend = majorSubjects.join(",");
-
-    const dataToSend = {
-      ...formData,
-      subject: subjectToSend,
-      major_subjects: majorSubjectsToSend,
-    };
-
-    Object.entries(dataToSend).forEach(([k, v]) => {
-      submissionData.append(k, v ?? "");
-    });
-
-    submissionData.append("image", formData.image);
-    submissionData.append("lat", coords.lat ?? "");
-    submissionData.append("lng", coords.lng ?? "");
-    submissionData.append("recaptcha_token", token); // match backend name
-
-    const res = await api.post("/tutors/register", submissionData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-
-    if (res.status === 200) {
-      setMessage("✅ Tutor registered successfully!");
-      setFormData({
-        name: "",
-        qualification: "",
-        subject: "",
-        major_subjects: "",
-        experience: "",
-        phone: "",
-        bio: "",
-        image: null,
-        agree: false,
-      });
-      setMajorSubjects([]);
-      setSelectedHigherSubject("");
-    } else {
-      setMessage("⚠️ Failed to submit. Try again.");
+    if (!formData.agree) return setMessage("⚠️ Please agree to Terms.");
+    if (!formData.image) {
+      setImageError(true);
+      return setMessage("⚠️ Please upload a profile picture.");
     }
-  } catch (err) {
-    console.error("Error submitting form:", err);
-    setMessage("❌ Error submitting form. Server might be down.");
-  } finally {
-    setLoading(false);
-  }
-};
+    if (higherEducation.includes(formData.qualification) && !selectedHigherSubject)
+      return setMessage("⚠️ Please select your subject for higher qualification.");
 
+    setLoading(true);
+
+    try {
+      if (!window.grecaptcha?.enterprise)
+        throw new Error("reCAPTCHA not loaded");
+
+      // Execute reCAPTCHA for 'tutor_register' action
+      const token = await new Promise((resolve, reject) => {
+        window.grecaptcha.enterprise.ready(() => {
+          window.grecaptcha.enterprise
+            .execute(RECAPTCHA_SITE_KEY, { action: "tutor_register" })
+            .then(resolve)
+            .catch(reject);
+        });
+      });
+
+      if (!token) throw new Error("Failed to get verification token");
+
+      // Prepare FormData
+      const submissionData = new FormData();
+      const subjectToSend = selectedHigherSubject || "";
+      const majorSubjectsToSend = majorSubjects.join(",");
+
+      const dataToSend = {
+        ...formData,
+        subject: subjectToSend,
+        major_subjects: majorSubjectsToSend,
+      };
+
+      Object.entries(dataToSend).forEach(([k, v]) => submissionData.append(k, v ?? ""));
+      submissionData.append("image", formData.image);
+      submissionData.append("lat", coords.lat ?? "");
+      submissionData.append("lng", coords.lng ?? "");
+      submissionData.append("recaptcha_token", token);
+
+      const res = await api.post("/tutors/register", submissionData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (res.status === 200) {
+        setMessage("✅ Tutor registered successfully!");
+        setFormData({
+          name: "",
+          qualification: "",
+          subject: "",
+          major_subjects: "",
+          experience: "",
+          phone: "",
+          bio: "",
+          image: null,
+          agree: false,
+        });
+        setMajorSubjects([]);
+        setSelectedHigherSubject("");
+      } else {
+        setMessage("⚠️ Failed to submit. Try again.");
+      }
+    } catch (err) {
+      console.error("Error submitting form:", err);
+      setMessage("❌ Error submitting form. Server might be down.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Box sx={{ bgcolor: "#f9f9f9", minHeight: "100vh", py: 6 }}>
@@ -283,10 +310,7 @@ const handleSubmit = async (e) => {
                 options={qualificationsList}
                 value={formData.qualification || null}
                 onChange={(e, newValue) =>
-                  setFormData((p) => ({
-                    ...p,
-                    qualification: newValue || "",
-                  }))
+                  setFormData((p) => ({ ...p, qualification: newValue || "" }))
                 }
                 renderInput={(params) => (
                   <TextField
