@@ -147,10 +147,13 @@ const handleSubmit = async (e) => {
     if (!window.grecaptcha?.enterprise)
       throw new Error("reCAPTCHA not loaded");
 
-    await window.grecaptcha.enterprise.ready();
-
-    const token = await window.grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, {
-      action: "tutor_register",
+    // Use callback properly
+    const token = await new Promise((resolve, reject) => {
+      window.grecaptcha.enterprise.ready(() => {
+        window.grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, {
+          action: "tutor_register",
+        }).then(resolve).catch(reject);
+      });
     });
 
     if (!token) throw new Error("Failed to get verification token");
@@ -204,6 +207,7 @@ const handleSubmit = async (e) => {
     setLoading(false);
   }
 };
+
 
   return (
     <Box sx={{ bgcolor: "#f9f9f9", minHeight: "100vh", py: 6 }}>
