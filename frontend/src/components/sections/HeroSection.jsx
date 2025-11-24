@@ -61,7 +61,7 @@ export default function HeroSection() {
             color: "#004aad",
           }}
         >
-          Premium Home Tutors For All Classes Available
+          Premium Home Tutors For All Classes
         </Typography>
 
         <Typography
