@@ -90,6 +90,19 @@ export default function TutorRegistration() {
     }
   }, [formData.qualification]);
 
+
+  // ------------------- Load reCAPTCHA dynamically -------------------
+useEffect(() => {
+  if (!window.grecaptcha) {
+    const script = document.createElement("script");
+    script.src = `https://www.google.com/recaptcha/enterprise.js?render=${RECAPTCHA_SITE_KEY}`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => console.log("✅ reCAPTCHA loaded");
+    document.body.appendChild(script);
+  }
+}, []);
+
   const handleChange = (e) => {
     const { name, value, files, checked, type } = e.target;
 
@@ -115,85 +128,82 @@ export default function TutorRegistration() {
     );
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMessage("");
+  // ------------------- Form Submit -------------------
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setMessage("");
 
-    if (!formData.agree) return setMessage("⚠️ Please agree to Terms.");
-    if (!formData.image) {
-      setImageError(true);
-      return setMessage("⚠️ Please upload a profile picture.");
+  if (!formData.agree) return setMessage("⚠️ Please agree to Terms.");
+  if (!formData.image) {
+    setImageError(true);
+    return setMessage("⚠️ Please upload a profile picture.");
+  }
+  if (higherEducation.includes(formData.qualification) && !selectedHigherSubject)
+    return setMessage("⚠️ Please select your subject for higher qualification.");
+
+  setLoading(true);
+
+  try {
+    if (!window.grecaptcha?.enterprise)
+      throw new Error("reCAPTCHA not loaded");
+
+    await window.grecaptcha.enterprise.ready();
+
+    const token = await window.grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, {
+      action: "tutor_register",
+    });
+
+    if (!token) throw new Error("Failed to get verification token");
+
+    // Prepare FormData
+    const submissionData = new FormData();
+    const subjectToSend = selectedHigherSubject || "";
+    const majorSubjectsToSend = majorSubjects.join(",");
+
+    const dataToSend = {
+      ...formData,
+      subject: subjectToSend,
+      major_subjects: majorSubjectsToSend,
+    };
+
+    Object.entries(dataToSend).forEach(([k, v]) => {
+      submissionData.append(k, v ?? "");
+    });
+
+    submissionData.append("image", formData.image);
+    submissionData.append("lat", coords.lat ?? "");
+    submissionData.append("lng", coords.lng ?? "");
+    submissionData.append("recaptcha_token", token); // match backend name
+
+    const res = await api.post("/tutors/register", submissionData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    if (res.status === 200) {
+      setMessage("✅ Tutor registered successfully!");
+      setFormData({
+        name: "",
+        qualification: "",
+        subject: "",
+        major_subjects: "",
+        experience: "",
+        phone: "",
+        bio: "",
+        image: null,
+        agree: false,
+      });
+      setMajorSubjects([]);
+      setSelectedHigherSubject("");
+    } else {
+      setMessage("⚠️ Failed to submit. Try again.");
     }
-    if (higherEducation.includes(formData.qualification) && !selectedHigherSubject)
-      return setMessage("⚠️ Please select your subject for higher qualification.");
-
-    setLoading(true);
-
-    try {
-      // Ensure grecaptcha is loaded
-      await new Promise((resolve) => {
-        window.grecaptcha.enterprise.ready(resolve);
-      });
-
-      const token = await window.grecaptcha.enterprise.execute(
-        RECAPTCHA_SITE_KEY,
-        { action: "tutor_register" }
-      );
-
-      if (!token) {
-        setLoading(false);
-        return setMessage("⚠️ Failed to get verification token. Try again.");
-      }
-
-      // Form Data
-      const submissionData = new FormData();
-      const subjectToSend = selectedHigherSubject || "";
-      const majorSubjectsToSend = majorSubjects.join(",");
-
-      const dataToSend = {
-        ...formData,
-        subject: subjectToSend,
-        major_subjects: majorSubjectsToSend,
-      };
-
-      Object.entries(dataToSend).forEach(([k, v]) => {
-        submissionData.append(k, v ?? "");
-      });
-
-      submissionData.append("image", formData.image);
-      submissionData.append("lat", coords.lat ?? "");
-      submissionData.append("lng", coords.lng ?? "");
-      submissionData.append("recaptcha_token", token);
-
-      const res = await api.post("/tutors/register", submissionData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      if (res.status === 200) {
-        setMessage("✅ Tutor registered successfully!");
-        setFormData({
-          name: "",
-          qualification: "",
-          subject: "",
-          major_subjects: "",
-          experience: "",
-          phone: "",
-          bio: "",
-          image: null,
-          agree: false,
-        });
-        setMajorSubjects([]);
-        setSelectedHigherSubject("");
-      } else {
-        setMessage("⚠️ Failed to submit. Try again.");
-      }
-    } catch (err) {
-      console.error("Error submitting form:", err);
-      setMessage("❌ Error submitting form. Server might be down.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (err) {
+    console.error("Error submitting form:", err);
+    setMessage("❌ Error submitting form. Server might be down.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <Box sx={{ bgcolor: "#f9f9f9", minHeight: "100vh", py: 6 }}>
