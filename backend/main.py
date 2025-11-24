@@ -16,6 +16,8 @@ from google.cloud import recaptchaenterprise_v1
 from datetime import datetime, timedelta
 from geopy.geocoders import Nominatim
 
+from fastapi import BackgroundTasks
+
 
 # -----------------------------------------
 #              FASTAPI APP
@@ -46,6 +48,14 @@ sheet = gspread_client.open_by_key(SHEET_ID).sheet1
 cached_tutors = []
 last_fetch_time = datetime.min
 CACHE_DURATION = timedelta(minutes=5)
+
+cached_tutors_full = []
+cached_tutors_first12 = []
+preload_in_progress = False
+MAX_PRELOAD = 120
+CHUNK_SIZE = 12
+
+
 
 
 # -----------------------------------------
@@ -137,6 +147,82 @@ def random_point_within_radius(center_lat, center_lng, radius_m=1000):
     return round(center_lat + lat_offset, 6), round(center_lng + lng_offset, 6)
 
 
+#------------------------------------------
+#     PRELOAD Teachers Data 
+#------------------------------------------
+def preload_more_tutors():
+    global cached_tutors_full, cached_tutors_first12, preload_in_progress
+
+    if preload_in_progress:
+        return
+    
+    preload_in_progress = True
+    try:
+        print("⏳ Preloading tutors progressively…")
+
+        records = sheet.get_all_records(empty2zero=False, head=1)
+
+        # Build full verified list
+        verified = []
+        def s(v): return str(v).strip() if v else ""
+
+        for r in records:
+            if s(r.get("Verified", "")).lower() != "yes":
+                continue
+
+            subjects = []
+            if s(r.get("Subject")):
+                subjects.append(s(r.get("Subject")))
+            if s(r.get("Major Subjects")):
+                subjects.extend([x.strip() for x in s(r.get("Major Subjects")).split(",") if x.strip()])
+
+            verified.append({
+                "Name": s(r.get("Name")),
+                "Subjects": subjects,
+                "Qualification": s(r.get("Qualification")),
+                "Experience": s(r.get("Experience")),
+                "Province": s(r.get("Province")),
+                "District": s(r.get("District")),
+                "Tehsil": s(r.get("Tehsil")),
+                "City": s(r.get("City")),
+                "Bio": s(r.get("Bio")),
+                "Area1": s(r.get("Area1")),
+                "Area2": s(r.get("Area2")),
+                "Area3": s(r.get("Area3")),
+                "ExactLocation": s(r.get("ExactLocation")),
+                "Image URL": s(r.get("Image URL")),
+                "Latitude": s(r.get("Latitude")),
+                "Longitude": s(r.get("Longitude")),
+                "Profile URL": s(r.get("Profile URL")),
+                "Verified": "Yes",
+            })
+
+        # Store the full list
+        cached_tutors_full = verified
+
+        # Ensure first 12 cache exists
+        cached_tutors_first12 = verified[:CHUNK_SIZE]
+
+        # Only preload up to 120
+        limit = min(MAX_PRELOAD, len(verified))
+
+        print(f"⚡ Preloading {limit} tutors in chunks…")
+
+        # progressively load chunks of 12
+        # (this simulates progressive ready-to-send cache)
+        progressive_cache = []
+        for i in range(0, limit, CHUNK_SIZE):
+            chunk = verified[i:i + CHUNK_SIZE]
+            progressive_cache.extend(chunk)
+
+        print("✅ Preloading complete")
+
+    except Exception as e:
+        print("❌ Preload error:", e)
+
+    preload_in_progress = False
+
+
 # -----------------------------------------
 #      UTIL: AREA COORDINATES
 # -----------------------------------------
@@ -168,7 +254,7 @@ def get_area_coordinates(area_name: str, city: str, province: str):
 # -----------------------------------------
 @app.get("/")
 def home():
-    return {"message": "APlus API running with reCAPTCHA Enterprise!"}
+    return {"message": "API disabled for unauthorize access"}
 
 
 @app.get("/locations")
@@ -189,6 +275,57 @@ def get_tehsils(province: str = Query(...), district: str = Query(...)):
 @app.get("/areas")
 def get_areas(province: str = Query(...), district: str = Query(...), tehsil: str = Query(...)):
     return {"areas": pakistan_data.get(province, {}).get(district, {}).get(tehsil, [])}
+
+
+@app.on_event("startup")
+def preload_tutors():
+    global cached_tutors, last_fetch_time
+
+    try:
+        records = sheet.get_all_records(empty2zero=False, head=1)
+        verified = []
+
+        def s(v): return str(v).strip() if v else ""
+
+        for r in records:
+            if s(r.get("Verified", "")).lower() != "yes":
+                continue
+
+            subjects = []
+            if s(r.get("Subject")):
+                subjects.append(s(r.get("Subject")))
+            if s(r.get("Major Subjects")):
+                subjects.extend([x.strip() for x in s(r.get("Major Subjects")).split(",") if x.strip()])
+
+            verified.append({
+                "Name": s(r.get("Name")),
+                "Subjects": subjects,
+                "Qualification": s(r.get("Qualification")),
+                "Experience": s(r.get("Experience")),
+                "Province": s(r.get("Province")),
+                "District": s(r.get("District")),
+                "Tehsil": s(r.get("Tehsil")),
+                "City": s(r.get("City")),
+                "Bio": s(r.get("Bio")),
+                "Area1": s(r.get("Area1")),
+                "Area2": s(r.get("Area2")),
+                "Area3": s(r.get("Area3")),
+                "ExactLocation": s(r.get("ExactLocation")),
+                "Image URL": s(r.get("Image URL")),
+                "Latitude": s(r.get("Latitude")),
+                "Longitude": s(r.get("Longitude")),
+                "Profile URL": s(r.get("Profile URL")),
+                "Verified": "Yes",
+            })
+
+        cached_tutors = verified
+        last_fetch_time = datetime.utcnow()
+        print("🔥 Tutors preloaded on startup:", len(cached_tutors))
+
+    except Exception as e:
+        print("⚠️ Preload failed:", e)
+
+
 
 
 # -----------------------------------------
@@ -326,56 +463,22 @@ async def register_tutor(
 #           GET VERIFIED TUTORS
 # -----------------------------------------
 @app.get("/tutors")
-def get_tutors():
-    global cached_tutors, last_fetch_time
+def get_tutors(background_tasks: BackgroundTasks):
+    """
+    Returns first 12 tutors instantly, triggers background preload up to 120.
+    """
+    global cached_tutors, cached_first12, last_fetch_time, preload_in_progress
 
     now = datetime.utcnow()
-    if now - last_fetch_time < CACHE_DURATION:
-        return cached_tutors
+    if cached_first12 and now - last_fetch_time < CACHE_DURATION:
+        if not preload_in_progress:
+            background_tasks.add_task(preload_tutors)
+        return cached_first12
 
-    try:
-        records = sheet.get_all_records(empty2zero=False, head=1)
-        verified = []
+    # No cache or cache expired → load first 12 immediately
+    preload_tutors()
+    return cached_first12
 
-        def s(v): return str(v).strip() if v else ""
-
-        for r in records:
-            if s(r.get("Verified", "")).lower() != "yes":
-                continue
-
-            subjects = []
-            if s(r.get("Subject")):
-                subjects.append(s(r.get("Subject")))
-            if s(r.get("Major Subjects")):
-                subjects.extend([x.strip() for x in s(r.get("Major Subjects")).split(",") if x.strip()])
-
-            verified.append({
-                "Name": s(r.get("Name")),
-                "Subjects": subjects,
-                "Qualification": s(r.get("Qualification")),
-                "Experience": s(r.get("Experience")),
-                "Province": s(r.get("Province")),
-                "District": s(r.get("District")),
-                "Tehsil": s(r.get("Tehsil")),
-                "City": s(r.get("City")),
-                "Bio": s(r.get("Bio")),
-                "Area1": s(r.get("Area1")),
-                "Area2": s(r.get("Area2")),
-                "Area3": s(r.get("Area3")),
-                "ExactLocation": s(r.get("ExactLocation")),
-                "Image URL": s(r.get("Image URL")),
-                "Latitude": s(r.get("Latitude")),
-                "Longitude": s(r.get("Longitude")),
-                "Profile URL": s(r.get("Profile URL")),
-                "Verified": "Yes",
-            })
-
-        cached_tutors = verified
-        last_fetch_time = now
-        return verified
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 
 # -----------------------------------------

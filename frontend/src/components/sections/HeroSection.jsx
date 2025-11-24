@@ -61,7 +61,7 @@ export default function HeroSection() {
             color: "#004aad",
           }}
         >
-          Premium Home Tutors For All Classes in Lahore
+          Premium Home Tutors For All Classes Available
         </Typography>
 
         <Typography
@@ -75,25 +75,59 @@ export default function HeroSection() {
           students, and teachers.
         </Typography>
 
-        <Button
-          component={Link}
-          to="/teachers"
-          variant="contained"
-          size="large"
-          sx={{
-            background: "#29b554",
-            "&:hover": { background: "#22a049" },
-            mt: 3,
-            px: 5,
-            py: 1.5,
-            borderRadius: "10px",
-            fontSize: { xs: "0.95rem", sm: "1.05rem", md: "1.1rem" },
-            width: { xs: "100%", sm: "auto" },
-            transition: "all 0.3s ease",
-          }}
-        >
-          Hire a Tutor
-        </Button>
+        {/* BUTTONS */}
+<Box
+  sx={{
+    mt: 3,
+    display: "flex",
+    flexDirection: { xs: "column", sm: "row" },
+    gap: 2,
+    justifyContent: { xs: "center", md: "flex-start" },
+  }}
+>
+  {/* WHATSAPP BUTTON */}
+  <Button
+    component="a"
+    href="https://wa.me/923066762289"
+    target="_blank"
+    rel="noopener noreferrer"
+    variant="contained"
+    size="large"
+    sx={{
+      background: "#007bff",
+      "&:hover": { background: "#0069d9" },
+      px: 5,
+      py: 1.5,
+      borderRadius: "10px",
+      fontSize: { xs: "0.95rem", sm: "1.05rem", md: "1.1rem" },
+      width: { xs: "100%", sm: "auto" },
+      transition: "all 0.3s ease",
+    }}
+  >
+    Contact Now
+  </Button>
+
+  {/* EXISTING HIRE TUTOR BUTTON */}
+  <Button
+    component={Link}
+    to="/teachers"
+    variant="contained"
+    size="large"
+    sx={{
+      background: "#29b554",
+      "&:hover": { background: "#22a049" },
+      px: 5,
+      py: 1.5,
+      borderRadius: "10px",
+      fontSize: { xs: "0.95rem", sm: "1.05rem", md: "1.1rem" },
+      width: { xs: "100%", sm: "auto" },
+      transition: "all 0.3s ease",
+    }}
+  >
+    Find Your Tutor
+  </Button>
+</Box>
+
       </Box>
 
       {/* RIGHT HERO IMAGES */}
