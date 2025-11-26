@@ -31,15 +31,12 @@ const personIcon = new L.Icon({
   popupAnchor: [0, -40],
 });
 
-const CACHE_KEY = "aplus_tutors_cache";
-const CACHE_DURATION = 24 * 60 * 60 * 1000;
-
 const TeacherDirectory = () => {
   const [teachers, setTeachers] = useState([]);
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
   const [userLocation, setUserLocation] = useState([31.5204, 74.3587]);
-  const [visibleCount, setVisibleCount] = useState(9);
+  const [visibleCount, setVisibleCount] = useState(12); // first 12
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [mapVisible, setMapVisible] = useState(false);
@@ -48,15 +45,6 @@ const TeacherDirectory = () => {
     const fetchTutors = async () => {
       try {
         setLoading(true);
-        const cached = localStorage.getItem(CACHE_KEY);
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (Date.now() - parsed.timestamp < CACHE_DURATION) {
-            setTeachers(parsed.data);
-            setLoading(false);
-            return;
-          }
-        }
 
         const res = await axios.get("https://aplus-academy.onrender.com/tutors/");
         if (Array.isArray(res.data)) {
@@ -69,13 +57,11 @@ const TeacherDirectory = () => {
             city: t["District"] ? String(t["District"]) : "",
             bio: t["Bio"] || "",
             price: t["Price"] || "Rs 2000",
-            imageUrl: t["Image URL"] || "",
+            thumbnail: t["Thumbnail"] || "",
             lat: isNaN(parseFloat(t["Latitude"])) ? 31.5204 : parseFloat(t["Latitude"]),
             lng: isNaN(parseFloat(t["Longitude"])) ? 74.3587 : parseFloat(t["Longitude"]),
             verified: t["Verified"]?.trim(),
           }));
-
-          localStorage.setItem(CACHE_KEY, JSON.stringify({ data: mapped, timestamp: Date.now() }));
           setTeachers(mapped);
         }
       } catch {
@@ -107,21 +93,13 @@ const TeacherDirectory = () => {
     return list;
   }, [selectedCity, selectedSubject, teachers, userLocation]);
 
-  const handleLoadMore = () => setVisibleCount((v) => v + 6);
+  const handleLoadMore = () => setVisibleCount((v) => v + 12); // load 12 more
 
   const [showMoreSubjects, setShowMoreSubjects] = useState({});
-
-  const handleToggleSubjects = (id) => {
-    setShowMoreSubjects(prev => ({ ...prev, [id]: !prev[id] }));
-  };
+  const handleToggleSubjects = (id) => setShowMoreSubjects(prev => ({ ...prev, [id]: !prev[id] }));
 
   const [showMoreBio, setShowMoreBio] = useState({});
-
-  const handleToggleBio = (id) => {
-    setShowMoreBio(prev => ({ ...prev, [id]: !prev[id] }));
-  };
-
-
+  const handleToggleBio = (id) => setShowMoreBio(prev => ({ ...prev, [id]: !prev[id] }));
 
   return (
     <Box sx={{ background: "#e8f2ff", py: 6, px: { xs: 2, md: 4 } }}>
@@ -146,7 +124,7 @@ const TeacherDirectory = () => {
         {/* Filters */}
         <Paper sx={{ p: 3, mb: 4, borderRadius: "22px", background: "rgba(255,255,255,0.25)", backdropFilter: "blur(12px)" }}>
           <Grid container spacing={2} justifyContent="center">
-            <Grid item xs={12} md={6} sx={{ minWidth: "240px" }} >
+            <Grid item xs={12} md={6} sx={{ minWidth: "240px" }}>
               <FormControl fullWidth>
                 <InputLabel>Select City</InputLabel>
                 <Select value={selectedCity} label="Select City" onChange={(e) => setSelectedCity(e.target.value)}>
@@ -172,188 +150,147 @@ const TeacherDirectory = () => {
 
         {/* Cards */}
         <Grid container spacing={3} sx={{ width: "100%", maxWidth: "xl" }} justifyContent="center">
-  {filtered.slice(0, visibleCount).map((t) => (
-    <Grid item key={t.id} xs={12} sm={6} md={4} sx={{ display: "flex" }}>
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-         style={{ flex: 1, display: "flex", flexDirection: "column" }}
-      >
-        <Card
-          sx={{
-            p: 0,
-            borderRadius: "22px",
-            display: "flex",
-            flexDirection: "column",
-            position: "relative",
-            flex: 1,         
-            minHeight: 400,  
-            minWidth: 320,
-            maxWidth: 320,
-          }}
-        >
-          {/* Floating Badge */}
-          <Box
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              background: "#00a6ff",
-              color: "white",
-              px: 2,
-              py: 0.5,
-              borderRadius: "16px",
-              fontSize: "0.75rem",
-              fontWeight: 700,
-            }}
-          >
-            Featured
-          </Box>
-
-          {/* Top Section */}
-          <Box
-            sx={{
-              display: "flex",
-              p: 2,
-              background: "rgba(0,80,200,0.25)",
-              backdropFilter: "blur(12px)",
-              borderTopLeftRadius: "22px",
-              borderTopRightRadius: "22px",
-              gap: 2,
-            }}
-          >
-            <Avatar
-              src={t.imageUrl}
-              alt={t.name}
-              sx={{ width: 70, height: 70, borderRadius: "14px" }}
-            />
-            <Box sx={{ textAlign: "left" }}>
-              {t.verified?.toLowerCase() === "yes" && (
-                <Typography
+          {filtered.slice(0, visibleCount).map((t) => (
+            <Grid item key={t.id} xs={12} sm={6} md={4} sx={{ display: "flex" }}>
+              <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                style={{ flex: 1, display: "flex", flexDirection: "column" }}
+              >
+                <Card
                   sx={{
+                    p: 0,
+                    borderRadius: "22px",
                     display: "flex",
-                    alignItems: "center",
-                    gap: 0.5,
-                    fontWeight: 700,
-                    maxWidth: 180,
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
+                    flexDirection: "column",
+                    position: "relative",
+                    flex: 1,
+                    minHeight: 400,
+                    minWidth: 320,
+                    maxWidth: 320,
                   }}
                 >
-                  <CheckCircleIcon fontSize="small" color="success" />
-                  {t.name}
-                </Typography>
-              )}
-              <Typography
-                sx={{ fontSize: "0.85rem", color: "#004aad", fontWeight: 700 }}
-              >
-                {t.qualification}
-              </Typography>
-              <Typography sx={{ fontSize: "0.8rem", color: "gold" }}>
-                ★★★★★
-              </Typography>
-              <Typography sx={{ fontSize: "0.75rem", color: "green" }}>
-                {t.city}
-              </Typography>
-            </Box>
-          </Box>
+                  {/* Floating Badge */}
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: 10,
+                      right: 10,
+                      background: "#00a6ff",
+                      color: "white",
+                      px: 2,
+                      py: 0.5,
+                      borderRadius: "16px",
+                      fontSize: "0.75rem",
+                      fontWeight: 700,
+                    }}
+                  >
+                    Featured
+                  </Box>
 
-          {/* Middle Section */}
-          <Box sx={{ p: 2, flexGrow: 1 }}>
-            {/* Subjects */}
-<Typography sx={{ mt: 1, fontWeight: 700 }}>Subjects:</Typography>
-<Box sx={{ fontSize: "0.85rem", mt: 0.5 }}>
-  {(showMoreSubjects[t.id] ? t.subjects : t.subjects.slice(0, 2)).map(
-    (subject, i) => (
-      <Typography key={i} sx={{ lineHeight: 1.5 }}>
-        {subject}
-      </Typography>
-    )
-  )}
-  {t.subjects.length > 2 && (
-    <Button
-      size="small"
-      onClick={() => handleToggleSubjects(t.id)}
-      sx={{ mt: 0.5, textTransform: "none", fontSize: "0.75rem" }}
-    >
-      {showMoreSubjects[t.id] ? "See less" : "See more"}
-    </Button>
-  )}
-</Box>
+                  {/* Top Section */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      p: 2,
+                      background: "rgba(0,80,200,0.25)",
+                      backdropFilter: "blur(12px)",
+                      borderTopLeftRadius: "22px",
+                      borderTopRightRadius: "22px",
+                      gap: 2,
+                    }}
+                  >
+                    <Avatar
+                      src={t.thumbnail} // <-- use secure thumbnail
+                      alt={t.name}
+                      sx={{ width: 70, height: 70, borderRadius: "14px" }}
+                    />
+                    <Box sx={{ textAlign: "left" }}>
+                      {t.verified?.toLowerCase() === "yes" && (
+                        <Typography
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 0.5,
+                            fontWeight: 700,
+                            maxWidth: 180,
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          <CheckCircleIcon fontSize="small" color="success" />
+                          {t.name}
+                        </Typography>
+                      )}
+                      <Typography sx={{ fontSize: "0.85rem", color: "#004aad", fontWeight: 700 }}>
+                        {t.qualification}
+                      </Typography>
+                      <Typography sx={{ fontSize: "0.8rem", color: "gold" }}>★★★★★</Typography>
+                      <Typography sx={{ fontSize: "0.75rem", color: "green" }}>{t.city}</Typography>
+                    </Box>
+                  </Box>
 
-{/* Bio */}
-<Typography sx={{ mt: 1, fontWeight: 700 }}>Bio:</Typography>
-<Box sx={{ fontSize: "0.85rem", mt: 0.5 }}>
-  <Typography
-    sx={{
-      lineHeight: 1.5,
-      display: "-webkit-box",
-      WebkitLineClamp: showMoreBio[t.id] ? "none" : 3, // 3 lines initially
-      WebkitBoxOrient: "vertical",
-      overflow: "hidden",
-      wordBreak: "break-word", // <--- ensures long words wrap
-      width: "100%",            // <--- take full card width
-    }}
-  >
-    {showMoreBio[t.id]
-      ? t.bio.split(" ").slice(0, 40).join(" ")
-      : t.bio.split(" ").slice(0, 40).join(" ")}
-  </Typography>
-  {t.bio.split(" ").length > 40 && (
-    <Button
-      size="small"
-      onClick={() => handleToggleBio(t.id)}
-      sx={{ mt: 0.5, textTransform: "none", fontSize: "0.75rem" }}
-    >
-      {showMoreBio[t.id] ? "See less" : "See more"}
-    </Button>
-  )}
-</Box>
+                  {/* Middle Section */}
+                  <Box sx={{ p: 2, flexGrow: 1 }}>
+                    {/* Subjects */}
+                    <Typography sx={{ mt: 1, fontWeight: 700 }}>Subjects:</Typography>
+                    <Box sx={{ fontSize: "0.85rem", mt: 0.5 }}>
+                      {(showMoreSubjects[t.id] ? t.subjects : t.subjects.slice(0, 2)).map((subject, i) => (
+                        <Typography key={i} sx={{ lineHeight: 1.5 }}>{subject}</Typography>
+                      ))}
+                      {t.subjects.length > 2 && (
+                        <Button size="small" onClick={() => handleToggleSubjects(t.id)} sx={{ mt: 0.5, textTransform: "none", fontSize: "0.75rem" }}>
+                          {showMoreSubjects[t.id] ? "See less" : "See more"}
+                        </Button>
+                      )}
+                    </Box>
 
+                    {/* Bio */}
+                    <Typography sx={{ mt: 1, fontWeight: 700 }}>Bio:</Typography>
+                    <Box sx={{ fontSize: "0.85rem", mt: 0.5 }}>
+                      <Typography
+                        sx={{
+                          lineHeight: 1.5,
+                          display: "-webkit-box",
+                          WebkitLineClamp: showMoreBio[t.id] ? "none" : 3,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                          wordBreak: "break-word",
+                          width: "100%",
+                        }}
+                      >
+                        {showMoreBio[t.id] ? t.bio : t.bio.split(" ").slice(0, 40).join(" ")}
+                      </Typography>
+                      {t.bio.split(" ").length > 40 && (
+                        <Button size="small" onClick={() => handleToggleBio(t.id)} sx={{ mt: 0.5, textTransform: "none", fontSize: "0.75rem" }}>
+                          {showMoreBio[t.id] ? "See less" : "See more"}
+                        </Button>
+                      )}
+                    </Box>
+                  </Box>
 
-          </Box>
+                  {/* Footer Price */}
+                  <Box sx={{ background: "rgba(0,200,100,0.25)", backdropFilter: "blur(8px)", textAlign: "center", py: 1, fontWeight: 700 }}>
+                    1500/hr
+                  </Box>
 
-          {/* Footer Price */}
-          <Box
-            sx={{
-              background: "rgba(0,200,100,0.25)",
-              backdropFilter: "blur(8px)",
-              textAlign: "center",
-              py: 1,
-              fontWeight: 700,
-            }}
-          >
-            1500/hr
-          </Box>
-
-          {/* Buttons */}
-          <Box sx={{ p: 2, display: "flex", justifyContent: "space-between" }}>
-            <Button
-              component={Link}
-              to={`/teacher/${t.id}`}
-              variant="contained"
-              sx={{ flex: 1, mr: 1 }}
-            >
-              View Profile
-            </Button>
-            <Button
-              component={Link}
-              to={`/hire/${t.id}`}
-              variant="contained"
-              sx={{ flex: 1, backgroundColor: "#29b554" }}
-            >
-              Hire Me
-            </Button>
-          </Box>
-        </Card>
-      </motion.div>
-    </Grid>
-  ))}
-</Grid>
-
+                  {/* Buttons */}
+                  <Box sx={{ p: 2, display: "flex", justifyContent: "space-between" }}>
+                    <Button component={Link} to={`/teacher/${t.id}`} variant="contained" sx={{ flex: 1, mr: 1 }}>
+                      View Profile
+                    </Button>
+                    <Button component={Link} to={`/hire/${t.id}`} variant="contained" sx={{ flex: 1, backgroundColor: "#29b554" }}>
+                      Hire Me
+                    </Button>
+                  </Box>
+                </Card>
+              </motion.div>
+            </Grid>
+          ))}
+        </Grid>
 
         {!loading && visibleCount < filtered.length && (
           <Box sx={{ textAlign: "center", mt: 4 }}>
