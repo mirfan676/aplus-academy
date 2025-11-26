@@ -58,7 +58,7 @@ const TeacherDirectory = () => {
           }
         }
 
-        const res = await axios.get("https://aplus-academy.onrender.com/tutors");
+        const res = await axios.get("https://aplus-academy.onrender.com/tutors/");
         if (Array.isArray(res.data)) {
           const mapped = res.data.map((t, i) => ({
             id: i,
