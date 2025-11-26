@@ -28,15 +28,15 @@ const qualificationsList = [
   "Intermediate / HSSC (F.A)",
   "Intermediate / HSSC (I.Com)",
   "Associate Degree (2-year)",
-  "BA / BSc (Pass)",
-  "BS (4-year)",
+  "BA / BSc",
+  "BS",
   "MSc",
   "MA",
   "MS / MPhil",
   "PhD",
 ];
 
-const higherEducation = ["BS (4-year)", "MSc", "MA", "MS / MPhil", "PhD"];
+const higherEducation = ["BS", "MSc", "MA", "MS / MPhil", "PhD"];
 
 const subjectsList = [
   "Mathematics",
@@ -44,11 +44,14 @@ const subjectsList = [
   "Chemistry",
   "Biology",
   "Computer Science / IT",
-  "Software Development",
+  "Software Engineering",
   "Artificial Intelligence / AI",
   "Robotics",
   "Economics",
+  "Nursing",
   "Accounting",
+  "Mass Communication",
+  "Electronics",
   "Finance",
   "Business Studies",
   "Marketing",
@@ -69,16 +72,13 @@ const subjectsList = [
   "Art & Design",
   "Music",
   "Drama / Theater",
-  "Food & Nutrition / Home Economics",
+  "Food & Nutrition",
+  "Home Economics",
+  "Pak Studies",
   "Fashion Design",
   "Photography",
-  "Graphic Design",
-  "Public Speaking",
-  "Critical Thinking",
-  "Soft Skills",
-  "Time Management",
-  "Career Counseling",
-  "Personality Development",
+  "Art & Design",
+  "Public Relations",
 ];
 
 export default function TutorRegistration() {
