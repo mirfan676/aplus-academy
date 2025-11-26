@@ -39,17 +39,33 @@ def refresh_cache_if_needed():
 @router.get("/debug-sheet")
 def debug_sheet():
     """
-    Temporary debug route to inspect what the server sees from Google Sheets.
-    Returns raw rows for verification.
+    Temporary debug route to inspect the raw sheet data.
+    Does NOT use cached_tutors.
+    
+    Returns:
+    - first 10 rows from the sheet
+    - which rows would pass the Verified filter
     """
     try:
         rows = sheets.sheet.get_all_records(empty2zero=False, head=1)
+        verified_rows = []
+
+        for idx, r in enumerate(rows):
+            raw_verified = r.get("Verified", "")
+            cleaned = str(raw_verified).strip().lower()
+            if cleaned.startswith("y"):
+                verified_rows.append({"row_index": idx, "row_data": r})
+
         return {
             "total_rows": len(rows),
-            "rows_preview": rows[:10]  # return first 10 rows for quick check
+            "rows_preview": rows[:10],
+            "verified_count": len(verified_rows),
+            "verified_rows_preview": verified_rows[:10]  # first 10 verified rows
         }
+
     except Exception as e:
         return {"error": str(e)}
+
 
 
 # -----------------------------
