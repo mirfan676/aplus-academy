@@ -23,14 +23,15 @@ def preload_tutors():
         verified = []
 
         for r in records:
-            if not s(r.get("Verified", "")).lower().startswith("y"):
+            # ---- FIXED VERIFIED CHECK ----
+            if not s(r.get("Verified", "")).strip().lower().startswith("y"):
                 continue
 
             subjects = []
             if s(r.get("Subject")):
                 subjects.append(s(r.get("Subject")))
             if s(r.get("Major Subjects")):
-                subjects.extend([x.strip() for x in s(r.get("Major Subjects")).split(",")])
+                subjects.extend([x.strip() for x in s(r.get("Major Subjects")).split(",") if x.strip()])
 
             verified.append({**r, "Subjects": subjects})
 
@@ -40,4 +41,5 @@ def preload_tutors():
 
     except Exception as e:
         print("⚠️ Preload failed:", e)
+
 
