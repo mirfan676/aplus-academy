@@ -17,63 +17,41 @@ def preload_tutors():
     global cached_tutors, last_fetch_time
 
     try:
-        print("\n================ PRELOAD START ================\n")
-
-        # Load all rows from sheet
         records = sheet.get_all_records(empty2zero=False, head=1)
-        print(f"📄 Loaded rows from sheet: {len(records)}")
+        print("📌 TOTAL ROWS LOADED FROM SHEET:", len(records))
 
         verified = []
 
-        for idx, r in enumerate(records, start=1):
-            print(f"\n--- Row {idx} raw data ---")
-            print(r)
+        for idx, r in enumerate(records):
+            raw_verified = r.get("Verified", None)
+            print(f"Row {idx} Verified raw value:", repr(raw_verified))
 
-            # Extract & normalize verified field
-            raw_verified = r.get("Verified", "")
-            v = str(raw_verified).strip().lower()
+            # Clean version
+            cleaned = s(raw_verified).lower().strip()
+            print(f"Row {idx} Verified cleaned:", repr(cleaned))
 
-            print(f"🔍 Verified value raw='{raw_verified}' normalized='{v}'")
-
-            # Skip non-verified tutors
-            if not v.startswith("y"):
-                print("⛔ Skipped (not verified)")
+            if not cleaned.startswith("y"):
+                print(f"❌ Row {idx} skipped — NOT verified")
                 continue
-            else:
-                print("✅ Accepted as verified")
 
-            # Parse subjects
+            print(f"✅ Row {idx} accepted")
+
             subjects = []
+            if s(r.get("Subject")):
+                subjects.append(s(r.get("Subject")))
+            if s(r.get("Major Subjects")):
+                subjects.extend([x.strip() for x in s(r.get("Major Subjects")).split(",") if x.strip()])
 
-            sub1 = str(r.get("Subject", "")).strip()
-            major = str(r.get("Major Subjects", "")).strip()
-
-            print(f"📘 Subject: '{sub1}'")
-            print(f"📗 Major Subjects: '{major}'")
-
-            if sub1:
-                subjects.append(sub1)
-
-            if major:
-                major_split = [x.strip() for x in major.split(",") if x.strip()]
-                subjects.extend(major_split)
-                print("➡️ Parsed major subjects:", major_split)
-
-            print("📚 Final subjects list:", subjects)
-
-            tutor = {**r, "Subjects": subjects}
-            verified.append(tutor)
-
-            print("✅ Tutor added")
+            verified.append({**r, "Subjects": subjects})
 
         cached_tutors = verified
         last_fetch_time = datetime.utcnow()
 
-        print(f"\n🔥 FINAL Preloaded tutors count: {len(cached_tutors)}")
-        print("\n================ PRELOAD END =================\n")
+        print("🔥 FINAL VERIFIED COUNT:", len(cached_tutors))
 
     except Exception as e:
         print("⚠️ Preload failed:", e)
+
 
 
 
