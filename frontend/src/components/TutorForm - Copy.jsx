@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Grid,
@@ -19,9 +19,7 @@ import api from "../api";
 
 const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
-// ----------------------------------------------------------
-// QUALIFICATIONS
-// ----------------------------------------------------------
+// --- Qualification & Subjects ---
 const qualificationsList = [
   "Matric / SSC",
   "O-Level / IGCSE",
@@ -40,9 +38,6 @@ const qualificationsList = [
 
 const higherEducation = ["BS", "MSc", "MA", "MS / MPhil", "PhD"];
 
-// ----------------------------------------------------------
-// SUBJECTS MASTER LIST
-// ----------------------------------------------------------
 const subjectsList = [
   "Mathematics",
   "Physics",
@@ -79,54 +74,12 @@ const subjectsList = [
   "Drama / Theater",
   "Food & Nutrition",
   "Home Economics",
+  "Pak Studies",
   "Fashion Design",
   "Photography",
+  "Art & Design",
   "Public Relations",
 ];
-
-// ----------------------------------------------------------
-// BROAD ENGINEERING MAPPING (Option B)
-// ----------------------------------------------------------
-const engineeringMapping = {
-  "Software Engineering": [
-    "Software Engineering",
-    "Computer Science / IT",
-    "Artificial Intelligence / AI",
-    "Robotics",
-    "Mathematics",
-  ],
-  "Mechanical Engineering": [
-    "Physics",
-    "Mathematics",
-    "Mechanical Engineering",
-    "Thermodynamics",
-    "Fluid Mechanics",
-  ],
-  "Electrical Engineering": [
-    "Electronics",
-    "Physics",
-    "Mathematics",
-    "Electrical Engineering",
-    "Circuits",
-  ],
-  "Civil Engineering": ["Civil Engineering", "Mathematics", "Physics", "Materials"],
-  "Chemical Engineering": ["Chemistry", "Biology", "Chemical Engineering", "Process Engineering"],
-};
-
-// ----------------------------------------------------------
-// QUALIFICATION → SUGGESTED SUBJECTS
-// ----------------------------------------------------------
-const qualificationSuggestions = {
-  "Intermediate / HSSC (FSc-Pre-Medical)": ["Biology", "Chemistry", "Physics"],
-  "Intermediate / HSSC (FSc-Pre-Engineering)": ["Mathematics", "Physics", "Chemistry"],
-  "Intermediate / HSSC (I.Com)": ["Accounting", "Business Studies", "Finance"],
-  "Intermediate / HSSC (F.A)": ["English Language", "Urdu", "Psychology"],
-  BS: ["Mathematics", "Computer Science / IT", "Physics"],
-  MSc: ["Mathematics", "Physics", "Chemistry"],
-  MA: ["English Literature", "Sociology", "History"],
-  "MS / MPhil": ["Research Methods", "Statistics", "Mathematics"],
-  PhD: ["Research Methods", "Advanced Studies", "Statistics"],
-};
 
 export default function TutorRegistration() {
   const [formData, setFormData] = useState({
@@ -149,41 +102,30 @@ export default function TutorRegistration() {
   const [imageError, setImageError] = useState(false);
   const [locationBlocked, setLocationBlocked] = useState(false);
 
-  // ----------------------------------------------------------
-  // LOAD reCAPTCHA
-  // ----------------------------------------------------------
+  // ------------------- Load reCAPTCHA dynamically -------------------
   useEffect(() => {
     if (!window.grecaptcha) {
       const script = document.createElement("script");
       script.src = `https://www.google.com/recaptcha/enterprise.js?render=${RECAPTCHA_SITE_KEY}`;
       script.async = true;
       script.defer = true;
+      script.onload = () => console.log("✅ reCAPTCHA loaded");
+      script.onerror = () => console.error("❌ Failed to load reCAPTCHA script");
       document.body.appendChild(script);
     }
   }, []);
 
-  // ----------------------------------------------------------
-  // GEOLOCATION WITH IP FALLBACK
-  // ----------------------------------------------------------
+  // Geo Location
   useEffect(() => {
-    navigator.geolocation?.getCurrentPosition(
+    if (!navigator.geolocation) return setLocationBlocked(true);
+
+    navigator.geolocation.getCurrentPosition(
       (pos) => setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      async () => {
-        setLocationBlocked(true);
-        try {
-          const res = await fetch("https://ipapi.co/json/");
-          const data = await res.json();
-          setCoords({ lat: data.latitude, lng: data.longitude });
-        } catch (err) {
-          console.error("IP-based location failed:", err);
-        }
-      }
+      () => setLocationBlocked(true)
     );
   }, []);
 
-  // ----------------------------------------------------------
-  // QUALIFICATION CHANGE → RESET SUBJECT
-  // ----------------------------------------------------------
+  // Reset subject if qualification is lower
   useEffect(() => {
     if (!higherEducation.includes(formData.qualification)) {
       setSelectedHigherSubject("");
@@ -191,9 +133,6 @@ export default function TutorRegistration() {
     }
   }, [formData.qualification]);
 
-  // ----------------------------------------------------------
-  // HANDLE INPUT CHANGE
-  // ----------------------------------------------------------
   const handleChange = (e) => {
     const { name, value, files, checked, type } = e.target;
 
@@ -207,44 +146,19 @@ export default function TutorRegistration() {
     }
   };
 
-  // ----------------------------------------------------------
-  // AUTO-SUGGEST SUBJECTS (MAX 3) - GHOST CHIPS
-  // ----------------------------------------------------------
-  const suggestedGhostSubjects = useMemo(() => {
-    let q = formData.qualification;
-    if (!q) return [];
+  const handleFindMe = () => {
+    if (!navigator.geolocation) return;
 
-    let suggestions = qualificationSuggestions[q] || [];
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setLocationBlocked(false);
+      },
+      () => setMessage("⚠️ Unable to fetch location. Please allow location access.")
+    );
+  };
 
-    if (selectedHigherSubject && engineeringMapping[selectedHigherSubject]) {
-      suggestions = engineeringMapping[selectedHigherSubject];
-    }
-
-    suggestions = suggestions.filter((s) => !majorSubjects.includes(s));
-
-    return suggestions.slice(0, 3);
-  }, [formData.qualification, selectedHigherSubject, majorSubjects]);
-
-  // ----------------------------------------------------------
-  // FILTER AVAILABLE MAJOR SUBJECT OPTIONS
-  // ----------------------------------------------------------
-  const filteredMajorSubjects = useMemo(() => {
-    if (selectedHigherSubject && engineeringMapping[selectedHigherSubject]) {
-      return engineeringMapping[selectedHigherSubject];
-    }
-
-    let base = subjectsList;
-    if (qualificationSuggestions[formData.qualification]) {
-      base = [...qualificationSuggestions[formData.qualification], ...subjectsList];
-    }
-
-    const unique = [...new Set(base)];
-    return unique.filter((s) => s !== selectedHigherSubject);
-  }, [formData.qualification, selectedHigherSubject]);
-
-  // ----------------------------------------------------------
-  // FORM SUBMIT
-  // ----------------------------------------------------------
+  // ------------------- Form Submit -------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
@@ -260,14 +174,22 @@ export default function TutorRegistration() {
     setLoading(true);
 
     try {
-      const token = await new Promise((resolve) => {
-        window.grecaptcha?.enterprise?.ready(() => {
+      if (!window.grecaptcha?.enterprise)
+        throw new Error("reCAPTCHA not loaded");
+
+      // Execute reCAPTCHA for 'tutor_register' action
+      const token = await new Promise((resolve, reject) => {
+        window.grecaptcha.enterprise.ready(() => {
           window.grecaptcha.enterprise
             .execute(RECAPTCHA_SITE_KEY, { action: "tutor_register" })
-            .then(resolve);
+            .then(resolve)
+            .catch(reject);
         });
       });
 
+      if (!token) throw new Error("Failed to get verification token");
+
+      // Prepare FormData
       const submissionData = new FormData();
       const subjectToSend = selectedHigherSubject || "";
       const majorSubjectsToSend = majorSubjects.join(",");
@@ -307,16 +229,13 @@ export default function TutorRegistration() {
         setMessage("⚠️ Failed to submit. Try again.");
       }
     } catch (err) {
-      console.error(err);
+      console.error("Error submitting form:", err);
       setMessage("❌ Error submitting form. Server might be down.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
-  // ----------------------------------------------------------
-  // RENDER
-  // ----------------------------------------------------------
   return (
     <Box sx={{ bgcolor: "#f9f9f9", minHeight: "100vh", py: 6 }}>
       <Box
@@ -350,12 +269,13 @@ export default function TutorRegistration() {
             </Typography>
 
             <Box component="form" onSubmit={handleSubmit}>
-              {/* IMAGE UPLOAD */}
+              {/* Upload Image */}
               <Box textAlign="center" mb={2}>
                 <Button
                   variant="contained"
                   component="label"
                   color={imageError ? "error" : "primary"}
+                  sx={{ mb: 1 }}
                 >
                   Upload Profile Picture
                   <input
@@ -369,12 +289,12 @@ export default function TutorRegistration() {
                 {formData.image && (
                   <Avatar
                     src={URL.createObjectURL(formData.image)}
+                    alt="Preview"
                     sx={{ width: 100, height: 100, mx: "auto", mt: 2 }}
                   />
                 )}
               </Box>
 
-              {/* NAME */}
               <TextField
                 label="Full Name"
                 name="name"
@@ -385,25 +305,32 @@ export default function TutorRegistration() {
                 margin="normal"
               />
 
-              {/* QUALIFICATION */}
+              {/* Qualification */}
               <Autocomplete
                 options={qualificationsList}
                 value={formData.qualification || null}
-                onChange={(e, v) => setFormData((p) => ({ ...p, qualification: v || "" }))}
+                onChange={(e, newValue) =>
+                  setFormData((p) => ({ ...p, qualification: newValue || "" }))
+                }
                 renderInput={(params) => (
-                  <TextField {...params} label="Qualification" margin="normal" fullWidth required />
+                  <TextField
+                    {...params}
+                    label="Qualification"
+                    margin="normal"
+                    required
+                    fullWidth
+                  />
                 )}
               />
 
-              {/* HIGHER QUALIFICATION SUBJECT */}
+              {/* Higher Education Subject */}
               {higherEducation.includes(formData.qualification) && (
                 <Autocomplete
-                  options={Object.keys(engineeringMapping).concat(subjectsList)}
+                  options={subjectsList}
                   value={selectedHigherSubject || null}
-                  onChange={(e, val) => {
-                    setSelectedHigherSubject(val || "");
-                    setFormData((p) => ({ ...p, subject: val || "" }));
-                    setMajorSubjects([]);
+                  onChange={(e, newValue) => {
+                    setSelectedHigherSubject(newValue || "");
+                    setFormData((p) => ({ ...p, subject: newValue || "" }));
                   }}
                   renderInput={(params) => (
                     <TextField
@@ -411,52 +338,58 @@ export default function TutorRegistration() {
                       label="Higher Qualification Subject"
                       margin="normal"
                       fullWidth
-                      required
                     />
                   )}
                 />
               )}
 
-              {/* MAJOR SUBJECTS WITH GHOST CHIPS */}
+              {/* Major Subjects */}
               <Autocomplete
                 multiple
-                options={filteredMajorSubjects}
+                options={subjectsList}
                 value={majorSubjects}
                 onChange={(e, newValue) => {
-                  if (newValue.length <= 5) setMajorSubjects(newValue);
+                  if (newValue.length > 5) return;
+                  setMajorSubjects(newValue);
                 }}
-                renderTags={(value, getTagProps) => {
-                  if (value.length === 0 && suggestedGhostSubjects.length > 0) {
-                    return suggestedGhostSubjects.map((s, i) => (
-                      <Chip key={i} label={s} variant="outlined" sx={{ opacity: 0.5 }} />
-                    ));
-                  }
-                  return value.map((option, index) => (
-                    <Chip {...getTagProps({ index })} label={option} color="primary" />
-                  ));
-                }}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip
+                      label={option}
+                      {...getTagProps({ index })}
+                      color="primary"
+                      variant="outlined"
+                    />
+                  ))
+                }
                 renderInput={(params) => (
-                  <TextField {...params} label="Select Major Subjects (Max 5)" margin="normal" fullWidth />
+                  <TextField
+                    {...params}
+                    label="Select Major Subjects (Max 5)"
+                    margin="normal"
+                    fullWidth
+                  />
                 )}
                 disableCloseOnSelect
               />
 
-              {/* EXPERIENCE */}
               <TextField
                 label="Experience (Years)"
                 name="experience"
                 type="number"
                 inputProps={{ min: 0, max: 40 }}
                 value={formData.experience}
-                onChange={(e) =>
-                  setFormData({ ...formData, experience: Math.min(40, Math.max(0, Number(e.target.value))) })
-                }
+                onChange={(e) => {
+                  let val = Number(e.target.value);
+                  if (val < 0) val = 0;
+                  if (val > 40) val = 40;
+                  setFormData({ ...formData, experience: val });
+                }}
                 required
                 fullWidth
                 margin="normal"
               />
 
-              {/* PHONE */}
               <TextField
                 label="Contact Number"
                 name="phone"
@@ -467,7 +400,6 @@ export default function TutorRegistration() {
                 margin="normal"
               />
 
-              {/* BIO */}
               <TextField
                 name="bio"
                 label="Tutor Bio"
@@ -480,39 +412,69 @@ export default function TutorRegistration() {
                 placeholder="Describe your teaching experience"
               />
 
-              {/* LOCATION */}
+              {/* Location */}
               {locationBlocked && (
                 <Box textAlign="center" mb={2}>
                   <Button
                     variant="outlined"
                     color="secondary"
-                    onClick={() => window.location.reload()}
+                    onClick={handleFindMe}
                   >
-                    📍 Enable Location
+                    📍 Find My Location
                   </Button>
                 </Box>
               )}
 
-              {/* TERMS */}
+              {/* Terms */}
               <FormControlLabel
-                control={<Checkbox checked={formData.agree} onChange={handleChange} name="agree" color="success" />}
+                control={
+                  <Checkbox
+                    checked={formData.agree}
+                    onChange={handleChange}
+                    name="agree"
+                    color="success"
+                  />
+                }
                 label={
                   <Typography variant="body2">
                     I agree to the{" "}
-                    <MuiLink href="/terms" target="_blank">Terms</MuiLink> and{" "}
-                    <MuiLink href="/privacy" target="_blank">Privacy Policy</MuiLink>.
+                    <MuiLink href="/terms" target="_blank">
+                      Terms
+                    </MuiLink>{" "}
+                    and{" "}
+                    <MuiLink href="/privacy" target="_blank">
+                      Privacy Policy
+                    </MuiLink>
+                    .
                   </Typography>
                 }
               />
 
-              {/* SUBMIT */}
-              <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }} disabled={loading}>
-                {loading ? <CircularProgress size={24} /> : "Submit Registration"}
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                fullWidth
+                sx={{ mt: 2 }}
+                disabled={loading}
+              >
+                {loading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  "Submit Registration"
+                )}
               </Button>
 
               {message && (
                 <Alert
-                  severity={message.includes("success") ? "success" : message.startsWith("❌") ? "error" : "info"}
+                  severity={
+                    message.includes("success")
+                      ? "success"
+                      : message.startsWith("❌")
+                      ? "error"
+                      : "info"
+                  }
                   sx={{ mt: 3, textAlign: "center" }}
                 >
                   {message}
