@@ -32,86 +32,65 @@ const qualificationsList = [
   "Associate Degree (2-year)",
   "BA / BSc",
   "BS",
+  "BE",
   "MSc",
   "MA",
   "MS / MPhil",
+  "ME",
   "PhD",
 ];
 
-const higherEducation = ["BS", "MSc", "MA", "MS / MPhil", "PhD"];
+const higherEducation = ["BS", "BE", "MSc", "MA", "ME", "MS / MPhil", "PhD"];
+
+// ----------------------------------------------------------
+// FIELD → RELEVANT SUBJECTS
+// ----------------------------------------------------------
+const fieldSubjects = {
+  Mathematics: ["Mathematics", "Algebra", "Calculus", "Geometry", "Trigonometry", "Statistics", "Discrete Mathematics", "Linear Algebra"],
+  Physics: ["Physics", "Mechanics", "Thermodynamics", "Optics", "Electromagnetism", "Waves", "Quantum Mechanics", "Mathematics"],
+  Chemistry: ["Chemistry", "Organic Chemistry", "Inorganic Chemistry", "Physical Chemistry", "Analytical Chemistry", "Biochemistry", "Environmental Chemistry", "Laboratory Techniques"],
+  Biology: ["Biology", "Botany", "Zoology", "Genetics", "Anatomy", "Physiology", "Microbiology", "Biochemistry"],
+  "Computer Science / IT": ["Computer Science / IT", "Programming", "Data Structures", "Algorithms", "Databases", "Networking", "Operating Systems", "Software Engineering"],
+  "Software Engineering": ["Software Engineering", "Programming", "Software Development", "Testing", "Databases", "Algorithms", "Computer Science / IT", "Project Management"],
+  "Artificial Intelligence / AI": ["Artificial Intelligence / AI", "Machine Learning", "Deep Learning", "Python", "Data Science", "Mathematics", "Robotics", "Computer Vision"],
+  Robotics: ["Robotics", "Electronics", "Mechanical Engineering", "Computer Science / IT", "Artificial Intelligence / AI", "Control Systems", "Programming", "Sensors"],
+  "Chemical Engineering": ["Chemistry", "Biology", "Chemical Engineering", "Process Engineering", "Thermodynamics", "Materials Science", "Fluid Mechanics", "Organic Chemistry"],
+  Metallurgy: ["Chemistry", "Biology", "Chemical Engineering", "Process Engineering", "Materials Science", "Mechanical Engineering", "Thermodynamics", "Physics"],
+  Materials: ["Materials", "Physics", "Chemistry", "Mechanical Engineering", "Nanotechnology", "Metallurgy", "Material Science", "Engineering Drawing"],
+  Economics: ["Economics", "Mathematics", "Accounting", "Finance", "Business Studies", "Statistics", "Political Science / Civics", "Sociology"],
+  Finance: ["Finance", "Accounting", "Economics", "Mathematics", "Statistics", "Business Studies", "Investment", "Banking"],
+  Accounting: ["Accounting", "Finance", "Economics", "Mathematics", "Business Studies", "Taxation", "Auditing", "Statistics"],
+  "Business Studies": ["Business Studies", "Economics", "Accounting", "Finance", "Marketing", "Management", "Statistics", "Entrepreneurship"],
+  Marketing: ["Marketing", "Business Studies", "Economics", "Public Relations", "Advertising", "Psychology", "Sales Management", "Statistics"],
+  "English Language": ["English Language", "English Literature", "Communication Skills", "Grammar", "Writing Skills", "Public Speaking", "Linguistics", "Creative Writing"],
+  "English Literature": ["English Literature", "English Language", "World Literature", "Poetry", "Creative Writing", "Drama / Theater", "History", "Philosophy"],
+  Urdu: ["Urdu", "Pakistani Literature", "Poetry", "Grammar", "Creative Writing", "Communication Skills", "History", "Philosophy"],
+  Arabic: ["Arabic", "Islamic Studies / Islamiat", "Grammar", "Communication Skills", "Linguistics", "Translation", "History", "Culture"],
+  French: ["French", "Grammar", "Communication Skills", "Literature", "Culture", "Translation", "Writing Skills", "Reading Comprehension"],
+  German: ["German", "Grammar", "Communication Skills", "Literature", "Culture", "Translation", "Writing Skills", "Reading Comprehension"],
+  Psychology: ["Psychology", "Biology", "Sociology", "Behavioral Science", "Neuroscience", "Statistics", "Human Development", "Counseling"],
+  Sociology: ["Sociology", "Psychology", "History", "Political Science / Civics", "Economics", "Anthropology", "Research Methods", "Culture Studies"],
+  History: ["History", "Political Science / Civics", "Sociology", "Geography", "Culture Studies", "World History", "Archaeology", "Religion Studies"],
+  Geography: ["Geography", "Environmental Science", "History", "Cartography", "Urban Planning", "GIS", "Meteorology", "Geology"],
+  "Political Science / Civics": ["Political Science / Civics", "History", "Economics", "Law", "Sociology", "International Relations", "Public Administration", "Philosophy"],
+  Philosophy: ["Philosophy", "Ethics", "Logic", "History", "Psychology", "Political Science / Civics", "Sociology", "Religion Studies"],
+  "Islamic Studies / Islamiat": ["Islamic Studies / Islamiat", "Arabic", "History", "Philosophy", "Quran Studies", "Hadith Studies", "Religion", "Culture"],
+  "Pakistan Studies": ["Pakistan Studies", "History", "Geography", "Political Science / Civics", "Economics", "Culture", "Current Affairs", "Sociology"],
+  "Art & Design": ["Art & Design", "Painting", "Drawing", "Photography", "Fashion Design", "Sculpture", "Graphic Design", "Interior Design"],
+  Music: ["Music", "Music Theory", "Vocal Training", "Instrumental", "Composition", "Performance", "Sound Engineering", "History of Music"],
+  "Drama / Theater": ["Drama / Theater", "Acting", "Stagecraft", "Directing", "Scriptwriting", "History of Theater", "Public Speaking", "Music"],
+  Photography: ["Photography", "Art & Design", "Digital Imaging", "Camera Techniques", "Photo Editing", "Lighting", "Composition", "Graphic Design"],
+  "Fashion Design": ["Fashion Design", "Art & Design", "Textiles", "Drawing", "Photography", "Marketing", "Business Studies", "Creative Design"],
+  "Food & Nutrition": ["Food & Nutrition", "Biology", "Chemistry", "Health Science", "Home Economics", "Dietetics", "Public Health", "Cooking Techniques"],
+  "Home Economics": ["Home Economics", "Food & Nutrition", "Textiles", "Fashion Design", "Health Science", "Budgeting", "Child Development", "Household Management"],
+  "Mass Communication": ["Mass Communication", "Media Studies", "Public Relations", "Journalism", "Writing Skills", "Communication Skills", "Advertising", "Broadcasting"],
+  "Public Relations": ["Public Relations", "Marketing", "Mass Communication", "Communication Skills", "Media Studies", "Business Studies", "Psychology", "Event Management"]
+};
 
 // ----------------------------------------------------------
 // SUBJECTS MASTER LIST
 // ----------------------------------------------------------
-const subjectsList = [
-  "Mathematics",
-  "Physics",
-  "Chemistry",
-  "Biology",
-  "Computer Science / IT",
-  "Software Engineering",
-  "Artificial Intelligence / AI",
-  "Robotics",
-  "Economics",
-  "Nursing",
-  "Accounting",
-  "Mass Communication",
-  "Electronics",
-  "Finance",
-  "Business Studies",
-  "Marketing",
-  "English Language",
-  "English Literature",
-  "Urdu",
-  "Arabic",
-  "French",
-  "German",
-  "Psychology",
-  "Sociology",
-  "History",
-  "Geography",
-  "Political Science / Civics",
-  "Philosophy",
-  "Islamic Studies / Islamiat",
-  "Pakistan Studies",
-  "Art & Design",
-  "Music",
-  "Drama / Theater",
-  "Food & Nutrition",
-  "Home Economics",
-  "Fashion Design",
-  "Photography",
-  "Public Relations",
-];
-
-// ----------------------------------------------------------
-// BROAD ENGINEERING MAPPING (Option B)
-// ----------------------------------------------------------
-const engineeringMapping = {
-  "Software Engineering": [
-    "Software Engineering",
-    "Computer Science / IT",
-    "Artificial Intelligence / AI",
-    "Robotics",
-    "Mathematics",
-  ],
-  "Mechanical Engineering": [
-    "Physics",
-    "Mathematics",
-    "Mechanical Engineering",
-    "Thermodynamics",
-    "Fluid Mechanics",
-  ],
-  "Electrical Engineering": [
-    "Electronics",
-    "Physics",
-    "Mathematics",
-    "Electrical Engineering",
-    "Circuits",
-  ],
-  "Civil Engineering": ["Civil Engineering", "Mathematics", "Physics", "Materials"],
-  "Chemical Engineering": ["Chemistry", "Biology", "Chemical Engineering", "Process Engineering"],
-};
+const subjectsList = Object.keys(fieldSubjects);
 
 // ----------------------------------------------------------
 // QUALIFICATION → SUGGESTED SUBJECTS
@@ -196,7 +175,6 @@ export default function TutorRegistration() {
   // ----------------------------------------------------------
   const handleChange = (e) => {
     const { name, value, files, checked, type } = e.target;
-
     if (files) {
       setFormData((p) => ({ ...p, image: files[0] }));
       setImageError(false);
@@ -213,33 +191,26 @@ export default function TutorRegistration() {
   const suggestedGhostSubjects = useMemo(() => {
     let q = formData.qualification;
     if (!q) return [];
-
     let suggestions = qualificationSuggestions[q] || [];
-
-    if (selectedHigherSubject && engineeringMapping[selectedHigherSubject]) {
-      suggestions = engineeringMapping[selectedHigherSubject];
+    if (selectedHigherSubject && fieldSubjects[selectedHigherSubject]) {
+      suggestions = [...suggestions, ...fieldSubjects[selectedHigherSubject]];
     }
-
     suggestions = suggestions.filter((s) => !majorSubjects.includes(s));
-
-    return suggestions.slice(0, 3);
+    return [...new Set(suggestions)].slice(0, 3);
   }, [formData.qualification, selectedHigherSubject, majorSubjects]);
 
   // ----------------------------------------------------------
   // FILTER AVAILABLE MAJOR SUBJECT OPTIONS
   // ----------------------------------------------------------
   const filteredMajorSubjects = useMemo(() => {
-    if (selectedHigherSubject && engineeringMapping[selectedHigherSubject]) {
-      return engineeringMapping[selectedHigherSubject];
+    if (selectedHigherSubject && fieldSubjects[selectedHigherSubject]) {
+      return [...fieldSubjects[selectedHigherSubject]];
     }
-
     let base = subjectsList;
     if (qualificationSuggestions[formData.qualification]) {
       base = [...qualificationSuggestions[formData.qualification], ...subjectsList];
     }
-
-    const unique = [...new Set(base)];
-    return unique.filter((s) => s !== selectedHigherSubject);
+    return [...new Set(base)].filter((s) => s !== selectedHigherSubject);
   }, [formData.qualification, selectedHigherSubject]);
 
   // ----------------------------------------------------------
@@ -269,16 +240,11 @@ export default function TutorRegistration() {
       });
 
       const submissionData = new FormData();
-      const subjectToSend = selectedHigherSubject || "";
-      const majorSubjectsToSend = majorSubjects.join(",");
-
-      const dataToSend = {
-        ...formData,
-        subject: subjectToSend,
-        major_subjects: majorSubjectsToSend,
-      };
-
-      Object.entries(dataToSend).forEach(([k, v]) => submissionData.append(k, v ?? ""));
+      submissionData.append("subject", selectedHigherSubject || "");
+      submissionData.append("major_subjects", majorSubjects.join(","));
+      Object.entries(formData).forEach(([k, v]) => {
+        if (k !== "image") submissionData.append(k, v ?? "");
+      });
       submissionData.append("image", formData.image);
       submissionData.append("lat", coords.lat ?? "");
       submissionData.append("lng", coords.lng ?? "");
@@ -310,7 +276,6 @@ export default function TutorRegistration() {
       console.error(err);
       setMessage("❌ Error submitting form. Server might be down.");
     }
-
     setLoading(false);
   };
 
@@ -339,81 +304,44 @@ export default function TutorRegistration() {
       <Grid container justifyContent="center">
         <Grid item xs={12} md={6}>
           <Paper elevation={4} sx={{ p: 4, borderRadius: 3 }}>
-            <Typography
-              variant="h5"
-              color="#0d6efd"
-              fontWeight={700}
-              textAlign="center"
-              mb={3}
-            >
+            <Typography variant="h5" color="#0d6efd" fontWeight={700} textAlign="center" mb={3}>
               Register as Tutor
             </Typography>
 
             <Box component="form" onSubmit={handleSubmit}>
               {/* IMAGE UPLOAD */}
               <Box textAlign="center" mb={2}>
-                <Button
-                  variant="contained"
-                  component="label"
-                  color={imageError ? "error" : "primary"}
-                >
+                <Button variant="contained" component="label" color={imageError ? "error" : "primary"}>
                   Upload Profile Picture
-                  <input
-                    type="file"
-                    hidden
-                    accept="image/*"
-                    name="image"
-                    onChange={handleChange}
-                  />
+                  <input type="file" hidden accept="image/*" name="image" onChange={handleChange} />
                 </Button>
                 {formData.image && (
-                  <Avatar
-                    src={URL.createObjectURL(formData.image)}
-                    sx={{ width: 100, height: 100, mx: "auto", mt: 2 }}
-                  />
+                  <Avatar src={URL.createObjectURL(formData.image)} sx={{ width: 100, height: 100, mx: "auto", mt: 2 }} />
                 )}
               </Box>
 
               {/* NAME */}
-              <TextField
-                label="Full Name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                fullWidth
-                margin="normal"
-              />
+              <TextField label="Full Name" name="name" value={formData.name} onChange={handleChange} required fullWidth margin="normal" />
 
               {/* QUALIFICATION */}
               <Autocomplete
                 options={qualificationsList}
                 value={formData.qualification || null}
                 onChange={(e, v) => setFormData((p) => ({ ...p, qualification: v || "" }))}
-                renderInput={(params) => (
-                  <TextField {...params} label="Qualification" margin="normal" fullWidth required />
-                )}
+                renderInput={(params) => <TextField {...params} label="Qualification" margin="normal" fullWidth required />}
               />
 
               {/* HIGHER QUALIFICATION SUBJECT */}
               {higherEducation.includes(formData.qualification) && (
                 <Autocomplete
-                  options={Object.keys(engineeringMapping).concat(subjectsList)}
+                  options={subjectsList} // all relevant subjects
                   value={selectedHigherSubject || null}
                   onChange={(e, val) => {
                     setSelectedHigherSubject(val || "");
                     setFormData((p) => ({ ...p, subject: val || "" }));
                     setMajorSubjects([]);
                   }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Higher Qualification Subject"
-                      margin="normal"
-                      fullWidth
-                      required
-                    />
-                  )}
+                  renderInput={(params) => <TextField {...params} label="Higher Qualification Subject" margin="normal" fullWidth required />}
                 />
               )}
 
@@ -422,22 +350,15 @@ export default function TutorRegistration() {
                 multiple
                 options={filteredMajorSubjects}
                 value={majorSubjects}
-                onChange={(e, newValue) => {
-                  if (newValue.length <= 5) setMajorSubjects(newValue);
-                }}
+                onChange={(e, newValue) => newValue.length <= 5 && setMajorSubjects(newValue)}
                 renderTags={(value, getTagProps) => {
-                  if (value.length === 0 && suggestedGhostSubjects.length > 0) {
+                  if (!value.length && suggestedGhostSubjects.length)
                     return suggestedGhostSubjects.map((s, i) => (
                       <Chip key={i} label={s} variant="outlined" sx={{ opacity: 0.5 }} />
                     ));
-                  }
-                  return value.map((option, index) => (
-                    <Chip {...getTagProps({ index })} label={option} color="primary" />
-                  ));
+                  return value.map((option, index) => <Chip {...getTagProps({ index })} label={option} color="primary" />);
                 }}
-                renderInput={(params) => (
-                  <TextField {...params} label="Select Major Subjects (Max 5)" margin="normal" fullWidth />
-                )}
+                renderInput={(params) => <TextField {...params} label="Select Major Subjects (Max 5)" margin="normal" fullWidth />}
                 disableCloseOnSelect
               />
 
@@ -448,24 +369,14 @@ export default function TutorRegistration() {
                 type="number"
                 inputProps={{ min: 0, max: 40 }}
                 value={formData.experience}
-                onChange={(e) =>
-                  setFormData({ ...formData, experience: Math.min(40, Math.max(0, Number(e.target.value))) })
-                }
+                onChange={(e) => setFormData({ ...formData, experience: Math.min(40, Math.max(0, Number(e.target.value))) })}
                 required
                 fullWidth
                 margin="normal"
               />
 
               {/* PHONE */}
-              <TextField
-                label="Contact Number"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                required
-                fullWidth
-                margin="normal"
-              />
+              <TextField label="Contact Number" name="phone" value={formData.phone} onChange={handleChange} required fullWidth margin="normal" />
 
               {/* BIO */}
               <TextField
@@ -483,11 +394,7 @@ export default function TutorRegistration() {
               {/* LOCATION */}
               {locationBlocked && (
                 <Box textAlign="center" mb={2}>
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={() => window.location.reload()}
-                  >
+                  <Button variant="outlined" color="secondary" onClick={() => window.location.reload()}>
                     📍 Enable Location
                   </Button>
                 </Box>
@@ -498,9 +405,7 @@ export default function TutorRegistration() {
                 control={<Checkbox checked={formData.agree} onChange={handleChange} name="agree" color="success" />}
                 label={
                   <Typography variant="body2">
-                    I agree to the{" "}
-                    <MuiLink href="/terms" target="_blank">Terms</MuiLink> and{" "}
-                    <MuiLink href="/privacy" target="_blank">Privacy Policy</MuiLink>.
+                    I agree to the <MuiLink href="/terms" target="_blank">Terms</MuiLink> and <MuiLink href="/privacy" target="_blank">Privacy Policy</MuiLink>.
                   </Typography>
                 }
               />
@@ -511,10 +416,7 @@ export default function TutorRegistration() {
               </Button>
 
               {message && (
-                <Alert
-                  severity={message.includes("success") ? "success" : message.startsWith("❌") ? "error" : "info"}
-                  sx={{ mt: 3, textAlign: "center" }}
-                >
+                <Alert severity={message.includes("success") ? "success" : message.startsWith("❌") ? "error" : "info"} sx={{ mt: 3, textAlign: "center" }}>
                   {message}
                 </Alert>
               )}
