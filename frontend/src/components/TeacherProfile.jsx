@@ -12,7 +12,8 @@ import {
   Container,
   Alert,
 } from "@mui/material";
-import { CheckCircle } from "@mui/icons-material";
+import { CheckCircle, Star } from "@mui/icons-material";
+import axios from "axios";
 
 const TeacherProfile = () => {
   const { id } = useParams();
@@ -21,21 +22,47 @@ const TeacherProfile = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const cached = localStorage.getItem("aplus_tutors_cache");
-    if (cached) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    const fetchTeacher = async () => {
       try {
-        const data = JSON.parse(cached).data;
-        const found = data.find((t) => Number(t.id) === Number(id));
-        if (found) setTeacher(found);
-        else setError("Teacher not found.");
+        setLoading(true);
+        const res = await axios.get("https://aplus-academy.onrender.com/tutors/");
+        if (Array.isArray(res.data)) {
+          const mapped = res.data.map((t, i) => ({
+            id: i,
+            name: t["Name"] || "Unknown",
+            subjects: Array.isArray(t["Subjects"]) ? t["Subjects"] : [],
+            qualification: t["Qualification"] || "",
+            experience: t["Experience"] || "",
+            city: t["District"] ? String(t["District"]) : "",
+            bio: t["Bio"] || "",
+            price: t["Price"] || "Rs 2000",
+            thumbnail: t["Thumbnail"] || "",
+            lat: isNaN(parseFloat(t["Latitude"])) ? 31.5204 : parseFloat(t["Latitude"]),
+            lng: isNaN(parseFloat(t["Longitude"])) ? 74.3587 : parseFloat(t["Longitude"]),
+            verified: t["Verified"]?.trim(),
+            featured: t["Featured"]?.trim(),
+            Area1: t["Area1"] || "",
+            Area2: t["Area2"] || "",
+            Area3: t["Area3"] || "",
+            rating: t["Rating"] || 5,
+          }));
+          const found = mapped.find((t) => Number(t.id) === Number(id));
+          if (found) setTeacher(found);
+          else setError("Teacher not found.");
+        } else {
+          setError("No teacher data available.");
+        }
       } catch (err) {
-        console.error("Error parsing cache:", err);
+        console.error(err);
         setError("Failed to load teacher profile.");
+      } finally {
+        setLoading(false);
       }
-    } else {
-      setError("No cached data available.");
-    }
-    setLoading(false);
+    };
+
+    fetchTeacher();
   }, [id]);
 
   if (loading)
@@ -59,70 +86,104 @@ const TeacherProfile = () => {
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
-      <Card sx={{ p: { xs: 2, md: 4 }, borderRadius: 3, boxShadow: 4 }}>
+      <Card
+        sx={{
+          p: { xs: 2, md: 4 },
+          borderRadius: 3,
+          boxShadow: 6,
+          border: "4px solid",
+          borderImage: "linear-gradient(45deg, #4facfe, #00f2fe) 1",
+          overflow: "hidden",
+        }}
+      >
         {/* Top Section */}
         <Grid container spacing={3} alignItems="center">
           <Grid item xs={12} sm={4} textAlign="center">
             <Avatar
-              src={teacher.imageUrl}
+              src={teacher.thumbnail}
               alt={teacher.name}
               sx={{
-                width: 120,
-                height: 120,
-                border: "4px solid #0d6efd",
+                width: 130,
+                height: 130,
+                border: "4px solid white",
                 mx: "auto",
+                boxShadow: "0 0 15px rgba(0,0,0,0.2)",
               }}
             />
-            {teacher.verified?.toLowerCase() === "yes" && (
-              <Chip
-                icon={<CheckCircle />}
-                label="Verified"
-                color="success"
-                size="small"
-                sx={{ mt: 2 }}
-              />
-            )}
+            <Box sx={{ mt: 2, display: "flex", justifyContent: "center", gap: 1, flexWrap: "wrap" }}>
+              {teacher.verified?.toLowerCase() === "yes" && (
+                <Chip
+                  icon={<CheckCircle />}
+                  label="Verified"
+                  color="success"
+                  size="small"
+                  sx={{ fontWeight: 600 }}
+                />
+              )}
+              {teacher.featured?.toLowerCase() === "yes" && (
+                <Chip
+                  label="Featured"
+                  color="primary"
+                  size="small"
+                  sx={{ fontWeight: 600 }}
+                />
+              )}
+              {teacher.rating && (
+                <Chip
+                  icon={<Star />}
+                  label={`${teacher.rating} ★`}
+                  color="warning"
+                  size="small"
+                  sx={{ fontWeight: 600 }}
+                />
+              )}
+            </Box>
           </Grid>
 
           <Grid item xs={12} sm={8}>
-            <Typography variant="h5" fontWeight={700} color="#0d6efd">
+            <Typography variant="h4" fontWeight={700} color="#004aad">
               {teacher.name}
             </Typography>
-            <Typography color="text.secondary">{teacher.qualification}</Typography>
-            <Typography color="text.secondary" sx={{ mb: 1 }}>
+            <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 0.5 }}>
+              {teacher.qualification}
+            </Typography>
+            <Typography variant="subtitle2" color="text.secondary">
               Experience: {teacher.experience} years
             </Typography>
-            <Typography color="text.secondary">{teacher.city}</Typography>
+            <Typography variant="subtitle2" color="text.secondary">
+              {teacher.city}
+            </Typography>
+            <Typography variant="h6" sx={{ mt: 1, color: "#29b554", fontWeight: 700 }}>
+              {teacher.price}/hr
+            </Typography>
           </Grid>
         </Grid>
 
         {/* Subjects */}
-        <Box sx={{ mt: 4 }}>
-          <Typography variant="subtitle1" fontWeight={700} color="#0d6efd" gutterBottom>
-            Subjects
-          </Typography>
-          <Grid container spacing={1}>
-            {teacher.subject
-              ?.split(",")
-              .map((s) => s.trim())
-              .filter(Boolean)
-              .map((sub, i) => (
+        {teacher.subjects?.length > 0 && (
+          <Box sx={{ mt: 4 }}>
+            <Typography variant="h6" fontWeight={700} color="#004aad" gutterBottom>
+              Subjects
+            </Typography>
+            <Grid container spacing={1}>
+              {teacher.subjects.map((sub, i) => (
                 <Grid item key={i}>
-                  <Chip label={sub} color="primary" variant="outlined" />
+                  <Chip label={sub} color="primary" variant="outlined" sx={{ fontWeight: 600 }} />
                 </Grid>
               ))}
-          </Grid>
-        </Box>
+            </Grid>
+          </Box>
+        )}
 
         {/* Preferred Areas */}
         <Box sx={{ mt: 3 }}>
-          <Typography variant="subtitle1" fontWeight={700} color="#0d6efd" gutterBottom>
+          <Typography variant="h6" fontWeight={700} color="#004aad" gutterBottom>
             Preferred Areas
           </Typography>
           {[teacher.Area1, teacher.Area2, teacher.Area3]
             .filter(Boolean)
             .map((area, i) => (
-              <Typography key={i} variant="body2" sx={{ mb: 0.5 }}>
+              <Typography key={i} variant="body1" sx={{ mb: 0.5 }}>
                 📍 {area}
               </Typography>
             ))}
@@ -131,10 +192,10 @@ const TeacherProfile = () => {
         {/* Bio */}
         {teacher.bio && (
           <Box sx={{ mt: 3 }}>
-            <Typography variant="subtitle1" fontWeight={700} color="#0d6efd" gutterBottom>
+            <Typography variant="h6" fontWeight={700} color="#004aad" gutterBottom>
               About
             </Typography>
-            <Typography variant="body2">{teacher.bio}</Typography>
+            <Typography variant="body1">{teacher.bio}</Typography>
           </Box>
         )}
 

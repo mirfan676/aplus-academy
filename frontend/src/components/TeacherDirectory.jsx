@@ -21,6 +21,7 @@ import { motion } from "framer-motion";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import TeacherCardLoader from "./TeacherCardLoader";
 
 const LazyMap = React.lazy(() => import("./LazyMapSection"));
 
@@ -45,7 +46,6 @@ const TeacherDirectory = () => {
     const fetchTutors = async () => {
       try {
         setLoading(true);
-
         const res = await axios.get("https://aplus-academy.onrender.com/tutors/");
         if (Array.isArray(res.data)) {
           const mapped = res.data.map((t, i) => ({
@@ -93,7 +93,7 @@ const TeacherDirectory = () => {
     return list;
   }, [selectedCity, selectedSubject, teachers, userLocation]);
 
-  const handleLoadMore = () => setVisibleCount((v) => v + 12); // load 12 more
+  const handleLoadMore = () => setVisibleCount((v) => v + 12);
 
   const [showMoreSubjects, setShowMoreSubjects] = useState({});
   const handleToggleSubjects = (id) => setShowMoreSubjects(prev => ({ ...prev, [id]: !prev[id] }));
@@ -149,110 +149,95 @@ const TeacherDirectory = () => {
         {error && <Alert severity="error">{error}</Alert>}
 
         {/* Cards */}
-        <Grid container spacing={3} sx={{ width: "100%", maxWidth: "xl" }} justifyContent="center">
-          {filtered.slice(0, visibleCount).map((t) => (
-            <Grid item key={t.id} xs={12} sm={6} md={4} sx={{ display: "flex" }}>
-              <motion.div
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-                style={{ flex: 1, display: "flex", flexDirection: "column" }}
-              >
-                <Card
-                  sx={{
-                    p: 0,
-                    borderRadius: "22px",
-                    display: "flex",
-                    flexDirection: "column",
-                    position: "relative",
-                    flex: 1,
-                    minHeight: 400,
-                    minWidth: 320,
-                    maxWidth: 320,
-                  }}
+        {loading ? (
+          <TeacherCardLoader count={visibleCount} />
+        ) : (
+          <Grid container spacing={3} sx={{ width: "100%", maxWidth: "xl" }} justifyContent="center">
+            {filtered.slice(0, visibleCount).map((t) => (
+              <Grid item key={t.id} xs={12} sm={6} md={4} sx={{ display: "flex" }}>
+                <motion.div
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
+                  style={{ flex: 1, display: "flex", flexDirection: "column" }}
                 >
-                  {/* Floating Badge */}
-                  <Box
+                  <Card
                     sx={{
-                      position: "absolute",
-                      top: 10,
-                      right: 10,
-                      background: "#00a6ff",
-                      color: "white",
-                      px: 2,
-                      py: 0.5,
-                      borderRadius: "16px",
-                      fontSize: "0.75rem",
-                      fontWeight: 700,
-                    }}
-                  >
-                    Featured
-                  </Box>
-
-                  {/* Top Section */}
-                  <Box
-                    sx={{
+                      p: 0,
+                      borderRadius: "22px",
                       display: "flex",
-                      p: 2,
-                      background: "rgba(0,80,200,0.25)",
-                      backdropFilter: "blur(12px)",
-                      borderTopLeftRadius: "22px",
-                      borderTopRightRadius: "22px",
-                      gap: 2,
+                      flexDirection: "column",
+                      position: "relative",
+                      flex: 1,
+                      minHeight: 400,
+                      minWidth: 320,
+                      maxWidth: 320,
                     }}
                   >
-                    <Avatar
-                      src={t.thumbnail} // <-- use secure thumbnail
-                      alt={t.name}
-                      sx={{ width: 70, height: 70, borderRadius: "14px" }}
-                    />
-                    <Box sx={{ textAlign: "left" }}>
-                      {t.verified?.toLowerCase() === "yes" && (
-                        <Typography
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 0.5,
-                            fontWeight: 700,
-                            maxWidth: 180,
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
-                          <CheckCircleIcon fontSize="small" color="success" />
-                          {t.name}
+                    {/* Floating Badge */}
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: 10,
+                        right: 10,
+                        background: "#00a6ff",
+                        color: "white",
+                        px: 2,
+                        py: 0.5,
+                        borderRadius: "16px",
+                        fontSize: "0.75rem",
+                        fontWeight: 700,
+                      }}
+                    >
+                      Featured
+                    </Box>
+
+                    {/* Top Section */}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        p: 2,
+                        background: "rgba(0,80,200,0.25)",
+                        backdropFilter: "blur(12px)",
+                        borderTopLeftRadius: "22px",
+                        borderTopRightRadius: "22px",
+                        gap: 2,
+                      }}
+                    >
+                      <Avatar src={t.thumbnail} alt={t.name} sx={{ width: 70, height: 70, borderRadius: "14px" }} />
+                      <Box sx={{ textAlign: "left" }}>
+                        {t.verified?.toLowerCase() === "yes" && (
+                          <Typography sx={{ display: "flex", alignItems: "center", gap: 0.5, fontWeight: 700, maxWidth: 180, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            <CheckCircleIcon fontSize="small" color="success" />
+                            {t.name}
+                          </Typography>
+                        )}
+                        <Typography sx={{ fontSize: "0.85rem", color: "#004aad", fontWeight: 700 }}>
+                          {t.qualification}
                         </Typography>
-                      )}
-                      <Typography sx={{ fontSize: "0.85rem", color: "#004aad", fontWeight: 700 }}>
-                        {t.qualification}
-                      </Typography>
-                      <Typography sx={{ fontSize: "0.8rem", color: "gold" }}>★★★★★</Typography>
-                      <Typography sx={{ fontSize: "0.75rem", color: "green" }}>{t.city}</Typography>
-                    </Box>
-                  </Box>
-
-                  {/* Middle Section */}
-                  <Box sx={{ p: 2, flexGrow: 1 }}>
-                    {/* Subjects */}
-                    <Typography sx={{ mt: 1, fontWeight: 700 }}>Subjects:</Typography>
-                    <Box sx={{ fontSize: "0.85rem", mt: 0.5 }}>
-                      {(showMoreSubjects[t.id] ? t.subjects : t.subjects.slice(0, 2)).map((subject, i) => (
-                        <Typography key={i} sx={{ lineHeight: 1.5 }}>{subject}</Typography>
-                      ))}
-                      {t.subjects.length > 2 && (
-                        <Button size="small" onClick={() => handleToggleSubjects(t.id)} sx={{ mt: 0.5, textTransform: "none", fontSize: "0.75rem" }}>
-                          {showMoreSubjects[t.id] ? "See less" : "See more"}
-                        </Button>
-                      )}
+                        <Typography sx={{ fontSize: "0.8rem", color: "gold" }}>★★★★★</Typography>
+                        <Typography sx={{ fontSize: "0.75rem", color: "green" }}>{t.city}</Typography>
+                      </Box>
                     </Box>
 
-                    {/* Bio */}
-                    <Typography sx={{ mt: 1, fontWeight: 700 }}>Bio:</Typography>
-                    <Box sx={{ fontSize: "0.85rem", mt: 0.5 }}>
-                      <Typography
-                        sx={{
+                    {/* Middle Section */}
+                    <Box sx={{ p: 2, flexGrow: 1 }}>
+                      <Typography sx={{ mt: 1, fontWeight: 700 }}>Subjects:</Typography>
+                      <Box sx={{ fontSize: "0.85rem", mt: 0.5 }}>
+                        {(showMoreSubjects[t.id] ? t.subjects : t.subjects.slice(0, 2)).map((subject, i) => (
+                          <Typography key={i} sx={{ lineHeight: 1.5 }}>{subject}</Typography>
+                        ))}
+                        {t.subjects.length > 2 && (
+                          <Button size="small" onClick={() => handleToggleSubjects(t.id)} sx={{ mt: 0.5, textTransform: "none", fontSize: "0.75rem" }}>
+                            {showMoreSubjects[t.id] ? "See less" : "See more"}
+                          </Button>
+                        )}
+                      </Box>
+
+                      <Typography sx={{ mt: 1, fontWeight: 700 }}>Bio:</Typography>
+                      <Box sx={{ fontSize: "0.85rem", mt: 0.5 }}>
+                        <Typography sx={{
                           lineHeight: 1.5,
                           display: "-webkit-box",
                           WebkitLineClamp: showMoreBio[t.id] ? "none" : 3,
@@ -260,37 +245,37 @@ const TeacherDirectory = () => {
                           overflow: "hidden",
                           wordBreak: "break-word",
                           width: "100%",
-                        }}
-                      >
-                        {showMoreBio[t.id] ? t.bio : t.bio.split(" ").slice(0, 40).join(" ")}
-                      </Typography>
-                      {t.bio.split(" ").length > 40 && (
-                        <Button size="small" onClick={() => handleToggleBio(t.id)} sx={{ mt: 0.5, textTransform: "none", fontSize: "0.75rem" }}>
-                          {showMoreBio[t.id] ? "See less" : "See more"}
-                        </Button>
-                      )}
+                        }}>
+                          {showMoreBio[t.id] ? t.bio : t.bio.split(" ").slice(0, 40).join(" ")}
+                        </Typography>
+                        {t.bio.split(" ").length > 40 && (
+                          <Button size="small" onClick={() => handleToggleBio(t.id)} sx={{ mt: 0.5, textTransform: "none", fontSize: "0.75rem" }}>
+                            {showMoreBio[t.id] ? "See less" : "See more"}
+                          </Button>
+                        )}
+                      </Box>
                     </Box>
-                  </Box>
 
-                  {/* Footer Price */}
-                  <Box sx={{ background: "rgba(0,200,100,0.25)", backdropFilter: "blur(8px)", textAlign: "center", py: 1, fontWeight: 700 }}>
-                    1500/hr
-                  </Box>
+                    {/* Footer Price */}
+                    <Box sx={{ background: "rgba(0,200,100,0.25)", backdropFilter: "blur(8px)", textAlign: "center", py: 1, fontWeight: 700 }}>
+                      1500/hr
+                    </Box>
 
-                  {/* Buttons */}
-                  <Box sx={{ p: 2, display: "flex", justifyContent: "space-between" }}>
-                    <Button component={Link} to={`/teacher/${t.id}`} variant="contained" sx={{ flex: 1, mr: 1 }}>
-                      View Profile
-                    </Button>
-                    <Button component={Link} to={`/hire/${t.id}`} variant="contained" sx={{ flex: 1, backgroundColor: "#29b554" }}>
-                      Hire Me
-                    </Button>
-                  </Box>
-                </Card>
-              </motion.div>
-            </Grid>
-          ))}
-        </Grid>
+                    {/* Buttons */}
+                    <Box sx={{ p: 2, display: "flex", justifyContent: "space-between" }}>
+                      <Button component={Link} to={`/teacher/${t.id}`} variant="contained" sx={{ flex: 1, mr: 1 }}>
+                        View Profile
+                      </Button>
+                      <Button component={Link} to={`/hire/${t.id}`} variant="contained" sx={{ flex: 1, backgroundColor: "#29b554" }}>
+                        Hire Me
+                      </Button>
+                    </Box>
+                  </Card>
+                </motion.div>
+              </Grid>
+            ))}
+          </Grid>
+        )}
 
         {!loading && visibleCount < filtered.length && (
           <Box sx={{ textAlign: "center", mt: 4 }}>
