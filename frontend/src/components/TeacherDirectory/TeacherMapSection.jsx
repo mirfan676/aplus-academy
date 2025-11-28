@@ -1,5 +1,6 @@
+// TeacherMapSection.jsx
 import React, { Suspense } from "react";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 
 const LazyMap = React.lazy(() => import("./LazyMapSection"));
 
@@ -8,23 +9,30 @@ export default function TeacherMapSection({
   setMapVisible,
   userLocation,
   filtered,
-  personIcon
+  personIcon,
 }) {
   return (
     <Box
       sx={{
-        height: { xs: 240, md: 340 },
+        height: { xs: 260, md: 360 },
         mb: 4,
         borderRadius: "22px",
         overflow: "hidden",
         background: "white",
-        boxShadow: "0px 4px 15px rgba(0,0,0,0.08)"
+        boxShadow: "0px 4px 15px rgba(0,0,0,0.08)",
       }}
     >
       {mapVisible ? (
         <Suspense
           fallback={
-            <Box sx={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Box
+              sx={{
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               <CircularProgress />
             </Box>
           }
@@ -37,7 +45,7 @@ export default function TeacherMapSection({
         </Suspense>
       ) : (
         <Box
-          onClick={() => setMapVisible(true)}
+          onMouseEnter={() => setMapVisible(true)}
           sx={{
             height: "100%",
             display: "flex",
@@ -47,10 +55,10 @@ export default function TeacherMapSection({
             background: "#e8f2ff",
             color: "#004aad",
             fontWeight: 600,
-            fontSize: "1.1rem"
+            fontSize: "1.05rem",
           }}
         >
-          Click to load map 🗺️
+          Hover to load map 🗺️
         </Box>
       )}
     </Box>

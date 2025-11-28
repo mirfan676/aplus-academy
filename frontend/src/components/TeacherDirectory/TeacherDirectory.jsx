@@ -1,3 +1,4 @@
+// TeacherDirectory.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { Container, Typography, Box, Button, Alert } from "@mui/material";
@@ -6,7 +7,23 @@ import TeacherList from "./TeacherList";
 import TeacherMapSection from "./TeacherMapSection";
 import { mapTutor, filterTeachers } from "./teacherUtils";
 import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
+// ------------------------------------------------------
+// FIX LEAFLET ICON ISSUE (must be placed here)
+// ------------------------------------------------------
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+});
+
+// Custom tutor icon
 const personIcon = new L.Icon({
   iconUrl: "https://cdn-icons-png.flaticon.com/512/1946/1946429.png",
   iconSize: [40, 40],
@@ -43,6 +60,7 @@ export default function TeacherDirectory() {
     () => [...new Set(teachers.flatMap((t) => t.subjects))],
     [teachers]
   );
+
   const cities = useMemo(
     () => [...new Set(teachers.map((t) => t.city).filter(Boolean))],
     [teachers]
