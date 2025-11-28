@@ -26,31 +26,47 @@ export default function TeacherDirectory() {
   const [userLocation, setUserLocation] = useState([31.5204, 74.3587]);
 
   useEffect(() => {
-    axios.get("https://aplus-academy.onrender.com/tutors/")
-      .then(res => setTeachers(res.data.map(mapTutor)))
+    axios
+      .get("https://aplus-academy.onrender.com/tutors/")
+      .then((res) => setTeachers(res.data.map(mapTutor)))
       .catch(() => setError("Unable to fetch data"))
       .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      pos => setUserLocation([pos.coords.latitude, pos.coords.longitude])
+    navigator.geolocation.getCurrentPosition((pos) =>
+      setUserLocation([pos.coords.latitude, pos.coords.longitude])
     );
   }, []);
 
-  const subjects = useMemo(() => [...new Set(teachers.flatMap(t => t.subjects))], [teachers]);
-  const cities = useMemo(() => [...new Set(teachers.map(t => t.city).filter(Boolean))], [teachers]);
+  const subjects = useMemo(
+    () => [...new Set(teachers.flatMap((t) => t.subjects))],
+    [teachers]
+  );
+  const cities = useMemo(
+    () => [...new Set(teachers.map((t) => t.city).filter(Boolean))],
+    [teachers]
+  );
 
-  const filtered = filterTeachers(teachers, selectedCity, selectedSubject, userLocation);
+  const filtered = filterTeachers(
+    teachers,
+    selectedCity,
+    selectedSubject,
+    userLocation
+  );
 
   const [showMoreBio, setShowMoreBio] = useState({});
   const [showMoreSubjects, setShowMoreSubjects] = useState({});
 
   return (
-    <Box sx={{ background: "#e8f2ff", py: 6 }}>
+    <Box sx={{ background: "#e8f2ff", py: 6, px: { xs: 2, md: 4 } }}>
       <Container maxWidth="lg">
-
-        <Typography variant="h4" align="center" fontWeight={700} sx={{ mb: 4 }}>
+        <Typography
+          variant="h4"
+          align="center"
+          fontWeight={700}
+          sx={{ mb: 4, color: "#004aad" }}
+        >
           Find Teachers Near You
         </Typography>
 
@@ -79,18 +95,25 @@ export default function TeacherDirectory() {
           visibleCount={visibleCount}
           showMoreBio={showMoreBio}
           showMoreSubjects={showMoreSubjects}
-          toggleBio={(id) => setShowMoreBio(prev => ({ ...prev, [id]: !prev[id] }))}
-          toggleSubjects={(id) => setShowMoreSubjects(prev => ({ ...prev, [id]: !prev[id] }))}
+          toggleBio={(id) =>
+            setShowMoreBio((prev) => ({ ...prev, [id]: !prev[id] }))
+          }
+          toggleSubjects={(id) =>
+            setShowMoreSubjects((prev) => ({ ...prev, [id]: !prev[id] }))
+          }
         />
 
         {!loading && visibleCount < filtered.length && (
           <Box sx={{ textAlign: "center", mt: 4 }}>
-            <Button variant="contained" onClick={() => setVisibleCount(v => v + 12)}>
+            <Button
+              variant="contained"
+              sx={{ background: "#004aad", fontWeight: 600 }}
+              onClick={() => setVisibleCount((v) => v + 12)}
+            >
               Load More
             </Button>
           </Box>
         )}
-
       </Container>
     </Box>
   );

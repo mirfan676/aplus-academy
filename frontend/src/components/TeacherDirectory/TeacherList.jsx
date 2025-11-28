@@ -9,9 +9,10 @@ export default function TeacherList({
   showMoreBio,
   toggleBio,
   showMoreSubjects,
-  toggleSubjects
+  toggleSubjects,
 }) {
-  if (loading) return <TeacherCardLoader count={visibleCount} />;
+  if (loading)
+    return <TeacherCardLoader count={visibleCount} />;
 
   return (
     <Grid container spacing={3} justifyContent="center">
