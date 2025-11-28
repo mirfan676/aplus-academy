@@ -9,7 +9,7 @@
     <!-- ✅ SEO Meta Tags -->
     <meta
       name="description"
-      content="A Plus Home Tutors connects students with expert tutors for O/A Levels, Quran, and all subjects — in Lahore, Karachi, Islamabad, and online."
+      content="A Plus Home Tutors connects students with expert tutors for O/A Levels, Quran, and all subjects — in Lahore, Karachi, Islamabad, Multan, and online."
     />
     <meta
       name="keywords"
@@ -23,7 +23,7 @@
     <meta property="og:title" content="A Plus Home Tutors — Trusted Home & Online Tuition in Pakistan" />
     <meta
       property="og:description"
-      content="Connect with expert tutors for O/A Levels, Quran, and all subjects — available in Lahore, Karachi, Islamabad, and online."
+      content="Connect with expert tutors for O/A Levels, Quran, and all subjects — available in Lahore, Karachi, Islamabad, Multan, and online."
     />
     <meta property="og:image" content="https://aplusacademy.pk/aplus-logo.png" />
     <meta property="og:image:width" content="1200" />
@@ -56,24 +56,174 @@
       gtag('config', 'G-P104YESY15');
     </script>
 
-    <!-- ✅ Structured Data (JSON-LD) -->
+    <!-- ✅ JSON-LD Structured Data -->
     <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "EducationalOrganization",
-        "name": "A Plus Home Tutors",
-        "url": "https://aplusacademy.pk",
-        "logo": "https://aplusacademy.pk/aplus-logo.png",
-        "sameAs": [
-          "https://www.facebook.com/aplusacademy",
-          "https://twitter.com/aplusacademy",
-          "https://www.instagram.com/aplusacademy"
-        ],
-        "description": "A Plus Home Tutors connects students with expert tutors for O/A Levels, Quran, and all subjects — in Lahore, Karachi, Islamabad, and online."
-      }
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "name": "A Plus Home Tutors",
+          "url": "https://aplusacademy.pk",
+          "logo": "https://aplusacademy.pk/aplus-logo.png",
+          "description": "A Plus Home Tutors is a trusted educational network dedicated to providing high-quality home and online tutoring across Pakistan.",
+          "sameAs": [
+            "https://www.facebook.com/aplushometutorspk/",
+            "https://x.com/aplus_pk",
+            "https://www.instagram.com/aplushometutorspk/"
+          ]
+        },
+        {
+          "@type": "Service",
+          "serviceType": "Home & Online Tutoring",
+          "provider": {
+            "@type": "Organization",
+            "name": "A Plus Home Tutors",
+            "url": "https://aplusacademy.pk"
+          },
+          "areaServed": {
+            "@type": "Country",
+            "name": "Pakistan"
+          },
+          "description": "Providing expert home and online tuition across Pakistan for O/A Levels, school subjects, and Quran education."
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What subjects do you offer tutoring for?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "We offer tutoring for all school subjects, O/A Levels, and Quran classes."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Do you provide online tutoring?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, we provide both home and online tutoring across Pakistan."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How can I hire a tutor?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "You can contact us via our website form, WhatsApp, or call to schedule a tutor."
+              }
+            }
+          ]
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://aplusacademy.pk"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Tutors",
+              "item": "https://aplusacademy.pk/tutors"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "O Levels",
+              "item": "https://aplusacademy.pk/tutors/o-levels"
+            }
+          ]
+        },
+        {
+          "@type": "LocalBusiness",
+          "name": "A Plus Home Tutors - Lahore",
+          "image": "https://aplusacademy.pk/aplus-logo.png",
+          "url": "https://aplusacademy.pk",
+          "telephone": "+92-300-0000000",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "House 729, Block R, Model Town",
+            "addressLocality": "Lahore",
+            "addressRegion": "Punjab",
+            "postalCode": "54000",
+            "addressCountry": "PK"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 31.5204,
+            "longitude": 74.3587
+          }
+        },
+        {
+          "@type": "LocalBusiness",
+          "name": "A Plus Home Tutors - Islamabad",
+          "image": "https://aplusacademy.pk/aplus-logo.png",
+          "url": "https://aplusacademy.pk",
+          "telephone": "+92-300-0000000",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "I-8 Markaz, Faizabad",
+            "addressLocality": "Islamabad",
+            "addressRegion": "ICT",
+            "postalCode": "44000",
+            "addressCountry": "PK"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 33.6844,
+            "longitude": 73.0479
+          }
+        },
+        {
+          "@type": "LocalBusiness",
+          "name": "A Plus Home Tutors - Karachi",
+          "image": "https://aplusacademy.pk/aplus-logo.png",
+          "url": "https://aplusacademy.pk",
+          "telephone": "+92-300-0000000",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Malir Cantonment",
+            "addressLocality": "Karachi",
+            "addressRegion": "Sindh",
+            "postalCode": "75000",
+            "addressCountry": "PK"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 24.8607,
+            "longitude": 67.0100
+          }
+        },
+        {
+          "@type": "LocalBusiness",
+          "name": "A Plus Home Tutors - Multan",
+          "image": "https://aplusacademy.pk/aplus-logo.png",
+          "url": "https://aplusacademy.pk",
+          "telephone": "+92-300-0000000",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "I Block, Shah Rukn E Alam Housing Scheme",
+            "addressLocality": "Multan",
+            "addressRegion": "Punjab",
+            "postalCode": "60000",
+            "addressCountry": "PK"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 30.1575,
+            "longitude": 71.5249
+          }
+        }
+      ]
+    }
     </script>
 
-    <!-- ✅ reCAPTCHA Enterprise: Load Script -->
+    <!-- ✅ reCAPTCHA Enterprise -->
     <script src="https://www.google.com/recaptcha/enterprise.js?render=6LfvTBYsAAAAAILUn8HJfciU9tcHly9e1IkE8WRr" async defer></script>
   </head>
 
