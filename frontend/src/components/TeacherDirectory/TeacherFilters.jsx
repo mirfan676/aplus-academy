@@ -51,7 +51,7 @@ export default function TeacherFilters({
             fullWidth
             sx={{
               width: {
-                xs: "100%",
+                xs: "120px",
                 sm: "80%",
                 md: "320px", // fixed width desktop
               },
@@ -93,7 +93,7 @@ export default function TeacherFilters({
             fullWidth
             sx={{
               width: {
-                xs: "260px",
+                xs: "120px",
                 sm: "80%",
                 md: "320px", // fixed width desktop
               },
