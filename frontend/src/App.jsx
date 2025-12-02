@@ -10,6 +10,7 @@ import CookieConsent from "./components/CookieConsent";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 
+
 import { ThemeProvider, CssBaseline, Container, Card, CardContent } from "@mui/material";
 import theme from "./theme";
 
@@ -70,6 +71,7 @@ function App() {
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/teacher/:id" element={<TeacherProfile />} />
           <Route path="/hire/:id" element={<HireForm />} />
+          <Route path="/jobs" element={<Jobs />} />
         </Routes>
 
         {/* Footer */}
