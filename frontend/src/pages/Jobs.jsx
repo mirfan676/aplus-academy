@@ -4,46 +4,88 @@ import JobCard from "../components/JobCard";
 
 const Jobs = () => {
   const [jobs, setJobs] = useState([]);
-  const [city, setCity] = useState("");
-  const [subject, setSubject] = useState("");
+  const [loading, setLoading] = useState(true);
 
+  const [cityFilter, setCityFilter] = useState("");
+  const [subjectFilter, setSubjectFilter] = useState("");
+
+  // -----------------------------
+  // Load Jobs From API
+  // -----------------------------
   useEffect(() => {
-    fetchJobs().then(setJobs);
+    fetchJobs()
+      .then((data) => {
+        setJobs(data);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  const filteredJobs = jobs.filter(job => {
+  // -----------------------------
+  // Generate City Filter Options
+  // -----------------------------
+  const cityOptions = Array.from(
+    new Set(
+      jobs
+        .map((j) => j.City || j.city || "")
+        .filter((city) => city && city.trim() !== "")
+    )
+  );
+
+  // -----------------------------
+  // Filter Jobs
+  // -----------------------------
+  const filteredJobs = jobs.filter((job) => {
+    const jobCity = (job.City || job.city || "").toLowerCase();
+    const jobSubjects = (job.Subjects || job.Subject || "").toLowerCase();
+
     return (
-      (city ? job.city?.toLowerCase().includes(city.toLowerCase()) : true) &&
-      (subject ? job.subjects?.toLowerCase().includes(subject.toLowerCase()) : true)
+      (cityFilter ? jobCity.includes(cityFilter.toLowerCase()) : true) &&
+      (subjectFilter
+        ? jobSubjects.includes(subjectFilter.toLowerCase())
+        : true)
     );
   });
 
   return (
-    <div className="container mx-auto py-6 px-4">
-      <h1 className="text-2xl font-bold mb-4">Latest Jobs</h1>
+    <div className="container mx-auto py-8 px-4">
+      <h1 className="text-3xl font-bold mb-4">Latest Home Tutor Jobs</h1>
 
-      {/* Filters */}
-      <div className="flex gap-3 mb-6">
-        <select value={city} onChange={e => setCity(e.target.value)}>
+      {/* ---------------- Filters ---------------- */}
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <select
+          className="border px-3 py-2 rounded"
+          value={cityFilter}
+          onChange={(e) => setCityFilter(e.target.value)}
+        >
           <option value="">Filter by City</option>
-          <option>Lahore</option>
-          <option>Islamabad</option>
-          <option>Karachi</option>
-          <option>Multan</option>
+          {cityOptions.map((city, index) => (
+            <option key={index} value={city}>
+              {city}
+            </option>
+          ))}
         </select>
 
         <input
+          className="border px-3 py-2 rounded"
           type="text"
-          placeholder="Filter by subject"
-          value={subject}
-          onChange={e => setSubject(e.target.value)}
+          placeholder="Filter by Subject"
+          value={subjectFilter}
+          onChange={(e) => setSubjectFilter(e.target.value)}
         />
       </div>
 
-      {/* Job Cards */}
-      <div className="grid gap-4 md:grid-cols-2">
-        {filteredJobs.map(job => (
-          <JobCard key={job.id} job={job} />
+      {/* ---------------- Loading State ---------------- */}
+      {loading && <p className="text-center text-lg">Loading jobs...</p>}
+
+      {/* ---------------- Empty State ---------------- */}
+      {!loading && filteredJobs.length === 0 && (
+        <p className="text-center text-gray-600">No jobs found.</p>
+      )}
+
+      {/* ---------------- Job Cards ---------------- */}
+      <div className="grid gap-5 md:grid-cols-2">
+        {filteredJobs.map((job, index) => (
+          <JobCard key={index} job={job} />
         ))}
       </div>
     </div>

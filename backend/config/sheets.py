@@ -78,3 +78,18 @@ def preload_tutors():
         print("⚠️ Preload failed:", e)
         # Raise exception so routes can handle it
         raise Exception(f"Failed to load tutors from sheet: {e}")
+    
+# ----------------------------
+# Load Jobs Sheet
+# ----------------------------
+def load_jobs_sheet():
+    """
+    Returns all job records from the Google Sheet named 'Jobs'
+    """
+    try:
+        jobs_sheet = gspread_client.open_by_key(SHEET_ID).worksheet("Jobs")
+        records = jobs_sheet.get_all_records(empty2zero=False, head=1)
+        return records
+    except Exception as e:
+        print("⚠️ Failed to load jobs sheet:", e)
+        raise Exception(f"Failed to load Jobs sheet: {e}")
