@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
+import Jobs from "./pages/Jobs";
 import TutorForm from "./components/TutorForm";
 import TeacherDirectory from "./components/TeacherDirectory";
 import AboutUs from "./pages/AboutUs";
