@@ -192,7 +192,7 @@ const Footer = () => {
             <Typography variant="body2" sx={{ opacity: 0.85 }}>
               📱 0306-6762289 | 0306-5555415  
               <br />
-              📧 aplushometutors.pk@gmail.com
+              📧 aplushometutorspk@gmail.com
             </Typography>
 
             <Box sx={{ mt: 2 }}>

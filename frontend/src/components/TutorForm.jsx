@@ -25,14 +25,17 @@ const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 const qualificationsList = [
   "Matric / SSC",
   "O-Level / IGCSE",
-  "Intermediate / HSSC (FSc-Pre-Medical)",
-  "Intermediate / HSSC (FSc-Pre-Engineering)",
-  "Intermediate / HSSC (F.A)",
-  "Intermediate / HSSC (I.Com)",
+  "Intermediate / (FSc-Pre-Medical)",
+  "Intermediate / (FSc-Pre-Engineering)",
+  "Intermediate / (ICS)",
+  "Intermediate / (F.A)",
+  "Intermediate / (I.Com)",
   "Associate Degree (2-year)",
   "BA / BSc",
   "BS",
   "BE",
+  "BDS",
+  "MBBS",
   "MSc",
   "MA",
   "MS / MPhil",
@@ -40,7 +43,7 @@ const qualificationsList = [
   "PhD",
 ];
 
-const higherEducation = ["BS", "BE", "MSc", "MA", "ME", "MS / MPhil", "PhD"];
+const higherEducation = ["BS", "BE", "BDS", "MBBS", "MSc", "MA", "ME", "MS / MPhil", "PhD"];
 
 // ----------------------------------------------------------
 // FIELD → RELEVANT SUBJECTS
@@ -84,7 +87,9 @@ const fieldSubjects = {
   "Food & Nutrition": ["Food & Nutrition", "Biology", "Chemistry", "Health Science", "Home Economics", "Dietetics", "Public Health", "Cooking Techniques"],
   "Home Economics": ["Home Economics", "Food & Nutrition", "Textiles", "Fashion Design", "Health Science", "Budgeting", "Child Development", "Household Management"],
   "Mass Communication": ["Mass Communication", "Media Studies", "Public Relations", "Journalism", "Writing Skills", "Communication Skills", "Advertising", "Broadcasting"],
-  "Public Relations": ["Public Relations", "Marketing", "Mass Communication", "Communication Skills", "Media Studies", "Business Studies", "Psychology", "Event Management"]
+  "Public Relations": ["Public Relations", "Marketing", "Mass Communication", "Communication Skills", "Media Studies", "Business Studies", "Psychology", "Event Management"],
+  BDS: ["Oral Anatomy", "Dental Materials", "Oral Biology", "Physiology", "Biochemistry", "General Anatomy", "Oral Pathology", "Community Dentistry", "Prosthodontics", "Orthodontics", "Endodontics", "Periodontology", "Oral Surgery"],
+  MBBS: ["Anatomy", "Physiology", "Biochemistry", "Pharmacology", "Pathology", "Microbiology", "Community Medicine", "Forensic Medicine", "General Medicine", "General Surgery", "Pediatrics", "Gynecology", "ENT", "Ophthalmology", "Cardiology Basics"],
 };
 
 // ----------------------------------------------------------
@@ -96,10 +101,13 @@ const subjectsList = Object.keys(fieldSubjects);
 // QUALIFICATION → SUGGESTED SUBJECTS
 // ----------------------------------------------------------
 const qualificationSuggestions = {
-  "Intermediate / HSSC (FSc-Pre-Medical)": ["Biology", "Chemistry", "Physics"],
-  "Intermediate / HSSC (FSc-Pre-Engineering)": ["Mathematics", "Physics", "Chemistry"],
-  "Intermediate / HSSC (I.Com)": ["Accounting", "Business Studies", "Finance"],
-  "Intermediate / HSSC (F.A)": ["English Language", "Urdu", "Psychology"],
+  "Intermediate / (FSc-Pre-Medical)": ["Biology", "Chemistry", "Physics"],
+  "Intermediate / (FSc-Pre-Engineering)": ["Mathematics", "Physics", "Chemistry"],
+  "Intermediate / (ICS)": ["Mathematics", "Physics", "Computer Science"],
+  "Intermediate / (I.Com)": ["Accounting", "Business Studies", "Finance"],
+  "Intermediate / (F.A)": ["English Language", "Urdu", "Psychology"],
+  BDS: ["Oral Anatomy", "Dental Materials", "Physiology"],
+  MBBS: ["Anatomy", "Physiology", "Biochemistry"],
   BS: ["Mathematics", "Computer Science / IT", "Physics"],
   MSc: ["Mathematics", "Physics", "Chemistry"],
   MA: ["English Literature", "Sociology", "History"],
