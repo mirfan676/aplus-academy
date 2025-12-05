@@ -9,7 +9,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 // ------------------------------------------------------
-// FIX LEAFLET ICON ISSUE (must be placed here)
+// FIX LEAFLET ICON ISSUE
 // ------------------------------------------------------
 delete L.Icon.Default.prototype._getIconUrl;
 
@@ -31,7 +31,7 @@ const personIcon = new L.Icon({
 });
 
 // ------------------------------------------------------
-// Filter function: filters by city, subject, and sorts by distance
+// FILTER FUNCTION (city + subject + distance)
 // ------------------------------------------------------
 function filterTeachers(teachers, selectedCity, selectedSubject, userLocation) {
   const [userLat, userLng] = userLocation;
@@ -45,12 +45,11 @@ function filterTeachers(teachers, selectedCity, selectedSubject, userLocation) {
       return matchesCity && matchesSubject;
     })
     .map((tutor) => {
-      // Calculate distance from user
-      const latDiff = tutor.location?.lat - userLat || 0;
-      const lngDiff = tutor.location?.lng - userLng || 0;
+      const latDiff = (tutor.location?.lat || 0) - userLat;
+      const lngDiff = (tutor.location?.lng || 0) - userLng;
       return { ...tutor, distance: Math.sqrt(latDiff ** 2 + lngDiff ** 2) };
     })
-    .sort((a, b) => a.distance - b.distance); // closest first
+    .sort((a, b) => a.distance - b.distance);
 }
 
 // ------------------------------------------------------
@@ -62,21 +61,35 @@ export default function TeacherDirectory() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [mapVisible, setMapVisible] = useState(false);
-  const [userLocation, setUserLocation] = useState([31.5204, 74.3587]); // default Lahore
+
+  const [userLocation, setUserLocation] = useState([31.5204, 74.3587]); // Lahore default
 
   const [showMoreBio, setShowMoreBio] = useState({});
   const [showMoreSubjects, setShowMoreSubjects] = useState({});
 
-  // Fetch teachers
+  // ------------------------------------------------------
+  // FETCH TEACHERS + NORMALIZE API FIELDS
+  // ------------------------------------------------------
   useEffect(() => {
     axios
       .get("https://aplus-academy.onrender.com/tutors/")
       .then((res) =>
         setTeachers(
           res.data.map((t) => ({
-            ...t,
-            subjects: t.subjects || [],
-            location: t.location || { lat: 31.5204, lng: 74.3587 },
+            id: t.id || t._id || Math.random(),
+            name: t.Name || "",
+            city: t.City || "",
+            subjects: t.Subjects || [],
+            bio: t.Bio || "",
+            experience: t.Experience || 0,
+            qualification: t.Qualification || "",
+            thumbnail: t.Thumbnail || "",
+            phone: t.Phone || "",
+            verified: t.Verified === "Yes",
+            location: {
+              lat: Number(t.Latitude) || 31.5204,
+              lng: Number(t.Longitude) || 74.3587,
+            },
           }))
         )
       )
@@ -84,16 +97,20 @@ export default function TeacherDirectory() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Get user location
+  // ------------------------------------------------------
+  // GET USER LIVE LOCATION
+  // ------------------------------------------------------
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (pos) =>
         setUserLocation([pos.coords.latitude, pos.coords.longitude]),
-      () => {} // ignore error
+      () => {} // ignore errors
     );
   }, []);
 
-  // Unique subjects and cities
+  // ------------------------------------------------------
+  // UNIQUE SUBJECTS & CITIES
+  // ------------------------------------------------------
   const subjects = useMemo(
     () => [...new Set(teachers.flatMap((t) => t.subjects))],
     [teachers]
@@ -104,7 +121,9 @@ export default function TeacherDirectory() {
     [teachers]
   );
 
-  // Filtered & sorted list
+  // ------------------------------------------------------
+  // FILTERED LIST FINAL
+  // ------------------------------------------------------
   const filtered = filterTeachers(
     teachers,
     selectedCity,
@@ -124,6 +143,7 @@ export default function TeacherDirectory() {
           Find Teachers Near You
         </Typography>
 
+        {/* MAP SECTION */}
         <TeacherMapSection
           mapVisible={mapVisible}
           setMapVisible={setMapVisible}
@@ -132,6 +152,7 @@ export default function TeacherDirectory() {
           personIcon={personIcon}
         />
 
+        {/* FILTERS */}
         <TeacherFilters
           selectedCity={selectedCity}
           setSelectedCity={setSelectedCity}
@@ -143,6 +164,7 @@ export default function TeacherDirectory() {
 
         {error && <Alert severity="error">{error}</Alert>}
 
+        {/* LIST */}
         <TeacherList
           loading={loading}
           filtered={filtered}
