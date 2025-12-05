@@ -1,171 +1,105 @@
-import { Box, Card, Typography, Button } from "@mui/material";
+// JobCard.jsx
+import { Box, Card, Typography, Button, Chip } from "@mui/material";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import WorkIcon from "@mui/icons-material/Work";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import { motion } from "framer-motion";
 
 export default function JobCard({ job }) {
-  const {
-    Title,
-    title,
-    Grade,
-    grade,
-    School,
-    school,
-    Students,
-    students,
-    Subjects,
-    subjects,
-    Timing,
-    timing,
-    Fee,
-    fee,
-    Location,
-    location,
-    City,
-    city,
-    Gender,
-    gender,
-    Contact,
-    contact,
-    Status,
-    status,
-    WhatsappMessage,
-    whatsapp_message
-  } = job;
+  // tolerant field mapping (sheet may have different caps)
+  const final = {
+    title: job.Title || job.title || "Home Tutor Required",
+    grade: job.Grade || job.grade || job.Class || "",
+    school: job.School || job.school || "",
+    students: job.Students || job.students || "",
+    subjects: job.Subjects || job.subjects || job.Subject || "",
+    timing: job.Timing || job.timing || job.Time || "",
+    fee: Number(job.Fee || job.fee || job.Fees || 0),
+    location: job.Location || job.location || "",
+    city: job.City || job.city || "",
+    gender: job.Gender || job.gender || "",
+    contact: job.Contact || job.contact || job.Phone || "",
+    status: (job.Status || job.status || "").toLowerCase(),
+    whatsapp_message: job.WhatsappMessage || job.whatsapp_message || `Hi, I want to apply for ${job.Title || job.title || "this job"}.`
+  };
 
-  const finalTitle = Title || title || "Home Tutor Required";
-  const finalSubjects = Subjects || subjects || "";
-  const finalStatus = (Status || status || "").toLowerCase();
-
-  const number = (Contact || contact || "").replace(/\D/g, "");
-  const message = encodeURIComponent(WhatsappMessage || whatsapp_message || finalTitle);
-  const whatsappURL = `https://wa.me/${number}?text=${message}`;
-
-  const isClosed = finalStatus === "closed";
+  const isClosed = final.status === "closed" || final.status === "inactive";
+  const phone = (final.contact || "").replace(/\D/g, "");
+  const waUrl = phone ? `https://wa.me/${phone}?text=${encodeURIComponent(final.whatsapp_message)}` : null;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40 }}
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.45 }}
       style={{ width: "100%" }}
     >
-      {/* Hover Gradient Wrapper */}
-      <Box
-        sx={{
-          p: 0.6,
-          borderRadius: "20px",
-          transition: "all 0.3s ease",
-          background: "transparent",
-          "&:hover": {
-            background: "linear-gradient(45deg, #1976d2, #00e676)"
-          }
-        }}
-      >
-        <Card
-          sx={{
-            borderRadius: "20px",
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-            boxShadow: "0px 4px 12px rgba(0,0,0,0.08)",
-            position: "relative",
-            opacity: isClosed ? 0.55 : 1,
-            minHeight: 260
-          }}
-        >
-          {/* HEADER */}
-          <Box
-            sx={{
-              p: 2,
-              background: "rgba(0,80,200,0.12)",
-              borderTopLeftRadius: "20px",
-              borderTopRightRadius: "20px",
-              position: "relative",
-              minHeight: 70
-            }}
-          >
-            {/* Right badges */}
-            <Box
-              sx={{
-                position: "absolute",
-                bottom: 6,
-                right: 6,
-                display: "flex",
-                gap: 1,
-                zIndex: 2
-              }}
-            >
-              {/* Status Badge */}
-              <Box
-                sx={{
-                  px: 0.9,
-                  py: 0.4,
-                  fontSize: "0.70rem",
-                  fontWeight: 700,
-                  borderRadius: "10px",
-                  background: isClosed ? "#d32f2f" : "#2e7d32",
-                  color: "white",
-                  textTransform: "uppercase"
-                }}
-              >
-                {isClosed ? "Closed" : "Active"}
-              </Box>
-
-              {/* Logo Badge */}
-              <Box
-                sx={{
-                  px: 1,
-                  py: 0.3,
-                  borderRadius: "10px",
-                }}
-              >
-                <img
-                  src="https://www.aplusacademy.pk/logo-nav.svg"
-                  alt="Aplus"
-                  style={{ height: 22 }}
-                />
+      <Box sx={{ p: 0.75, borderRadius: "18px", "&:hover": { transform: "translateY(-2px)" }, transition: "all .2s ease" }}>
+        <Card sx={{ borderRadius: "16px", overflow: "hidden", boxShadow: "0 8px 30px rgba(5,30,80,0.06)" }}>
+          {/* TOP BAR */}
+          <Box sx={{ background: "linear-gradient(90deg,#004aad,#1976d2)", color: "white", px: 3, py: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: 800 }}>
+              {final.title}
+            </Typography>
+            <Box sx={{ display: "flex", gap: 1, mt: 1, alignItems: "center" }}>
+              <Chip label={final.grade || "Grade N/A"} size="small" sx={{ background: "rgba(255,255,255,0.12)", color: "#fff", fontWeight: 700 }} />
+              <Chip label={final.city || final.location || "Location N/A"} size="small" sx={{ background: "rgba(255,255,255,0.12)", color: "#fff", fontWeight: 700 }} />
+              <Chip label={final.gender || "Any"} size="small" sx={{ background: "rgba(255,255,255,0.12)", color: "#fff", fontWeight: 700 }} />
+              <Box sx={{ flex: 1 }} />
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <Box sx={{ px: 1.1, py: 0.5, bgcolor: isClosed ? "#b71c1c" : "#1faa00", borderRadius: "8px", color: "white", fontWeight: 700, fontSize: "0.85rem" }}>
+                  {isClosed ? "Closed" : "Active"}
+                </Box>
               </Box>
             </Box>
-
-            <Typography sx={{ fontSize: "1.1rem", fontWeight: 700 }}>
-              {finalTitle}
-            </Typography>
           </Box>
 
-          {/* MAIN CONTENT */}
-          <Box sx={{ p: 2, flexGrow: 1 }}>
-            <Typography><b>Grade:</b> {Grade || grade}</Typography>
-            <Typography><b>School:</b> {School || school}</Typography>
-            <Typography><b>Students:</b> {Students || students}</Typography>
-            <Typography><b>Subjects:</b> {finalSubjects}</Typography>
-            <Typography><b>Timing:</b> {Timing || timing}</Typography>
-            <Typography><b>Fee:</b> {Fee || fee}</Typography>
-            <Typography><b>Location:</b> {Location || location}</Typography>
-            <Typography><b>City:</b> {City || city}</Typography>
-            <Typography><b>Gender:</b> {Gender || gender}</Typography>
-            <Typography><b>Contact:</b> {Contact || contact}</Typography>
-          </Box>
+          {/* BODY */}
+          <Box sx={{ p: 3 }}>
+            <Box sx={{ display: "grid", gridTemplateColumns: "1fr 160px", gap: 2 }}>
+              <Box>
+                <Typography sx={{ mb: 1 }}>{final.school ? <b>School:</b> : null} {final.school}</Typography>
+                <Typography sx={{ mb: 1 }}><b>Students:</b> {final.students || "—"}</Typography>
+                <Typography sx={{ mb: 2 }}><b>Subjects:</b> {final.subjects || "All"}</Typography>
+                <Typography sx={{ mb: 1, display: "flex", gap: 1, alignItems: "center", color: "#555" }}>
+                  <CalendarTodayIcon fontSize="small" /> {final.timing || "Timing not specified"}
+                </Typography>
+                <Typography sx={{ mb: 1, display: "flex", gap: 1, alignItems: "center", color: "#555" }}>
+                  <LocationOnIcon fontSize="small" /> {final.location || final.city || "Location not specified"}
+                </Typography>
+              </Box>
 
-          {/* ACTION BUTTON */}
-          <Box sx={{ p: 2 }}>
-            <Button
-              fullWidth
-              variant="contained"
-              startIcon={<WhatsAppIcon />}
-              href={whatsappURL}
-              target="_blank"
-              disabled={isClosed}
-              sx={{
-                py: 1.2,
-                background: isClosed ? "#b71c1c" : "#1faa00",
-                fontWeight: 700,
-                fontSize: "0.90rem"
-              }}
-            >
-              {isClosed ? "Position Closed" : "Apply on WhatsApp"}
-            </Button>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1, alignItems: "flex-end" }}>
+                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <MonetizationOnIcon />
+                    <Typography variant="h6" sx={{ fontWeight: 800 }}>{final.fee ? final.fee.toLocaleString() : "Negotiable"}</Typography>
+                  </Box>
+                  <Typography sx={{ color: "#777", fontSize: "0.85rem" }}>Fee</Typography>
+                </Box>
+
+                <Box sx={{ mt: 2, width: "100%" }}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    startIcon={<WhatsAppIcon />}
+                    href={waUrl || undefined}
+                    target="_blank"
+                    disabled={isClosed || !waUrl}
+                    sx={{ background: isClosed ? "#b71c1c" : "#25D366", color: "#fff", fontWeight: 800 }}
+                  >
+                    {isClosed ? "Position Closed" : "Apply on WhatsApp"}
+                  </Button>
+
+                  <Typography sx={{ mt: 1, color: "#666", fontSize: "0.85rem", textAlign: "center" }}>
+                    {final.contact ? `Contact: ${final.contact}` : "Contact not listed"}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
           </Box>
         </Card>
       </Box>

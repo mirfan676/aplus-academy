@@ -1,95 +1,160 @@
-import { useEffect, useState } from "react";
+// Jobs.jsx
+import { useEffect, useState, useRef, useCallback } from "react";
 import { fetchJobs } from "../api";
 import JobCard from "../components/JobCard";
+import JobFilters from "../components/JobFilters";
+import { Container, Box, Typography } from "@mui/material";
 
-const Jobs = () => {
+export default function Jobs() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [cityFilter, setCityFilter] = useState("");
-  const [subjectFilter, setSubjectFilter] = useState("");
+  // filters
+  const [city, setCity] = useState("");
+  const [subject, setSubject] = useState("");
+  const [gender, setGender] = useState("");
+  const [grade, setGrade] = useState("");
+  const [feeValue, setFeeValue] = useState([0, 50000]);
+  const [feeRange, setFeeRange] = useState([0, 50000]);
 
-  // -----------------------------
-  // Load Jobs From API
-  // -----------------------------
+  // infinite scroll
+  const PAGE_SIZE = 8;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const loaderRef = useRef(null);
+
+  // fetch jobs
   useEffect(() => {
+    setLoading(true);
     fetchJobs()
-      .then((data) => {
-        setJobs(data);
+      .then((res) => {
+        // support both structures: { jobs: [...] } or [...]
+        const data = res?.jobs ?? res ?? [];
+        setJobs(Array.isArray(data) ? data : []);
+        // compute fee range
+        const fees = (data || [])
+          .map((j) => Number(j.Fee || j.fee || j.Fees || 0))
+          .filter((n) => !!n);
+        const min = fees.length ? Math.min(...fees) : 0;
+        const max = fees.length ? Math.max(...fees) : 50000;
+        setFeeRange([Math.max(0, min), Math.max(max, min)]);
+        setFeeValue([Math.max(0, min), Math.max(max, min)]);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch jobs", err);
+        setJobs([]);
       })
       .finally(() => setLoading(false));
   }, []);
 
-  // -----------------------------
-  // Generate City Filter Options
-  // -----------------------------
-  const cityOptions = Array.from(
-    new Set(
-      jobs
-        .map((j) => j.City || j.city || "")
-        .filter((city) => city && city.trim() !== "")
-    )
-  );
+  // derive options
+  const cityOptions = Array.from(new Set(jobs.map((j) => (j.City || j.city || "").trim()).filter(Boolean)));
+  const gradeOptions = Array.from(new Set(jobs.map((j) => (j.Grade || j.grade || j.Class || "").trim()).filter(Boolean)));
 
-  // -----------------------------
-  // Filter Jobs
-  // -----------------------------
-  const filteredJobs = jobs.filter((job) => {
+  // apply filters
+  const filtered = jobs.filter((job) => {
     const jobCity = (job.City || job.city || "").toLowerCase();
-    const jobSubjects = (job.Subjects || job.Subject || "").toLowerCase();
+    const jobSubjects = (job.Subjects || job.subjects || job.Subject || "").toLowerCase();
+    const jobGender = (job.Gender || job.gender || "").toLowerCase();
+    const jobGrade = (job.Grade || job.grade || job.Class || "").toLowerCase();
+    const jobFee = Number(job.Fee || job.fee || job.Fees || 0) || 0;
 
-    return (
-      (cityFilter ? jobCity.includes(cityFilter.toLowerCase()) : true) &&
-      (subjectFilter
-        ? jobSubjects.includes(subjectFilter.toLowerCase())
-        : true)
-    );
+    if (city && !jobCity.includes(city.toLowerCase())) return false;
+    if (subject && !jobSubjects.includes(subject.toLowerCase())) return false;
+    if (gender && gender !== "" && gender !== "Both" && !jobGender.includes(gender.toLowerCase())) return false;
+    if (grade && !jobGrade.includes(grade.toLowerCase())) return false;
+    if (jobFee < feeValue[0] || jobFee > feeValue[1]) return false;
+    return true;
   });
 
-  return (
-    <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-4">Latest Home Tutor Jobs</h1>
+  // visible slice for infinite loading
+  const visibleJobs = filtered.slice(0, visibleCount);
 
-      {/* ---------------- Filters ---------------- */}
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <select
-          className="border px-3 py-2 rounded"
-          value={cityFilter}
-          onChange={(e) => setCityFilter(e.target.value)}
-        >
-          <option value="">Filter by City</option>
-          {cityOptions.map((city, index) => (
-            <option key={index} value={city}>
-              {city}
-            </option>
-          ))}
-        </select>
+  // reset visibleCount when filters change
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [city, subject, gender, grade, feeValue]);
 
-        <input
-          className="border px-3 py-2 rounded"
-          type="text"
-          placeholder="Filter by Subject"
-          value={subjectFilter}
-          onChange={(e) => setSubjectFilter(e.target.value)}
-        />
-      </div>
-
-      {/* ---------------- Loading State ---------------- */}
-      {loading && <p className="text-center text-lg">Loading jobs...</p>}
-
-      {/* ---------------- Empty State ---------------- */}
-      {!loading && filteredJobs.length === 0 && (
-        <p className="text-center text-gray-600">No jobs found.</p>
-      )}
-
-      {/* ---------------- Job Cards ---------------- */}
-      <div className="grid gap-5 md:grid-cols-2">
-        {filteredJobs.map((job, index) => (
-          <JobCard key={index} job={job} />
-        ))}
-      </div>
-    </div>
+  // intersection observer to load more
+  const handleObserver = useCallback(
+    (entries) => {
+      const target = entries[0];
+      if (target.isIntersecting && visibleCount < filtered.length) {
+        setVisibleCount((v) => Math.min(filtered.length, v + PAGE_SIZE));
+      }
+    },
+    [visibleCount, filtered.length]
   );
-};
 
-export default Jobs;
+  useEffect(() => {
+    const option = { root: null, rootMargin: "200px", threshold: 0.1 };
+    const observer = new IntersectionObserver(handleObserver, option);
+    if (loaderRef.current) observer.observe(loaderRef.current);
+    return () => observer.disconnect();
+  }, [handleObserver]);
+
+  const onReset = () => {
+    setCity("");
+    setSubject("");
+    setGender("");
+    setGrade("");
+    setFeeValue(feeRange);
+  };
+
+  return (
+    <Box sx={{ background: "#e8f2ff", py: 6, px: { xs: 2, md: 4 } }}>
+      <Container maxWidth="lg">
+        <Typography variant="h4" align="center" fontWeight={700} sx={{ mb: 4, color: "#004aad" }}>
+          Latest Home Tutor Jobs
+        </Typography>
+
+        <JobFilters
+          city={city}
+          setCity={setCity}
+          subject={subject}
+          setSubject={setSubject}
+          gender={gender}
+          setGender={setGender}
+          grade={grade}
+          setGrade={setGrade}
+          cities={cityOptions}
+          grades={gradeOptions}
+          feeRange={feeRange}
+          feeValue={feeValue}
+          setFeeValue={setFeeValue}
+          onReset={onReset}
+        />
+
+        {/* Loading or no items */}
+        {loading && <Typography align="center">Loading jobs...</Typography>}
+        {!loading && filtered.length === 0 && (
+          <Typography align="center" sx={{ mt: 4, color: "gray" }}>
+            No jobs found.
+          </Typography>
+        )}
+
+        {/* Job list */}
+        <Box sx={{ display: "grid", gap: 3 }}>
+          {visibleJobs.map((job, i) => (
+            <JobCard key={i} job={job} />
+          ))}
+        </Box>
+
+        {/* loader sentinel */}
+        <div ref={loaderRef} style={{ height: 1 }} />
+
+        {/* small status */}
+        {!loading && visibleJobs.length < filtered.length && (
+          <Typography align="center" sx={{ mt: 2, color: "#555" }}>
+            Loading more...
+          </Typography>
+        )}
+
+        {!loading && visibleJobs.length >= filtered.length && filtered.length > 0 && (
+          <Typography align="center" sx={{ mt: 2, color: "#555" }}>
+            You've reached the end.
+          </Typography>
+        )}
+      </Container>
+    </Box>
+  );
+}
