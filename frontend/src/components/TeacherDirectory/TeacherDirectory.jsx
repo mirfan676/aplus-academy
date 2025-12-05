@@ -30,6 +30,30 @@ const personIcon = new L.Icon({
   popupAnchor: [0, -40],
 });
 
+// ------------------------------------------------------
+// Filter function: filters by city, subject, and sorts by distance
+// ------------------------------------------------------
+function filterTeachers(teachers, selectedCity, selectedSubject, userLocation) {
+  const [userLat, userLng] = userLocation;
+
+  return teachers
+    .filter((tutor) => {
+      const matchesCity = selectedCity ? tutor.city === selectedCity : true;
+      const matchesSubject = selectedSubject
+        ? tutor.subjects.includes(selectedSubject)
+        : true;
+      return matchesCity && matchesSubject;
+    })
+    .map((tutor) => {
+      // Calculate distance from user
+      const latDiff = tutor.location?.lat - userLat || 0;
+      const lngDiff = tutor.location?.lng - userLng || 0;
+      return { ...tutor, distance: Math.sqrt(latDiff ** 2 + lngDiff ** 2) };
+    })
+    .sort((a, b) => a.distance - b.distance); // closest first
+}
+
+// ------------------------------------------------------
 export default function TeacherDirectory() {
   const [teachers, setTeachers] = useState([]);
   const [selectedCity, setSelectedCity] = useState("");
@@ -38,23 +62,38 @@ export default function TeacherDirectory() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [mapVisible, setMapVisible] = useState(false);
+  const [userLocation, setUserLocation] = useState([31.5204, 74.3587]); // default Lahore
 
-  const [userLocation, setUserLocation] = useState([31.5204, 74.3587]);
+  const [showMoreBio, setShowMoreBio] = useState({});
+  const [showMoreSubjects, setShowMoreSubjects] = useState({});
 
+  // Fetch teachers
   useEffect(() => {
     axios
       .get("https://aplus-academy.onrender.com/tutors/")
-      .then((res) => setTeachers(res.data.map(mapTutor)))
+      .then((res) =>
+        setTeachers(
+          res.data.map((t) => ({
+            ...t,
+            subjects: t.subjects || [],
+            location: t.location || { lat: 31.5204, lng: 74.3587 },
+          }))
+        )
+      )
       .catch(() => setError("Unable to fetch data"))
       .finally(() => setLoading(false));
   }, []);
 
+  // Get user location
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition((pos) =>
-      setUserLocation([pos.coords.latitude, pos.coords.longitude])
+    navigator.geolocation.getCurrentPosition(
+      (pos) =>
+        setUserLocation([pos.coords.latitude, pos.coords.longitude]),
+      () => {} // ignore error
     );
   }, []);
 
+  // Unique subjects and cities
   const subjects = useMemo(
     () => [...new Set(teachers.flatMap((t) => t.subjects))],
     [teachers]
@@ -65,15 +104,13 @@ export default function TeacherDirectory() {
     [teachers]
   );
 
+  // Filtered & sorted list
   const filtered = filterTeachers(
     teachers,
     selectedCity,
     selectedSubject,
     userLocation
   );
-
-  const [showMoreBio, setShowMoreBio] = useState({});
-  const [showMoreSubjects, setShowMoreSubjects] = useState({});
 
   return (
     <Box sx={{ background: "#e8f2ff", py: 6, px: { xs: 2, md: 4 } }}>
