@@ -5,7 +5,6 @@ import { Container, Typography, Box, Button, Alert } from "@mui/material";
 import TeacherFilters from "./TeacherFilters";
 import TeacherList from "./TeacherList";
 import TeacherMapSection from "./TeacherMapSection";
-import { mapTutor, filterTeachers } from "./teacherUtils";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
