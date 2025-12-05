@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Jobs from "./pages/Jobs";
 import TutorForm from "./components/TutorForm";
-import TeacherDirectory from "./components/TeacherDirectory";
+import TeacherDirectory from "./components/TeacherDirectory/TeacherDirectory.jsx";
 import AboutUs from "./pages/AboutUs";
 import TeacherProfile from "./components/TeacherProfile";
 import HireForm from "./components/HireForm";
