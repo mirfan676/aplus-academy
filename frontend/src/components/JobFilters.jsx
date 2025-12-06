@@ -49,7 +49,7 @@ export default function JobFilters({
   ];
 
   const filterContent = (
-    <Box sx={{ p: 3, width: "100%", maxWidth: 480, mx: "auto" }}>
+    <Box sx={{ p: 3, width: "100%", maxWidth: 960, mx: "auto" }}>
       {/* CLOSE BUTTON (MOBILE) */}
       {isMobile && (
         <Box sx={{ textAlign: "right" }}>
@@ -59,16 +59,20 @@ export default function JobFilters({
         </Box>
       )}
 
-      <Grid container spacing={3} justifyContent="center">
-        {/* City */}
-        <Grid item xs={12}>
-          <FormControl fullWidth
-            sx={{
-              width: { xs: "100%", sm: "80%", md: "320px" },
-              mx: "auto",
-              display: "block"
-            }}
-          >
+      <Grid container spacing={2} justifyContent="center">
+        {/* Filters Row */}
+        <Grid
+          item
+          xs={12}
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
+            justifyContent: isMobile ? "center" : "space-between"
+          }}
+        >
+          {/* CITY */}
+          <FormControl sx={{ flex: isMobile ? "1 1 100%" : "1 1 22%", minWidth: 150 }}>
             <InputLabel>Select City</InputLabel>
             <Select
               value={city}
@@ -84,39 +88,21 @@ export default function JobFilters({
               ))}
             </Select>
           </FormControl>
-        </Grid>
 
-        {/* Subject */}
-        <Grid item xs={12}>
-          <Box
+          {/* SUBJECT */}
+          <TextField
+            label="Search Subject"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
             sx={{
-              width: { xs: "100%", sm: "80%", md: "320px" },
-              mx: "auto"
+              flex: isMobile ? "1 1 100%" : "1 1 22%",
+              minWidth: 150,
+              "& .MuiInputBase-root": { height: "52px", borderRadius: "14px" },
             }}
-          >
-            <TextField
-              fullWidth
-              label="Search Subject"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              sx={{
-                "& .MuiInputBase-root": {
-                  height: "52px",
-                  borderRadius: "14px"
-                }
-              }}
-            />
-          </Box>
-        </Grid>
+          />
 
-        {/* Gender */}
-        <Grid item xs={12}>
-          <FormControl fullWidth
-            sx={{
-              width: { xs: "100%", sm: "80%", md: "320px" },
-              mx: "auto"
-            }}
-          >
+          {/* GENDER */}
+          <FormControl sx={{ flex: isMobile ? "1 1 100%" : "1 1 22%", minWidth: 150 }}>
             <InputLabel>Gender</InputLabel>
             <Select
               value={gender}
@@ -130,16 +116,9 @@ export default function JobFilters({
               <MenuItem value="Both">Both</MenuItem>
             </Select>
           </FormControl>
-        </Grid>
 
-        {/* Grade */}
-        <Grid item xs={12}>
-          <FormControl fullWidth
-            sx={{
-              width: { xs: "100%", sm: "80%", md: "320px" },
-              mx: "auto"
-            }}
-          >
+          {/* GRADE */}
+          <FormControl sx={{ flex: isMobile ? "1 1 100%" : "1 1 22%", minWidth: 150 }}>
             <InputLabel>Grade</InputLabel>
             <Select
               value={grade}
@@ -157,17 +136,12 @@ export default function JobFilters({
           </FormControl>
         </Grid>
 
-        {/* Fee Filter */}
+        {/* Fee Slider */}
         <Grid item xs={12}>
           <Box sx={{ width: "100%", maxWidth: 480, mx: "auto" }}>
-            <Typography
-              variant="subtitle2"
-              sx={{ mb: 1, color: "#333", fontWeight: 600 }}
-            >
-              Fee Range: {feeValue[0].toLocaleString()} —{" "}
-              {feeValue[1].toLocaleString()}
+            <Typography variant="subtitle2" sx={{ mb: 1, color: "#333", fontWeight: 600 }}>
+              Fee Range: {feeValue[0].toLocaleString()} — {feeValue[1].toLocaleString()}
             </Typography>
-
             <Slider
               value={feeValue}
               onChange={(e, v) => setFeeValue(v)}
@@ -175,15 +149,7 @@ export default function JobFilters({
               min={minFee}
               max={maxFee}
             />
-
-            <Box
-              sx={{
-                display: "flex",
-                gap: 1,
-                flexWrap: "wrap",
-                mt: 1
-              }}
-            >
+            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1 }}>
               {presets.map((p, i) => (
                 <Button
                   key={i}
@@ -192,10 +158,7 @@ export default function JobFilters({
                   onClick={() => setFeeValue(p)}
                   sx={{ textTransform: "none" }}
                 >
-                  {p[0].toLocaleString()} -{" "}
-                  {p[1] === maxFee
-                    ? `${p[0].toLocaleString()}+`
-                    : p[1].toLocaleString()}
+                  {p[0].toLocaleString()} - {p[1] === maxFee ? `${p[0].toLocaleString()}+` : p[1].toLocaleString()}
                 </Button>
               ))}
             </Box>
@@ -204,11 +167,7 @@ export default function JobFilters({
 
         {/* RESET BUTTON */}
         <Grid item xs={12} sx={{ textAlign: "center", mt: 2 }}>
-          <Button
-            onClick={onReset}
-            variant="contained"
-            sx={{ background: "#004aad", px: 4 }}
-          >
+          <Button onClick={onReset} variant="contained" sx={{ background: "#004aad", px: 4 }}>
             Reset Filters
           </Button>
         </Grid>
@@ -216,9 +175,6 @@ export default function JobFilters({
     </Box>
   );
 
-  // -------------------------------
-  // RETURN UI
-  // -------------------------------
   return (
     <>
       {/* MOBILE FILTER BUTTON */}
@@ -228,12 +184,7 @@ export default function JobFilters({
             variant="contained"
             onClick={() => setDrawerOpen(true)}
             startIcon={<FilterListIcon />}
-            sx={{
-              background: "#004aad",
-              textTransform: "none",
-              borderRadius: "12px",
-              px: 3
-            }}
+            sx={{ background: "#004aad", textTransform: "none", borderRadius: "12px", px: 3 }}
           >
             Filters
           </Button>
@@ -259,18 +210,12 @@ export default function JobFilters({
         </Paper>
       )}
 
-      {/* MOBILE DRAWER (BOTTOM) */}
+      {/* MOBILE DRAWER */}
       <Drawer
         anchor="bottom"
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        PaperProps={{
-          sx: {
-            borderTopLeftRadius: "22px",
-            borderTopRightRadius: "22px",
-            p: 2
-          }
-        }}
+        PaperProps={{ sx: { borderTopLeftRadius: "22px", borderTopRightRadius: "22px", p: 2 } }}
       >
         {filterContent}
       </Drawer>

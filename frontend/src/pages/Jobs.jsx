@@ -3,13 +3,13 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { fetchJobs } from "../api";
 import JobCard from "../components/JobCard";
 import JobFilters from "../components/JobFilters";
-import { Container, Box, Typography } from "@mui/material";
+import { Container, Box, Typography, Chip, Stack } from "@mui/material";
 
 export default function Jobs() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // filters
+  // Filters
   const [city, setCity] = useState("");
   const [subject, setSubject] = useState("");
   const [gender, setGender] = useState("");
@@ -17,20 +17,20 @@ export default function Jobs() {
   const [feeValue, setFeeValue] = useState([0, 50000]);
   const [feeRange, setFeeRange] = useState([0, 50000]);
 
-  // infinite scroll
+  // Infinite scroll
   const PAGE_SIZE = 8;
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const loaderRef = useRef(null);
 
-  // fetch jobs
+  // Fetch jobs
   useEffect(() => {
     setLoading(true);
     fetchJobs()
       .then((res) => {
-        // support both structures: { jobs: [...] } or [...]
         const data = res?.jobs ?? res ?? [];
         setJobs(Array.isArray(data) ? data : []);
-        // compute fee range
+
+        // Compute fee range
         const fees = (data || [])
           .map((j) => Number(j.Fee || j.fee || j.Fees || 0))
           .filter((n) => !!n);
@@ -46,11 +46,23 @@ export default function Jobs() {
       .finally(() => setLoading(false));
   }, []);
 
-  // derive options
-  const cityOptions = Array.from(new Set(jobs.map((j) => (j.City || j.city || "").trim()).filter(Boolean)));
-  const gradeOptions = Array.from(new Set(jobs.map((j) => (j.Grade || j.grade || j.Class || "").trim()).filter(Boolean)));
+  // Derive options
+  const cityOptions = Array.from(
+    new Set(
+      jobs
+        .map((j) => (j.City || j.city || "").trim())
+        .filter(Boolean)
+    )
+  );
+  const gradeOptions = Array.from(
+    new Set(
+      jobs
+        .map((j) => (j.Grade || j.grade || j.Class || "").trim())
+        .filter(Boolean)
+    )
+  );
 
-  // apply filters
+  // Apply filters
   const filtered = jobs.filter((job) => {
     const jobCity = (job.City || job.city || "").toLowerCase();
     const jobSubjects = (job.Subjects || job.subjects || job.Subject || "").toLowerCase();
@@ -66,15 +78,15 @@ export default function Jobs() {
     return true;
   });
 
-  // visible slice for infinite loading
+  // Visible slice for infinite loading
   const visibleJobs = filtered.slice(0, visibleCount);
 
-  // reset visibleCount when filters change
+  // Reset visibleCount when filters change
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
   }, [city, subject, gender, grade, feeValue]);
 
-  // intersection observer to load more
+  // Intersection observer to load more
   const handleObserver = useCallback(
     (entries) => {
       const target = entries[0];
@@ -100,11 +112,37 @@ export default function Jobs() {
     setFeeValue(feeRange);
   };
 
+  // Active filter chips
+  const activeFilters = [
+    city && { label: `City: ${city}`, key: "city", clear: () => setCity("") },
+    subject && { label: `Subject: ${subject}`, key: "subject", clear: () => setSubject("") },
+    gender && { label: `Gender: ${gender}`, key: "gender", clear: () => setGender("") },
+    grade && { label: `Grade: ${grade}`, key: "grade", clear: () => setGrade("") },
+    (feeValue[0] !== feeRange[0] || feeValue[1] !== feeRange[1]) && {
+      label: `Fee: ${feeValue[0].toLocaleString()} - ${feeValue[1].toLocaleString()}`,
+      key: "fee",
+      clear: () => setFeeValue(feeRange),
+    },
+  ].filter(Boolean);
+
   return (
     <Box sx={{ background: "#e8f2ff", py: 6, px: { xs: 2, md: 4 } }}>
       <Container maxWidth="lg">
-        <Typography variant="h4" align="center" fontWeight={700} sx={{ mb: 4, color: "#004aad" }}>
+        <Typography
+          variant="h4"
+          align="center"
+          fontWeight={700}
+          sx={{ mb: 2, color: "#004aad" }}
+        >
           Latest Home Tutor Jobs
+        </Typography>
+
+        <Typography
+          variant="body1"
+          align="center"
+          sx={{ mb: 4, color: "#333" }}
+        >
+          Browse verified home tuition jobs and connect with parents looking for qualified tutors.
         </Typography>
 
         <JobFilters
@@ -124,8 +162,27 @@ export default function Jobs() {
           onReset={onReset}
         />
 
+        {/* Active Filter Chips */}
+        {activeFilters.length > 0 && (
+          <Box sx={{ mb: 3 }}>
+            <Stack direction="row" spacing={1} flexWrap="wrap">
+              {activeFilters.map((f) => (
+                <Chip
+                  key={f.key}
+                  label={f.label}
+                  onDelete={f.clear}
+                  color="primary"
+                  variant="outlined"
+                />
+              ))}
+            </Stack>
+          </Box>
+        )}
+
         {/* Loading or no items */}
-        {loading && <Typography align="center">Loading jobs...</Typography>}
+        {loading && (
+          <Typography align="center">Loading jobs...</Typography>
+        )}
         {!loading && filtered.length === 0 && (
           <Typography align="center" sx={{ mt: 4, color: "gray" }}>
             No jobs found.
@@ -139,16 +196,15 @@ export default function Jobs() {
           ))}
         </Box>
 
-        {/* loader sentinel */}
+        {/* Loader sentinel */}
         <div ref={loaderRef} style={{ height: 1 }} />
 
-        {/* small status */}
+        {/* Small status */}
         {!loading && visibleJobs.length < filtered.length && (
           <Typography align="center" sx={{ mt: 2, color: "#555" }}>
             Loading more...
           </Typography>
         )}
-
         {!loading && visibleJobs.length >= filtered.length && filtered.length > 0 && (
           <Typography align="center" sx={{ mt: 2, color: "#555" }}>
             You've reached the end.
