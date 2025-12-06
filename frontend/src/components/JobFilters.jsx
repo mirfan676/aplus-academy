@@ -10,8 +10,14 @@ import {
   Box,
   Typography,
   Slider,
-  Button
+  Button,
+  Drawer,
+  IconButton,
+  useMediaQuery
 } from "@mui/material";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import CloseIcon from "@mui/icons-material/Close";
+import { useState } from "react";
 
 export default function JobFilters({
   city,
@@ -29,6 +35,9 @@ export default function JobFilters({
   setFeeValue,
   onReset
 }) {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const isMobile = useMediaQuery("(max-width:900px)");
+
   const [minFee, maxFee] = feeRange;
 
   const presets = [
@@ -39,24 +48,27 @@ export default function JobFilters({
     [20000, maxFee || 50000]
   ];
 
-  return (
-    <Paper
-      sx={{
-        position: "sticky",
-        top: 60,
-        zIndex: 50,
-        p: 3,
-        mb: 4,
-        borderRadius: "22px",
-        background: "rgba(255,255,255,0.90)",
-        backdropFilter: "blur(6px)",
-        boxShadow: "0 6px 18px rgba(0,0,0,0.08)"
-      }}
-    >
-      <Grid container spacing={3} justifyContent="center" alignItems="center">
+  const filterContent = (
+    <Box sx={{ p: 3, width: "100%", maxWidth: 480, mx: "auto" }}>
+      {/* CLOSE BUTTON (MOBILE) */}
+      {isMobile && (
+        <Box sx={{ textAlign: "right" }}>
+          <IconButton onClick={() => setDrawerOpen(false)}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+      )}
+
+      <Grid container spacing={3} justifyContent="center">
         {/* City */}
-        <Grid item xs={12} sm={6} md={3}>
-          <FormControl fullWidth>
+        <Grid item xs={12}>
+          <FormControl fullWidth
+            sx={{
+              width: { xs: "100%", sm: "80%", md: "320px" },
+              mx: "auto",
+              display: "block"
+            }}
+          >
             <InputLabel>Select City</InputLabel>
             <Select
               value={city}
@@ -74,20 +86,37 @@ export default function JobFilters({
           </FormControl>
         </Grid>
 
-        {/* Subject (text search) */}
-        <Grid item xs={12} sm={6} md={3}>
-          <TextField
-            fullWidth
-            label="Search Subject"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            sx={{ "& .MuiInputBase-root": { height: "52px", borderRadius: "14px" } }}
-          />
+        {/* Subject */}
+        <Grid item xs={12}>
+          <Box
+            sx={{
+              width: { xs: "100%", sm: "80%", md: "320px" },
+              mx: "auto"
+            }}
+          >
+            <TextField
+              fullWidth
+              label="Search Subject"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              sx={{
+                "& .MuiInputBase-root": {
+                  height: "52px",
+                  borderRadius: "14px"
+                }
+              }}
+            />
+          </Box>
         </Grid>
 
         {/* Gender */}
-        <Grid item xs={12} sm={6} md={2}>
-          <FormControl fullWidth>
+        <Grid item xs={12}>
+          <FormControl fullWidth
+            sx={{
+              width: { xs: "100%", sm: "80%", md: "320px" },
+              mx: "auto"
+            }}
+          >
             <InputLabel>Gender</InputLabel>
             <Select
               value={gender}
@@ -104,8 +133,13 @@ export default function JobFilters({
         </Grid>
 
         {/* Grade */}
-        <Grid item xs={12} sm={6} md={2}>
-          <FormControl fullWidth>
+        <Grid item xs={12}>
+          <FormControl fullWidth
+            sx={{
+              width: { xs: "100%", sm: "80%", md: "320px" },
+              mx: "auto"
+            }}
+          >
             <InputLabel>Grade</InputLabel>
             <Select
               value={grade}
@@ -123,48 +157,123 @@ export default function JobFilters({
           </FormControl>
         </Grid>
 
-        {/* Fee slider */}
-        <Grid item xs={12} md={12}>
-          <Box sx={{ px: 1 }}>
-            <Typography variant="subtitle2" sx={{ mb: 1, color: "#333", fontWeight: 600 }}>
-              Fee Range: {feeValue[0].toLocaleString()} — {feeValue[1].toLocaleString()}
+        {/* Fee Filter */}
+        <Grid item xs={12}>
+          <Box sx={{ width: "100%", maxWidth: 480, mx: "auto" }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ mb: 1, color: "#333", fontWeight: 600 }}
+            >
+              Fee Range: {feeValue[0].toLocaleString()} —{" "}
+              {feeValue[1].toLocaleString()}
             </Typography>
 
-            <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-              <Box sx={{ flex: 1 }}>
-                <Slider
-                  value={feeValue}
-                  onChange={(e, v) => setFeeValue(v)}
-                  valueLabelDisplay="auto"
-                  min={minFee}
-                  max={maxFee}
-                />
-              </Box>
+            <Slider
+              value={feeValue}
+              onChange={(e, v) => setFeeValue(v)}
+              valueLabelDisplay="auto"
+              min={minFee}
+              max={maxFee}
+            />
 
-              <Box sx={{ display: "flex", gap: 1 }}>
-                {presets.map((p, i) => (
-                  <Button
-                    key={i}
-                    size="small"
-                    variant="outlined"
-                    onClick={() => setFeeValue(p)}
-                    sx={{ textTransform: "none" }}
-                  >
-                    {p[0].toLocaleString()} - {p[1] === maxFee ? `${p[0].toLocaleString()}+` : p[1].toLocaleString()}
-                  </Button>
-                ))}
-              </Box>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                flexWrap: "wrap",
+                mt: 1
+              }}
+            >
+              {presets.map((p, i) => (
+                <Button
+                  key={i}
+                  size="small"
+                  variant="outlined"
+                  onClick={() => setFeeValue(p)}
+                  sx={{ textTransform: "none" }}
+                >
+                  {p[0].toLocaleString()} -{" "}
+                  {p[1] === maxFee
+                    ? `${p[0].toLocaleString()}+`
+                    : p[1].toLocaleString()}
+                </Button>
+              ))}
             </Box>
           </Box>
         </Grid>
 
-        {/* Reset */}
-        <Grid item xs={12} md={12} sx={{ textAlign: "right" }}>
-          <Button onClick={onReset} variant="contained" sx={{ background: "#004aad" }}>
+        {/* RESET BUTTON */}
+        <Grid item xs={12} sx={{ textAlign: "center", mt: 2 }}>
+          <Button
+            onClick={onReset}
+            variant="contained"
+            sx={{ background: "#004aad", px: 4 }}
+          >
             Reset Filters
           </Button>
         </Grid>
       </Grid>
-    </Paper>
+    </Box>
+  );
+
+  // -------------------------------
+  // RETURN UI
+  // -------------------------------
+  return (
+    <>
+      {/* MOBILE FILTER BUTTON */}
+      {isMobile && (
+        <Box sx={{ textAlign: "right", mb: 2 }}>
+          <Button
+            variant="contained"
+            onClick={() => setDrawerOpen(true)}
+            startIcon={<FilterListIcon />}
+            sx={{
+              background: "#004aad",
+              textTransform: "none",
+              borderRadius: "12px",
+              px: 3
+            }}
+          >
+            Filters
+          </Button>
+        </Box>
+      )}
+
+      {/* DESKTOP FILTER BAR */}
+      {!isMobile && (
+        <Paper
+          sx={{
+            position: "sticky",
+            top: 60,
+            zIndex: 50,
+            p: 3,
+            mb: 4,
+            borderRadius: "22px",
+            background: "rgba(255,255,255,0.90)",
+            backdropFilter: "blur(6px)",
+            boxShadow: "0 6px 18px rgba(0,0,0,0.08)"
+          }}
+        >
+          {filterContent}
+        </Paper>
+      )}
+
+      {/* MOBILE DRAWER (BOTTOM) */}
+      <Drawer
+        anchor="bottom"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        PaperProps={{
+          sx: {
+            borderTopLeftRadius: "22px",
+            borderTopRightRadius: "22px",
+            p: 2
+          }
+        }}
+      >
+        {filterContent}
+      </Drawer>
+    </>
   );
 }
