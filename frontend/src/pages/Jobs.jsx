@@ -25,21 +25,34 @@ export default function Jobs() {
 
         setJobs(data);
 
-        // Prepare filter metadata
-        setCities([...new Set(data.map((j) => j.city || "").filter(Boolean))]);
-        setSubjects([
+        // FIXED — safe metadata extraction
+        setCities([
           ...new Set(
             data
-              .map((j) => (j.subjects || j.Subject || "").split(","))
-              .flat()
-              .map((s) => s.trim())
+              .map((j) => (j.city || j.City || j.Location || "").trim())
               .filter(Boolean)
           ),
         ]);
+
+        setSubjects([
+          ...new Set(
+            data
+              .map((j) => {
+                const raw = j.subjects || j.Subjects || j.Subject || "";
+                if (Array.isArray(raw)) return raw;
+                if (typeof raw === "string") return raw.split(",");
+                return [];
+              })
+              .flat()
+              .map((s) => String(s).trim())
+              .filter(Boolean)
+          ),
+        ]);
+
         setGrades([
           ...new Set(
             data
-              .map((j) => j.grade || j.Grade || j.Class || "")
+              .map((j) => (j.grade || j.Grade || j.Class || "").trim())
               .filter(Boolean)
           ),
         ]);
@@ -59,60 +72,69 @@ export default function Jobs() {
 
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting) {
-        setVisibleCount((prev) => prev + PAGE_SIZE);
+        setVisibleCount((prev) =>
+          filtered.length > prev ? prev + PAGE_SIZE : prev
+        );
       }
     });
 
     observer.observe(bottomRef.current);
-
     return () => observer.disconnect();
-  }, []);
+  }, [filtered]);
 
   // Apply filters
-  const onFilterChange = useCallback((filters) => {
-    let result = [...jobs];
+  const onFilterChange = useCallback(
+    (filters) => {
+      let result = [...jobs];
 
-    if (filters.city) {
-      result = result.filter(
-        (j) => (j.city || "").toLowerCase() === filters.city.toLowerCase()
-      );
-    }
+      if (filters.city) {
+        result = result.filter(
+          (j) =>
+            (j.city || j.City || "")
+              .toLowerCase()
+              .includes(filters.city.toLowerCase())
+        );
+      }
 
-    if (filters.subject) {
-      result = result.filter((j) =>
-        (j.subjects || j.Subject || "")
-          .toLowerCase()
-          .includes(filters.subject.toLowerCase())
-      );
-    }
+      if (filters.subject) {
+        result = result.filter((j) => {
+          const raw = j.subjects || j.Subjects || j.Subject || "";
+          const str = Array.isArray(raw) ? raw.join(" ") : String(raw);
+          return str.toLowerCase().includes(filters.subject.toLowerCase());
+        });
+      }
 
-    if (filters.grade) {
-      result = result.filter((j) =>
-        (j.grade || j.Grade || "")
-          .toLowerCase()
-          .includes(filters.grade.toLowerCase())
-      );
-    }
+      if (filters.grade) {
+        result = result.filter((j) =>
+          (j.grade || j.Grade || j.Class || "")
+            .toLowerCase()
+            .includes(filters.grade.toLowerCase())
+        );
+      }
 
-    if (filters.gender) {
-      result = result.filter(
-        (j) =>
-          (j.genderRequirement || "").toLowerCase() ===
-          filters.gender.toLowerCase()
-      );
-    }
+      if (filters.gender) {
+        result = result.filter(
+          (j) =>
+            (j.gender || j.Gender || "")
+              .toLowerCase()
+              .includes(filters.gender.toLowerCase())
+        );
+      }
 
-    // Fee range
-    result = result.filter((j) => {
-      const fee = Number(j.fee || j.Fee || 0);
-      return fee >= filters.feeValue[0] && fee <= filters.feeValue[1];
-    });
+      const [minFee, maxFee] = filters.feeValue;
+      result = result.filter((j) => {
+        const fee = Number(j.fee || j.Fee || 0) || 0;
+        return fee >= minFee && fee <= maxFee;
+      });
 
-    setVisibleCount(PAGE_SIZE);
-    setFiltered(result);
-  }, [jobs]);
+      setVisibleCount(PAGE_SIZE);
+      setFiltered(result);
+    },
+    [jobs]
+  );
 
-  if (loading) return <div className="p-6 text-center">Loading jobs…</div>;
+  if (loading)
+    return <div className="p-6 text-center">Loading jobs…</div>;
 
   return (
     <div className="container mx-auto p-4">
