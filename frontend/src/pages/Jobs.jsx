@@ -1,160 +1,135 @@
-// Jobs.jsx
-import { useEffect, useState, useRef, useCallback } from "react";
-import { fetchJobs } from "../api";
-import JobCard from "../components/JobCard";
+// src/pages/Jobs.jsx
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import JobFilters from "../components/JobFilters";
-import { Container, Box, Typography } from "@mui/material";
+import JobCard from "../components/JobCard";
+import { fetchJobs } from "../api";
+
+const PAGE_SIZE = 12;
 
 export default function Jobs() {
   const [jobs, setJobs] = useState([]);
+  const [filtered, setFiltered] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [grades, setGrades] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [loading, setLoading] = useState(true);
 
-  // filters
-  const [city, setCity] = useState("");
-  const [subject, setSubject] = useState("");
-  const [gender, setGender] = useState("");
-  const [grade, setGrade] = useState("");
-  const [feeValue, setFeeValue] = useState([0, 50000]);
-  const [feeRange, setFeeRange] = useState([0, 50000]);
+  const bottomRef = useRef(null);
 
-  // infinite scroll
-  const PAGE_SIZE = 8;
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const loaderRef = useRef(null);
-
-  // fetch jobs
+  // Fetch jobs
   useEffect(() => {
-    setLoading(true);
-    fetchJobs()
-      .then((res) => {
-        // support both structures: { jobs: [...] } or [...]
-        const data = res?.jobs ?? res ?? [];
-        setJobs(Array.isArray(data) ? data : []);
-        // compute fee range
-        const fees = (data || [])
-          .map((j) => Number(j.Fee || j.fee || j.Fees || 0))
-          .filter((n) => !!n);
-        const min = fees.length ? Math.min(...fees) : 0;
-        const max = fees.length ? Math.max(...fees) : 50000;
-        setFeeRange([Math.max(0, min), Math.max(max, min)]);
-        setFeeValue([Math.max(0, min), Math.max(max, min)]);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch jobs", err);
-        setJobs([]);
-      })
-      .finally(() => setLoading(false));
+    const loadJobs = async () => {
+      try {
+        const data = await fetchJobs();
+
+        setJobs(data);
+
+        // Prepare filter metadata
+        setCities([...new Set(data.map((j) => j.city || "").filter(Boolean))]);
+        setSubjects([
+          ...new Set(
+            data
+              .map((j) => (j.subjects || j.Subject || "").split(","))
+              .flat()
+              .map((s) => s.trim())
+              .filter(Boolean)
+          ),
+        ]);
+        setGrades([
+          ...new Set(
+            data
+              .map((j) => j.grade || j.Grade || j.Class || "")
+              .filter(Boolean)
+          ),
+        ]);
+
+        setFiltered(data);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadJobs();
   }, []);
 
-  // derive options
-  const cityOptions = Array.from(new Set(jobs.map((j) => (j.City || j.city || "").trim()).filter(Boolean)));
-  const gradeOptions = Array.from(new Set(jobs.map((j) => (j.Grade || j.grade || j.Class || "").trim()).filter(Boolean)));
-
-  // apply filters
-  const filtered = jobs.filter((job) => {
-    const jobCity = (job.City || job.city || "").toLowerCase();
-    const jobSubjects = (job.Subjects || job.subjects || job.Subject || "").toLowerCase();
-    const jobGender = (job.Gender || job.gender || "").toLowerCase();
-    const jobGrade = (job.Grade || job.grade || job.Class || "").toLowerCase();
-    const jobFee = Number(job.Fee || job.fee || job.Fees || 0) || 0;
-
-    if (city && !jobCity.includes(city.toLowerCase())) return false;
-    if (subject && !jobSubjects.includes(subject.toLowerCase())) return false;
-    if (gender && gender !== "" && gender !== "Both" && !jobGender.includes(gender.toLowerCase())) return false;
-    if (grade && !jobGrade.includes(grade.toLowerCase())) return false;
-    if (jobFee < feeValue[0] || jobFee > feeValue[1]) return false;
-    return true;
-  });
-
-  // visible slice for infinite loading
-  const visibleJobs = filtered.slice(0, visibleCount);
-
-  // reset visibleCount when filters change
+  // Infinite scroll
   useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
-  }, [city, subject, gender, grade, feeValue]);
+    if (!bottomRef.current) return;
 
-  // intersection observer to load more
-  const handleObserver = useCallback(
-    (entries) => {
-      const target = entries[0];
-      if (target.isIntersecting && visibleCount < filtered.length) {
-        setVisibleCount((v) => Math.min(filtered.length, v + PAGE_SIZE));
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setVisibleCount((prev) => prev + PAGE_SIZE);
       }
-    },
-    [visibleCount, filtered.length]
-  );
+    });
 
-  useEffect(() => {
-    const option = { root: null, rootMargin: "200px", threshold: 0.1 };
-    const observer = new IntersectionObserver(handleObserver, option);
-    if (loaderRef.current) observer.observe(loaderRef.current);
+    observer.observe(bottomRef.current);
+
     return () => observer.disconnect();
-  }, [handleObserver]);
+  }, []);
 
-  const onReset = () => {
-    setCity("");
-    setSubject("");
-    setGender("");
-    setGrade("");
-    setFeeValue(feeRange);
-  };
+  // Apply filters
+  const onFilterChange = useCallback((filters) => {
+    let result = [...jobs];
+
+    if (filters.city) {
+      result = result.filter(
+        (j) => (j.city || "").toLowerCase() === filters.city.toLowerCase()
+      );
+    }
+
+    if (filters.subject) {
+      result = result.filter((j) =>
+        (j.subjects || j.Subject || "")
+          .toLowerCase()
+          .includes(filters.subject.toLowerCase())
+      );
+    }
+
+    if (filters.grade) {
+      result = result.filter((j) =>
+        (j.grade || j.Grade || "")
+          .toLowerCase()
+          .includes(filters.grade.toLowerCase())
+      );
+    }
+
+    if (filters.gender) {
+      result = result.filter(
+        (j) =>
+          (j.genderRequirement || "").toLowerCase() ===
+          filters.gender.toLowerCase()
+      );
+    }
+
+    // Fee range
+    result = result.filter((j) => {
+      const fee = Number(j.fee || j.Fee || 0);
+      return fee >= filters.feeValue[0] && fee <= filters.feeValue[1];
+    });
+
+    setVisibleCount(PAGE_SIZE);
+    setFiltered(result);
+  }, [jobs]);
+
+  if (loading) return <div className="p-6 text-center">Loading jobs…</div>;
 
   return (
-    <Box sx={{ background: "#e8f2ff", py: 6, px: { xs: 2, md: 4 } }}>
-      <Container maxWidth="lg">
-        <Typography variant="h4" align="center" fontWeight={700} sx={{ mb: 4, color: "#004aad" }}>
-          Latest Home Tutor Jobs
-        </Typography>
+    <div className="container mx-auto p-4">
+      <JobFilters
+        cities={cities}
+        subjects={subjects}
+        grades={grades}
+        onFilterChange={onFilterChange}
+      />
 
-        <JobFilters
-          city={city}
-          setCity={setCity}
-          subject={subject}
-          setSubject={setSubject}
-          gender={gender}
-          setGender={setGender}
-          grade={grade}
-          setGrade={setGrade}
-          cities={cityOptions}
-          grades={gradeOptions}
-          feeRange={feeRange}
-          feeValue={feeValue}
-          setFeeValue={setFeeValue}
-          onReset={onReset}
-        />
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-6">
+        {filtered.slice(0, visibleCount).map((job, idx) => (
+          <JobCard key={idx} job={job} />
+        ))}
+      </div>
 
-        {/* Loading or no items */}
-        {loading && <Typography align="center">Loading jobs...</Typography>}
-        {!loading && filtered.length === 0 && (
-          <Typography align="center" sx={{ mt: 4, color: "gray" }}>
-            No jobs found.
-          </Typography>
-        )}
-
-        {/* Job list */}
-        <Box sx={{ display: "grid", gap: 3 }}>
-          {visibleJobs.map((job, i) => (
-            <JobCard key={i} job={job} />
-          ))}
-        </Box>
-
-        {/* loader sentinel */}
-        <div ref={loaderRef} style={{ height: 1 }} />
-
-        {/* small status */}
-        {!loading && visibleJobs.length < filtered.length && (
-          <Typography align="center" sx={{ mt: 2, color: "#555" }}>
-            Loading more...
-          </Typography>
-        )}
-
-        {!loading && visibleJobs.length >= filtered.length && filtered.length > 0 && (
-          <Typography align="center" sx={{ mt: 2, color: "#555" }}>
-            You've reached the end.
-          </Typography>
-        )}
-      </Container>
-    </Box>
+      <div ref={bottomRef} className="h-12"></div>
+    </div>
   );
 }
