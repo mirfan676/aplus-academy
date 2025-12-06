@@ -32,7 +32,10 @@ export default function Jobs() {
 
         // Compute fee range
         const fees = (data || [])
-          .map((j) => Number(j.Fee || j.fee || j.Fees || 0))
+          .map((j) => {
+            const f = Number(j.Fee || j.fee || j.Fees);
+            return isNaN(f) ? 0 : f;
+          })
           .filter(Boolean);
         const min = fees.length ? Math.min(...fees) : 0;
         const max = fees.length ? Math.max(...fees) : 50000;
@@ -48,31 +51,32 @@ export default function Jobs() {
 
   // Derive filter options
   const cityOptions = Array.from(
-    new Set(jobs.map((j) => (j.City || j.city || "").trim()).filter(Boolean))
+    new Set(jobs.map((j) => (j.city || j.City || "").trim()).filter(Boolean))
   );
   const gradeOptions = Array.from(
-    new Set(
-      jobs.map((j) => (j.Grade || j.grade || j.Class || "").trim()).filter(Boolean)
-    )
+    new Set(jobs.map((j) => (j.grade || j.Grade || j.Class || "").trim()).filter(Boolean))
   );
 
-  // Apply filters
+  // Apply filters (tolerant to missing fields)
   const filtered = jobs.filter((job) => {
-    const jobCity = (job.City || job.city || "").toLowerCase();
-    const jobSubjects = (job.Subjects || job.subjects || job.Subject || "").toLowerCase();
-    const jobGender = (job.Gender || job.gender || "").toLowerCase();
-    const jobGrade = (job.Grade || job.grade || job.Class || "").toLowerCase();
-    const jobFee = Number(job.Fee || job.fee || job.Fees || 0) || 0;
+    const jobCity = (job.city || job.City || "").toLowerCase();
+    const jobSubjects = (job.subjects || job.Subjects || job.Subject || "").toLowerCase();
+    const jobGender = (job.gender || job.Gender || "Both").toLowerCase();
+    const jobGrade = (job.grade || job.Grade || job.Class || "").toLowerCase();
 
-    if (city && !jobCity.includes(city.toLowerCase())) return false;
-    if (subject && !jobSubjects.includes(subject.toLowerCase())) return false;
-    if (gender && gender !== "" && gender !== "Both" && !jobGender.includes(gender.toLowerCase())) return false;
-    if (grade && !jobGrade.includes(grade.toLowerCase())) return false;
+    let jobFee = Number(job.fee || job.Fee || job.Fees);
+    if (isNaN(jobFee)) jobFee = 0;
+
+    if (city && jobCity && !jobCity.includes(city.toLowerCase())) return false;
+    if (subject && jobSubjects && !jobSubjects.includes(subject.toLowerCase())) return false;
+    if (gender && gender !== "Both" && jobGender && !jobGender.includes(gender.toLowerCase())) return false;
+    if (grade && jobGrade && !jobGrade.includes(grade.toLowerCase())) return false;
     if (jobFee < feeValue[0] || jobFee > feeValue[1]) return false;
+
     return true;
   });
 
-  // Visible jobs slice
+  // Visible jobs slice for infinite scroll
   const visibleJobs = filtered.slice(0, Math.min(visibleCount, filtered.length));
 
   // Reset visible count when filters change
@@ -80,7 +84,7 @@ export default function Jobs() {
     setVisibleCount(PAGE_SIZE);
   }, [city, subject, gender, grade, feeValue]);
 
-  // Intersection observer to load more
+  // Intersection observer for infinite scroll
   const handleObserver = useCallback(
     (entries) => {
       const target = entries[0];
@@ -190,9 +194,9 @@ export default function Jobs() {
             display: "grid",
             gap: 3,
             gridTemplateColumns: {
-              xs: "1fr", // mobile centered single column
-              sm: "repeat(2, 1fr)", // tablets
-              md: "repeat(3, 1fr)", // desktop
+              xs: "1fr",
+              sm: "repeat(2, 1fr)",
+              md: "repeat(3, 1fr)",
             },
             justifyContent: "center",
           }}
