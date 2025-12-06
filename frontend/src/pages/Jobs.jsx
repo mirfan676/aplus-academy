@@ -33,7 +33,7 @@ export default function Jobs() {
         // Compute fee range
         const fees = (data || [])
           .map((j) => Number(j.Fee || j.fee || j.Fees || 0))
-          .filter((n) => !!n);
+          .filter(Boolean);
         const min = fees.length ? Math.min(...fees) : 0;
         const max = fees.length ? Math.max(...fees) : 50000;
         setFeeRange([Math.max(0, min), Math.max(max, min)]);
@@ -46,19 +46,13 @@ export default function Jobs() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Derive options
+  // Derive filter options
   const cityOptions = Array.from(
-    new Set(
-      jobs
-        .map((j) => (j.City || j.city || "").trim())
-        .filter(Boolean)
-    )
+    new Set(jobs.map((j) => (j.City || j.city || "").trim()).filter(Boolean))
   );
   const gradeOptions = Array.from(
     new Set(
-      jobs
-        .map((j) => (j.Grade || j.grade || j.Class || "").trim())
-        .filter(Boolean)
+      jobs.map((j) => (j.Grade || j.grade || j.Class || "").trim()).filter(Boolean)
     )
   );
 
@@ -78,10 +72,10 @@ export default function Jobs() {
     return true;
   });
 
-  // Visible slice for infinite loading
-  const visibleJobs = filtered.slice(0, visibleCount);
+  // Visible jobs slice
+  const visibleJobs = filtered.slice(0, Math.min(visibleCount, filtered.length));
 
-  // Reset visibleCount when filters change
+  // Reset visible count when filters change
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
   }, [city, subject, gender, grade, feeValue]);
@@ -98,11 +92,13 @@ export default function Jobs() {
   );
 
   useEffect(() => {
-    const option = { root: null, rootMargin: "200px", threshold: 0.1 };
-    const observer = new IntersectionObserver(handleObserver, option);
-    if (loaderRef.current) observer.observe(loaderRef.current);
-    return () => observer.disconnect();
-  }, [handleObserver]);
+    if (filtered.length > PAGE_SIZE) {
+      const option = { root: null, rootMargin: "200px", threshold: 0.1 };
+      const observer = new IntersectionObserver(handleObserver, option);
+      if (loaderRef.current) observer.observe(loaderRef.current);
+      return () => observer.disconnect();
+    }
+  }, [handleObserver, filtered.length]);
 
   const onReset = () => {
     setCity("");
@@ -145,6 +141,7 @@ export default function Jobs() {
           Browse verified home tuition jobs and connect with parents looking for qualified tutors.
         </Typography>
 
+        {/* Filters */}
         <JobFilters
           city={city}
           setCity={setCity}
@@ -162,7 +159,7 @@ export default function Jobs() {
           onReset={onReset}
         />
 
-        {/* Active Filter Chips */}
+        {/* Active filter chips */}
         {activeFilters.length > 0 && (
           <Box sx={{ mb: 3 }}>
             <Stack direction="row" spacing={1} flexWrap="wrap">
@@ -180,9 +177,7 @@ export default function Jobs() {
         )}
 
         {/* Loading or no items */}
-        {loading && (
-          <Typography align="center">Loading jobs...</Typography>
-        )}
+        {loading && <Typography align="center">Loading jobs...</Typography>}
         {!loading && filtered.length === 0 && (
           <Typography align="center" sx={{ mt: 4, color: "gray" }}>
             No jobs found.
@@ -190,7 +185,18 @@ export default function Jobs() {
         )}
 
         {/* Job list */}
-        <Box sx={{ display: "grid", gap: 3 }}>
+        <Box
+          sx={{
+            display: "grid",
+            gap: 3,
+            gridTemplateColumns: {
+              xs: "1fr", // mobile centered single column
+              sm: "repeat(2, 1fr)", // tablets
+              md: "repeat(3, 1fr)", // desktop
+            },
+            justifyContent: "center",
+          }}
+        >
           {visibleJobs.map((job, i) => (
             <JobCard key={i} job={job} />
           ))}
