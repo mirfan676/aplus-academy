@@ -1,107 +1,170 @@
-// src/components/JobFilters.jsx
-import React, { useEffect, useState } from "react";
-import { Slider } from "@mui/material";
+// JobFilters.jsx
+import {
+  Grid,
+  Paper,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  TextField,
+  Box,
+  Typography,
+  Slider,
+  Button
+} from "@mui/material";
 
 export default function JobFilters({
-  cities,
-  subjects,
-  grades,
-  onFilterChange,
+  city,
+  setCity,
+  subject,
+  setSubject,
+  gender,
+  setGender,
+  grade,
+  setGrade,
+  cities = [],
+  grades = [],
+  feeRange = [0, 50000],
+  feeValue = [0, 50000],
+  setFeeValue,
+  onReset
 }) {
-  const [city, setCity] = useState("");
-  const [subject, setSubject] = useState("");
-  const [grade, setGrade] = useState("");
-  const [gender, setGender] = useState("");
-  const [feeValue, setFeeValue] = useState([2000, 25000]);
+  const [minFee, maxFee] = feeRange;
 
-  useEffect(() => {
-    onFilterChange({
-      city,
-      subject,
-      grade,
-      gender,
-      feeValue,
-    });
-  }, [city, subject, grade, gender, feeValue]);
-
-  const reset = () => {
-    setCity("");
-    setSubject("");
-    setGrade("");
-    setGender("");
-    setFeeValue([2000, 25000]);
-  };
+  const presets = [
+    [0, 5000],
+    [5000, 8000],
+    [8000, 12000],
+    [12000, 20000],
+    [20000, maxFee || 50000]
+  ];
 
   return (
-    <div className="bg-white p-4 rounded-xl shadow-md space-y-4">
-      {/* Row 1 */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <select
-          className="border p-2 rounded"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-        >
-          <option value="">Select City</option>
-          {cities.map((c, i) => (
-            <option key={i}>{c}</option>
-          ))}
-        </select>
+    <Paper
+      sx={{
+        position: "sticky",
+        top: 60,
+        zIndex: 50,
+        p: 3,
+        mb: 4,
+        borderRadius: "22px",
+        background: "rgba(255,255,255,0.90)",
+        backdropFilter: "blur(6px)",
+        boxShadow: "0 6px 18px rgba(0,0,0,0.08)"
+      }}
+    >
+      <Grid container spacing={3} justifyContent="center" alignItems="center">
+        {/* City */}
+        <Grid item xs={12} sm={6} md={3}>
+          <FormControl fullWidth>
+            <InputLabel>Select City</InputLabel>
+            <Select
+              value={city}
+              label="Select City"
+              onChange={(e) => setCity(e.target.value)}
+              sx={{ height: "52px", borderRadius: "14px" }}
+            >
+              <MenuItem value="">All Cities</MenuItem>
+              {cities.map((c, i) => (
+                <MenuItem key={i} value={c}>
+                  {c}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
 
-        <select
-          className="border p-2 rounded"
-          value={subject}
-          onChange={(e) => setSubject(e.target.value)}
-        >
-          <option value="">Select Subject</option>
-          {subjects.map((s, i) => (
-            <option key={i}>{s}</option>
-          ))}
-        </select>
-
-        <select
-          className="border p-2 rounded"
-          value={grade}
-          onChange={(e) => setGrade(e.target.value)}
-        >
-          <option value="">Select Grade</option>
-          {grades.map((g, i) => (
-            <option key={i}>{g}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Row 2 */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <select
-          className="border p-2 rounded"
-          value={gender}
-          onChange={(e) => setGender(e.target.value)}
-        >
-          <option value="">Gender Requirement</option>
-          <option value="Male">Male Only</option>
-          <option value="Female">Female Only</option>
-        </select>
-
-        <div className="col-span-2">
-          <label className="font-medium">
-            Fee Range: {feeValue[0]} – {feeValue[1]}
-          </label>
-          <Slider
-            value={feeValue}
-            onChange={(e, newVal) => setFeeValue(newVal)}
-            min={2000}
-            max={50000}
-            step={500}
+        {/* Subject (text search) */}
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            fullWidth
+            label="Search Subject"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            sx={{ "& .MuiInputBase-root": { height: "52px", borderRadius: "14px" } }}
           />
-        </div>
-      </div>
+        </Grid>
 
-      <button
-        onClick={reset}
-        className="bg-gray-800 text-white px-4 py-2 rounded"
-      >
-        Reset Filters
-      </button>
-    </div>
+        {/* Gender */}
+        <Grid item xs={12} sm={6} md={2}>
+          <FormControl fullWidth>
+            <InputLabel>Gender</InputLabel>
+            <Select
+              value={gender}
+              label="Gender"
+              onChange={(e) => setGender(e.target.value)}
+              sx={{ height: "52px", borderRadius: "14px" }}
+            >
+              <MenuItem value="">Any</MenuItem>
+              <MenuItem value="Male">Male</MenuItem>
+              <MenuItem value="Female">Female</MenuItem>
+              <MenuItem value="Both">Both</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+
+        {/* Grade */}
+        <Grid item xs={12} sm={6} md={2}>
+          <FormControl fullWidth>
+            <InputLabel>Grade</InputLabel>
+            <Select
+              value={grade}
+              label="Grade"
+              onChange={(e) => setGrade(e.target.value)}
+              sx={{ height: "52px", borderRadius: "14px" }}
+            >
+              <MenuItem value="">All Grades</MenuItem>
+              {grades.map((g, i) => (
+                <MenuItem key={i} value={g}>
+                  {g}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+
+        {/* Fee slider */}
+        <Grid item xs={12} md={12}>
+          <Box sx={{ px: 1 }}>
+            <Typography variant="subtitle2" sx={{ mb: 1, color: "#333", fontWeight: 600 }}>
+              Fee Range: {feeValue[0].toLocaleString()} — {feeValue[1].toLocaleString()}
+            </Typography>
+
+            <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+              <Box sx={{ flex: 1 }}>
+                <Slider
+                  value={feeValue}
+                  onChange={(e, v) => setFeeValue(v)}
+                  valueLabelDisplay="auto"
+                  min={minFee}
+                  max={maxFee}
+                />
+              </Box>
+
+              <Box sx={{ display: "flex", gap: 1 }}>
+                {presets.map((p, i) => (
+                  <Button
+                    key={i}
+                    size="small"
+                    variant="outlined"
+                    onClick={() => setFeeValue(p)}
+                    sx={{ textTransform: "none" }}
+                  >
+                    {p[0].toLocaleString()} - {p[1] === maxFee ? `${p[0].toLocaleString()}+` : p[1].toLocaleString()}
+                  </Button>
+                ))}
+              </Box>
+            </Box>
+          </Box>
+        </Grid>
+
+        {/* Reset */}
+        <Grid item xs={12} md={12} sx={{ textAlign: "right" }}>
+          <Button onClick={onReset} variant="contained" sx={{ background: "#004aad" }}>
+            Reset Filters
+          </Button>
+        </Grid>
+      </Grid>
+    </Paper>
   );
 }
