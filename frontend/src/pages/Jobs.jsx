@@ -1,4 +1,3 @@
-// Jobs.jsx
 import { useEffect, useState, useRef, useCallback } from "react";
 import { fetchJobs } from "../api";
 import JobCard from "../components/JobCard";
@@ -30,10 +29,10 @@ export default function Jobs() {
         const data = res?.jobs ?? res ?? [];
         setJobs(Array.isArray(data) ? data : []);
 
-        // Compute fee range
+        // Compute fee range safely
         const fees = (data || [])
           .map((j) => {
-            const f = Number(j.Fee || j.fee || j.Fees);
+            const f = Number(j.fee ?? j.Fee ?? j.Fees ?? 0);
             return isNaN(f) ? 0 : f;
           })
           .filter(Boolean);
@@ -49,42 +48,42 @@ export default function Jobs() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Derive filter options
+  // Derive filter options safely
   const cityOptions = Array.from(
-    new Set(jobs.map((j) => (j.city || j.City || "").trim()).filter(Boolean))
+    new Set(jobs.map((j) => String(j.city ?? j.City ?? "").trim()).filter(Boolean))
   );
   const gradeOptions = Array.from(
-    new Set(jobs.map((j) => (j.grade || j.Grade || j.Class || "").trim()).filter(Boolean))
+    new Set(jobs.map((j) => String(j.grade ?? j.Grade ?? j.Class ?? "").trim()).filter(Boolean))
   );
 
-  // Apply filters (tolerant to missing fields)
+  // Apply filters
   const filtered = jobs.filter((job) => {
-    const jobCity = (job.city || job.City || "").toLowerCase();
-    const jobSubjects = (job.subjects || job.Subjects || job.Subject || "").toLowerCase();
-    const jobGender = (job.gender || job.Gender || "Both").toLowerCase();
-    const jobGrade = (job.grade || job.Grade || job.Class || "").toLowerCase();
+    const jobCity = String(job.city ?? job.City ?? "").toLowerCase();
+    const jobSubjects = String(job.subjects ?? job.Subjects ?? job.Subject ?? "").toLowerCase();
+    const jobGender = String(job.gender ?? job.Gender ?? "Both").toLowerCase();
+    const jobGrade = String(job.grade ?? job.Grade ?? job.Class ?? "").toLowerCase();
 
-    let jobFee = Number(job.fee || job.Fee || job.Fees);
+    let jobFee = Number(job.fee ?? job.Fee ?? job.Fees ?? 0);
     if (isNaN(jobFee)) jobFee = 0;
 
-    if (city && jobCity && !jobCity.includes(city.toLowerCase())) return false;
-    if (subject && jobSubjects && !jobSubjects.includes(subject.toLowerCase())) return false;
-    if (gender && gender !== "Both" && jobGender && !jobGender.includes(gender.toLowerCase())) return false;
-    if (grade && jobGrade && !jobGrade.includes(grade.toLowerCase())) return false;
+    if (city && !jobCity.includes(city.toLowerCase())) return false;
+    if (subject && !jobSubjects.includes(subject.toLowerCase())) return false;
+    if (gender && gender.toLowerCase() !== "both" && !jobGender.includes(gender.toLowerCase())) return false;
+    if (grade && !jobGrade.includes(grade.toLowerCase())) return false;
     if (jobFee < feeValue[0] || jobFee > feeValue[1]) return false;
 
     return true;
   });
 
-  // Visible jobs slice for infinite scroll
+  // Slice visible jobs for infinite scroll
   const visibleJobs = filtered.slice(0, Math.min(visibleCount, filtered.length));
 
-  // Reset visible count when filters change
+  // Reset visible count on filters change
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
   }, [city, subject, gender, grade, feeValue]);
 
-  // Intersection observer for infinite scroll
+  // Infinite scroll observer
   const handleObserver = useCallback(
     (entries) => {
       const target = entries[0];
