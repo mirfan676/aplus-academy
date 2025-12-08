@@ -48,9 +48,12 @@ export default function JobFilters({
     [20000, maxFee || 50000]
   ];
 
+  // Make options safe: convert any value to string
+  const safeCities = Array.from(new Set(cities.map(c => c != null ? String(c) : ""))).filter(Boolean);
+  const safeGrades = Array.from(new Set(grades.map(g => g != null ? String(g) : ""))).filter(Boolean);
+
   const filterContent = (
     <Box sx={{ p: 3, width: "100%", maxWidth: 960, mx: "auto" }}>
-      {/* CLOSE BUTTON (MOBILE) */}
       {isMobile && (
         <Box sx={{ textAlign: "right" }}>
           <IconButton onClick={() => setDrawerOpen(false)}>
@@ -60,7 +63,6 @@ export default function JobFilters({
       )}
 
       <Grid container spacing={2} justifyContent="center">
-        {/* Filters Row */}
         <Grid
           item
           xs={12}
@@ -81,7 +83,7 @@ export default function JobFilters({
               sx={{ height: "52px", borderRadius: "14px" }}
             >
               <MenuItem value="">All Cities</MenuItem>
-              {cities.map((c, i) => (
+              {safeCities.map((c, i) => (
                 <MenuItem key={i} value={c}>
                   {c}
                 </MenuItem>
@@ -127,7 +129,7 @@ export default function JobFilters({
               sx={{ height: "52px", borderRadius: "14px" }}
             >
               <MenuItem value="">All Grades</MenuItem>
-              {grades.map((g, i) => (
+              {safeGrades.map((g, i) => (
                 <MenuItem key={i} value={g}>
                   {g}
                 </MenuItem>
@@ -140,7 +142,7 @@ export default function JobFilters({
         <Grid item xs={12}>
           <Box sx={{ width: "100%", maxWidth: 480, mx: "auto" }}>
             <Typography variant="subtitle2" sx={{ mb: 1, color: "#333", fontWeight: 600 }}>
-              Fee Range: {feeValue[0].toLocaleString()} — {feeValue[1].toLocaleString()}
+              Fee Range: {Number(feeValue[0]).toLocaleString()} — {Number(feeValue[1]).toLocaleString()}
             </Typography>
             <Slider
               value={feeValue}
@@ -158,7 +160,7 @@ export default function JobFilters({
                   onClick={() => setFeeValue(p)}
                   sx={{ textTransform: "none" }}
                 >
-                  {p[0].toLocaleString()} - {p[1] === maxFee ? `${p[0].toLocaleString()}+` : p[1].toLocaleString()}
+                  {Number(p[0]).toLocaleString()} - {p[1] === maxFee ? `${Number(p[0]).toLocaleString()}+` : Number(p[1]).toLocaleString()}
                 </Button>
               ))}
             </Box>

@@ -1,3 +1,4 @@
+// JobCard.jsx
 import { Box, Card, Typography, Button, Chip } from "@mui/material";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
@@ -6,31 +7,28 @@ import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import { motion } from "framer-motion";
 
 export default function JobCard({ job }) {
+  // Tolerant field mapping (convert numbers to strings if needed)
   const final = {
-    title: String(job.Title || job.title || "Home Tutor Required"),
-    grade: String(job.Grade || job.grade || job.Class || ""),
-    school: String(job.School || job.school || ""),
-    students: String(job.Students || job.students || ""),
-    subjects: String(job.Subjects || job.subjects || job.Subject || ""),
-    timing: String(job.Timing || job.timing || job.Time || ""),
-    fee: Number(job.Fee || job.fee || job.Fees || 0),
-    location: String(job.Location || job.location || ""),
-    city: String(job.City || job.city || ""),
-    gender: String(job.Gender || job.gender || ""),
-    contact: String(job.Contact || job.contact || job.Phone || ""),
-    status: String((job.Status || job.status || "")).toLowerCase(),
+    title: String(job.Title ?? job.title ?? "Home Tutor Required"),
+    grade: String(job.Grade ?? job.grade ?? job.Class ?? ""),
+    school: String(job.School ?? job.school ?? ""),
+    students: String(job.Students ?? job.students ?? ""),
+    subjects: String(job.Subjects ?? job.subjects ?? job.Subject ?? ""),
+    timing: String(job.Timing ?? job.timing ?? job.Time ?? ""),
+    fee: Number(job.Fee ?? job.fee ?? job.Fees ?? 0),
+    location: String(job.Location ?? job.location ?? ""),
+    city: String(job.City ?? job.city ?? ""),
+    gender: String(job.Gender ?? job.gender ?? ""),
+    contact: String(job.Contact ?? job.contact ?? job.Phone ?? ""),
+    status: String(job.Status ?? job.status ?? "").toLowerCase(),
     whatsapp_message: String(
-      job.WhatsappMessage ||
-        job.whatsapp_message ||
-        `Hi, I want to apply for ${job.Title || job.title || "this job"}.`
+      job.WhatsappMessage ?? job.whatsapp_message ?? `Hi, I want to apply for ${job.Title ?? job.title ?? "this job"}.`
     ),
   };
 
   const isClosed = final.status === "closed" || final.status === "inactive";
-  const phone = (final.contact || "").replace(/\D/g, "");
-  const waUrl = phone
-    ? `https://wa.me/${phone}?text=${encodeURIComponent(final.whatsapp_message)}`
-    : null;
+  const phone = final.contact.replace(/\D/g, "");
+  const waUrl = phone ? `https://wa.me/${phone}?text=${encodeURIComponent(final.whatsapp_message)}` : null;
 
   return (
     <motion.div
