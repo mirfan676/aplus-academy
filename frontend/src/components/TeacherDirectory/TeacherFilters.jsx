@@ -5,6 +5,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  TextField,
 } from "@mui/material";
 
 export default function TeacherFilters({
@@ -12,6 +13,8 @@ export default function TeacherFilters({
   setSelectedCity,
   selectedSubject,
   setSelectedSubject,
+  search,
+  setSearch,
   cities,
   subjects,
 }) {
@@ -36,16 +39,41 @@ export default function TeacherFilters({
         alignItems="center"
         sx={{ width: "100%", mx: "auto" }}
       >
+        {/* SEARCH */}
+        <Grid
+          item
+          xs={12}
+          sm={12}
+          md={4}
+          sx={{ display: "flex", justifyContent: "center" }}
+        >
+          <TextField
+            fullWidth
+            label="Search tutor name or subject"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            sx={{
+              width: {
+                xs: "100%",
+                sm: "80%",
+                md: "320px",
+              },
+              "& .MuiOutlinedInput-root": {
+                height: "52px",
+                borderRadius: "14px",
+                fontSize: "16px",
+              },
+            }}
+          />
+        </Grid>
+
         {/* CITY */}
         <Grid
           item
           xs={12}
           sm={6}
           md={4}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-          }}
+          sx={{ display: "flex", justifyContent: "center" }}
         >
           <FormControl
             fullWidth
@@ -53,7 +81,7 @@ export default function TeacherFilters({
               width: {
                 xs: "120px",
                 sm: "80%",
-                md: "320px", // fixed width desktop
+                md: "320px",
               },
             }}
           >
@@ -84,10 +112,7 @@ export default function TeacherFilters({
           xs={12}
           sm={6}
           md={4}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-          }}
+          sx={{ display: "flex", justifyContent: "center" }}
         >
           <FormControl
             fullWidth
@@ -95,7 +120,7 @@ export default function TeacherFilters({
               width: {
                 xs: "120px",
                 sm: "80%",
-                md: "320px", // fixed width desktop
+                md: "320px",
               },
             }}
           >
