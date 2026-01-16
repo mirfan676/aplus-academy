@@ -1,9 +1,19 @@
 // LazyMapSection.jsx
-import React from "react";
-import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
+import React, { useEffect } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  Circle,
+  useMap,
+} from "react-leaflet";
 import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
+// -----------------------------
 // Subject color mapping
+// -----------------------------
 const subjectColors = {
   Mathematics: "#1E88E5",
   Physics: "#43A047",
@@ -14,31 +24,28 @@ const subjectColors = {
   Statistics: "#FB8C00",
   Botany: "#4CAF50",
   Zoology: "#E53935",
-  default: "#FF5722", // fallback
+  default: "#FF5722",
 };
 
-/**
- * Creates a stylish teacher marker with optional initials
- * @param {string} color Marker color
- * @param {string} initials Letters to display inside marker
- */
+// -----------------------------
+// Custom marker icon
+// -----------------------------
 const createTeacherIcon = (color = "#004aad", initials = "") =>
   new L.DivIcon({
     html: `
       <div style="
-        background: ${color};
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        border: 2px solid white;
-        box-shadow: 0 0 6px rgba(0,0,0,0.3);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 14px;
-        font-weight: 700;
-        color: white;
-        text-transform: uppercase;
+        background:${color};
+        width:32px;
+        height:32px;
+        border-radius:50%;
+        border:2px solid white;
+        box-shadow:0 0 6px rgba(0,0,0,0.3);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:13px;
+        font-weight:700;
+        color:white;
       ">
         ${initials}
       </div>
@@ -49,47 +56,58 @@ const createTeacherIcon = (color = "#004aad", initials = "") =>
     popupAnchor: [0, -32],
   });
 
+// -----------------------------
+// Auto fit bounds helper
+// -----------------------------
+function FitBounds({ points = [] }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!points.length) return;
+    const bounds = L.latLngBounds(points);
+    map.fitBounds(bounds.pad(0.18));
+  }, [points, map]);
+
+  return null;
+}
+
 /**
  * Props:
  * - userLocation: [lat, lng]
- * - filtered: array of tutors { id, name, lat, lng, city, subjects }
+ * - filtered: tutors [{ id, name, lat, lng, city, subjects }]
  */
-const LazyMapSection = ({ userLocation = [31.5204, 74.3587], filtered = [] }) => {
-  // collect valid coordinates
-  const points = filtered
+const LazyMapSection = ({
+  userLocation = [31.5204, 74.3587],
+  filtered = [],
+}) => {
+  // -----------------------------
+  // Valid teacher points
+  // -----------------------------
+  const teacherPoints = filtered
     .map((t) => {
       const lat = Number(t.lat);
       const lng = Number(t.lng);
-      if (!isNaN(lat) && !isNaN(lng)) return [lat, lng];
-      return null;
+      return Number.isFinite(lat) && Number.isFinite(lng)
+        ? [lat, lng]
+        : null;
     })
     .filter(Boolean);
+
+  const allPoints = [userLocation, ...teacherPoints];
 
   return (
     <MapContainer
       center={userLocation}
       zoom={12}
       style={{ height: "100%", width: "100%" }}
-      whenCreated={(map) => {
-        try {
-          if (points.length > 0) {
-            const bounds = L.latLngBounds(points);
-            bounds.extend(userLocation);
-            map.fitBounds(bounds.pad(0.18));
-          } else {
-            map.setView(userLocation, 12);
-          }
-        } catch {
-          map.setView(userLocation, 12);
-        }
-      }}
+      scrollWheelZoom={false}
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
+        attribution="&copy; OpenStreetMap contributors"
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      {/* circle around user */}
+      {/* Radius around user */}
       <Circle
         center={userLocation}
         radius={20000}
@@ -100,18 +118,20 @@ const LazyMapSection = ({ userLocation = [31.5204, 74.3587], filtered = [] }) =>
         }}
       />
 
-      {/* user marker */}
-      <Marker position={userLocation} icon={createTeacherIcon("#0d6efd", "U")}>
+      {/* User marker */}
+      <Marker
+        position={userLocation}
+        icon={createTeacherIcon("#0d6efd", "U")}
+      >
         <Popup>You are here</Popup>
       </Marker>
 
-      {/* teacher markers */}
+      {/* Teacher markers */}
       {filtered.slice(0, 200).map((t) => {
         const lat = Number(t.lat);
         const lng = Number(t.lng);
-        if (isNaN(lat) || isNaN(lng)) return null;
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
 
-        const firstSubject = Array.isArray(t.subjects) ? t.subjects[0] : "";
         const initials = t.name
           ? t.name
               .split(" ")
@@ -121,8 +141,13 @@ const LazyMapSection = ({ userLocation = [31.5204, 74.3587], filtered = [] }) =>
               .toUpperCase()
           : "?";
 
-        // pick color based on subject
-        const color = subjectColors[firstSubject] || subjectColors.default;
+        const firstSubject =
+          Array.isArray(t.subjects) && t.subjects.length > 0
+            ? t.subjects[0]
+            : "";
+
+        const color =
+          subjectColors[firstSubject] || subjectColors.default;
 
         return (
           <Marker
@@ -132,12 +157,19 @@ const LazyMapSection = ({ userLocation = [31.5204, 74.3587], filtered = [] }) =>
           >
             <Popup>
               <div style={{ fontWeight: 700 }}>{t.name}</div>
-              <div style={{ fontSize: 12 }}>{firstSubject}</div>
-              <div style={{ fontSize: 12, color: "#333" }}>{t.city}</div>
+              {firstSubject && (
+                <div style={{ fontSize: 12 }}>{firstSubject}</div>
+              )}
+              <div style={{ fontSize: 12, color: "#333" }}>
+                {t.city}
+              </div>
             </Popup>
           </Marker>
         );
       })}
+
+      {/* Auto fit */}
+      <FitBounds points={allPoints} />
     </MapContainer>
   );
 };

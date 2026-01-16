@@ -8,8 +8,7 @@ export default function TeacherMapSection({
   mapVisible,
   setMapVisible,
   userLocation,
-  filtered,
-  personIcon,
+  filtered = [],
 }) {
   return (
     <Box
@@ -38,9 +37,8 @@ export default function TeacherMapSection({
           }
         >
           <LazyMap
-            filtered={filtered}
             userLocation={userLocation}
-            personIcon={personIcon}
+            filtered={filtered}
           />
         </Suspense>
       ) : (
