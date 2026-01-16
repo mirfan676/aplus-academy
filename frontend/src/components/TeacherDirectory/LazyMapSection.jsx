@@ -28,7 +28,7 @@ const subjectColors = {
 };
 
 // -----------------------------
-// Custom marker icon
+// Custom marker
 // -----------------------------
 const createTeacherIcon = (color = "#004aad", initials = "") =>
   new L.DivIcon({
@@ -57,36 +57,28 @@ const createTeacherIcon = (color = "#004aad", initials = "") =>
   });
 
 // -----------------------------
-// Auto fit bounds helper
+// Auto-fit bounds
 // -----------------------------
-function FitBounds({ points = [] }) {
+function FitBounds({ points }) {
   const map = useMap();
 
   useEffect(() => {
     if (!points.length) return;
-    const bounds = L.latLngBounds(points);
-    map.fitBounds(bounds.pad(0.18));
+    map.fitBounds(L.latLngBounds(points).pad(0.18));
   }, [points, map]);
 
   return null;
 }
 
-/**
- * Props:
- * - userLocation: [lat, lng]
- * - filtered: tutors [{ id, name, lat, lng, city, subjects }]
- */
 const LazyMapSection = ({
   userLocation = [31.5204, 74.3587],
   filtered = [],
 }) => {
-  // -----------------------------
-  // Valid teacher points
-  // -----------------------------
+  // ✅ CORRECT LOCATION READ
   const teacherPoints = filtered
     .map((t) => {
-      const lat = Number(t.lat);
-      const lng = Number(t.lng);
+      const lat = Number(t.location?.lat);
+      const lng = Number(t.location?.lng);
       return Number.isFinite(lat) && Number.isFinite(lng)
         ? [lat, lng]
         : null;
@@ -100,14 +92,13 @@ const LazyMapSection = ({
       center={userLocation}
       zoom={12}
       style={{ height: "100%", width: "100%" }}
-      scrollWheelZoom={false}
     >
       <TileLayer
         attribution="&copy; OpenStreetMap contributors"
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      {/* Radius around user */}
+      {/* User radius */}
       <Circle
         center={userLocation}
         radius={20000}
@@ -126,10 +117,10 @@ const LazyMapSection = ({
         <Popup>You are here</Popup>
       </Marker>
 
-      {/* Teacher markers */}
-      {filtered.slice(0, 200).map((t) => {
-        const lat = Number(t.lat);
-        const lng = Number(t.lng);
+      {/* ✅ TEACHER MARKERS */}
+      {filtered.map((t) => {
+        const lat = Number(t.location?.lat);
+        const lng = Number(t.location?.lng);
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
 
         const initials = t.name
@@ -141,17 +132,16 @@ const LazyMapSection = ({
               .toUpperCase()
           : "?";
 
-        const firstSubject =
-          Array.isArray(t.subjects) && t.subjects.length > 0
-            ? t.subjects[0]
-            : "";
+        const firstSubject = Array.isArray(t.subjects)
+          ? t.subjects[0]
+          : "";
 
         const color =
           subjectColors[firstSubject] || subjectColors.default;
 
         return (
           <Marker
-            key={t.id ?? `${lat}-${lng}`}
+            key={t.id}
             position={[lat, lng]}
             icon={createTeacherIcon(color, initials)}
           >
@@ -160,15 +150,12 @@ const LazyMapSection = ({
               {firstSubject && (
                 <div style={{ fontSize: 12 }}>{firstSubject}</div>
               )}
-              <div style={{ fontSize: 12, color: "#333" }}>
-                {t.city}
-              </div>
+              <div style={{ fontSize: 12 }}>{t.city}</div>
             </Popup>
           </Marker>
         );
       })}
 
-      {/* Auto fit */}
       <FitBounds points={allPoints} />
     </MapContainer>
   );
