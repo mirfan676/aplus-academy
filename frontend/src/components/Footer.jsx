@@ -15,6 +15,7 @@ import {
   WhatsApp,
   Twitter,
   LinkedIn,
+  Pinterest,
 } from "@mui/icons-material";
 
 const Footer = () => {
@@ -197,11 +198,11 @@ const Footer = () => {
 
             <Box sx={{ mt: 2 }}>
               {[
-                { icon: <Facebook />, link: "#" },
-                { icon: <Instagram />, link: "#" },
-                { icon: <Twitter />, link: "#" },
-                { icon: <LinkedIn />, link: "#" },
-                { icon: <YouTube />, link: "#" },
+                { icon: <Facebook />, link: "facebook.com/aplushometutorspk" },
+                { icon: <Instagram />, link: "instagram.com/aplushometutorspk" },
+                { icon: <Twitter />, link: "x.com/aplus_pk" },
+                { icon: <Pinterest />, link: "pinterest.com/aplushometutorspk/" },
+                { icon: <YouTube />, link: "youtube.com/@aplushometutors" },
                 {
                   icon: <WhatsApp />,
                   link: "https://wa.me/923066762289",
