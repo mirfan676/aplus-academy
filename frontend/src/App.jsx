@@ -12,6 +12,8 @@ import TermsAndConditions from "./pages/TermsAndConditions";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 import RouteRedirect from "./components/RouteRedirect";
+import LandingPage from "./pages/landing/LandingPage";
+import { allLandingPages } from "./pages/landing/landingPages";
 
 
 import { ThemeProvider, CssBaseline, Container, Card, CardContent } from "@mui/material";
@@ -70,14 +72,26 @@ function App() {
           />
           <Route path="/teachers" element={<TeacherDirectory />} />
           <Route path="/tutors" element={<RouteRedirect to="/teachers" />} />
-          <Route path="/tutors/o-levels" element={<RouteRedirect to="/teachers?subject=O%20Level" />} />
+          <Route path="/tutors/o-levels" element={<RouteRedirect to="/o-a-level" />} />
           <Route path="/contact" element={<RouteRedirect to="/about" />} />
           <Route path="/become-a-tutor" element={<RouteRedirect to="/register" />} />
-          <Route path="/career-opportunities" element={<RouteRedirect to="/jobs" />} />
-          <Route path="/study-abroad" element={<RouteRedirect to="/about" />} />
-          <Route path="/referral-program" element={<RouteRedirect to="/about" />} />
-          <Route path="/languages" element={<RouteRedirect to="/teachers" />} />
-          <Route path="/buy-courses" element={<RouteRedirect to="/teachers" />} />
+          <Route path="/study-abroad" element={<LandingPage page={allLandingPages.studyAbroad} />} />
+          <Route path="/referral-program" element={<LandingPage page={allLandingPages.referralProgram} />} />
+          <Route path="/career-opportunities" element={<LandingPage page={allLandingPages.careerOpportunities} />} />
+          <Route path="/languages" element={<LandingPage page={allLandingPages.languages} />} />
+          <Route path="/buy-courses" element={<LandingPage page={allLandingPages.buyCourses} />} />
+          <Route path="/k-12" element={<LandingPage page={allLandingPages.k12} />} />
+          <Route path="/o-a-level" element={<LandingPage page={allLandingPages.oALevel} />} />
+          <Route path="/bachelors-masters" element={<LandingPage page={allLandingPages.bachelorsMasters} />} />
+          <Route path="/competitive-exams" element={<LandingPage page={allLandingPages.competitiveExams} />} />
+          <Route path="/it-technology" element={<LandingPage page={allLandingPages.itTechnology} />} />
+          <Route path="/programming" element={<LandingPage page={allLandingPages.programming} />} />
+          <Route path="/quran-tajweed" element={<LandingPage page={allLandingPages.quranTajweed} />} />
+          <Route path="/english-language" element={<LandingPage page={allLandingPages.englishLanguage} />} />
+          <Route path="/ielts" element={<LandingPage page={allLandingPages.ielts} />} />
+          <Route path="/graphics-multimedia" element={<LandingPage page={allLandingPages.graphicsMultimedia} />} />
+          <Route path="/online-tutors-pakistan" element={<LandingPage page={allLandingPages.onlineTutorsPakistan} />} />
+          <Route path="/home-tutors-lahore" element={<LandingPage page={allLandingPages.homeTutorsLahore} />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/terms" element={<TermsAndConditions />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />

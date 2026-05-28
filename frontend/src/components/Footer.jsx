@@ -16,22 +16,22 @@ const academyLinks = [
   { label: "Become a Tutor", href: "/register" },
   { label: "Study Abroad", href: "/study-abroad" },
   { label: "Referral Program", href: "/referral-program" },
-  { label: "Career Opportunities", href: "/jobs" },
+  { label: "Career Opportunities", href: "/career-opportunities" },
   { label: "Languages", href: "/languages" },
   { label: "Buy Courses", href: "/buy-courses" },
 ];
 
 const classLinks = [
-  { label: "K-12", href: "/teachers" },
-  { label: "O & A Level", href: "/tutors/o-levels" },
-  { label: "Bachelors / Masters", href: "/teachers" },
-  { label: "Competitive Exams", href: "/teachers" },
-  { label: "IT & Technology", href: "/teachers?subject=Computer%20Science" },
-  { label: "Programming", href: "/teachers?subject=Programming" },
-  { label: "Qur'an & Tajweed", href: "/teachers?subject=Quran" },
-  { label: "English Language", href: "/teachers?subject=English" },
-  { label: "IELTS", href: "/teachers?subject=IELTS" },
-  { label: "Graphics & Multimedia", href: "/teachers?subject=Graphic%20Design" },
+  { label: "K-12", href: "/k-12" },
+  { label: "O & A Level", href: "/o-a-level" },
+  { label: "Bachelors / Masters", href: "/bachelors-masters" },
+  { label: "Competitive Exams", href: "/competitive-exams" },
+  { label: "IT & Technology", href: "/it-technology" },
+  { label: "Programming", href: "/programming" },
+  { label: "Qur'an & Tajweed", href: "/quran-tajweed" },
+  { label: "English Language", href: "/english-language" },
+  { label: "IELTS", href: "/ielts" },
+  { label: "Graphics & Multimedia", href: "/graphics-multimedia" },
 ];
 
 const socialLinks = [
