@@ -4,8 +4,16 @@ import { fetchJobs } from "../api";
 import JobCard from "../components/JobCard";
 import JobFilters from "../components/JobFilters";
 import { Container, Box, Typography, Chip, Stack } from "@mui/material";
+import useSEO from "../hooks/useSEO";
 
 export default function Jobs() {
+  useSEO({
+    title: "Latest Home Tutor Jobs - A Plus Home Tutors Pakistan",
+    description:
+      "Browse verified home tuition and online tutor jobs across Pakistan with A Plus Home Tutors.",
+    canonical: "https://www.aplusacademy.pk/jobs",
+  });
+
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -138,6 +146,7 @@ export default function Jobs() {
     <Box sx={{ background: "#e8f2ff", py: 6, px: { xs: 2, md: 4 } }}>
       <Container maxWidth="lg">
         <Typography
+          component="h1"
           variant="h4"
           align="center"
           fontWeight={700}

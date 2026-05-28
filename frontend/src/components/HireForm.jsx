@@ -12,6 +12,8 @@ import {
 } from "@mui/material";
 import { useParams, useLocation } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
+import api from "../api";
+import useSEO from "../hooks/useSEO";
 
 const RECAPTCHA_SITE_KEY = "6LcTdf8rAAAAAHUIrbcURlFEKtL4-4siGvJgYpxl";
 
@@ -34,6 +36,15 @@ const HireForm = () => {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
+  useSEO({
+    title: teacher
+      ? `Hire ${teacher.Name || teacher.name || "Tutor"} - A Plus Home Tutors`
+      : "Hire a Verified Tutor - A Plus Home Tutors",
+    description:
+      "Send a secure tutor hiring request to A Plus Home Tutors and connect with a verified teacher.",
+    canonical: `https://www.aplusacademy.pk/hire/${teacherId || ""}`,
+  });
+
   // Fetch teacher info
   useEffect(() => {
     const fetchTeacher = async () => {
@@ -42,11 +53,8 @@ const HireForm = () => {
         return;
       }
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/teachers/${teacherId}`
-        );
-        if (!response.ok) throw new Error("Failed to fetch teacher data");
-        const data = await response.json();
+        const response = await api.get(`/tutors/${teacherId}`);
+        const data = response.data;
         setTeacher(data);
       } catch (err) {
         console.error("Error fetching teacher:", err);

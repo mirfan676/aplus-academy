@@ -16,6 +16,7 @@ import {
   Autocomplete,
 } from "@mui/material";
 import api from "../api";
+import useSEO from "../hooks/useSEO";
 
 const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
@@ -116,6 +117,13 @@ const qualificationSuggestions = {
 };
 
 export default function TutorRegistration() {
+  useSEO({
+    title: "Register as a Tutor - A Plus Home Tutors Pakistan",
+    description:
+      "Apply to join A Plus Home Tutors and connect with students looking for verified home and online tutors across Pakistan.",
+    canonical: "https://www.aplusacademy.pk/register",
+  });
+
   const [formData, setFormData] = useState({
     name: "",
     qualification: "",

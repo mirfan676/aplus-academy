@@ -10,6 +10,8 @@ import HireForm from "./components/HireForm";
 import CookieConsent from "./components/CookieConsent";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import NotFound from "./pages/NotFound";
+import RouteRedirect from "./components/RouteRedirect";
 
 
 import { ThemeProvider, CssBaseline, Container, Card, CardContent } from "@mui/material";
@@ -67,12 +69,22 @@ function App() {
             }
           />
           <Route path="/teachers" element={<TeacherDirectory />} />
+          <Route path="/tutors" element={<RouteRedirect to="/teachers" />} />
+          <Route path="/tutors/o-levels" element={<RouteRedirect to="/teachers?subject=O%20Level" />} />
+          <Route path="/contact" element={<RouteRedirect to="/about" />} />
+          <Route path="/become-a-tutor" element={<RouteRedirect to="/register" />} />
+          <Route path="/career-opportunities" element={<RouteRedirect to="/jobs" />} />
+          <Route path="/study-abroad" element={<RouteRedirect to="/about" />} />
+          <Route path="/referral-program" element={<RouteRedirect to="/about" />} />
+          <Route path="/languages" element={<RouteRedirect to="/teachers" />} />
+          <Route path="/buy-courses" element={<RouteRedirect to="/teachers" />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/terms" element={<TermsAndConditions />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/teacher/:id" element={<TeacherProfile />} />
           <Route path="/hire/:id" element={<HireForm />} />
           <Route path="/jobs" element={<Jobs />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
 
         {/* Footer */}

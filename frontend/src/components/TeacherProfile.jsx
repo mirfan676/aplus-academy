@@ -13,7 +13,8 @@ import {
   Alert,
 } from "@mui/material";
 import { CheckCircle, Star } from "@mui/icons-material";
-import axios from "axios";
+import api from "../api";
+import useSEO from "../hooks/useSEO";
 
 const TeacherProfile = () => {
   const { id } = useParams();
@@ -21,39 +22,43 @@ const TeacherProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  useSEO({
+    title: teacher
+      ? `${teacher.name} - Verified Tutor | A Plus Home Tutors`
+      : "Verified Tutor Profile - A Plus Home Tutors",
+    description: teacher
+      ? `View ${teacher.name}'s tutor profile, subjects, experience, and preferred teaching areas.`
+      : "View verified tutor profiles at A Plus Home Tutors.",
+    canonical: `https://www.aplusacademy.pk/teacher/${id}`,
+  });
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
 
     const fetchTeacher = async () => {
       try {
         setLoading(true);
-        const res = await axios.get("https://aplus-academy.onrender.com/tutors/");
-        if (Array.isArray(res.data)) {
-          const mapped = res.data.map((t, i) => ({
-            id: i,
-            name: t["Name"] || "Unknown",
-            subjects: Array.isArray(t["Subjects"]) ? t["Subjects"] : [],
-            qualification: t["Qualification"] || "",
-            experience: t["Experience"] || "",
-            city: t["District"] ? String(t["District"]) : "",
-            bio: t["Bio"] || "",
-            price: t["Price"] || "Rs 2000",
-            thumbnail: t["Thumbnail"] || "",
-            lat: isNaN(parseFloat(t["Latitude"])) ? 31.5204 : parseFloat(t["Latitude"]),
-            lng: isNaN(parseFloat(t["Longitude"])) ? 74.3587 : parseFloat(t["Longitude"]),
-            verified: t["Verified"]?.trim(),
-            featured: t["Featured"]?.trim(),
-            Area1: t["Area1"] || "",
-            Area2: t["Area2"] || "",
-            Area3: t["Area3"] || "",
-            rating: t["Rating"] || 5,
-          }));
-          const found = mapped.find((t) => Number(t.id) === Number(id));
-          if (found) setTeacher(found);
-          else setError("Teacher not found.");
-        } else {
-          setError("No teacher data available.");
-        }
+        const res = await api.get(`/tutors/${id}`);
+        const t = res.data;
+        setTeacher({
+          id: Number(id),
+          name: t["Name"] || "Unknown",
+          subjects: Array.isArray(t["Subjects"]) ? t["Subjects"] : [],
+          qualification: t["Qualification"] || "",
+          experience: t["Experience"] || "",
+          city: t["District"] ? String(t["District"]) : t["City"] || "",
+          bio: t["Bio"] || "",
+          price: t["Price"] || "Rs 2000",
+          thumbnail: t["Thumbnail"] || "",
+          lat: isNaN(parseFloat(t["Latitude"])) ? 31.5204 : parseFloat(t["Latitude"]),
+          lng: isNaN(parseFloat(t["Longitude"])) ? 74.3587 : parseFloat(t["Longitude"]),
+          verified: t["Verified"]?.trim(),
+          featured: t["Featured"]?.trim(),
+          Area1: t["Area1"] || "",
+          Area2: t["Area2"] || "",
+          Area3: t["Area3"] || "",
+          rating: t["Rating"] || 5,
+        });
       } catch (err) {
         console.error(err);
         setError("Failed to load teacher profile.");

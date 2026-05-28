@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Box, TextField, MenuItem, CircularProgress } from "@mui/material";
-import axios from "axios";
 import api from "../api";
 
 export default function LocationSelector({ onChange }) {

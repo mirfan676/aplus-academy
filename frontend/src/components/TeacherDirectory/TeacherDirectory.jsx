@@ -1,6 +1,6 @@
 // TeacherDirectory.jsx
 import React, { useState, useEffect, useMemo } from "react";
-import axios from "axios";
+import api from "../../api";
 import {
   Container,
   Typography,
@@ -8,12 +8,13 @@ import {
   Button,
   Alert,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import TeacherFilters from "./TeacherFilters";
 import TeacherList from "./TeacherList";
 import TeacherMapSection from "./TeacherMapSection";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import useSEO from "../../hooks/useSEO";
 
 // ------------------------------------------------------
 // FIX LEAFLET ICON ISSUE
@@ -72,9 +73,17 @@ function filterTeachers(
 
 // ------------------------------------------------------
 export default function TeacherDirectory() {
+  useSEO({
+    title: "Find Verified Home and Online Tutors in Pakistan - A Plus Home Tutors",
+    description:
+      "Browse verified home and online tutors across Pakistan by city, subject, and distance.",
+    canonical: "https://www.aplusacademy.pk/teachers",
+  });
+
   const [teachers, setTeachers] = useState([]);
+  const [searchParams] = useSearchParams();
   const [selectedCity, setSelectedCity] = useState("");
-  const [selectedSubject, setSelectedSubject] = useState("");
+  const [selectedSubject, setSelectedSubject] = useState(searchParams.get("subject") || "");
   const [search, setSearch] = useState("");
   const [visibleCount, setVisibleCount] = useState(12);
   const [loading, setLoading] = useState(true);
@@ -90,12 +99,12 @@ export default function TeacherDirectory() {
   // FETCH TEACHERS + NORMALIZE API FIELDS
   // ------------------------------------------------------
   useEffect(() => {
-    axios
-      .get("https://aplus-academy.onrender.com/tutors/")
+    api
+      .get("/tutors/")
       .then((res) =>
         setTeachers(
-          res.data.map((t) => ({
-            id: t.id || t._id || Math.random(),
+          res.data.map((t, index) => ({
+            id: Number.isInteger(Number(t.id)) ? Number(t.id) : index,
             name: t.Name || "",
             city: t.City || "",
             subjects: t.Subjects || [],

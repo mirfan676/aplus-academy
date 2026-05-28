@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  Box,
-  Grid,
-  Typography,
-  Link,
-  IconButton,
-  Divider,
-} from "@mui/material";
-
+import { Box, Grid, Typography, Link, IconButton, Divider } from "@mui/material";
 import {
   Facebook,
   Instagram,
@@ -18,9 +10,44 @@ import {
   Pinterest,
 } from "@mui/icons-material";
 
-const Footer = () => {
+const academyLinks = [
+  { label: "About Us", href: "/about" },
+  { label: "Find a Tutor", href: "/teachers" },
+  { label: "Become a Tutor", href: "/register" },
+  { label: "Study Abroad", href: "/study-abroad" },
+  { label: "Referral Program", href: "/referral-program" },
+  { label: "Career Opportunities", href: "/jobs" },
+  { label: "Languages", href: "/languages" },
+  { label: "Buy Courses", href: "/buy-courses" },
+];
+
+const classLinks = [
+  { label: "K-12", href: "/teachers" },
+  { label: "O & A Level", href: "/tutors/o-levels" },
+  { label: "Bachelors / Masters", href: "/teachers" },
+  { label: "Competitive Exams", href: "/teachers" },
+  { label: "IT & Technology", href: "/teachers?subject=Computer%20Science" },
+  { label: "Programming", href: "/teachers?subject=Programming" },
+  { label: "Qur'an & Tajweed", href: "/teachers?subject=Quran" },
+  { label: "English Language", href: "/teachers?subject=English" },
+  { label: "IELTS", href: "/teachers?subject=IELTS" },
+  { label: "Graphics & Multimedia", href: "/teachers?subject=Graphic%20Design" },
+];
+
+const socialLinks = [
+  { label: "Facebook", icon: <Facebook />, link: "https://www.facebook.com/aplushometutorspk" },
+  { label: "Instagram", icon: <Instagram />, link: "https://www.instagram.com/aplushometutorspk" },
+  { label: "X", icon: <Twitter />, link: "https://x.com/aplus_pk" },
+  { label: "Pinterest", icon: <Pinterest />, link: "https://www.pinterest.com/aplushometutorspk/" },
+  { label: "YouTube", icon: <YouTube />, link: "https://www.youtube.com/@aplushometutors" },
+  { label: "WhatsApp", icon: <WhatsApp />, link: "https://wa.me/923066762289" },
+  { label: "LinkedIn", icon: <LinkedIn />, link: "https://www.linkedin.com" },
+];
+
+export default function Footer() {
   return (
     <Box
+      component="footer"
       sx={{
         bgcolor: "#0a0a0a",
         color: "#fff",
@@ -30,7 +57,6 @@ const Footer = () => {
       }}
     >
       <Grid container spacing={6} justifyContent="center">
-        {/* LOGO + DESCRIPTION */}
         <Grid item xs={12} md={3}>
           <Box
             sx={{
@@ -40,182 +66,113 @@ const Footer = () => {
               justifyContent: { xs: "center", md: "flex-start" },
             }}
           >
-            <img
-              src="logo-footer.svg"
-              alt="APlus Home Tutors"
-              style={{ height: "120px", marginRight: "10px" }}
+            <Box
+              component="img"
+              src="/logo-footer.svg"
+              alt="A Plus Home Tutors"
+              sx={{ height: 120, mr: 1 }}
             />
           </Box>
+
           <Box
             sx={{
               background: "rgba(255,255,255,0.05)",
-              backdropFilter: "blur(10px)",
               p: 3,
-              borderRadius: "20px",
+              borderRadius: 2,
               boxShadow: "0 8px 30px rgba(0,0,0,0.2)",
             }}
           >
             <Typography variant="body1" sx={{ opacity: 0.85, lineHeight: 1.7 }}>
-              A Plus Home Tutors is Pakistan’s most trusted home and online tutoring
-              network — connecting students with expert educators nationwide. From
-              O/A Levels to Qur’an with Tajweed, our mission is to create confident
-              learners through personalized teaching, modern tools, and one-on-one
-              guidance that transforms academic performance.
+              A Plus Home Tutors is Pakistan's trusted home and online tutoring
+              network, connecting students with verified educators for O/A Levels,
+              Quran with Tajweed, school subjects, and one-to-one academic support.
             </Typography>
           </Box>
         </Grid>
 
-        {/* ACADEMY LINKS */}
         <Grid item xs={12} sm={6} md={2}>
-          <Typography
-            variant="h6"
-            sx={{
-              mb: 2,
-              fontWeight: 700,
-              background: "linear-gradient(135deg, #00a6ff, #00ff8f)",
-              WebkitBackgroundClip: "text",
-              color: "transparent",
-            }}
-          >
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 700, color: "#29b554" }}>
             Academy
           </Typography>
-
-          {[
-            "About Us",
-            "Find a Tutor",
-            "Become a Tutor",
-            "Study Abroad",
-            "Referral Program",
-            "Career Opportunities",
-            "Languages",
-            "Buy Courses",
-          ].map((item) => (
+          {academyLinks.map((item) => (
             <Link
-              key={item}
-              href="#"
+              key={item.label}
+              href={item.href}
               underline="none"
               sx={{
                 display: "block",
                 color: "#fff",
                 opacity: 0.8,
                 py: 0.5,
-                transition: "all 0.3s ease",
-                "&:hover": {
-                  opacity: 1,
-                  color: "#00ff8f",
-                  transform: "translateX(3px)",
-                },
+                transition: "all 0.2s ease",
+                "&:hover": { opacity: 1, color: "#00ff8f", transform: "translateX(3px)" },
               }}
             >
-              {item}
+              {item.label}
             </Link>
           ))}
         </Grid>
 
-        {/* CLASSES */}
         <Grid item xs={12} sm={6} md={2}>
-          <Typography
-            variant="h6"
-            sx={{
-              mb: 2,
-              fontWeight: 700,
-              background: "linear-gradient(135deg, #00a6ff, #00ff8f)",
-              WebkitBackgroundClip: "text",
-              color: "transparent",
-            }}
-          >
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 700, color: "#29b554" }}>
             Classes
           </Typography>
-
-          {[
-            "K-12",
-            "O & A Level",
-            "Bachelors / Masters",
-            "Competitive Exams",
-            "IT & Technology",
-            "Programming",
-            "Qur’an & Tajweed",
-            "English Language",
-            "IELTS",
-            "Graphics & Multimedia",
-          ].map((item) => (
+          {classLinks.map((item) => (
             <Link
-              key={item}
-              href="#"
+              key={item.label}
+              href={item.href}
               underline="none"
               sx={{
                 display: "block",
                 color: "#fff",
                 opacity: 0.8,
                 py: 0.5,
-                transition: "all 0.3s ease",
-                "&:hover": {
-                  opacity: 1,
-                  color: "#00ff8f",
-                  transform: "translateX(3px)",
-                },
+                transition: "all 0.2s ease",
+                "&:hover": { opacity: 1, color: "#00ff8f", transform: "translateX(3px)" },
               }}
             >
-              {item}
+              {item.label}
             </Link>
           ))}
         </Grid>
 
-        {/* CONTACT & SOCIALS */}
         <Grid item xs={12} md={3}>
-          <Typography
-            variant="h6"
-            sx={{
-              mb: 2,
-              fontWeight: 700,
-              background: "linear-gradient(135deg, #00a6ff, #00ff8f)",
-              WebkitBackgroundClip: "text",
-              color: "transparent",
-            }}
-          >
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 700, color: "#29b554" }}>
             Contact Us
           </Typography>
 
           <Box
             sx={{
               background: "rgba(255,255,255,0.05)",
-              backdropFilter: "blur(10px)",
               p: 3,
-              borderRadius: "20px",
+              borderRadius: 2,
               boxShadow: "0 8px 30px rgba(0,0,0,0.2)",
             }}
           >
             <Typography variant="body2" sx={{ mb: 1, opacity: 0.85 }}>
-              Lahore • Karachi • Islamabad • Rawalpindi • Faisalabad  
-              Online tutoring available across Pakistan.
+              Lahore, Karachi, Islamabad, Rawalpindi, Faisalabad, and online
+              tutoring across Pakistan.
             </Typography>
 
             <Typography variant="body2" sx={{ opacity: 0.85 }}>
-              📱 0306-6762289 | 0306-5555415  
+              0306-6762289 | 0306-5555415
               <br />
-              📧 aplushometutorspk@gmail.com
+              aplushometutorspk@gmail.com
             </Typography>
 
             <Box sx={{ mt: 2 }}>
-              {[
-                { icon: <Facebook />, link: "facebook.com/aplushometutorspk" },
-                { icon: <Instagram />, link: "instagram.com/aplushometutorspk" },
-                { icon: <Twitter />, link: "x.com/aplus_pk" },
-                { icon: <Pinterest />, link: "pinterest.com/aplushometutorspk/" },
-                { icon: <YouTube />, link: "youtube.com/@aplushometutors" },
-                {
-                  icon: <WhatsApp />,
-                  link: "https://wa.me/923066762289",
-                },
-              ].map((s, idx) => (
+              {socialLinks.map((s) => (
                 <IconButton
-                  key={idx}
+                  key={s.label}
                   href={s.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={s.label}
                   sx={{
                     color: "#fff",
                     mx: 0.5,
-                    transition: "all 0.3s ease",
-                    "&:hover": { color: "#00ff8f", transform: "scale(1.2)" },
+                    transition: "all 0.2s ease",
+                    "&:hover": { color: "#00ff8f", transform: "scale(1.12)" },
                   }}
                 >
                   {s.icon}
@@ -226,20 +183,16 @@ const Footer = () => {
         </Grid>
       </Grid>
 
-      {/* DIVIDER */}
       <Divider sx={{ borderColor: "rgba(255,255,255,0.1)", my: 4 }} />
 
-      {/* BOTTOM BAR */}
       <Box sx={{ textAlign: "center", opacity: 0.7 }}>
         <Typography variant="body2">
-          © {new Date().getFullYear()} APlus Home Tutors — All Rights Reserved
+          © {new Date().getFullYear()} A Plus Home Tutors - All rights reserved.
         </Typography>
         <Typography variant="caption">
-          Empowering students across Pakistan — From Basic to Brilliance.
+          Empowering students across Pakistan, from basics to brilliance.
         </Typography>
       </Box>
     </Box>
   );
-};
-
-export default Footer;
+}

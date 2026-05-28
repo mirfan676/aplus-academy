@@ -5,19 +5,6 @@ import { Link } from "react-router-dom";
 export default function HeroSection() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
-
-  const glassFrame = {
-    position: "absolute",
-    bottom: isMobile ? "-15px" : "-25px",
-    right: isMobile ? "-10px" : "-30px",
-    padding: isMobile ? "6px" : "10px",
-    borderRadius: "20px",
-    backdropFilter: "blur(10px)",
-    background: "rgba(255, 255, 255, 0.25)",
-    border: "1px solid rgba(255, 255, 255, 0.35)",
-    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
-  };
 
   const whiteFrame = {
     position: "absolute",
