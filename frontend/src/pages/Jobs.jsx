@@ -144,7 +144,7 @@ export default function Jobs() {
 
   return (
     <Box sx={{ background: "#e8f2ff", py: 6, px: { xs: 2, md: 4 } }}>
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         <Typography
           component="h1"
           variant="h4"
@@ -163,81 +163,86 @@ export default function Jobs() {
           Browse verified home tuition jobs and connect with parents looking for qualified tutors.
         </Typography>
 
-        {/* Filters */}
-        <JobFilters
-          city={city}
-          setCity={setCity}
-          subject={subject}
-          setSubject={setSubject}
-          gender={gender}
-          setGender={setGender}
-          grade={grade}
-          setGrade={setGrade}
-          cities={cityOptions}
-          grades={gradeOptions}
-          feeRange={feeRange}
-          feeValue={feeValue}
-          setFeeValue={setFeeValue}
-          onReset={onReset}
-        />
-
-        {/* Active filter chips */}
-        {activeFilters.length > 0 && (
-          <Box sx={{ mb: 3 }}>
-            <Stack direction="row" spacing={1} flexWrap="wrap">
-              {activeFilters.map((f) => (
-                <Chip
-                  key={f.key}
-                  label={f.label}
-                  onDelete={f.clear}
-                  color="primary"
-                  variant="outlined"
-                />
-              ))}
-            </Stack>
-          </Box>
-        )}
-
-        {/* Loading or no items */}
-        {loading && <Typography align="center">Loading jobs...</Typography>}
-        {!loading && filtered.length === 0 && (
-          <Typography align="center" sx={{ mt: 4, color: "gray" }}>
-            No jobs found.
-          </Typography>
-        )}
-
-        {/* Job list */}
         <Box
           sx={{
-            display: "grid",
-            gap: 3,
-            gridTemplateColumns: {
-              xs: "1fr",
-              sm: "repeat(2, 1fr)",
-              md: "repeat(3, 1fr)",
-            },
-            justifyContent: "center",
+            display: { xs: "block", md: "flex" },
+            alignItems: "flex-start",
+            gap: { md: 3 },
           }}
         >
-          {visibleJobs.map((job, i) => (
-            <JobCard key={i} job={job} />
-          ))}
+          <JobFilters
+            city={city}
+            setCity={setCity}
+            subject={subject}
+            setSubject={setSubject}
+            gender={gender}
+            setGender={setGender}
+            grade={grade}
+            setGrade={setGrade}
+            cities={cityOptions}
+            grades={gradeOptions}
+            feeRange={feeRange}
+            feeValue={feeValue}
+            setFeeValue={setFeeValue}
+            onReset={onReset}
+          />
+
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            {activeFilters.length > 0 && (
+              <Box sx={{ mb: 3 }}>
+                <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+                  {activeFilters.map((f) => (
+                    <Chip
+                      key={f.key}
+                      label={f.label}
+                      onDelete={f.clear}
+                      color="primary"
+                      variant="outlined"
+                    />
+                  ))}
+                </Stack>
+              </Box>
+            )}
+
+            {loading && <Typography align="center">Loading jobs...</Typography>}
+            {!loading && filtered.length === 0 && (
+              <Typography align="center" sx={{ mt: 4, color: "gray" }}>
+                No jobs found.
+              </Typography>
+            )}
+
+            <Box
+              sx={{
+                display: "grid",
+                gap: 3,
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "repeat(2, minmax(0, 1fr))",
+                  lg: "repeat(2, minmax(0, 1fr))",
+                  xl: "repeat(3, minmax(0, 1fr))",
+                },
+                alignItems: "stretch",
+              }}
+            >
+              {visibleJobs.map((job, i) => (
+                <JobCard key={i} job={job} />
+              ))}
+            </Box>
+
+            <div ref={loaderRef} style={{ height: 1 }} />
+
+            {!loading && visibleJobs.length < filtered.length && (
+              <Typography align="center" sx={{ mt: 2, color: "#555" }}>
+                Loading more...
+              </Typography>
+            )}
+            {!loading && visibleJobs.length >= filtered.length && filtered.length > 0 && (
+              <Typography align="center" sx={{ mt: 2, color: "#555" }}>
+                You've reached the end.
+              </Typography>
+            )}
+          </Box>
         </Box>
-
-        {/* Loader sentinel */}
-        <div ref={loaderRef} style={{ height: 1 }} />
-
-        {/* Small status */}
-        {!loading && visibleJobs.length < filtered.length && (
-          <Typography align="center" sx={{ mt: 2, color: "#555" }}>
-            Loading more...
-          </Typography>
-        )}
-        {!loading && visibleJobs.length >= filtered.length && filtered.length > 0 && (
-          <Typography align="center" sx={{ mt: 2, color: "#555" }}>
-            You've reached the end.
-          </Typography>
-        )}
       </Container>
     </Box>
   );

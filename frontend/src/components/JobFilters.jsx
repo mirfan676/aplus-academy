@@ -1,6 +1,5 @@
 // JobFilters.jsx
 import {
-  Grid,
   Paper,
   FormControl,
   InputLabel,
@@ -13,10 +12,12 @@ import {
   Button,
   Drawer,
   IconButton,
-  useMediaQuery
+  Stack,
+  useMediaQuery,
 } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import CloseIcon from "@mui/icons-material/Close";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import { useState } from "react";
 
 export default function JobFilters({
@@ -33,193 +34,197 @@ export default function JobFilters({
   feeRange = [0, 50000],
   feeValue = [0, 50000],
   setFeeValue,
-  onReset
+  onReset,
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const isMobile = useMediaQuery("(max-width:900px)");
 
   const [minFee, maxFee] = feeRange;
+  const safeCities = Array.from(new Set(cities.map((c) => (c != null ? String(c) : "")))).filter(Boolean);
+  const safeGrades = Array.from(new Set(grades.map((g) => (g != null ? String(g) : "")))).filter(Boolean);
 
   const presets = [
-    [0, 5000],
-    [5000, 8000],
-    [8000, 12000],
-    [12000, 20000],
-    [20000, maxFee || 50000]
+    [0, 8000],
+    [8000, 15000],
+    [15000, 25000],
+    [25000, maxFee || 50000],
   ];
 
-  // Make options safe: convert any value to string
-  const safeCities = Array.from(new Set(cities.map(c => c != null ? String(c) : ""))).filter(Boolean);
-  const safeGrades = Array.from(new Set(grades.map(g => g != null ? String(g) : ""))).filter(Boolean);
+  const fieldSx = {
+    "& .MuiInputBase-root": { borderRadius: 2, minHeight: 48 },
+  };
 
   const filterContent = (
-    <Box sx={{ p: 3, width: "100%", maxWidth: 960, mx: "auto" }}>
-      {isMobile && (
-        <Box sx={{ textAlign: "right" }}>
-          <IconButton onClick={() => setDrawerOpen(false)}>
-            <CloseIcon />
-          </IconButton>
+    <Stack spacing={2.25}>
+      <Box>
+        <Typography variant="h6" fontWeight={800} color="#004aad">
+          Filters
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Narrow jobs by city, class, subject, and fee.
+        </Typography>
+      </Box>
+
+      <FormControl fullWidth size="small">
+        <InputLabel>Select City</InputLabel>
+        <Select value={city} label="Select City" onChange={(e) => setCity(e.target.value)} sx={{ borderRadius: 2 }}>
+          <MenuItem value="">All Cities</MenuItem>
+          {safeCities.map((c) => (
+            <MenuItem key={c} value={c}>
+              {c}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <TextField
+        fullWidth
+        size="small"
+        label="Search Subject"
+        value={subject}
+        onChange={(e) => setSubject(e.target.value)}
+        sx={fieldSx}
+      />
+
+      <FormControl fullWidth size="small">
+        <InputLabel>Gender</InputLabel>
+        <Select value={gender} label="Gender" onChange={(e) => setGender(e.target.value)} sx={{ borderRadius: 2 }}>
+          <MenuItem value="">Any</MenuItem>
+          <MenuItem value="Male">Male</MenuItem>
+          <MenuItem value="Female">Female</MenuItem>
+          <MenuItem value="Both">Both</MenuItem>
+        </Select>
+      </FormControl>
+
+      <FormControl fullWidth size="small">
+        <InputLabel>Grade</InputLabel>
+        <Select value={grade} label="Grade" onChange={(e) => setGrade(e.target.value)} sx={{ borderRadius: 2 }}>
+          <MenuItem value="">All Grades</MenuItem>
+          {safeGrades.map((g) => (
+            <MenuItem key={g} value={g}>
+              {g}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <Box>
+        <Typography variant="subtitle2" sx={{ mb: 1, color: "#333", fontWeight: 700 }}>
+          Fee: {Number(feeValue[0]).toLocaleString()} - {Number(feeValue[1]).toLocaleString()}
+        </Typography>
+        <Slider
+          value={feeValue}
+          onChange={(e, v) => setFeeValue(v)}
+          valueLabelDisplay="auto"
+          min={minFee}
+          max={maxFee}
+        />
+        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, mt: 1 }}>
+          {presets.map((p) => (
+            <Button
+              key={`${p[0]}-${p[1]}`}
+              size="small"
+              variant="outlined"
+              onClick={() => setFeeValue(p)}
+              sx={{ textTransform: "none", px: 1, minWidth: 0 }}
+            >
+              {p[1] === maxFee
+                ? `${Number(p[0]).toLocaleString()}+`
+                : `${Number(p[0]).toLocaleString()}-${Number(p[1]).toLocaleString()}`}
+            </Button>
+          ))}
         </Box>
-      )}
+      </Box>
 
-      <Grid container spacing={2} justifyContent="center">
-        <Grid
-          item
-          xs={12}
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 2,
-            justifyContent: isMobile ? "center" : "space-between"
-          }}
+      <Button
+        onClick={onReset}
+        variant="outlined"
+        startIcon={<RestartAltIcon />}
+        sx={{ textTransform: "none", borderRadius: 2 }}
+      >
+        Reset Filters
+      </Button>
+
+      {isMobile && (
+        <Button
+          onClick={() => setDrawerOpen(false)}
+          variant="contained"
+          sx={{ textTransform: "none", borderRadius: 2, fontWeight: 800 }}
         >
-          {/* CITY */}
-          <FormControl sx={{ flex: isMobile ? "1 1 100%" : "1 1 22%", minWidth: 150 }}>
-            <InputLabel>Select City</InputLabel>
-            <Select
-              value={city}
-              label="Select City"
-              onChange={(e) => setCity(e.target.value)}
-              sx={{ height: "52px", borderRadius: "14px" }}
-            >
-              <MenuItem value="">All Cities</MenuItem>
-              {safeCities.map((c, i) => (
-                <MenuItem key={i} value={c}>
-                  {c}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* SUBJECT */}
-          <TextField
-            label="Search Subject"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            sx={{
-              flex: isMobile ? "1 1 100%" : "1 1 22%",
-              minWidth: 150,
-              "& .MuiInputBase-root": { height: "52px", borderRadius: "14px" },
-            }}
-          />
-
-          {/* GENDER */}
-          <FormControl sx={{ flex: isMobile ? "1 1 100%" : "1 1 22%", minWidth: 150 }}>
-            <InputLabel>Gender</InputLabel>
-            <Select
-              value={gender}
-              label="Gender"
-              onChange={(e) => setGender(e.target.value)}
-              sx={{ height: "52px", borderRadius: "14px" }}
-            >
-              <MenuItem value="">Any</MenuItem>
-              <MenuItem value="Male">Male</MenuItem>
-              <MenuItem value="Female">Female</MenuItem>
-              <MenuItem value="Both">Both</MenuItem>
-            </Select>
-          </FormControl>
-
-          {/* GRADE */}
-          <FormControl sx={{ flex: isMobile ? "1 1 100%" : "1 1 22%", minWidth: 150 }}>
-            <InputLabel>Grade</InputLabel>
-            <Select
-              value={grade}
-              label="Grade"
-              onChange={(e) => setGrade(e.target.value)}
-              sx={{ height: "52px", borderRadius: "14px" }}
-            >
-              <MenuItem value="">All Grades</MenuItem>
-              {safeGrades.map((g, i) => (
-                <MenuItem key={i} value={g}>
-                  {g}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-
-        {/* Fee Slider */}
-        <Grid item xs={12}>
-          <Box sx={{ width: "100%", maxWidth: 480, mx: "auto" }}>
-            <Typography variant="subtitle2" sx={{ mb: 1, color: "#333", fontWeight: 600 }}>
-              Fee Range: {Number(feeValue[0]).toLocaleString()} — {Number(feeValue[1]).toLocaleString()}
-            </Typography>
-            <Slider
-              value={feeValue}
-              onChange={(e, v) => setFeeValue(v)}
-              valueLabelDisplay="auto"
-              min={minFee}
-              max={maxFee}
-            />
-            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1 }}>
-              {presets.map((p, i) => (
-                <Button
-                  key={i}
-                  size="small"
-                  variant="outlined"
-                  onClick={() => setFeeValue(p)}
-                  sx={{ textTransform: "none" }}
-                >
-                  {Number(p[0]).toLocaleString()} - {p[1] === maxFee ? `${Number(p[0]).toLocaleString()}+` : Number(p[1]).toLocaleString()}
-                </Button>
-              ))}
-            </Box>
-          </Box>
-        </Grid>
-
-        {/* RESET BUTTON */}
-        <Grid item xs={12} sx={{ textAlign: "center", mt: 2 }}>
-          <Button onClick={onReset} variant="contained" sx={{ background: "#004aad", px: 4 }}>
-            Reset Filters
-          </Button>
-        </Grid>
-      </Grid>
-    </Box>
+          Show Results
+        </Button>
+      )}
+    </Stack>
   );
+
+  if (!isMobile) {
+    return (
+      <Paper
+        sx={{
+          position: "sticky",
+          top: 84,
+          alignSelf: "flex-start",
+          width: 280,
+          maxHeight: "calc(100vh - 108px)",
+          overflowY: "auto",
+          p: 2.5,
+          borderRadius: 2,
+          background: "rgba(255,255,255,0.94)",
+          boxShadow: "0 8px 24px rgba(5,30,80,0.08)",
+          border: "1px solid rgba(0,74,173,0.08)",
+        }}
+      >
+        {filterContent}
+      </Paper>
+    );
+  }
 
   return (
     <>
-      {/* MOBILE FILTER BUTTON */}
-      {isMobile && (
-        <Box sx={{ textAlign: "right", mb: 2 }}>
-          <Button
-            variant="contained"
-            onClick={() => setDrawerOpen(true)}
-            startIcon={<FilterListIcon />}
-            sx={{ background: "#004aad", textTransform: "none", borderRadius: "12px", px: 3 }}
-          >
-            Filters
-          </Button>
-        </Box>
-      )}
-
-      {/* DESKTOP FILTER BAR */}
-      {!isMobile && (
-        <Paper
-          sx={{
-            position: "sticky",
-            top: 60,
-            zIndex: 50,
-            p: 3,
-            mb: 4,
-            borderRadius: "22px",
-            background: "rgba(255,255,255,0.90)",
-            backdropFilter: "blur(6px)",
-            boxShadow: "0 6px 18px rgba(0,0,0,0.08)"
-          }}
+      <Box
+        sx={{
+          position: "sticky",
+          top: 64,
+          zIndex: 30,
+          display: "flex",
+          justifyContent: "flex-end",
+          mb: 2,
+          py: 1,
+          background: "linear-gradient(180deg, #e8f2ff 75%, rgba(232,242,255,0))",
+        }}
+      >
+        <Button
+          variant="contained"
+          onClick={() => setDrawerOpen(true)}
+          startIcon={<FilterListIcon />}
+          sx={{ background: "#004aad", textTransform: "none", borderRadius: 2, px: 2.5, fontWeight: 800 }}
         >
-          {filterContent}
-        </Paper>
-      )}
+          Filters
+        </Button>
+      </Box>
 
-      {/* MOBILE DRAWER */}
       <Drawer
         anchor="bottom"
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        PaperProps={{ sx: { borderTopLeftRadius: "22px", borderTopRightRadius: "22px", p: 2 } }}
+        PaperProps={{
+          sx: {
+            maxHeight: "86vh",
+            borderTopLeftRadius: 3,
+            borderTopRightRadius: 3,
+            p: 2,
+          },
+        }}
       >
-        {filterContent}
+        <Box sx={{ display: "flex", justifyContent: "center", mb: 1 }}>
+          <Box sx={{ width: 42, height: 4, borderRadius: 99, bgcolor: "grey.300" }} />
+        </Box>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
+          <IconButton aria-label="Close filters" onClick={() => setDrawerOpen(false)}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        <Box sx={{ overflowY: "auto", px: 0.5, pb: 2 }}>{filterContent}</Box>
       </Drawer>
     </>
   );
