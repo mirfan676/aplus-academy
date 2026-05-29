@@ -28,4 +28,7 @@ jobs:
           git config user.email "actions@github.com"
 
       - name: Create and publish blog
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          BLOG_IMAGE_MODE: auto
         run: python scripts/create_blog.py --publish

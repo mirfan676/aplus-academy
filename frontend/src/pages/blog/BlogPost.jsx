@@ -23,6 +23,35 @@ const formatDate = (value) =>
     year: "numeric",
   }).format(new Date(value));
 
+const ArticleImage = ({ image }) => {
+  if (!image?.url) return null;
+
+  return (
+    <Box component="figure" sx={{ my: 5, mx: 0 }}>
+      <Box
+        component="img"
+        src={image.url}
+        alt={image.alt || "A Plus Academy education blog image"}
+        sx={{
+          width: "100%",
+          borderRadius: 1,
+          aspectRatio: "16 / 9",
+          objectFit: "cover",
+          display: "block",
+        }}
+      />
+      <Typography
+        component="figcaption"
+        variant="caption"
+        color="text.secondary"
+        sx={{ display: "block", mt: 1 }}
+      >
+        {image.credit}
+      </Typography>
+    </Box>
+  );
+};
+
 const BlogPost = () => {
   const { slug } = useParams();
   const [post, setPost] = useState(null);
@@ -179,7 +208,40 @@ const BlogPost = () => {
           </Stack>
         </Box>
 
-        {post.sections.map((section) => (
+        {(post.sections || []).slice(0, 1).map((section) => (
+          <Box key={section.heading} sx={{ mb: 4 }}>
+            <Typography component="h2" variant="h4" fontWeight={800} gutterBottom>
+              {section.heading}
+            </Typography>
+            <Typography sx={{ lineHeight: 1.9, color: "text.secondary", whiteSpace: "pre-line" }}>
+              {section.body}
+            </Typography>
+          </Box>
+        ))}
+
+        <ArticleImage image={post.images?.[1]} />
+
+        {post.sourceAnalyses?.map((analysis, index) => (
+          <Box key={`${analysis.source}-${analysis.title}`} sx={{ mb: 5 }}>
+            <Typography component="h2" variant="h4" fontWeight={800} gutterBottom>
+              {analysis.heading}
+            </Typography>
+            <Typography
+              component="p"
+              variant="subtitle1"
+              color="primary"
+              sx={{ fontWeight: 800, mb: 2, lineHeight: 1.6 }}
+            >
+              {analysis.title}
+            </Typography>
+            <Typography sx={{ lineHeight: 1.95, color: "text.secondary", whiteSpace: "pre-line" }}>
+              {analysis.summary}
+            </Typography>
+            <ArticleImage image={post.images?.[index + 2]} />
+          </Box>
+        ))}
+
+        {(post.sections || []).slice(post.sourceAnalyses ? 1 : 0).map((section) => (
           <Box key={section.heading} sx={{ mb: 4 }}>
             <Typography component="h2" variant="h4" fontWeight={800} gutterBottom>
               {section.heading}
@@ -207,14 +269,18 @@ const BlogPost = () => {
               </Typography>
             </Typography>
           ))}
-          {post.heroImage?.sourceUrl && (
-            <Typography component="li">
-              Hero image:{" "}
-              <Link href={post.heroImage.sourceUrl} target="_blank" rel="noopener noreferrer">
-                {post.heroImage.credit}
-              </Link>
+          {(post.images || [post.heroImage]).filter(Boolean).map((image, index) => (
+            <Typography component="li" key={`${image.url}-${index}`}>
+              Image {index + 1}:{" "}
+              {image.sourceUrl ? (
+                <Link href={image.sourceUrl} target="_blank" rel="noopener noreferrer">
+                  {image.credit}
+                </Link>
+              ) : (
+                image.credit
+              )}
             </Typography>
-          )}
+          ))}
         </Stack>
       </Container>
     </Box>

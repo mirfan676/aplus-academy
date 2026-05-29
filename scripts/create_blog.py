@@ -14,6 +14,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import base64
 import datetime as dt
 import html
 import json
@@ -31,6 +32,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 BLOG_DIR = ROOT / "frontend" / "public" / "blogs"
+BLOG_IMAGE_DIR = BLOG_DIR / "images"
 BLOG_INDEX = BLOG_DIR / "index.json"
 SITEMAP = ROOT / "frontend" / "public" / "sitemap.xml"
 SITE_URL = "https://www.aplusacademy.pk"
@@ -121,6 +123,13 @@ IMAGE_POOL = [
     },
 ]
 
+ARTICLE_IMAGE_SLOTS = [
+    "hero",
+    "student impact",
+    "parent action plan",
+    "tutor guidance",
+]
+
 
 def slugify(value: str) -> str:
     value = re.sub(r"[^a-zA-Z0-9\s-]", "", value).strip().lower()
@@ -162,6 +171,49 @@ def fetch_url(url: str, timeout: int = 20) -> bytes:
     )
     with urllib.request.urlopen(request, timeout=timeout) as response:
         return response.read()
+
+
+def decode_html(raw: bytes) -> str:
+    for encoding in ("utf-8", "cp1252", "latin-1"):
+        try:
+            return raw.decode(encoding)
+        except UnicodeDecodeError:
+            continue
+    return raw.decode("utf-8", errors="replace")
+
+
+def extract_meta(html_text: str, key: str) -> str:
+    patterns = [
+        rf'<meta[^>]+property=["\']{re.escape(key)}["\'][^>]+content=["\']([^"\']+)["\']',
+        rf'<meta[^>]+name=["\']{re.escape(key)}["\'][^>]+content=["\']([^"\']+)["\']',
+        rf'<meta[^>]+content=["\']([^"\']+)["\'][^>]+(?:property|name)=["\']{re.escape(key)}["\']',
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, html_text, flags=re.I)
+        if match:
+            return clean_text(match.group(1))
+    return ""
+
+
+def extract_article_context(item: dict) -> str:
+    try:
+        raw = fetch_url(item["url"], timeout=12)
+    except Exception:
+        return item.get("summary", "")
+
+    html_text = decode_html(raw)
+    parts = [
+        extract_meta(html_text, "description"),
+        extract_meta(html_text, "og:description"),
+    ]
+    paragraphs = re.findall(r"<p[^>]*>(.*?)</p>", html_text, flags=re.I | re.S)
+    for paragraph in paragraphs[:8]:
+        cleaned = clean_text(paragraph)
+        if len(cleaned.split()) >= 12:
+            parts.append(cleaned)
+
+    context = " ".join(part for part in parts if part)
+    return trim_text(context, 900) or item.get("summary", "")
 
 
 def google_news_rss(query: str) -> str:
@@ -263,16 +315,92 @@ def choose_topic(items: list[dict], forced_topic: str | None) -> str:
     return phrase or "Pakistan Education Update"
 
 
-def choose_image(topic: str, items: list[dict]) -> dict:
+def choose_images(topic: str, items: list[dict], slug: str, image_mode: str) -> list[dict]:
+    if image_mode in {"auto", "ai"} and os.environ.get("OPENAI_API_KEY"):
+        try:
+            return generate_ai_images(topic, items, slug)
+        except Exception as exc:
+            if image_mode == "ai":
+                raise
+            print(f"Warning: AI image generation failed, using Pexels fallback: {exc}", file=sys.stderr)
+
     haystack = " ".join([topic] + [item["title"] for item in items]).lower()
-    best = IMAGE_POOL[0]
-    best_score = -1
+    ranked = []
     for image in IMAGE_POOL:
         score = sum(1 for keyword in image["keywords"] if keyword in haystack)
-        if score > best_score:
-            best = image
-            best_score = score
-    return best
+        ranked.append((score, image))
+    ranked.sort(key=lambda item: item[0], reverse=True)
+
+    images = []
+    for index, (_, image) in enumerate(ranked[:4]):
+        images.append(
+            {
+                **image,
+                "kind": "pexels",
+                "placement": ARTICLE_IMAGE_SLOTS[index],
+            }
+        )
+    return images
+
+
+def generate_ai_images(topic: str, items: list[dict], slug: str) -> list[dict]:
+    BLOG_IMAGE_DIR.mkdir(parents=True, exist_ok=True)
+    api_key = os.environ["OPENAI_API_KEY"]
+    model = os.environ.get("OPENAI_IMAGE_MODEL", "gpt-image-1-mini")
+    titles = "; ".join(item["title"] for item in items[:3])
+    images = []
+
+    for index, slot in enumerate(ARTICLE_IMAGE_SLOTS):
+        prompt = (
+            "Create a realistic editorial image for A Plus Academy Pakistan. "
+            f"Topic: {topic}. Article context: {titles}. "
+            f"Image role: {slot}. Show Pakistani students, parents, tutors, desks, notebooks, "
+            "classrooms, laptops, or exam preparation as relevant. No logos, no readable text, "
+            "no political symbols, natural lighting, professional education blog style."
+        )
+        payload = {
+            "model": model,
+            "prompt": prompt,
+            "size": "1536x1024",
+            "quality": "low",
+            "n": 1,
+        }
+        request = urllib.request.Request(
+            "https://api.openai.com/v1/images/generations",
+            data=json.dumps(payload).encode("utf-8"),
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        with urllib.request.urlopen(request, timeout=90) as response:
+            data = json.loads(response.read().decode("utf-8"))
+
+        image_data = data["data"][0]
+        if image_data.get("b64_json"):
+            raw = base64.b64decode(image_data["b64_json"])
+        elif image_data.get("url"):
+            raw = fetch_url(image_data["url"], timeout=60)
+        else:
+            raise RuntimeError("OpenAI image response did not include image data.")
+
+        filename = f"{slug}-{index + 1}.png"
+        output = BLOG_IMAGE_DIR / filename
+        output.write_bytes(raw)
+        images.append(
+            {
+                "kind": "ai",
+                "placement": slot,
+                "url": f"/blogs/images/{filename}",
+                "sourceUrl": "https://platform.openai.com/docs/guides/image-generation",
+                "credit": f"AI-generated image by A Plus Academy using {model}",
+                "alt": f"{topic} education blog illustration for {slot}",
+                "prompt": prompt,
+            }
+        )
+
+    return images
 
 
 def sentence_from_item(item: dict) -> str:
@@ -281,15 +409,89 @@ def sentence_from_item(item: dict) -> str:
     return f"{source} reports: {title}."
 
 
-def build_post(items: list[dict], topic: str | None) -> dict:
+def source_analysis(item: dict, topic: str, index: int) -> dict:
+    source = item["source"] or f"Source {index}"
+    title = item["title"].rstrip(".")
+    context = clean_text(item.get("articleContext") or item.get("summary") or "")
+    if not context:
+        context = (
+            "The public feed summary is limited, so this section focuses on the headline, "
+            "publisher signal, and practical implications for students and families."
+        )
+
+    body = (
+        f"{source} highlights the issue through the update titled \"{title}.\" "
+        f"The available reporting points to a wider education concern connected with {topic.lower()}. "
+        f"In practical terms, this is not just a news item for institutions; it can shape how students, "
+        "parents, tutors, and school leaders prepare for the next academic checkpoint.\n\n"
+        f"The source context says: {context} This information should be read as a signal rather than a "
+        "complete policy brief. Families should confirm dates, exam-board notices, university instructions, "
+        "and school circulars from official channels before making final decisions. Still, the update is useful "
+        "because it shows where pressure is building: assessment reliability, class continuity, learning gaps, "
+        "admissions planning, technology access, or the need for stronger academic support.\n\n"
+        "For students, the main lesson is to avoid waiting for perfect clarity. A learner who keeps notes updated, "
+        "tracks weak chapters, practises past-paper style questions, and asks for help early is less affected by "
+        "sudden changes. If the update relates to exams, students should review the syllabus, marking pattern, "
+        "and deadline calendar. If it relates to universities or study abroad, they should keep documents, English "
+        "practice, and subject foundations ready. If it relates to online or digital learning, they should make sure "
+        "their basic study setup and digital skills are not holding them back.\n\n"
+        "For parents, the update is a reminder to convert news into a home learning routine. That means checking "
+        "where the child is confident, where they are guessing, and where they need guided practice. A short weekly "
+        "plan can work better than a last-minute rush: one concept-building session, one written practice session, "
+        "one revision session, and one review conversation. Parents should also keep communication open with the "
+        "school or tutor so that academic decisions are based on current information.\n\n"
+        "For tutors, this source suggests a need for lessons that are connected to real academic conditions. Tutors "
+        "should not only explain chapters; they should help students interpret exam expectations, organise revision, "
+        "improve writing, and practise under time limits. In Pakistan, where students may be preparing for board "
+        "exams, Cambridge exams, university admissions, IELTS, or skills-based courses at the same time, this kind "
+        "of structured guidance can make the difference between scattered effort and measurable progress.\n\n"
+        "The practical takeaway is simple: every education headline should lead to one concrete action. That action "
+        "might be checking an official notice, booking a diagnostic session, revising one weak chapter, improving "
+        "English writing, practising one past paper, or discussing a realistic timetable with a tutor. When families "
+        "respond in small planned steps, news becomes useful information instead of stress.\n\n"
+        "For SEO and reader clarity, this section deliberately connects the source update with common search needs in "
+        "Pakistan: home tutors, online tutors, board exam preparation, O and A Level support, IELTS readiness, and "
+        "subject-specific revision. That makes the article useful for readers while still giving credit to the original "
+        "publisher for the reported news."
+    )
+
+    return {
+        "source": source,
+        "title": title,
+        "url": item["url"],
+        "publishedAt": item.get("publishedAt", ""),
+        "heading": f"Source {index}: {source}",
+        "summary": body,
+    }
+
+
+def general_section(topic: str) -> dict:
+    return {
+        "heading": "What families should do next",
+        "body": (
+            f"The safest response to {topic.lower()} news is a practical learning plan. Students should list "
+            "their next tests, weak chapters, missing notes, and deadlines. Parents should decide whether the "
+            "student needs home tuition, online support, a short revision plan, or a subject specialist. Tutors "
+            "should begin with diagnosis before teaching: a short quiz, a writing sample, a past-paper question, "
+            "or a conversation about the learner's routine can reveal where time is being wasted.\n\n"
+            "A Plus Academy recommends a simple weekly rhythm for most students in Pakistan: understand the concept, "
+            "practise it in writing, test it under time pressure, and review mistakes before moving on. This works "
+            "for K-12, O Level, A Level, matric, intermediate, IELTS, university courses, Quran learning, programming, "
+            "and skill-based subjects. News changes quickly, but strong learning habits remain useful in every season."
+        ),
+    }
+
+
+def build_post(items: list[dict], topic: str | None, image_mode: str) -> dict:
     if len(items) < 3:
         raise RuntimeError("At least three news sources are needed to create a referenced blog post.")
 
     now = dt.datetime.now(dt.timezone.utc)
     display_date = now.strftime("%B %d, %Y")
     chosen_topic = choose_topic(items, topic)
-    image = choose_image(chosen_topic, items)
     slug = f"{now.strftime('%Y-%m-%d')}-{slugify(chosen_topic)}"
+    images = choose_images(chosen_topic, items, slug, image_mode)
+    hero_image = images[0]
 
     title = f"{chosen_topic}: What Students and Parents Should Watch"
     description = (
@@ -297,37 +499,28 @@ def build_post(items: list[dict], topic: str | None) -> dict:
         "may mean for students, parents, and tutors in Pakistan."
     )
 
-    evidence_lines = [sentence_from_item(item) for item in items[:6]]
-    implications = [
-        "Students should keep exam calendars, admission deadlines, and school notices under regular review.",
-        "Parents can support learners by turning news into a weekly study plan rather than waiting until exams are close.",
-        "Tutors should connect lessons with current syllabus, assessment, technology, and study-abroad changes when relevant.",
+    selected_items = items[:3]
+    for item in selected_items:
+        item["articleContext"] = extract_article_context(item)
+
+    source_analyses = [
+        source_analysis(item, chosen_topic, index + 1)
+        for index, item in enumerate(selected_items)
     ]
 
     sections = [
         {
-            "heading": "What is trending",
-            "body": "\n\n".join(evidence_lines[:3]),
-        },
-        {
-            "heading": "Why it matters for learners in Pakistan",
+            "heading": "Overview",
             "body": (
-                "Education news can affect how families plan tuition, exam preparation, admissions, digital learning, "
-                "and skill development. The common signal across the latest sources is that students need flexible "
-                "support, stronger fundamentals, and clearer guidance before pressure points arrive.\n\n"
-                + "\n".join(f"- {line}" for line in implications)
+                f"Education updates around {chosen_topic.lower()} matter because they influence how Pakistani "
+                "families plan exams, admissions, online learning, tutoring, and long-term academic confidence. "
+                "This A Plus Academy article reviews three referenced news items, reorganises the public information "
+                "into original guidance, and turns the headlines into a practical plan for students, parents, and tutors. "
+                "The goal is not to replace the original reporting. The goal is to help readers understand what to watch, "
+                "what to verify, and how to respond without panic."
             ),
         },
-        {
-            "heading": "How A Plus Academy recommends responding",
-            "body": (
-                "Use the update as a planning prompt. Review the learner's current class, weak subjects, upcoming tests, "
-                "and preferred study mode. For school students, this may mean focused maths, science, English, or O/A Level "
-                "support. For older learners, it may mean IELTS, programming, university subjects, or study-abroad readiness.\n\n"
-                "A good next step is to create a short weekly routine: one concept session, one practice session, one review "
-                "session, and one checkpoint with a parent or tutor."
-            ),
-        },
+        general_section(chosen_topic),
     ]
 
     references = [
@@ -340,7 +533,11 @@ def build_post(items: list[dict], topic: str | None) -> dict:
         for item in items[:8]
     ]
 
-    word_count = sum(len(section["body"].split()) for section in sections) + len(description.split())
+    word_count = (
+        sum(len(section["body"].split()) for section in sections)
+        + sum(len(analysis["summary"].split()) for analysis in source_analyses)
+        + len(description.split())
+    )
     read_minutes = max(3, round(word_count / 220))
 
     return {
@@ -352,19 +549,22 @@ def build_post(items: list[dict], topic: str | None) -> dict:
         "publishedAt": now.isoformat(),
         "updatedAt": now.isoformat(),
         "readTime": f"{read_minutes} min read",
-        "heroImage": image,
+        "wordCount": word_count,
+        "heroImage": hero_image,
+        "images": images,
         "takeaways": [
-            "This article is an original synthesis of multiple referenced education updates.",
-            "Families should translate education news into practical weekly learning plans.",
-            "Students benefit most when tutoring targets weak concepts before exam pressure rises.",
+            "This long-form article is an original synthesis of three referenced education updates.",
+            "Each source is summarised and analysed separately so readers can compare the signals.",
+            "Families should translate education news into weekly learning plans instead of waiting for exam pressure.",
         ],
         "sections": sections,
+        "sourceAnalyses": source_analyses,
         "references": references,
         "tags": sorted({word.lower() for word in re.findall(r"[a-zA-Z]{4,}", chosen_topic)})[:8],
         "generatedBy": "scripts/create_blog.py",
         "generationNote": (
-            "Created from public RSS/news summaries and rewritten as original A Plus Academy guidance. "
-            "References are included for attribution and reader verification."
+            "Created from public RSS/news summaries, limited page context where accessible, and original A Plus Academy "
+            "analysis. References are included for attribution and reader verification."
         ),
     }
 
@@ -439,7 +639,18 @@ def run_git(args: list[str]) -> None:
 
 
 def publish(post: dict, post_path: Path) -> None:
-    run_git(["git", "add", str(post_path.relative_to(ROOT)), str(BLOG_INDEX.relative_to(ROOT)), str(SITEMAP.relative_to(ROOT))])
+    paths = [
+        str(post_path.relative_to(ROOT)),
+        str(BLOG_INDEX.relative_to(ROOT)),
+        str(SITEMAP.relative_to(ROOT)),
+    ]
+    for image in post.get("images", []):
+        url = image.get("url", "")
+        if url.startswith("/blogs/images/"):
+            image_path = ROOT / "frontend" / "public" / url.lstrip("/")
+            if image_path.exists():
+                paths.append(str(image_path.relative_to(ROOT)))
+    run_git(["git", "add", *paths])
     run_git(["git", "commit", "-m", f"Publish blog: {post['title'][:50]}"])
     run_git(["git", "push", "origin", "main"])
 
@@ -450,12 +661,18 @@ def main() -> int:
     )
     parser.add_argument("--topic", help="Force a topic instead of selecting one from trending news.")
     parser.add_argument("--max-sources", type=int, default=6, help="Number of source items to cite.")
+    parser.add_argument(
+        "--image-mode",
+        choices=["auto", "ai", "pexels"],
+        default=os.environ.get("BLOG_IMAGE_MODE", "auto"),
+        help="Use AI images when OPENAI_API_KEY is available, require AI, or use Pexels fallback.",
+    )
     parser.add_argument("--publish", action="store_true", help="Commit and push the generated post.")
     parser.add_argument("--dry-run", action="store_true", help="Print the post without writing files.")
     args = parser.parse_args()
 
     items = gather_news(args.topic, max(3, args.max_sources))
-    post = build_post(items, args.topic)
+    post = build_post(items, args.topic, args.image_mode)
 
     if args.dry_run:
         print(json.dumps(post, ensure_ascii=False, indent=2))

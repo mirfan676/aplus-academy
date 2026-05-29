@@ -4,8 +4,8 @@
     "title": "Board Exams And School Assessment: What Students and Parents Should Watch",
     "description": "A Plus Academy reviews current education updates and explains what they may mean for students, parents, and tutors in Pakistan.",
     "topic": "Board Exams And School Assessment",
-    "publishedAt": "2026-05-29T09:59:41.826929+00:00",
-    "readTime": "3 min read",
+    "publishedAt": "2026-05-29T10:19:45.818143+00:00",
+    "readTime": "8 min read",
     "heroImage": {
       "keywords": [
         "exam",
@@ -17,7 +17,9 @@
       "url": "https://images.pexels.com/photos/256417/pexels-photo-256417.jpeg?auto=compress&cs=tinysrgb&w=1600",
       "sourceUrl": "https://www.pexels.com/photo/books-on-library-shelf-256417/",
       "credit": "Pexels free photo",
-      "alt": "Books in a library for exam preparation"
+      "alt": "Books in a library for exam preparation",
+      "kind": "pexels",
+      "placement": "hero"
     }
   }
 ]
