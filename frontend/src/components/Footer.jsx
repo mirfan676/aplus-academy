@@ -17,6 +17,7 @@ const academyLinks = [
   { label: "Study Abroad", href: "/study-abroad" },
   { label: "Referral Program", href: "/referral-program" },
   { label: "Career Opportunities", href: "/career-opportunities" },
+  { label: "Blog", href: "/blog" },
   { label: "Languages", href: "/languages" },
   { label: "Buy Courses", href: "/buy-courses" },
 ];

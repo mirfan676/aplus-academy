@@ -1,0 +1,31 @@
+name: Daily education blog
+
+on:
+  schedule:
+    - cron: "15 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish-blog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Configure Git author
+        run: |
+          git config user.name "A Plus Academy Blog Bot"
+          git config user.email "actions@github.com"
+
+      - name: Create and publish blog
+        run: python scripts/create_blog.py --publish

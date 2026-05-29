@@ -14,6 +14,8 @@ import NotFound from "./pages/NotFound";
 import RouteRedirect from "./components/RouteRedirect";
 import LandingPage from "./pages/landing/LandingPage";
 import { allLandingPages } from "./pages/landing/landingPages";
+import BlogList from "./pages/blog/BlogList";
+import BlogPost from "./pages/blog/BlogPost";
 
 
 import { ThemeProvider, CssBaseline, Container, Card, CardContent } from "@mui/material";
@@ -98,6 +100,8 @@ function App() {
           <Route path="/teacher/:id" element={<TeacherProfile />} />
           <Route path="/hire/:id" element={<HireForm />} />
           <Route path="/jobs" element={<Jobs />} />
+          <Route path="/blog" element={<BlogList />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
 

@@ -8,6 +8,7 @@ import WhyChooseUs from "../components/sections/WhyChooseUs";
 import AreasWeCover from "../components/sections/AreasWeCover";
 import FAQSection from "../components/sections/FAQSection";
 import FooterCTA from "../components/sections/FooterCTA";
+import LatestNewsSection from "../components/blog/LatestNewsSection";
 
 const Home = () => {
 
@@ -25,6 +26,7 @@ const Home = () => {
       <StepsSection />
       <WhyChooseUs />
       <AreasWeCover />
+      <LatestNewsSection />
       <FAQSection />
       <FooterCTA />
     </>
