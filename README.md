@@ -20,6 +20,13 @@ Create a post around a specific topic:
 python scripts/create_blog.py --topic "IELTS preparation in Pakistan"
 ```
 
+Create a post for a specific approved category:
+
+```bash
+python scripts/create_blog.py --category IELTS
+python scripts/create_blog.py --category "IT & Technology"
+```
+
 Use only credited Pexels fallback images:
 
 ```bash
@@ -35,8 +42,11 @@ python scripts/create_blog.py --image-mode ai
 
 The script uses public RSS/news summaries, writes an original A Plus Academy
 article of roughly 1500+ words, adds source references, creates multiple images
-per article, updates the blog index, and adds the post URL to the sitemap. In
-`auto` mode it generates AI images when `OPENAI_API_KEY` is available and falls
-back to credited Pexels images otherwise. A GitHub Actions workflow also runs
-this daily and pushes a new post when sources are available.
+per article, updates the blog index, and adds the post URL to the sitemap. Daily
+posts rotate through approved categories: K-12, O & A Level, Bachelors / Masters,
+Competitive Exams, IT & Technology, Programming, Qur'an & Tajweed, English
+Language, IELTS, and Graphics & Multimedia. In `auto` mode it generates AI
+images when `OPENAI_API_KEY` is available and falls back to credited Pexels images
+otherwise. A GitHub Actions workflow also runs this daily and pushes a new post
+when sources are available.
 aplus academy developer notes

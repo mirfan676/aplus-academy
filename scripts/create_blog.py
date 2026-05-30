@@ -37,14 +37,90 @@ BLOG_INDEX = BLOG_DIR / "index.json"
 SITEMAP = ROOT / "frontend" / "public" / "sitemap.xml"
 SITE_URL = "https://www.aplusacademy.pk"
 
-NEWS_QUERIES = [
-    "Pakistan education students schools exams",
-    "Pakistan higher education universities students",
-    "online learning Pakistan education technology",
-    "AI in education students teachers",
-    "IELTS study abroad Pakistan students",
-    "Cambridge O Level A Level Pakistan education",
+BLOG_CATEGORIES = [
+    {
+        "label": "K-12",
+        "queries": [
+            "global K-12 education students schools learning trends",
+            "primary secondary education curriculum students worldwide",
+            "school learning recovery assessment education international",
+        ],
+    },
+    {
+        "label": "O & A Level",
+        "queries": [
+            "Cambridge O Level A Level education exams students international",
+            "Cambridge International education A Level O Level exams",
+            "IGCSE O Level A Level students schools global education",
+        ],
+    },
+    {
+        "label": "Bachelors / Masters",
+        "queries": [
+            "higher education university students bachelors masters global trends",
+            "university admissions graduate education international students",
+            "college students skills employment higher education worldwide",
+        ],
+    },
+    {
+        "label": "Competitive Exams",
+        "queries": [
+            "competitive exams students test preparation education global",
+            "standardized tests admissions exams students international",
+            "exam preparation students assessment education news worldwide",
+        ],
+    },
+    {
+        "label": "IT & Technology",
+        "queries": [
+            "education technology IT skills students global learning",
+            "digital skills computer science education students worldwide",
+            "AI technology education students teachers global",
+        ],
+    },
+    {
+        "label": "Programming",
+        "queries": [
+            "programming education coding students global computer science",
+            "coding skills students schools universities programming learning",
+            "software development education students programming courses worldwide",
+        ],
+    },
+    {
+        "label": "Qur'an & Tajweed",
+        "queries": [
+            "Quran education Tajweed online learning students global",
+            "Islamic education Quran learning children online classes",
+            "Quran Tajweed teaching students education worldwide",
+        ],
+    },
+    {
+        "label": "English Language",
+        "queries": [
+            "English language learning students global education",
+            "spoken English learning students education worldwide",
+            "English grammar writing language learning international students",
+        ],
+    },
+    {
+        "label": "IELTS",
+        "queries": [
+            "IELTS students study abroad English test global education",
+            "IELTS preparation international students study abroad news",
+            "English proficiency tests IELTS education migration students",
+        ],
+    },
+    {
+        "label": "Graphics & Multimedia",
+        "queries": [
+            "graphic design education students multimedia skills global",
+            "digital media design courses students creative skills education",
+            "multimedia design learning students creative technology worldwide",
+        ],
+    },
 ]
+
+NEWS_QUERIES = [query for category in BLOG_CATEGORIES for query in category["queries"][:1]]
 
 STOPWORDS = {
     "about",
@@ -218,7 +294,7 @@ def extract_article_context(item: dict) -> str:
 
 def google_news_rss(query: str) -> str:
     encoded = urllib.parse.quote(query)
-    return f"https://news.google.com/rss/search?q={encoded}&hl=en-PK&gl=PK&ceid=PK:en"
+    return f"https://news.google.com/rss/search?q={encoded}&hl=en-US&gl=US&ceid=US:en"
 
 
 def parse_feed(xml_bytes: bytes) -> list[dict]:
@@ -254,8 +330,13 @@ def parse_feed(xml_bytes: bytes) -> list[dict]:
     return items
 
 
-def gather_news(topic: str | None, max_items: int) -> list[dict]:
-    queries = [topic] if topic else NEWS_QUERIES
+def gather_news(topic: str | None, max_items: int, category: dict | None = None) -> list[dict]:
+    if topic:
+        queries = [topic]
+    elif category:
+        queries = category["queries"]
+    else:
+        queries = NEWS_QUERIES
     seen = set()
     items: list[dict] = []
 
@@ -287,9 +368,21 @@ def gather_news(topic: str | None, max_items: int) -> list[dict]:
     return (selected + items)[:max_items]
 
 
-def choose_topic(items: list[dict], forced_topic: str | None) -> str:
+def choose_topic(items: list[dict], forced_topic: str | None, category_label: str | None = None) -> str:
     if forced_topic:
         return forced_topic.strip()
+
+    if category_label:
+        haystack = " ".join(item["title"] for item in items[:8]).lower()
+        if any(word in haystack for word in ("ai", "artificial intelligence", "digital", "technology")):
+            return f"{category_label} And Digital Learning"
+        if any(word in haystack for word in ("exam", "assessment", "test", "admission")):
+            return f"{category_label} Exam And Assessment Trends"
+        if any(word in haystack for word in ("skills", "career", "jobs", "employment")):
+            return f"{category_label} Skills And Career Readiness"
+        if any(word in haystack for word in ("online", "remote", "hybrid")):
+            return f"{category_label} Online Learning Trends"
+        return f"{category_label} Global Education Trends"
 
     haystack = " ".join(item["title"] for item in items[:10]).lower()
     topic_rules = [
@@ -482,13 +575,19 @@ def general_section(topic: str) -> dict:
     }
 
 
-def build_post(items: list[dict], topic: str | None, image_mode: str) -> dict:
+def build_post(
+    items: list[dict],
+    topic: str | None,
+    image_mode: str,
+    category: dict | None = None,
+) -> dict:
     if len(items) < 3:
         raise RuntimeError("At least three news sources are needed to create a referenced blog post.")
 
     now = dt.datetime.now(dt.timezone.utc)
     display_date = now.strftime("%B %d, %Y")
-    chosen_topic = choose_topic(items, topic)
+    category_label = category["label"] if category else None
+    chosen_topic = choose_topic(items, topic, category_label)
     slug = f"{now.strftime('%Y-%m-%d')}-{slugify(chosen_topic)}"
     images = choose_images(chosen_topic, items, slug, image_mode)
     hero_image = images[0]
@@ -546,6 +645,7 @@ def build_post(items: list[dict], topic: str | None, image_mode: str) -> dict:
         "seoTitle": f"{title} | A Plus Academy Blog",
         "description": description,
         "topic": chosen_topic,
+        "category": category_label or "Education",
         "publishedAt": now.isoformat(),
         "updatedAt": now.isoformat(),
         "readTime": f"{read_minutes} min read",
@@ -602,6 +702,50 @@ def find_recent_duplicate(topic: str, days: int) -> dict | None:
     return None
 
 
+def normalize_category(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
+
+
+def category_last_published(category_label: str) -> dt.datetime | None:
+    normalized = normalize_category(category_label)
+    dates = []
+    for post in load_index():
+        post_category = post.get("category") or post.get("topic") or ""
+        if normalize_category(post_category).startswith(normalized):
+            published_at = parse_published_at(post.get("publishedAt", ""))
+            if published_at:
+                dates.append(published_at)
+    return max(dates) if dates else None
+
+
+def resolve_category(category_name: str | None) -> dict | None:
+    if not category_name:
+        return None
+    requested = normalize_category(category_name)
+    for category in BLOG_CATEGORIES:
+        if normalize_category(category["label"]) == requested:
+            return category
+    labels = ", ".join(category["label"] for category in BLOG_CATEGORIES)
+    raise ValueError(f"Unknown category {category_name!r}. Choose one of: {labels}")
+
+
+def choose_daily_category(duplicate_window_days: int) -> dict:
+    now = dt.datetime.now(dt.timezone.utc)
+    offset = now.toordinal() % len(BLOG_CATEGORIES)
+    ordered = BLOG_CATEGORIES[offset:] + BLOG_CATEGORIES[:offset]
+    cutoff = now - dt.timedelta(days=duplicate_window_days)
+
+    for category in ordered:
+        last_published = category_last_published(category["label"])
+        if last_published is None or last_published < cutoff:
+            return category
+
+    return min(
+        BLOG_CATEGORIES,
+        key=lambda category: category_last_published(category["label"]) or dt.datetime.min.replace(tzinfo=dt.timezone.utc),
+    )
+
+
 def write_post(post: dict) -> Path:
     BLOG_DIR.mkdir(parents=True, exist_ok=True)
     post_path = BLOG_DIR / f"{post['slug']}.json"
@@ -622,6 +766,7 @@ def write_post(post: dict) -> Path:
             "title": post["title"],
             "description": post["description"],
             "topic": post["topic"],
+            "category": post.get("category", "Education"),
             "publishedAt": post["publishedAt"],
             "readTime": post["readTime"],
             "heroImage": post["heroImage"],
@@ -682,6 +827,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Generate an original referenced A Plus Academy education blog post."
     )
+    parser.add_argument(
+        "--category",
+        help="Pick one category from the approved list. If omitted, the script rotates daily.",
+    )
     parser.add_argument("--topic", help="Force a topic instead of selecting one from trending news.")
     parser.add_argument("--max-sources", type=int, default=6, help="Number of source items to cite.")
     parser.add_argument(
@@ -693,8 +842,8 @@ def main() -> int:
     parser.add_argument(
         "--duplicate-window-days",
         type=int,
-        default=int(os.environ.get("BLOG_DUPLICATE_WINDOW_DAYS", "14")),
-        help="Skip publishing if the same topic was published within this many days.",
+        default=int(os.environ.get("BLOG_DUPLICATE_WINDOW_DAYS", "9")),
+        help="Prefer categories not used within this many days. Daily publishing still continues.",
     )
     parser.add_argument(
         "--allow-duplicate",
@@ -705,22 +854,35 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true", help="Print the post without writing files.")
     args = parser.parse_args()
 
-    items = gather_news(args.topic, max(3, args.max_sources))
-    selected_topic = choose_topic(items, args.topic)
+    requested_category = resolve_category(args.category)
+    category = requested_category or choose_daily_category(args.duplicate_window_days)
 
-    if not args.allow_duplicate:
+    attempts = [category]
+    if not requested_category:
+        attempts.extend(candidate for candidate in BLOG_CATEGORIES if candidate is not category)
+
+    post = None
+    for candidate in attempts:
+        items = gather_news(args.topic, max(3, args.max_sources), candidate)
+        selected_topic = choose_topic(items, args.topic, candidate["label"])
         duplicate = find_recent_duplicate(selected_topic, args.duplicate_window_days)
-        if duplicate:
+        if duplicate and not args.allow_duplicate and not requested_category:
             print(
-                "Skipped blog creation: "
-                f"'{selected_topic}' was already published recently at {SITE_URL}/blog/{duplicate['slug']}"
+                "Trying another category because "
+                f"'{selected_topic}' was recently published at {SITE_URL}/blog/{duplicate['slug']}"
             )
-            return 0
+            continue
+        post = build_post(items, selected_topic, args.image_mode, candidate)
+        break
 
-    post = build_post(items, selected_topic, args.image_mode)
+    if post is None:
+        fallback_category = choose_daily_category(0)
+        items = gather_news(args.topic, max(3, args.max_sources), fallback_category)
+        selected_topic = choose_topic(items, args.topic, fallback_category["label"])
+        post = build_post(items, selected_topic, args.image_mode, fallback_category)
 
     if args.dry_run:
-        print(json.dumps(post, ensure_ascii=False, indent=2))
+        sys.stdout.buffer.write((json.dumps(post, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
         return 0
 
     post_path = write_post(post)
