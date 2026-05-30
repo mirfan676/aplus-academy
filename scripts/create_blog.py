@@ -579,6 +579,29 @@ def load_index() -> list[dict]:
         return []
 
 
+def parse_published_at(value: str) -> dt.datetime | None:
+    if not value:
+        return None
+    try:
+        return dt.datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def find_recent_duplicate(topic: str, days: int) -> dict | None:
+    cutoff = dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=days)
+    topic_key = slugify(topic)
+    for post in load_index():
+        published_at = parse_published_at(post.get("publishedAt", ""))
+        if published_at is None or published_at < cutoff:
+            continue
+
+        existing_topic = post.get("topic") or post.get("title", "")
+        if slugify(existing_topic) == topic_key:
+            return post
+    return None
+
+
 def write_post(post: dict) -> Path:
     BLOG_DIR.mkdir(parents=True, exist_ok=True)
     post_path = BLOG_DIR / f"{post['slug']}.json"
@@ -667,12 +690,34 @@ def main() -> int:
         default=os.environ.get("BLOG_IMAGE_MODE", "auto"),
         help="Use AI images when OPENAI_API_KEY is available, require AI, or use Pexels fallback.",
     )
+    parser.add_argument(
+        "--duplicate-window-days",
+        type=int,
+        default=int(os.environ.get("BLOG_DUPLICATE_WINDOW_DAYS", "14")),
+        help="Skip publishing if the same topic was published within this many days.",
+    )
+    parser.add_argument(
+        "--allow-duplicate",
+        action="store_true",
+        help="Force publishing even if the same topic was recently published.",
+    )
     parser.add_argument("--publish", action="store_true", help="Commit and push the generated post.")
     parser.add_argument("--dry-run", action="store_true", help="Print the post without writing files.")
     args = parser.parse_args()
 
     items = gather_news(args.topic, max(3, args.max_sources))
-    post = build_post(items, args.topic, args.image_mode)
+    selected_topic = choose_topic(items, args.topic)
+
+    if not args.allow_duplicate:
+        duplicate = find_recent_duplicate(selected_topic, args.duplicate_window_days)
+        if duplicate:
+            print(
+                "Skipped blog creation: "
+                f"'{selected_topic}' was already published recently at {SITE_URL}/blog/{duplicate['slug']}"
+            )
+            return 0
+
+    post = build_post(items, selected_topic, args.image_mode)
 
     if args.dry_run:
         print(json.dumps(post, ensure_ascii=False, indent=2))
