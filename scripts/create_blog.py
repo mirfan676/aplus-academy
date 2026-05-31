@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import base64
 import datetime as dt
+import email.utils
 import html
 import json
 import os
@@ -206,6 +207,136 @@ ARTICLE_IMAGE_SLOTS = [
     "tutor guidance",
 ]
 
+CATEGORY_GUIDANCE = {
+    "K-12": {
+        "focus": "school routines, concept clarity, assessments, homework support, and age-appropriate online learning",
+        "actions": [
+            "Check the child's current syllabus and mark the three weakest chapters before booking extra support.",
+            "Build a weekly plan with one concept session, one written practice session, and one short review conversation.",
+            "Ask the tutor to share visible progress: quiz scores, corrected mistakes, and next-week goals.",
+        ],
+    },
+    "O & A Level": {
+        "focus": "Cambridge syllabus coverage, past papers, subject choices, predicted grades, and exam-board updates",
+        "actions": [
+            "Match every lesson to the current Cambridge syllabus and keep a topic-by-topic checklist.",
+            "Practise past-paper questions under timed conditions, then review the mark scheme rather than only the answer.",
+            "Confirm registration deadlines, component codes, and predicted-grade requirements with the school.",
+        ],
+    },
+    "Bachelors / Masters": {
+        "focus": "university admissions, degree planning, research skills, employability, and postgraduate readiness",
+        "actions": [
+            "Shortlist programmes by entry requirements, fee deadlines, scholarship dates, and career outcomes.",
+            "Strengthen academic writing, presentation, and research methods before final-year pressure arrives.",
+            "Use tutoring or mentoring for difficult courses instead of waiting until the final exam week.",
+        ],
+    },
+    "Competitive Exams": {
+        "focus": "syllabus tracking, past papers, admissions tests, time management, and official notices",
+        "actions": [
+            "Download the latest official syllabus and convert it into a weekly preparation tracker.",
+            "Do one timed practice set every week and record mistakes by topic, not just by score.",
+            "Verify dates, centres, roll-number slips, and result notices from official boards or testing bodies.",
+        ],
+    },
+    "IT & Technology": {
+        "focus": "digital skills, certifications, AI literacy, freelancing readiness, and practical projects",
+        "actions": [
+            "Choose one job-relevant skill track and build a small portfolio project within two weeks.",
+            "Compare certifications by employer value, course depth, project work, and local affordability.",
+            "Practise explaining technical work in simple English because interviews and freelancing both require it.",
+        ],
+    },
+    "Programming": {
+        "focus": "coding fundamentals, software projects, debugging habits, computer science concepts, and portfolio building",
+        "actions": [
+            "Pick one language and complete small projects before jumping between frameworks.",
+            "Keep a debugging journal that records the error, cause, fix, and lesson learned.",
+            "Publish a simple portfolio project or GitHub repository to show real problem-solving ability.",
+        ],
+    },
+    "Qur'an & Tajweed": {
+        "focus": "tajweed rules, hifz planning, qari qualifications, online Quran classes, recitation practice, and family routines",
+        "actions": [
+            "Choose a qualified qari or qaria who can correct makharij, tajweed rules, fluency, and revision habits.",
+            "Set a realistic hifz or nazra routine with daily recitation, weekly revision, and parent listening time.",
+            "Evaluate online Quran platforms by teacher screening, trial class quality, class timing, and progress reports.",
+        ],
+    },
+    "English Language": {
+        "focus": "spoken English, grammar, vocabulary, writing confidence, pronunciation, and practical communication",
+        "actions": [
+            "Balance grammar study with daily speaking practice so confidence grows with accuracy.",
+            "Keep a vocabulary notebook with example sentences instead of isolated word lists.",
+            "Ask the tutor to correct pronunciation, sentence structure, and writing in the same weekly cycle.",
+        ],
+    },
+    "IELTS": {
+        "focus": "band-score targets, writing task 2, speaking practice, listening and reading strategy, and test timelines",
+        "actions": [
+            "Take a diagnostic test and set separate band targets for listening, reading, writing, and speaking.",
+            "Practise IELTS Writing Task 2 with feedback on task response, coherence, vocabulary, and grammar.",
+            "Choose a test date only after mock results are close to the required band score.",
+        ],
+    },
+    "Graphics & Multimedia": {
+        "focus": "design fundamentals, creative software, portfolio work, branding, video, animation, and freelancing readiness",
+        "actions": [
+            "Learn design principles alongside software tools so the portfolio looks intentional, not template-based.",
+            "Create three portfolio pieces: one social campaign, one brand layout, and one motion or multimedia sample.",
+            "Collect feedback on readability, spacing, colour, and client goals before publishing work online.",
+        ],
+    },
+}
+
+CATEGORY_OUTCOMES = {
+    "K-12": "a corrected worksheet, a clearer concept explanation, or a stronger quiz result",
+    "O & A Level": "a marked past-paper answer, a completed syllabus checklist, or a better timed response",
+    "Bachelors / Masters": "a stronger assignment draft, a clearer research outline, or a completed admissions task",
+    "Competitive Exams": "a timed practice score, a corrected weak topic, or a verified exam deadline",
+    "IT & Technology": "a working project, a completed certification module, or a clearer technical explanation",
+    "Programming": "a running program, a fixed bug, or a small project pushed to a portfolio",
+    "Qur'an & Tajweed": "a corrected recitation, stronger makharij, or a consistent hifz revision record",
+    "English Language": "a clearer spoken response, a corrected paragraph, or a stronger vocabulary routine",
+    "IELTS": "a marked Task 2 essay, a recorded speaking answer, or a timed listening and reading score",
+    "Graphics & Multimedia": "a cleaner layout, a stronger portfolio piece, or a revised design based on feedback",
+}
+
+CATEGORY_KEYWORDS = {
+    "K-12": ["k-12", "school", "primary", "secondary", "children", "curriculum", "assessment", "classroom", "teacher"],
+    "O & A Level": ["cambridge", "o level", "a level", "igcse", "exam", "syllabus", "cie", "pearson", "edexcel"],
+    "Bachelors / Masters": ["university", "college", "bachelor", "master", "graduate", "degree", "admission", "higher education"],
+    "Competitive Exams": ["exam", "test", "assessment", "admission", "competitive", "standardized", "board", "result", "entry test"],
+    "IT & Technology": ["technology", "digital", "ai", "computer", "cyber", "data", "cloud", "edtech", "skills"],
+    "Programming": ["programming", "coding", "software", "developer", "computer science", "python", "javascript", "code"],
+    "Qur'an & Tajweed": ["quran", "qur'an", "tajweed", "hifz", "hafiz", "recitation", "qari", "islamic education", "memorization", "memorisation", "online quran"],
+    "English Language": ["english", "language", "grammar", "spoken", "writing", "vocabulary", "pronunciation", "communication"],
+    "IELTS": ["ielts", "english proficiency", "study abroad", "band score", "speaking test", "writing task", "idp", "british council"],
+    "Graphics & Multimedia": ["graphic", "design", "multimedia", "creative", "animation", "video", "photoshop", "illustrator", "portfolio"],
+}
+
+GLOBAL_BLOCKLIST_TERMS = [
+    "taliban",
+    "terror",
+    "terrorism",
+    "suspect",
+    "attack",
+    "extremist",
+    "militant",
+    "war crime",
+    "shooting",
+    "bomb",
+]
+
+AGGREGATOR_SNIPPETS = [
+    "comprehensive, up-to-date news coverage",
+    "coverage, aggregated from sources all over the world",
+    "google news",
+]
+
+MAX_SOURCE_AGE_DAYS = 180
+
 
 def slugify(value: str) -> str:
     value = re.sub(r"[^a-zA-Z0-9\s-]", "", value).strip().lower()
@@ -235,6 +366,67 @@ def trim_text(value: str, limit: int = 155) -> str:
         return value
     trimmed = value[:limit].rsplit(" ", 1)[0].rstrip(" ,.;:")
     return f"{trimmed}."
+
+
+def split_sentences(value: str) -> list[str]:
+    cleaned = clean_text(value)
+    if not cleaned:
+        return []
+    sentences = re.split(r"(?<=[.!?])\s+", cleaned)
+    return [sentence.strip() for sentence in sentences if len(sentence.split()) >= 6]
+
+
+def strip_source_from_title(title: str, source: str) -> str:
+    cleaned = clean_text(title).rstrip(".")
+    if source:
+        cleaned = re.sub(rf"\s+-\s+{re.escape(source)}$", "", cleaned, flags=re.I)
+    return cleaned
+
+
+def category_focus(category_label: str | None) -> str:
+    if not category_label:
+        return "learning plans, tutor support, exam preparation, and student progress"
+    return CATEGORY_GUIDANCE.get(category_label, {}).get(
+        "focus",
+        "learning plans, tutor support, exam preparation, and student progress",
+    )
+
+
+def category_actions(category_label: str | None) -> list[str]:
+    if not category_label:
+        return [
+            "Check the official source behind the update before changing a study plan.",
+            "Turn the news into one weekly academic target instead of reacting with stress.",
+            "Ask a tutor to diagnose weak areas before adding more lessons.",
+        ]
+    return CATEGORY_GUIDANCE.get(category_label, {}).get("actions", [])
+
+
+def category_outcome(category_label: str | None) -> str:
+    return CATEGORY_OUTCOMES.get(
+        category_label or "",
+        "a visible learning result, a corrected mistake, or a verified next step",
+    )
+
+
+def parse_feed_date(value: str) -> dt.datetime | None:
+    if not value:
+        return None
+    try:
+        parsed = email.utils.parsedate_to_datetime(value)
+    except (TypeError, ValueError):
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=dt.timezone.utc)
+    return parsed.astimezone(dt.timezone.utc)
+
+
+def is_recent_source(item: dict, max_age_days: int = MAX_SOURCE_AGE_DAYS) -> bool:
+    published = parse_feed_date(item.get("publishedAt", ""))
+    if published is None:
+        return True
+    cutoff = dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=max_age_days)
+    return published >= cutoff
 
 
 def fetch_url(url: str, timeout: int = 20) -> bytes:
@@ -289,10 +481,15 @@ def extract_article_context(item: dict) -> str:
             parts.append(cleaned)
 
     context = " ".join(part for part in parts if part)
-    return trim_text(context, 900) or item.get("summary", "")
+    context = trim_text(context, 900)
+    if any(snippet in context.lower() for snippet in AGGREGATOR_SNIPPETS):
+        return item.get("summary", "")
+    return context or item.get("summary", "")
 
 
 def google_news_rss(query: str) -> str:
+    if "when:" not in query:
+        query = f"{query} when:{MAX_SOURCE_AGE_DAYS}d"
     encoded = urllib.parse.quote(query)
     return f"https://news.google.com/rss/search?q={encoded}&hl=en-US&gl=US&ceid=US:en"
 
@@ -330,6 +527,69 @@ def parse_feed(xml_bytes: bytes) -> list[dict]:
     return items
 
 
+def relevance_score(item: dict, category: dict | None) -> int:
+    if not category:
+        return 1
+
+    if not is_recent_source(item):
+        return -90
+
+    category_label = category["label"]
+    text = " ".join(
+        [
+            item.get("title", ""),
+            item.get("summary", ""),
+            item.get("source", ""),
+        ]
+    ).lower()
+
+    if any(term in text for term in GLOBAL_BLOCKLIST_TERMS):
+        return -100
+
+    keywords = CATEGORY_KEYWORDS.get(category_label, [])
+    score = 0
+    for keyword in keywords:
+        if keyword in text:
+            score += 3 if " " in keyword else 2
+
+    if "education" in text or "learning" in text or "students" in text:
+        score += 1
+    if category_label == "Qur'an & Tajweed" and "madrasa" in text and score < 3:
+        score -= 4
+    if item.get("source", "").lower() in {"google news"}:
+        score -= 1
+    return score
+
+
+def select_relevant_items(items: list[dict], category: dict | None, max_items: int) -> list[dict]:
+    if not category:
+        return items[:max_items]
+
+    scored = sorted(
+        ((relevance_score(item, category), index, item) for index, item in enumerate(items)),
+        key=lambda row: (row[0], -row[1]),
+        reverse=True,
+    )
+    minimum_score = 2
+    filtered = [item for score, _, item in scored if score >= minimum_score]
+    if len(filtered) < 3:
+        filtered = [item for score, _, item in scored if score > -50 and is_recent_source(item)]
+    if len(filtered) < 3:
+        filtered = [item for score, _, item in scored if score > -50]
+
+    distinct_sources = []
+    selected = []
+    for item in filtered:
+        source_key = item["source"].lower()
+        if source_key not in distinct_sources:
+            distinct_sources.append(source_key)
+            selected.append(item)
+        if len(selected) >= max_items:
+            return selected
+
+    return (selected + filtered)[:max_items]
+
+
 def gather_news(topic: str | None, max_items: int, category: dict | None = None) -> list[dict]:
     if topic:
         queries = [topic]
@@ -355,17 +615,7 @@ def gather_news(topic: str | None, max_items: int, category: dict | None = None)
             items.append(item)
         time.sleep(1)
 
-    distinct_sources = []
-    selected = []
-    for item in items:
-        source_key = item["source"].lower()
-        if source_key not in distinct_sources:
-            distinct_sources.append(source_key)
-            selected.append(item)
-        if len(selected) >= max_items:
-            return selected
-
-    return (selected + items)[:max_items]
+    return select_relevant_items(items, category, max_items)
 
 
 def choose_topic(items: list[dict], forced_topic: str | None, category_label: str | None = None) -> str:
@@ -496,56 +746,48 @@ def generate_ai_images(topic: str, items: list[dict], slug: str) -> list[dict]:
     return images
 
 
-def sentence_from_item(item: dict) -> str:
-    title = item["title"].rstrip(".")
-    source = item["source"] or "a referenced source"
-    return f"{source} reports: {title}."
-
-
-def source_analysis(item: dict, topic: str, index: int) -> dict:
-    source = item["source"] or f"Source {index}"
-    title = item["title"].rstrip(".")
+def summarize_source(item: dict, category_label: str | None) -> str:
+    source = item["source"] or "the referenced source"
+    title = strip_source_from_title(item["title"], source)
     context = clean_text(item.get("articleContext") or item.get("summary") or "")
-    if not context:
-        context = (
-            "The public feed summary is limited, so this section focuses on the headline, "
-            "publisher signal, and practical implications for students and families."
+    title_key = re.sub(r"[^a-z0-9]+", " ", title.lower()).strip()
+    title_tokens = set(title_key.split())
+    sentences = []
+    for sentence in split_sentences(context):
+        sentence_key = re.sub(r"[^a-z0-9]+", " ", sentence.lower()).strip()
+        sentence_tokens = set(sentence_key.split())
+        token_overlap = len(title_tokens & sentence_tokens) / max(1, len(sentence_tokens))
+        if title_key and (sentence_key == title_key or title_key in sentence_key):
+            continue
+        if token_overlap >= 0.75:
+            continue
+        if source and sentence.lower().strip() == source.lower().strip():
+            continue
+        sentences.append(sentence)
+    if sentences:
+        detail = " ".join(sentences[:2])
+        return (
+            f"{source} reports that {title[0].lower() + title[1:] if title else 'this update matters'}. "
+            f"{detail}"
         )
 
+    focus = category_focus(category_label)
+    return (
+        f"{source} reports on \"{title}.\" The public feed gives limited article text, so the useful signal "
+        f"for readers is the connection to {focus}."
+    )
+
+
+def source_analysis(item: dict, topic: str, index: int, category_label: str | None) -> dict:
+    source = item["source"] or f"Source {index}"
+    title = strip_source_from_title(item["title"], source)
+    summary = summarize_source(item, category_label)
+    focus = category_focus(category_label)
     body = (
-        f"{source} highlights the issue through the update titled \"{title}.\" "
-        f"The available reporting points to a wider education concern connected with {topic.lower()}. "
-        f"In practical terms, this is not just a news item for institutions; it can shape how students, "
-        "parents, tutors, and school leaders prepare for the next academic checkpoint.\n\n"
-        f"The source context says: {context} This information should be read as a signal rather than a "
-        "complete policy brief. Families should confirm dates, exam-board notices, university instructions, "
-        "and school circulars from official channels before making final decisions. Still, the update is useful "
-        "because it shows where pressure is building: assessment reliability, class continuity, learning gaps, "
-        "admissions planning, technology access, or the need for stronger academic support.\n\n"
-        "For students, the main lesson is to avoid waiting for perfect clarity. A learner who keeps notes updated, "
-        "tracks weak chapters, practises past-paper style questions, and asks for help early is less affected by "
-        "sudden changes. If the update relates to exams, students should review the syllabus, marking pattern, "
-        "and deadline calendar. If it relates to universities or study abroad, they should keep documents, English "
-        "practice, and subject foundations ready. If it relates to online or digital learning, they should make sure "
-        "their basic study setup and digital skills are not holding them back.\n\n"
-        "For parents, the update is a reminder to convert news into a home learning routine. That means checking "
-        "where the child is confident, where they are guessing, and where they need guided practice. A short weekly "
-        "plan can work better than a last-minute rush: one concept-building session, one written practice session, "
-        "one revision session, and one review conversation. Parents should also keep communication open with the "
-        "school or tutor so that academic decisions are based on current information.\n\n"
-        "For tutors, this source suggests a need for lessons that are connected to real academic conditions. Tutors "
-        "should not only explain chapters; they should help students interpret exam expectations, organise revision, "
-        "improve writing, and practise under time limits. In Pakistan, where students may be preparing for board "
-        "exams, Cambridge exams, university admissions, IELTS, or skills-based courses at the same time, this kind "
-        "of structured guidance can make the difference between scattered effort and measurable progress.\n\n"
-        "The practical takeaway is simple: every education headline should lead to one concrete action. That action "
-        "might be checking an official notice, booking a diagnostic session, revising one weak chapter, improving "
-        "English writing, practising one past paper, or discussing a realistic timetable with a tutor. When families "
-        "respond in small planned steps, news becomes useful information instead of stress.\n\n"
-        "For SEO and reader clarity, this section deliberately connects the source update with common search needs in "
-        "Pakistan: home tutors, online tutors, board exam preparation, O and A Level support, IELTS readiness, and "
-        "subject-specific revision. That makes the article useful for readers while still giving credit to the original "
-        "publisher for the reported news."
+        f"{summary}\n\n"
+        f"Why it matters: for A Plus Academy readers, this source should be read through the lens of {focus}. "
+        "It is useful because it points to a real study decision: what to verify, what skill to practise next, "
+        "and whether the learner needs clearer guidance before deadlines arrive."
     )
 
     return {
@@ -558,21 +800,41 @@ def source_analysis(item: dict, topic: str, index: int) -> dict:
     }
 
 
-def general_section(topic: str) -> dict:
+def shared_guidance_section(topic: str, category_label: str | None) -> dict:
+    focus = category_focus(category_label)
     return {
-        "heading": "What families should do next",
+        "heading": "What this means for students, parents, and tutors",
         "body": (
-            f"The safest response to {topic.lower()} news is a practical learning plan. Students should list "
-            "their next tests, weak chapters, missing notes, and deadlines. Parents should decide whether the "
-            "student needs home tuition, online support, a short revision plan, or a subject specialist. Tutors "
-            "should begin with diagnosis before teaching: a short quiz, a writing sample, a past-paper question, "
-            "or a conversation about the learner's routine can reveal where time is being wasted.\n\n"
-            "A Plus Academy recommends a simple weekly rhythm for most students in Pakistan: understand the concept, "
-            "practise it in writing, test it under time pressure, and review mistakes before moving on. This works "
-            "for K-12, O Level, A Level, matric, intermediate, IELTS, university courses, Quran learning, programming, "
-            "and skill-based subjects. News changes quickly, but strong learning habits remain useful in every season."
+            f"The shared message across these sources is that {topic.lower()} should be turned into a practical "
+            f"learning plan, not treated as background noise. For this category, the important areas are {focus}. "
+            "Students should identify the next skill or chapter that needs attention. Parents should ask whether "
+            "the current routine is producing visible progress. Tutors should connect each lesson to a measurable "
+            f"outcome: {category_outcome(category_label)}.\n\n"
+            "For Pakistani families, the safest habit is to verify official dates and requirements, then act early. "
+            "A short diagnostic session, a weekly written task, or a structured revision plan can prevent confusion "
+            "from becoming exam pressure. A Plus Academy can support that work through subject tutors, online classes, "
+            "exam preparation, language coaching, Quran learning, programming support, and skill-based mentoring."
         ),
     }
+
+
+def action_steps_section(category_label: str | None) -> dict:
+    actions = category_actions(category_label)
+    body = "\n".join(f"{index + 1}. {action}" for index, action in enumerate(actions))
+    return {
+        "heading": f"Three action steps for {category_label or 'education'} learners in Pakistan",
+        "body": body,
+    }
+
+
+def build_takeaways(selected_items: list[dict], category_label: str | None) -> list[str]:
+    takeaways = []
+    for item in selected_items[:3]:
+        title = strip_source_from_title(item["title"], item.get("source", ""))
+        takeaways.append(trim_text(title, 120))
+    if len(takeaways) < 3:
+        takeaways.append(f"Focus today's response on {category_focus(category_label)}.")
+    return takeaways[:3]
 
 
 def build_post(
@@ -580,6 +842,8 @@ def build_post(
     topic: str | None,
     image_mode: str,
     category: dict | None = None,
+    replace_slug: str | None = None,
+    preserve_published_at: str | None = None,
 ) -> dict:
     if len(items) < 3:
         raise RuntimeError("At least three news sources are needed to create a referenced blog post.")
@@ -588,14 +852,14 @@ def build_post(
     display_date = now.strftime("%B %d, %Y")
     category_label = category["label"] if category else None
     chosen_topic = choose_topic(items, topic, category_label)
-    slug = f"{now.strftime('%Y-%m-%d')}-{slugify(chosen_topic)}"
+    slug = replace_slug or f"{now.strftime('%Y-%m-%d')}-{slugify(chosen_topic)}"
     images = choose_images(chosen_topic, items, slug, image_mode)
     hero_image = images[0]
 
     title = f"{chosen_topic}: What Students and Parents Should Watch"
     description = (
-        "A Plus Academy reviews current education updates and explains what they "
-        "may mean for students, parents, and tutors in Pakistan."
+        f"A Plus Academy reviews current {category_label or 'education'} updates with source-specific "
+        "analysis and practical next steps for learners in Pakistan."
     )
 
     selected_items = items[:3]
@@ -603,23 +867,27 @@ def build_post(
         item["articleContext"] = extract_article_context(item)
 
     source_analyses = [
-        source_analysis(item, chosen_topic, index + 1)
+        source_analysis(item, chosen_topic, index + 1, category_label)
         for index, item in enumerate(selected_items)
     ]
+
+    source_observation = summarize_source(selected_items[0], category_label)
 
     sections = [
         {
             "heading": "Overview",
             "body": (
-                f"Education updates around {chosen_topic.lower()} matter because they influence how Pakistani "
-                "families plan exams, admissions, online learning, tutoring, and long-term academic confidence. "
-                "This A Plus Academy article reviews three referenced news items, reorganises the public information "
-                "into original guidance, and turns the headlines into a practical plan for students, parents, and tutors. "
-                "The goal is not to replace the original reporting. The goal is to help readers understand what to watch, "
-                "what to verify, and how to respond without panic."
+                f"Today's education signals around {chosen_topic.lower()} start with a specific pattern: "
+                f"{source_observation} When this is read alongside the other sources below, the useful question "
+                "is not only what happened, but what a learner should do next.\n\n"
+                f"This A Plus Academy article keeps the references visible, but the main value is original guidance "
+                f"for Pakistani students, parents, and tutors. The focus is {category_focus(category_label)}. "
+                "The goal is to help readers compare the sources, avoid irrelevant noise, and turn the news into "
+                "a practical study decision."
             ),
         },
-        general_section(chosen_topic),
+        shared_guidance_section(chosen_topic, category_label),
+        action_steps_section(category_label),
     ]
 
     references = [
@@ -646,25 +914,21 @@ def build_post(
         "description": description,
         "topic": chosen_topic,
         "category": category_label or "Education",
-        "publishedAt": now.isoformat(),
+        "publishedAt": preserve_published_at or now.isoformat(),
         "updatedAt": now.isoformat(),
         "readTime": f"{read_minutes} min read",
         "wordCount": word_count,
         "heroImage": hero_image,
         "images": images,
-        "takeaways": [
-            "This long-form article is an original synthesis of three referenced education updates.",
-            "Each source is summarised and analysed separately so readers can compare the signals.",
-            "Families should translate education news into weekly learning plans instead of waiting for exam pressure.",
-        ],
+        "takeaways": build_takeaways(selected_items, category_label),
         "sections": sections,
         "sourceAnalyses": source_analyses,
         "references": references,
         "tags": sorted({word.lower() for word in re.findall(r"[a-zA-Z]{4,}", chosen_topic)})[:8],
         "generatedBy": "scripts/create_blog.py",
         "generationNote": (
-            "Created from public RSS/news summaries, limited page context where accessible, and original A Plus Academy "
-            "analysis. References are included for attribution and reader verification."
+            "Created from public RSS/news summaries, limited page context where accessible, relevance filtering, "
+            "and original A Plus Academy analysis. References are included for attribution and reader verification."
         ),
     }
 
@@ -700,6 +964,17 @@ def find_recent_duplicate(topic: str, days: int) -> dict | None:
         if slugify(existing_topic) == topic_key:
             return post
     return None
+
+
+def load_post(slug: str) -> dict | None:
+    post_path = BLOG_DIR / f"{slug}.json"
+    if not post_path.exists():
+        return None
+    try:
+        data = json.loads(post_path.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else None
+    except json.JSONDecodeError:
+        return None
 
 
 def normalize_category(value: str) -> str:
@@ -746,15 +1021,19 @@ def choose_daily_category(duplicate_window_days: int) -> dict:
     )
 
 
-def write_post(post: dict) -> Path:
+def write_post(post: dict, replace_slug: str | None = None) -> Path:
     BLOG_DIR.mkdir(parents=True, exist_ok=True)
     post_path = BLOG_DIR / f"{post['slug']}.json"
 
-    suffix = 2
-    while post_path.exists():
-        post["slug"] = re.sub(r"-\d+$", "", post["slug"]) + f"-{suffix}"
-        post_path = BLOG_DIR / f"{post['slug']}.json"
-        suffix += 1
+    if replace_slug:
+        post["slug"] = replace_slug
+        post_path = BLOG_DIR / f"{replace_slug}.json"
+    else:
+        suffix = 2
+        while post_path.exists():
+            post["slug"] = re.sub(r"-\d+$", "", post["slug"]) + f"-{suffix}"
+            post_path = BLOG_DIR / f"{post['slug']}.json"
+            suffix += 1
 
     post_path.write_text(json.dumps(post, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
@@ -850,11 +1129,21 @@ def main() -> int:
         action="store_true",
         help="Force publishing even if the same topic was recently published.",
     )
+    parser.add_argument(
+        "--replace-slug",
+        help="Overwrite an existing blog JSON while keeping its URL. Useful for quality revisions.",
+    )
     parser.add_argument("--publish", action="store_true", help="Commit and push the generated post.")
     parser.add_argument("--dry-run", action="store_true", help="Print the post without writing files.")
     args = parser.parse_args()
 
+    existing_post = load_post(args.replace_slug) if args.replace_slug else None
+    if args.replace_slug and existing_post is None:
+        raise RuntimeError(f"Cannot replace missing blog post: {args.replace_slug}")
+
     requested_category = resolve_category(args.category)
+    if existing_post and not requested_category:
+        requested_category = resolve_category(existing_post.get("category"))
     category = requested_category or choose_daily_category(args.duplicate_window_days)
 
     attempts = [category]
@@ -872,20 +1161,34 @@ def main() -> int:
                 f"'{selected_topic}' was recently published at {SITE_URL}/blog/{duplicate['slug']}"
             )
             continue
-        post = build_post(items, selected_topic, args.image_mode, candidate)
+        post = build_post(
+            items,
+            selected_topic,
+            args.image_mode,
+            candidate,
+            replace_slug=args.replace_slug,
+            preserve_published_at=existing_post.get("publishedAt") if existing_post else None,
+        )
         break
 
     if post is None:
         fallback_category = choose_daily_category(0)
         items = gather_news(args.topic, max(3, args.max_sources), fallback_category)
         selected_topic = choose_topic(items, args.topic, fallback_category["label"])
-        post = build_post(items, selected_topic, args.image_mode, fallback_category)
+        post = build_post(
+            items,
+            selected_topic,
+            args.image_mode,
+            fallback_category,
+            replace_slug=args.replace_slug,
+            preserve_published_at=existing_post.get("publishedAt") if existing_post else None,
+        )
 
     if args.dry_run:
         sys.stdout.buffer.write((json.dumps(post, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
         return 0
 
-    post_path = write_post(post)
+    post_path = write_post(post, args.replace_slug)
     print(f"Created blog post: {post_path.relative_to(ROOT)}")
     print(f"URL after deployment: {SITE_URL}/blog/{post['slug']}")
     print("\nImportant: this is an original synthesis, not copied article text.")
