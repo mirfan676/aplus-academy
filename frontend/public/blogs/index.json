@@ -2,23 +2,16 @@
   {
     "slug": "2026-05-31-english-language-and-digital-learning",
     "title": "English Language And Digital Learning: What Students and Parents Should Watch",
-    "description": "A Plus Academy reviews current education updates and explains what they may mean for students, parents, and tutors in Pakistan.",
+    "description": "A Plus Academy reviews current English Language updates with source-specific analysis and practical next steps for learners in Pakistan.",
     "topic": "English Language And Digital Learning",
     "category": "English Language",
     "publishedAt": "2026-05-31T07:06:45.207682+00:00",
-    "readTime": "8 min read",
+    "readTime": "5 min read",
     "heroImage": {
-      "keywords": [
-        "ai",
-        "technology",
-        "online",
-        "digital",
-        "computer"
-      ],
-      "url": "https://images.pexels.com/photos/1181354/pexels-photo-1181354.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/person-using-macbook-pro-1181354/",
-      "credit": "Pexels free photo",
-      "alt": "Student using a laptop for online learning",
+      "url": "https://images.pexels.com/photos/8423402/pexels-photo-8423402.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/students-on-a-classroom-8423402/",
+      "credit": "Pexels free photo by Pavel Danilyuk",
+      "alt": "Students practising English in a classroom discussion",
       "kind": "pexels",
       "placement": "hero"
     }
@@ -30,19 +23,12 @@
     "topic": "Qur'an & Tajweed And Digital Learning",
     "category": "Qur'an & Tajweed",
     "publishedAt": "2026-05-30T09:52:41.802860+00:00",
-    "readTime": "3 min read",
+    "readTime": "5 min read",
     "heroImage": {
-      "keywords": [
-        "ai",
-        "technology",
-        "online",
-        "digital",
-        "computer"
-      ],
-      "url": "https://images.pexels.com/photos/1181354/pexels-photo-1181354.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/person-using-macbook-pro-1181354/",
+      "url": "https://images.pexels.com/photos/8164397/pexels-photo-8164397.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/a-quran-book-on-the-stand-8164397/",
       "credit": "Pexels free photo",
-      "alt": "Student using a laptop for online learning",
+      "alt": "Quran placed on a wooden stand for recitation practice",
       "kind": "pexels",
       "placement": "hero"
     }
@@ -54,19 +40,12 @@
     "topic": "Competitive Exams And Digital Learning",
     "category": "Competitive Exams",
     "publishedAt": "2026-05-29T10:19:45.818143+00:00",
-    "readTime": "3 min read",
+    "readTime": "5 min read",
     "heroImage": {
-      "keywords": [
-        "exam",
-        "exams",
-        "assessment",
-        "cambridge",
-        "level"
-      ],
       "url": "https://images.pexels.com/photos/256417/pexels-photo-256417.jpeg?auto=compress&cs=tinysrgb&w=1600",
       "sourceUrl": "https://www.pexels.com/photo/books-on-library-shelf-256417/",
       "credit": "Pexels free photo",
-      "alt": "Books in a library for exam preparation",
+      "alt": "Library books for competitive exam preparation",
       "kind": "pexels",
       "placement": "hero"
     }

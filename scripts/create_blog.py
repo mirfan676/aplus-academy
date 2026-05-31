@@ -200,6 +200,87 @@ IMAGE_POOL = [
     },
 ]
 
+CATEGORY_IMAGES = {
+    "English Language": [
+        {
+            "url": "https://images.pexels.com/photos/8423402/pexels-photo-8423402.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/students-on-a-classroom-8423402/",
+            "credit": "Pexels free photo by Pavel Danilyuk",
+            "alt": "Students practising English in a classroom discussion",
+        },
+        {
+            "url": "https://images.pexels.com/photos/5212331/pexels-photo-5212331.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/students-sitting-in-their-classroom-5212331/",
+            "credit": "Pexels free photo by Max Fischer",
+            "alt": "Students learning with a teacher in a bright classroom",
+        },
+        {
+            "url": "https://images.pexels.com/photos/8617741/pexels-photo-8617741.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/students-and-teaching-inside-a-classroom-8617741/",
+            "credit": "Pexels free photo by Yan Krukau",
+            "alt": "Teacher guiding students through a language lesson",
+        },
+        {
+            "url": "https://images.pexels.com/photos/5676741/pexels-photo-5676741.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/students-in-the-classroom-5676741/",
+            "credit": "Pexels free photo",
+            "alt": "University students collaborating during class",
+        },
+    ],
+    "Qur'an & Tajweed": [
+        {
+            "url": "https://images.pexels.com/photos/8164397/pexels-photo-8164397.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/a-quran-book-on-the-stand-8164397/",
+            "credit": "Pexels free photo",
+            "alt": "Quran placed on a wooden stand for recitation practice",
+        },
+        {
+            "url": "https://images.pexels.com/photos/7249288/pexels-photo-7249288.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/person-pointing-to-an-open-book-7249288/",
+            "credit": "Pexels free photo",
+            "alt": "Teacher pointing to Quran text during a learning session",
+        },
+        {
+            "url": "https://images.pexels.com/photos/8522578/pexels-photo-8522578.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/close-up-shot-of-a-book-8522578/",
+            "credit": "Pexels free photo",
+            "alt": "Open Quran pages for tajweed and hifz revision",
+        },
+        {
+            "url": "https://images.pexels.com/photos/15694717/pexels-photo-15694717.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/quran-book-on-windowsill-15694717/",
+            "credit": "Pexels free photo",
+            "alt": "Quran book near a window for daily recitation",
+        },
+    ],
+    "Competitive Exams": [
+        {
+            "url": "https://images.pexels.com/photos/256417/pexels-photo-256417.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/books-on-library-shelf-256417/",
+            "credit": "Pexels free photo",
+            "alt": "Library books for competitive exam preparation",
+        },
+        {
+            "url": "https://images.pexels.com/photos/5940831/pexels-photo-5940831.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/person-writing-on-white-paper-5940831/",
+            "credit": "Pexels free photo",
+            "alt": "Student writing a timed exam practice answer",
+        },
+        {
+            "url": "https://images.pexels.com/photos/5212345/pexels-photo-5212345.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/a-child-studying-with-a-tutor-5212345/",
+            "credit": "Pexels free photo",
+            "alt": "Tutor helping a student prepare for exams",
+        },
+        {
+            "url": "https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/people-walking-in-a-campus-267885/",
+            "credit": "Pexels free photo",
+            "alt": "University campus linked to admissions testing",
+        },
+    ],
+}
+
 ARTICLE_IMAGE_SLOTS = [
     "hero",
     "student impact",
@@ -301,6 +382,27 @@ CATEGORY_OUTCOMES = {
     "English Language": "a clearer spoken response, a corrected paragraph, or a stronger vocabulary routine",
     "IELTS": "a marked Task 2 essay, a recorded speaking answer, or a timed listening and reading score",
     "Graphics & Multimedia": "a cleaner layout, a stronger portfolio piece, or a revised design based on feedback",
+}
+
+INTERNAL_LINKS = {
+    "English Language": [
+        {"label": "English Language classes", "url": "/english-language"},
+        {"label": "IELTS preparation", "url": "/ielts"},
+        {"label": "Online tutors in Pakistan", "url": "/online-tutors-pakistan"},
+        {"label": "Find an English tutor", "url": "/teachers"},
+    ],
+    "Competitive Exams": [
+        {"label": "Competitive exam preparation", "url": "/competitive-exams"},
+        {"label": "Online tutors in Pakistan", "url": "/online-tutors-pakistan"},
+        {"label": "O & A Level support", "url": "/o-a-level"},
+        {"label": "Find a tutor", "url": "/teachers"},
+    ],
+    "Qur'an & Tajweed": [
+        {"label": "Qur'an & Tajweed classes", "url": "/quran-tajweed"},
+        {"label": "Online tutors in Pakistan", "url": "/online-tutors-pakistan"},
+        {"label": "Find a Quran tutor", "url": "/teachers"},
+        {"label": "Become a tutor", "url": "/register"},
+    ],
 }
 
 CATEGORY_KEYWORDS = {
@@ -406,6 +508,17 @@ def category_outcome(category_label: str | None) -> str:
     return CATEGORY_OUTCOMES.get(
         category_label or "",
         "a visible learning result, a corrected mistake, or a verified next step",
+    )
+
+
+def internal_links_for(category_label: str | None) -> list[dict]:
+    return INTERNAL_LINKS.get(
+        category_label or "",
+        [
+            {"label": "Find a tutor", "url": "/teachers"},
+            {"label": "Online tutors in Pakistan", "url": "/online-tutors-pakistan"},
+            {"label": "Study abroad support", "url": "/study-abroad"},
+        ],
     )
 
 
@@ -658,7 +771,13 @@ def choose_topic(items: list[dict], forced_topic: str | None, category_label: st
     return phrase or "Pakistan Education Update"
 
 
-def choose_images(topic: str, items: list[dict], slug: str, image_mode: str) -> list[dict]:
+def choose_images(
+    topic: str,
+    items: list[dict],
+    slug: str,
+    image_mode: str,
+    category_label: str | None = None,
+) -> list[dict]:
     if image_mode in {"auto", "ai"} and os.environ.get("OPENAI_API_KEY"):
         try:
             return generate_ai_images(topic, items, slug)
@@ -666,6 +785,16 @@ def choose_images(topic: str, items: list[dict], slug: str, image_mode: str) -> 
             if image_mode == "ai":
                 raise
             print(f"Warning: AI image generation failed, using Pexels fallback: {exc}", file=sys.stderr)
+
+    if category_label in CATEGORY_IMAGES:
+        return [
+            {
+                **image,
+                "kind": "pexels",
+                "placement": ARTICLE_IMAGE_SLOTS[index],
+            }
+            for index, image in enumerate(CATEGORY_IMAGES[category_label][:4])
+        ]
 
     haystack = " ".join([topic] + [item["title"] for item in items]).lower()
     ranked = []
@@ -778,16 +907,92 @@ def summarize_source(item: dict, category_label: str | None) -> str:
     )
 
 
+def infer_source_angle(item: dict, category_label: str | None) -> tuple[str, str, str]:
+    title = strip_source_from_title(item["title"], item.get("source", ""))
+    text = f"{title} {item.get('summary', '')}".lower()
+
+    if category_label == "English Language":
+        if any(term in text for term in ("english uk", "policy", "minister", "jacqui smith")):
+            return (
+                "The source is about policy confidence in the English-language education market, not only classroom grammar.",
+                "Policy signals matter because international students choose countries and courses partly on visa clarity, trust, and perceived student support.",
+                "Pakistani students should connect English learning with study-abroad planning: IELTS readiness, spoken confidence, documentation, and realistic timelines.",
+            )
+        if any(term in text for term in ("esl", "celcis", "40 years", "excellence")):
+            return (
+                "The source points to long-running ESL support as a serious academic service, not a casual extra class.",
+                "Strong language centres show that English progress needs placement, feedback, speaking practice, writing support, and trained instructors.",
+                "Pakistani learners preparing for O/A Level English, university work, IELTS, or jobs need structured practice instead of memorised phrases.",
+            )
+        if any(term in text for term in ("proficiency", "requirement", "critic", "criticized", "criticised")):
+            return (
+                "The source raises the issue of language proficiency requirements and how students experience them.",
+                "That matters because English rules can affect admission, graduation, scholarships, and confidence in higher education.",
+                "Pakistani students should treat English proficiency as an academic skill to build early, especially writing, reading speed, and spoken clarity.",
+            )
+        if any(term in text for term in ("online", "digital", "platform", "app", "ai")):
+            return (
+                "The source shows English learning moving further into digital tools and online delivery.",
+                "Digital practice can help, but only when learners still receive correction on pronunciation, grammar, writing, and fluency.",
+                "Pakistani families should use apps for repetition and tutors for feedback, because the two solve different parts of the problem.",
+            )
+
+    if category_label == "Competitive Exams":
+        if any(term in text for term in ("standardized", "sat", "admission", "yale", "lsu", "uc")):
+            return (
+                "The source is about the return or debate around standardized testing in admissions.",
+                "This matters globally because universities are still balancing fairness, academic prediction, and access.",
+                "Pakistani students should keep test preparation active even when policies look optional, because requirements can change by institution and year.",
+            )
+        if any(term in text for term in ("board", "cbse", "exam", "results", "oxfordaqa")):
+            return (
+                "The source focuses on formal exam systems, results, or board-level assessment pressure.",
+                "Exam timing and assessment design shape how students revise, practise, and manage stress.",
+                "Pakistani students should keep a verified deadline calendar and practise written answers under timed conditions.",
+            )
+        if any(term in text for term in ("app", "sathee", "digital", "online")):
+            return (
+                "The source highlights digital exam-preparation support.",
+                "Free or low-cost platforms can widen access, but students still need a plan for weak topics and mock-test review.",
+                "Pakistani learners should combine digital practice with tutor feedback so mistakes are fixed, not simply repeated.",
+            )
+
+    if category_label == "Qur'an & Tajweed":
+        if any(term in text for term in ("hifz", "memorization", "memorisation", "memorization")):
+            return (
+                "The source is about hifz and Quran memorisation becoming more organised across families and communities.",
+                "Hifz success depends on revision, listening, tajweed correction, and a sustainable daily routine.",
+                "Pakistani families should choose teachers who track both new sabaq and old revision, not only daily quantity.",
+            )
+        if any(term in text for term in ("platform", "online", "digital")):
+            return (
+                "The source points to Quran education moving onto digital platforms.",
+                "Online Quran learning can help with access and scheduling, but teacher quality and correction remain essential.",
+                "Pakistani parents should evaluate trial classes, teacher credentials, makharij correction, and progress reports before committing.",
+            )
+        if any(term in text for term in ("parent", "follow-up", "children", "kids")):
+            return (
+                "The source highlights family involvement in Quran learning.",
+                "Parent follow-up matters because recitation and memorisation improve through daily listening and repetition.",
+                "Pakistani homes can support Quran learning with a short fixed revision time after class and weekly parent-teacher feedback.",
+            )
+
+    return (
+        "The source adds a relevant education signal for this category.",
+        f"It matters because readers are trying to make decisions around {category_focus(category_label)}.",
+        "For Pakistani learners, the practical response is to verify the details, identify the affected skill, and act before deadlines create pressure.",
+    )
+
+
 def source_analysis(item: dict, topic: str, index: int, category_label: str | None) -> dict:
     source = item["source"] or f"Source {index}"
     title = strip_source_from_title(item["title"], source)
     summary = summarize_source(item, category_label)
-    focus = category_focus(category_label)
+    what_happened, global_value, pakistan_value = infer_source_angle(item, category_label)
     body = (
-        f"{summary}\n\n"
-        f"Why it matters: for A Plus Academy readers, this source should be read through the lens of {focus}. "
-        "It is useful because it points to a real study decision: what to verify, what skill to practise next, "
-        "and whether the learner needs clearer guidance before deadlines arrive."
+        f"What happened: {summary} {what_happened}\n\n"
+        f"Why it matters: {global_value}\n\n"
+        f"Pakistan angle: {pakistan_value}"
     )
 
     return {
@@ -805,7 +1010,7 @@ def shared_guidance_section(topic: str, category_label: str | None) -> dict:
     return {
         "heading": "What this means for students, parents, and tutors",
         "body": (
-            f"The shared message across these sources is that {topic.lower()} should be turned into a practical "
+            f"The shared message across these sources is that {topic} should be turned into a practical "
             f"learning plan, not treated as background noise. For this category, the important areas are {focus}. "
             "Students should identify the next skill or chapter that needs attention. Parents should ask whether "
             "the current routine is producing visible progress. Tutors should connect each lesson to a measurable "
@@ -824,6 +1029,73 @@ def action_steps_section(category_label: str | None) -> dict:
     return {
         "heading": f"Three action steps for {category_label or 'education'} learners in Pakistan",
         "body": body,
+    }
+
+
+def global_context_section(topic: str, selected_items: list[dict], category_label: str | None) -> dict:
+    source_names = ", ".join(item.get("source", "a referenced source") for item in selected_items[:3])
+    return {
+        "heading": "Why this matters globally",
+        "body": (
+            f"The sources from {source_names} show that {topic} is part of a wider education shift. "
+            "Institutions are paying more attention to measurable progress, flexible learning options, and the "
+            "quality of student support. For readers, the important point is not that every country has the same "
+            "system. The useful lesson is that learners who can prove their skills through writing, speaking, "
+            "testing, recitation, coding, or portfolio work are better prepared when policies and requirements change."
+        ),
+    }
+
+
+def pakistan_students_section(category_label: str | None) -> dict:
+    focus = category_focus(category_label)
+    return {
+        "heading": "What it means for Pakistani students",
+        "body": (
+            f"For Pakistani students, the practical value is in connecting the news to {focus}. A student should "
+            "ask three questions: which requirement affects me, which skill is weakest today, and what evidence "
+            "will show improvement next week? For English and IELTS this may be a marked essay or speaking recording. "
+            "For competitive exams it may be a timed score sheet. For Quran learning it may be corrected tajweed and "
+            "a hifz revision record. For technology or design it may be a finished project that can be shown to a teacher, "
+            "client, or admissions officer."
+        ),
+    }
+
+
+def parent_guidance_section(category_label: str | None) -> dict:
+    return {
+        "heading": "What parents should do",
+        "body": (
+            "Parents should avoid reacting to education news with panic or last-minute tuition. A better response is "
+            "to ask for a short diagnostic check, a visible weekly plan, and simple progress evidence. The best tutor "
+            "is not the one who only gives more homework; it is the one who can identify the learner's gap, explain it "
+            "clearly, and show whether the gap is closing."
+        ),
+    }
+
+
+def tutor_guidance_section(category_label: str | None) -> dict:
+    outcome = category_outcome(category_label)
+    return {
+        "heading": "What tutors should do",
+        "body": (
+            f"Tutors should connect every lesson to a measurable outcome such as {outcome}. This makes the lesson useful "
+            "for the student and trustworthy for the parent. It also improves article relevance for A Plus Academy because "
+            "the advice comes back to real tutoring work: diagnosis, correction, practice, feedback, and follow-up."
+        ),
+    }
+
+
+def expert_view_section(category_label: str | None) -> dict:
+    actions = category_actions(category_label)
+    action_text = " ".join(actions[:2])
+    return {
+        "heading": "A Plus Academy's expert view",
+        "body": (
+            "The strongest response to education updates is a calm plan with expert feedback. A Plus Academy's view is "
+            "that families should not treat news headlines as pressure; they should use them as prompts to check readiness. "
+            f"{action_text} This keeps learning specific, local, and useful for Pakistani students rather than turning the "
+            "article into generic advice."
+        ),
     }
 
 
@@ -853,7 +1125,7 @@ def build_post(
     category_label = category["label"] if category else None
     chosen_topic = choose_topic(items, topic, category_label)
     slug = replace_slug or f"{now.strftime('%Y-%m-%d')}-{slugify(chosen_topic)}"
-    images = choose_images(chosen_topic, items, slug, image_mode)
+    images = choose_images(chosen_topic, items, slug, image_mode, category_label)
     hero_image = images[0]
 
     title = f"{chosen_topic}: What Students and Parents Should Watch"
@@ -877,7 +1149,7 @@ def build_post(
         {
             "heading": "Overview",
             "body": (
-                f"Today's education signals around {chosen_topic.lower()} start with a specific pattern: "
+                f"Today's education signals around {chosen_topic} start with a specific pattern: "
                 f"{source_observation} When this is read alongside the other sources below, the useful question "
                 "is not only what happened, but what a learner should do next.\n\n"
                 f"This A Plus Academy article keeps the references visible, but the main value is original guidance "
@@ -886,6 +1158,11 @@ def build_post(
                 "a practical study decision."
             ),
         },
+        global_context_section(chosen_topic, selected_items, category_label),
+        pakistan_students_section(category_label),
+        parent_guidance_section(category_label),
+        tutor_guidance_section(category_label),
+        expert_view_section(category_label),
         shared_guidance_section(chosen_topic, category_label),
         action_steps_section(category_label),
     ]
@@ -924,6 +1201,7 @@ def build_post(
         "sections": sections,
         "sourceAnalyses": source_analyses,
         "references": references,
+        "internalLinks": internal_links_for(category_label),
         "tags": sorted({word.lower() for word in re.findall(r"[a-zA-Z]{4,}", chosen_topic)})[:8],
         "generatedBy": "scripts/create_blog.py",
         "generationNote": (
