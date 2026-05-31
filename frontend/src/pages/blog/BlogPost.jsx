@@ -252,27 +252,6 @@ const BlogPost = () => {
           </Box>
         ))}
 
-        {post.internalLinks?.length ? (
-          <Box sx={{ my: 5, p: 3, borderRadius: 1, bgcolor: "#f7fbf8", border: "1px solid #e3eee7" }}>
-            <Typography component="h2" variant="h5" fontWeight={800} gutterBottom>
-              Related A Plus Academy pages
-            </Typography>
-            <Stack direction="row" spacing={1.2} useFlexGap flexWrap="wrap">
-              {post.internalLinks.map((item) => (
-                <Button
-                  key={`${item.label}-${item.url}`}
-                  component={RouterLink}
-                  to={item.url}
-                  variant="outlined"
-                  sx={{ borderRadius: 1, textTransform: "none", fontWeight: 700 }}
-                >
-                  {item.label}
-                </Button>
-              ))}
-            </Stack>
-          </Box>
-        ) : null}
-
         <Divider sx={{ my: 5 }} />
 
         <Typography component="h2" variant="h4" fontWeight={800} gutterBottom>

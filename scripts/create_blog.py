@@ -405,6 +405,19 @@ INTERNAL_LINKS = {
     ],
 }
 
+EDITORIAL_TOPICS = {
+    "K-12": "Global Trends in K-12 Education",
+    "O & A Level": "Global Trends in O and A Level Education",
+    "Bachelors / Masters": "Global Trends in Higher Education",
+    "Competitive Exams": "Global Trends in Competitive Exams and Assessment",
+    "IT & Technology": "Global Trends in IT and Technology Education",
+    "Programming": "Global Trends in Programming Education",
+    "Qur'an & Tajweed": "Global Trends in Quran Memorization and Tajweed Education",
+    "English Language": "Global Trends in English Language Learning",
+    "IELTS": "Global Trends in IELTS and English Proficiency Testing",
+    "Graphics & Multimedia": "Global Trends in Graphics and Multimedia Education",
+}
+
 CATEGORY_KEYWORDS = {
     "K-12": ["k-12", "school", "primary", "secondary", "children", "curriculum", "assessment", "classroom", "teacher"],
     "O & A Level": ["cambridge", "o level", "a level", "igcse", "exam", "syllabus", "cie", "pearson", "edexcel"],
@@ -736,16 +749,7 @@ def choose_topic(items: list[dict], forced_topic: str | None, category_label: st
         return forced_topic.strip()
 
     if category_label:
-        haystack = " ".join(item["title"] for item in items[:8]).lower()
-        if any(word in haystack for word in ("ai", "artificial intelligence", "digital", "technology")):
-            return f"{category_label} And Digital Learning"
-        if any(word in haystack for word in ("exam", "assessment", "test", "admission")):
-            return f"{category_label} Exam And Assessment Trends"
-        if any(word in haystack for word in ("skills", "career", "jobs", "employment")):
-            return f"{category_label} Skills And Career Readiness"
-        if any(word in haystack for word in ("online", "remote", "hybrid")):
-            return f"{category_label} Online Learning Trends"
-        return f"{category_label} Global Education Trends"
+        return EDITORIAL_TOPICS.get(category_label, f"Global Trends in {category_label} Education")
 
     haystack = " ".join(item["title"] for item in items[:10]).lower()
     topic_rules = [
@@ -896,14 +900,14 @@ def summarize_source(item: dict, category_label: str | None) -> str:
     if sentences:
         detail = " ".join(sentences[:2])
         return (
-            f"{source} reports that {title[0].lower() + title[1:] if title else 'this update matters'}. "
+            f"{source} covered {title[0].lower() + title[1:] if title else 'a relevant education development'}. "
             f"{detail}"
         )
 
     focus = category_focus(category_label)
     return (
-        f"{source} reports on \"{title}.\" The public feed gives limited article text, so the useful signal "
-        f"for readers is the connection to {focus}."
+        f"{source} covered \"{title}.\" The available feed summary is limited, but the item is relevant to "
+        f"{focus}."
     )
 
 
@@ -916,25 +920,25 @@ def infer_source_angle(item: dict, category_label: str | None) -> tuple[str, str
             return (
                 "The source is about policy confidence in the English-language education market, not only classroom grammar.",
                 "Policy signals matter because international students choose countries and courses partly on visa clarity, trust, and perceived student support.",
-                "Pakistani students should connect English learning with study-abroad planning: IELTS readiness, spoken confidence, documentation, and realistic timelines.",
+                "It also shows how language education is tied to mobility, institutional trust, and student support systems.",
             )
         if any(term in text for term in ("esl", "celcis", "40 years", "excellence")):
             return (
                 "The source points to long-running ESL support as a serious academic service, not a casual extra class.",
                 "Strong language centres show that English progress needs placement, feedback, speaking practice, writing support, and trained instructors.",
-                "Pakistani learners preparing for O/A Level English, university work, IELTS, or jobs need structured practice instead of memorised phrases.",
+                "The broader lesson is that language learning improves when institutions combine qualified instructors with consistent feedback.",
             )
         if any(term in text for term in ("proficiency", "requirement", "critic", "criticized", "criticised")):
             return (
                 "The source raises the issue of language proficiency requirements and how students experience them.",
                 "That matters because English rules can affect admission, graduation, scholarships, and confidence in higher education.",
-                "Pakistani students should treat English proficiency as an academic skill to build early, especially writing, reading speed, and spoken clarity.",
+                "It reflects a wider debate over how universities define readiness and how students prove communication ability.",
             )
         if any(term in text for term in ("online", "digital", "platform", "app", "ai")):
             return (
                 "The source shows English learning moving further into digital tools and online delivery.",
                 "Digital practice can help, but only when learners still receive correction on pronunciation, grammar, writing, and fluency.",
-                "Pakistani families should use apps for repetition and tutors for feedback, because the two solve different parts of the problem.",
+                "The wider trend is a blended model in which apps support repetition while teachers provide correction and structure.",
             )
 
     if category_label == "Competitive Exams":
@@ -942,19 +946,19 @@ def infer_source_angle(item: dict, category_label: str | None) -> tuple[str, str
             return (
                 "The source is about the return or debate around standardized testing in admissions.",
                 "This matters globally because universities are still balancing fairness, academic prediction, and access.",
-                "Pakistani students should keep test preparation active even when policies look optional, because requirements can change by institution and year.",
+                "The debate shows that exam policy remains unsettled, especially where admissions teams weigh grades, tests, and wider student context.",
             )
         if any(term in text for term in ("board", "cbse", "exam", "results", "oxfordaqa")):
             return (
                 "The source focuses on formal exam systems, results, or board-level assessment pressure.",
                 "Exam timing and assessment design shape how students revise, practise, and manage stress.",
-                "Pakistani students should keep a verified deadline calendar and practise written answers under timed conditions.",
+                "It highlights how assessment systems influence preparation habits, school calendars, and expectations around results.",
             )
         if any(term in text for term in ("app", "sathee", "digital", "online")):
             return (
                 "The source highlights digital exam-preparation support.",
                 "Free or low-cost platforms can widen access, but students still need a plan for weak topics and mock-test review.",
-                "Pakistani learners should combine digital practice with tutor feedback so mistakes are fixed, not simply repeated.",
+                "The key issue is whether digital tools help students move from access to measurable preparation gains.",
             )
 
     if category_label == "Qur'an & Tajweed":
@@ -962,25 +966,25 @@ def infer_source_angle(item: dict, category_label: str | None) -> tuple[str, str
             return (
                 "The source is about hifz and Quran memorisation becoming more organised across families and communities.",
                 "Hifz success depends on revision, listening, tajweed correction, and a sustainable daily routine.",
-                "Pakistani families should choose teachers who track both new sabaq and old revision, not only daily quantity.",
+                "The development reflects a wider move toward structured routines and longer-term support for Quranic learning.",
             )
         if any(term in text for term in ("platform", "online", "digital")):
             return (
                 "The source points to Quran education moving onto digital platforms.",
                 "Online Quran learning can help with access and scheduling, but teacher quality and correction remain essential.",
-                "Pakistani parents should evaluate trial classes, teacher credentials, makharij correction, and progress reports before committing.",
+                "The wider question is how digital access can be balanced with teacher quality, recitation correction, and continuity.",
             )
         if any(term in text for term in ("parent", "follow-up", "children", "kids")):
             return (
                 "The source highlights family involvement in Quran learning.",
                 "Parent follow-up matters because recitation and memorisation improve through daily listening and repetition.",
-                "Pakistani homes can support Quran learning with a short fixed revision time after class and weekly parent-teacher feedback.",
+                "It underlines the continuing role of family routines alongside formal classes and community programmes.",
             )
 
     return (
         "The source adds a relevant education signal for this category.",
         f"It matters because readers are trying to make decisions around {category_focus(category_label)}.",
-        "For Pakistani learners, the practical response is to verify the details, identify the affected skill, and act before deadlines create pressure.",
+        "Taken together with the other sources, it helps explain where education demand, delivery models, and learner expectations are moving.",
     )
 
 
@@ -988,11 +992,9 @@ def source_analysis(item: dict, topic: str, index: int, category_label: str | No
     source = item["source"] or f"Source {index}"
     title = strip_source_from_title(item["title"], source)
     summary = summarize_source(item, category_label)
-    what_happened, global_value, pakistan_value = infer_source_angle(item, category_label)
+    story_context, wider_value, connecting_theme = infer_source_angle(item, category_label)
     body = (
-        f"What happened: {summary} {what_happened}\n\n"
-        f"Why it matters: {global_value}\n\n"
-        f"Pakistan angle: {pakistan_value}"
+        f"{summary} {story_context} {wider_value} {connecting_theme}"
     )
 
     return {
@@ -1000,7 +1002,7 @@ def source_analysis(item: dict, topic: str, index: int, category_label: str | No
         "title": title,
         "url": item["url"],
         "publishedAt": item.get("publishedAt", ""),
-        "heading": f"Source {index}: {source}",
+        "heading": title,
         "summary": body,
     }
 
@@ -1042,6 +1044,71 @@ def global_context_section(topic: str, selected_items: list[dict], category_labe
             "quality of student support. For readers, the important point is not that every country has the same "
             "system. The useful lesson is that learners who can prove their skills through writing, speaking, "
             "testing, recitation, coding, or portfolio work are better prepared when policies and requirements change."
+        ),
+    }
+
+
+def emerging_themes_section(topic: str, selected_items: list[dict], category_label: str | None) -> dict:
+    focus = category_focus(category_label)
+    return {
+        "heading": "Emerging themes",
+        "body": (
+            f"Several themes connect these developments. First, {topic} is becoming more structured, with programmes "
+            "and institutions placing greater emphasis on planned instruction rather than informal study alone. Second, "
+            "families and learners continue to play an important role in maintaining progress outside the classroom, "
+            "especially where revision, practice, or long-term skill development is required. Third, demand for qualified "
+            f"instructors is rising because {focus} requires consistency, correction, and clear learning standards."
+        ),
+    }
+
+
+def digital_learning_section(category_label: str | None) -> dict:
+    if category_label == "Qur'an & Tajweed":
+        body = (
+            "Digital learning is becoming more visible in Quran education through online Tajweed classes, virtual hifz "
+            "groups, revision reminders, recitation recordings, and Quran learning platforms. These tools can improve "
+            "access and continuity, especially for learners who do not live near a suitable teacher. At the same time, "
+            "the core requirement remains human correction: pronunciation, makharij, fluency, and memorisation quality "
+            "still depend on trained instruction."
+        )
+    elif category_label == "English Language":
+        body = (
+            "Digital learning is also reshaping English education. Language apps, online classes, speech-practice tools, "
+            "AI writing feedback, and remote tutoring can increase daily exposure to English. The most effective models "
+            "combine digital repetition with teacher-led correction, because fluency, pronunciation, essay structure, "
+            "and academic vocabulary require feedback as well as practice."
+        )
+    elif category_label == "Competitive Exams":
+        body = (
+            "Digital exam preparation is expanding through practice platforms, recorded lessons, mock-test systems, and "
+            "adaptive quizzes. These tools can make preparation more accessible, but their value depends on how well they "
+            "help learners identify weak topics, review mistakes, and improve performance over time."
+        )
+    else:
+        body = (
+            "Digital learning appears across the sources as a supporting trend rather than a complete replacement for "
+            "instruction. Online platforms can widen access, organise practice, and provide flexible learning options, "
+            "but educational quality still depends on curriculum design, feedback, and sustained engagement."
+        )
+    return {"heading": "The role of digital learning", "body": body}
+
+
+def conclusion_section(topic: str, selected_items: list[dict], category_label: str | None) -> dict:
+    regions = []
+    for item in selected_items:
+        text = f"{item.get('title', '')} {item.get('summary', '')}".lower()
+        for region in ("Brazil", "Iran", "United States", "United Kingdom", "Qatar", "Philippines", "India", "Sri Lanka"):
+            if region.lower() in text and region not in regions:
+                regions.append(region)
+    region_text = ", ".join(regions[:3]) if regions else "different parts of the world"
+    return {
+        "heading": "Conclusion",
+        "body": (
+            f"The developments from {region_text} point to a broader interest in {topic.lower()}. While the models "
+            "differ by country and institution, the common thread is clear: learners are looking for more organised "
+            "instruction, stronger guidance, and learning formats that can continue beyond a single classroom session. "
+            "The trend is not only about more enrolment; it is about how education providers structure learning so that "
+            "students can sustain progress over time."
         ),
     }
 
@@ -1105,7 +1172,7 @@ def build_takeaways(selected_items: list[dict], category_label: str | None) -> l
         title = strip_source_from_title(item["title"], item.get("source", ""))
         takeaways.append(trim_text(title, 120))
     if len(takeaways) < 3:
-        takeaways.append(f"Focus today's response on {category_focus(category_label)}.")
+        takeaways.append(f"The common theme is growing structure around {category_focus(category_label)}.")
     return takeaways[:3]
 
 
@@ -1128,10 +1195,10 @@ def build_post(
     images = choose_images(chosen_topic, items, slug, image_mode, category_label)
     hero_image = images[0]
 
-    title = f"{chosen_topic}: What Students and Parents Should Watch"
+    title = chosen_topic
     description = (
-        f"A Plus Academy reviews current {category_label or 'education'} updates with source-specific "
-        "analysis and practical next steps for learners in Pakistan."
+        f"A concise education-news summary covering recent developments in {category_label or 'education'} "
+        "and the common themes connecting them."
     )
 
     selected_items = items[:3]
@@ -1149,22 +1216,17 @@ def build_post(
         {
             "heading": "Overview",
             "body": (
-                f"Today's education signals around {chosen_topic} start with a specific pattern: "
-                f"{source_observation} When this is read alongside the other sources below, the useful question "
-                "is not only what happened, but what a learner should do next.\n\n"
-                f"This A Plus Academy article keeps the references visible, but the main value is original guidance "
-                f"for Pakistani students, parents, and tutors. The focus is {category_focus(category_label)}. "
-                "The goal is to help readers compare the sources, avoid irrelevant noise, and turn the news into "
-                "a practical study decision."
+                f"Interest in {chosen_topic.lower()} continues to develop across different regions and institutions. "
+                f"Recent items in the news point to a shared pattern: {source_observation}\n\n"
+                "While each story comes from a different context, the common theme is a move toward more structured "
+                "learning, clearer teaching standards, and sustained engagement beyond occasional study. The sections "
+                "below summarise the key developments first, then draw out the themes connecting them."
             ),
         },
         global_context_section(chosen_topic, selected_items, category_label),
-        pakistan_students_section(category_label),
-        parent_guidance_section(category_label),
-        tutor_guidance_section(category_label),
-        expert_view_section(category_label),
-        shared_guidance_section(chosen_topic, category_label),
-        action_steps_section(category_label),
+        emerging_themes_section(chosen_topic, selected_items, category_label),
+        digital_learning_section(category_label),
+        conclusion_section(chosen_topic, selected_items, category_label),
     ]
 
     references = [
@@ -1187,7 +1249,7 @@ def build_post(
     return {
         "slug": slug,
         "title": title,
-        "seoTitle": f"{title} | A Plus Academy Blog",
+        "seoTitle": title,
         "description": description,
         "topic": chosen_topic,
         "category": category_label or "Education",
@@ -1201,12 +1263,11 @@ def build_post(
         "sections": sections,
         "sourceAnalyses": source_analyses,
         "references": references,
-        "internalLinks": internal_links_for(category_label),
         "tags": sorted({word.lower() for word in re.findall(r"[a-zA-Z]{4,}", chosen_topic)})[:8],
         "generatedBy": "scripts/create_blog.py",
         "generationNote": (
             "Created from public RSS/news summaries, limited page context where accessible, relevance filtering, "
-            "and original A Plus Academy analysis. References are included for attribution and reader verification."
+            "and original editorial synthesis. References are included for attribution and reader verification."
         ),
     }
 
