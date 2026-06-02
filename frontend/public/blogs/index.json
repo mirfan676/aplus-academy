@@ -1,5 +1,29 @@
 [
   {
+    "slug": "2026-06-02-global-trends-in-graphics-and-multimedia-education",
+    "title": "Global Trends in Graphics and Multimedia Education",
+    "description": "A concise education-news summary covering recent developments in Graphics & Multimedia and the common themes connecting them.",
+    "topic": "Global Trends in Graphics and Multimedia Education",
+    "category": "Graphics & Multimedia",
+    "publishedAt": "2026-06-02T08:06:14.381153+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "keywords": [
+        "ai",
+        "technology",
+        "online",
+        "digital",
+        "computer"
+      ],
+      "url": "https://images.pexels.com/photos/1181354/pexels-photo-1181354.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/person-using-macbook-pro-1181354/",
+      "credit": "Pexels free photo",
+      "alt": "Student using a laptop for online learning",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-06-01-global-trends-in-ielts-and-english-proficiency-testing",
     "title": "Global Trends in IELTS and English Proficiency Testing",
     "description": "A concise education-news summary covering recent developments in IELTS and the common themes connecting them.",
