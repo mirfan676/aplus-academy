@@ -94,6 +94,14 @@ function App() {
           <Route path="/graphics-multimedia" element={<LandingPage page={allLandingPages.graphicsMultimedia} />} />
           <Route path="/online-tutors-pakistan" element={<LandingPage page={allLandingPages.onlineTutorsPakistan} />} />
           <Route path="/home-tutors-lahore" element={<LandingPage page={allLandingPages.homeTutorsLahore} />} />
+          <Route path="/female-home-tutor-lahore" element={<LandingPage page={allLandingPages.femaleHomeTutorLahore} />} />
+          <Route path="/home-tuition-lahore" element={<LandingPage page={allLandingPages.homeTuitionLahore} />} />
+          <Route path="/o-level-tutors-lahore" element={<LandingPage page={allLandingPages.oLevelTutorsLahore} />} />
+          <Route path="/a-level-tutors-pakistan" element={<LandingPage page={allLandingPages.aLevelTutorsPakistan} />} />
+          <Route path="/quran-tutor-with-tajweed" element={<LandingPage page={allLandingPages.quranTutorWithTajweed} />} />
+          <Route path="/ielts-tutor-pakistan" element={<LandingPage page={allLandingPages.ieltsTutorPakistan} />} />
+          <Route path="/english-tutor-lahore" element={<LandingPage page={allLandingPages.englishTutorLahore} />} />
+          <Route path="/verified-tutors-pakistan" element={<LandingPage page={allLandingPages.verifiedTutorsPakistan} />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/terms" element={<TermsAndConditions />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />

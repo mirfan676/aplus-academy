@@ -41,8 +41,19 @@ const socialLinks = [
   { label: "X", icon: <Twitter />, link: "https://x.com/aplus_pk" },
   { label: "Pinterest", icon: <Pinterest />, link: "https://www.pinterest.com/aplushometutorspk/" },
   { label: "YouTube", icon: <YouTube />, link: "https://www.youtube.com/@aplushometutors" },
-  { label: "WhatsApp", icon: <WhatsApp />, link: "https://wa.me/923066762289" },
+  { label: "WhatsApp", icon: <WhatsApp />, link: "https://wa.me/923197659491" },
   { label: "LinkedIn", icon: <LinkedIn />, link: "https://www.linkedin.com" },
+];
+
+const popularSearchLinks = [
+  { label: "Female Home Tutor Lahore", href: "/female-home-tutor-lahore" },
+  { label: "Home Tuition Lahore", href: "/home-tuition-lahore" },
+  { label: "O Level Tutors Lahore", href: "/o-level-tutors-lahore" },
+  { label: "A Level Tutors Pakistan", href: "/a-level-tutors-pakistan" },
+  { label: "Quran Tutor with Tajweed", href: "/quran-tutor-with-tajweed" },
+  { label: "IELTS Tutor Pakistan", href: "/ielts-tutor-pakistan" },
+  { label: "English Tutor Lahore", href: "/english-tutor-lahore" },
+  { label: "Verified Tutors Pakistan", href: "/verified-tutors-pakistan" },
 ];
 
 export default function Footer() {
@@ -156,7 +167,7 @@ export default function Footer() {
             </Typography>
 
             <Typography variant="body2" sx={{ opacity: 0.85 }}>
-              0306-6762289 | 0306-5555415
+              +92 319 7659491
               <br />
               aplushometutorspk@gmail.com
             </Typography>
@@ -185,6 +196,33 @@ export default function Footer() {
       </Grid>
 
       <Divider sx={{ borderColor: "rgba(255,255,255,0.1)", my: 4 }} />
+
+      <Box sx={{ maxWidth: 1120, mx: "auto", mb: 4 }}>
+        <Typography variant="h6" sx={{ mb: 2, fontWeight: 700, color: "#29b554" }}>
+          Popular Searches
+        </Typography>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.2 }}>
+          {popularSearchLinks.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              underline="none"
+              sx={{
+                color: "#fff",
+                opacity: 0.82,
+                border: "1px solid rgba(255,255,255,0.16)",
+                borderRadius: 1,
+                px: 1.4,
+                py: 0.7,
+                fontSize: 14,
+                "&:hover": { opacity: 1, color: "#00ff8f", borderColor: "#00ff8f" },
+              }}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </Box>
+      </Box>
 
       <Box sx={{ textAlign: "center", opacity: 0.7 }}>
         <Typography variant="body2">

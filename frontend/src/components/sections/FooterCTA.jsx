@@ -78,7 +78,7 @@ const FooterCTA = () => {
 
           <Button
             startIcon={<WhatsAppIcon />}
-            href="https://wa.me/923066762289"
+            href="https://wa.me/923197659491"
             target="_blank"
             variant="outlined"
             sx={{

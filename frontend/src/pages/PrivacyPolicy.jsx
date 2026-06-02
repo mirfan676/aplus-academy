@@ -76,7 +76,7 @@ const PrivacyPolicy = () => {
           8. Contact Information
         </Typography>
         <Typography variant="body1">
-          If you have questions or concerns about your privacy, please reach out via email at <strong>aplushometutorspk@gmail.com</strong> or WhatsApp at 0306-6762289.
+          If you have questions or concerns about your privacy, please reach out via email at <strong>aplushometutorspk@gmail.com</strong> or WhatsApp at +92 319 7659491.
         </Typography>
       </Box>
 

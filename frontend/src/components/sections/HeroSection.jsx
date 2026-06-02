@@ -75,7 +75,7 @@ export default function HeroSection() {
   {/* WHATSAPP BUTTON */}
   <Button
     component="a"
-    href="https://wa.me/923066762289"
+    href="https://wa.me/923197659491"
     target="_blank"
     rel="noopener noreferrer"
     variant="contained"

@@ -97,7 +97,7 @@ const TermsAndConditions = () => {
           11. Contact Information
         </Typography>
         <Typography variant="body1">
-          For questions or concerns regarding these terms, please contact us at <strong>aplushometutorspk@gmail.com</strong> or via WhatsApp at 0306-6762289.
+          For questions or concerns regarding these terms, please contact us at <strong>aplushometutorspk@gmail.com</strong> or via WhatsApp at +92 319 7659491.
         </Typography>
       </Box>
 

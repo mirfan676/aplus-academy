@@ -119,7 +119,7 @@ const AboutUs = () => {
       </Typography>
       <Box sx={{ lineHeight: 1.8 }}>
         <Typography component="p">
-          <strong>Call / WhatsApp:</strong> 0306-6762289 | 0306-5555415
+          <strong>Call / WhatsApp:</strong> +92 319 7659491
         </Typography>
         <Typography component="p">
           <strong>Email:</strong> aplushometutorspk@gmail.com

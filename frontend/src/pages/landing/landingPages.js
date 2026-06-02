@@ -6,7 +6,7 @@ const commonCities =
 
 const tutorCta = { label: "Find a Tutor", to: "/teachers" };
 const registerCta = { label: "Become a Tutor", to: "/register" };
-const whatsappCta = { label: "Talk on WhatsApp", href: "https://wa.me/923066762289" };
+const whatsappCta = { label: "Talk on WhatsApp", href: "https://wa.me/923197659491" };
 
 const page = ({
   slug,
@@ -88,7 +88,7 @@ export const landingPages = {
       "If you know a student who needs support or a teacher who can guide learners responsibly, connect them with A Plus Academy.",
     imageId: 3184292,
     imageAlt: "People discussing a referral program",
-    primaryCta: { label: "Refer on WhatsApp", href: "https://wa.me/923066762289" },
+    primaryCta: { label: "Refer on WhatsApp", href: "https://wa.me/923197659491" },
     secondaryCta: tutorCta,
     highlights: ["Quick WhatsApp referral", "For students and teachers", "Home and online tuition"],
     sections: [
@@ -196,7 +196,7 @@ export const landingPages = {
       "A Plus Academy helps families arrange tutor-led courses for academic subjects, skills, language learning, and exam preparation.",
     imageId: 5905709,
     imageAlt: "Student attending an online course",
-    primaryCta: { label: "Discuss Course Plan", href: "https://wa.me/923066762289" },
+    primaryCta: { label: "Discuss Course Plan", href: "https://wa.me/923197659491" },
     secondaryCta: tutorCta,
     highlights: ["One-to-one online courses", "Custom duration and pace", "Academic and skills-based courses"],
     sections: [
@@ -659,8 +659,294 @@ export const extraSeoPages = {
   }),
 };
 
+export const keywordSeoPages = {
+  femaleHomeTutorLahore: page({
+    slug: "female-home-tutor-lahore",
+    title: "Female Home Tutor in Lahore | Verified Female Tutors",
+    description:
+      "Find a verified female home tutor in Lahore for school subjects, O/A Level, Quran, English, IELTS, and one-to-one home tuition.",
+    eyebrow: "Female Home Tutor Lahore",
+    heading: "Verified female home tutors in Lahore for safe one-to-one learning",
+    intro:
+      "A Plus Home Tutors helps families find female tutors in Lahore for school support, exam preparation, Quran learning, English, IELTS, and academic confidence at home.",
+    imageId: 5212331,
+    imageAlt: "Female teacher helping students in class",
+    primaryCta: { label: "Find Female Tutors", to: "/teachers?location=Lahore" },
+    highlights: ["Female tutors in Lahore", "Home and online options", "School, Quran, English and IELTS"],
+    sections: [
+      {
+        title: "Female tutor matching for Lahore families",
+        body:
+          "Many families prefer a female home tutor for younger students, girls, Quran reading, English practice, and regular school support. Tutor availability depends on area, timing, subject, and class level.",
+      },
+      {
+        title: "Subjects female tutors can support",
+        body:
+          "Common requests include Math, English, Science, Urdu, Islamiat, O Level, A Level, Quran with Tajweed, IELTS speaking, grammar, homework support, and exam revision.",
+      },
+    ],
+    popularLinks: [
+      { label: "Home tutors Lahore", to: "/home-tutors-lahore" },
+      { label: "English tutor Lahore", to: "/english-tutor-lahore" },
+      { label: "Quran tutor with Tajweed", to: "/quran-tutor-with-tajweed" },
+    ],
+    faqs: [
+      ["Can I request a female tutor near my area?", "Yes, share your area, subject, class, and timing so availability can be checked."],
+      ["Are online female tutors available?", "Yes, online female tutors can be arranged depending on the subject and schedule."],
+    ],
+  }),
+  homeTuitionLahore: page({
+    slug: "home-tuition-lahore",
+    title: "Home Tuition in Lahore | One-to-One Tutors at Home",
+    description:
+      "Arrange home tuition in Lahore with verified tutors for school subjects, O/A Level, Matric, FSc, Quran, IELTS, English, and exam preparation.",
+    eyebrow: "Home Tuition Lahore",
+    heading: "Home tuition in Lahore for focused academic progress",
+    intro:
+      "Get one-to-one home tuition in Lahore for school children, O/A Level students, board exam preparation, Quran learning, English language, and university subjects.",
+    imageId: 5212345,
+    imageAlt: "Tutor helping a child study at home",
+    primaryCta: { label: "Arrange Home Tuition", to: "/teachers?location=Lahore" },
+    highlights: ["One-to-one home tuition", "Lahore area-based tutor matching", "Trial and tutor replacement support"],
+    sections: [
+      {
+        title: "Home tuition built around the student's routine",
+        body:
+          "Home tuition is useful when students need regular attention, homework help, concept clarity, exam revision, or a safe learning routine without travelling to an academy.",
+      },
+      {
+        title: "Classes and subjects covered",
+        body:
+          "Families can request tutors for primary classes, middle school, Matric, FSc, ICS, ICom, O Level, A Level, Quran, English, IELTS, programming, and university subjects.",
+      },
+    ],
+    popularLinks: [
+      { label: "Female home tutor Lahore", to: "/female-home-tutor-lahore" },
+      { label: "O Level tutors Lahore", to: "/o-level-tutors-lahore" },
+      { label: "Verified tutors Pakistan", to: "/verified-tutors-pakistan" },
+    ],
+    faqs: [
+      ["How quickly can I get a home tutor in Lahore?", "Timing depends on subject, area, class, and tutor availability."],
+      ["Can I choose home or online tuition?", "Yes, families can discuss both options based on convenience and tutor availability."],
+    ],
+  }),
+  oLevelTutorsLahore: page({
+    slug: "o-level-tutors-lahore",
+    title: "O Level Tutors in Lahore | Cambridge Home & Online Tuition",
+    description:
+      "Find O Level tutors in Lahore for Cambridge Maths, Physics, Chemistry, Biology, English, Islamiyat, Pakistan Studies, Business, Economics, and Computer Science.",
+    eyebrow: "O Level Tutors Lahore",
+    heading: "O Level tutors in Lahore for Cambridge syllabus and past-paper practice",
+    intro:
+      "Connect with O Level tutors for concept clarity, topical revision, past papers, marking-scheme practice, and subject-specific Cambridge exam preparation.",
+    imageId: 256417,
+    imagePath: "pexels-photo-256417.jpeg",
+    imageAlt: "Books in a library for O Level preparation",
+    primaryCta: { label: "Find O Level Tutors", to: "/teachers?subject=O%20Level" },
+    highlights: ["Cambridge O Level", "Topical and yearly past papers", "Science, commerce and humanities"],
+    sections: [
+      {
+        title: "O Level preparation with exam-board awareness",
+        body:
+          "O Level students need more than chapter reading. Strong preparation includes syllabus mapping, paper formats, command words, timing practice, and correction against examiner expectations.",
+      },
+      {
+        title: "Popular O Level subjects",
+        body:
+          "Tutors may support Mathematics, Add Maths, Physics, Chemistry, Biology, English, Urdu, Islamiyat, Pakistan Studies, Accounting, Economics, Business, and Computer Science.",
+      },
+    ],
+    popularLinks: [
+      { label: "A Level tutors Pakistan", to: "/a-level-tutors-pakistan" },
+      { label: "English tutor Lahore", to: "/english-tutor-lahore" },
+      { label: "Home tuition Lahore", to: "/home-tuition-lahore" },
+    ],
+    faqs: [
+      ["Do O Level tutors help with past papers?", "Yes, tutors can guide topical and yearly past-paper practice."],
+      ["Can I request home tuition in DHA Lahore?", "Share your area and subject so tutor availability can be checked."],
+    ],
+  }),
+  aLevelTutorsPakistan: page({
+    slug: "a-level-tutors-pakistan",
+    title: "A Level Tutors in Pakistan | Cambridge Subject Specialists",
+    description:
+      "Find A Level tutors in Pakistan for Cambridge Maths, Physics, Chemistry, Biology, Accounting, Economics, Business, Psychology, Sociology, and Computer Science.",
+    eyebrow: "A Level Tutors Pakistan",
+    heading: "A Level tutors in Pakistan for advanced Cambridge subject support",
+    intro:
+      "Get A Level tutoring online or at home for difficult concepts, exam technique, past-paper practice, and subject-specific guidance.",
+    imageId: 267885,
+    imageAlt: "Students walking on a campus after class",
+    primaryCta: { label: "Find A Level Tutors", to: "/teachers?subject=A%20Level" },
+    highlights: ["Cambridge A Level", "Online tutors across Pakistan", "Advanced subject specialists"],
+    sections: [
+      {
+        title: "Advanced tutoring for demanding subjects",
+        body:
+          "A Level subjects require deeper concepts, structured problem solving, and strong exam technique. One-to-one tutoring can help students prepare for school exams, mocks, and final papers.",
+      },
+      {
+        title: "Subjects commonly requested",
+        body:
+          "Popular A Level tutor requests include Mathematics, Physics, Chemistry, Biology, Economics, Business, Accounting, Psychology, Sociology, English, and Computer Science.",
+      },
+    ],
+    popularLinks: [
+      { label: "O Level tutors Lahore", to: "/o-level-tutors-lahore" },
+      { label: "Online tutors Pakistan", to: "/online-tutors-pakistan" },
+      { label: "Bachelors / Masters", to: "/bachelors-masters" },
+    ],
+    faqs: [
+      ["Are online A Level tutors available?", "Yes, online tutoring can be arranged across Pakistan depending on subject availability."],
+      ["Can tutors support predicted-grade preparation?", "Tutors can support school tests, mocks, revision, and topic mastery."],
+    ],
+  }),
+  quranTutorWithTajweed: page({
+    slug: "quran-tutor-with-tajweed",
+    title: "Quran Tutor with Tajweed | Online & Home Quran Classes",
+    description:
+      "Find a Quran tutor with Tajweed for children and adults. Learn Nazra, Tajweed rules, makharij, fluency, duas, and Quran reading online or at home.",
+    eyebrow: "Quran Tutor with Tajweed",
+    heading: "Quran tutors with Tajweed for clear recitation and steady learning",
+    intro:
+      "Arrange Quran classes for children or adults with support for Nazra, Tajweed rules, makharij, fluency, revision, duas, and regular recitation practice.",
+    imageId: 8164397,
+    imagePath: "pexels-photo-8164397.jpeg",
+    imageAlt: "Quran placed on a wooden stand",
+    primaryCta: { label: "Find Quran Tutors", to: "/teachers?subject=Quran" },
+    highlights: ["Nazra and Tajweed", "Children and adults", "Online and home classes"],
+    sections: [
+      {
+        title: "Tajweed-focused Quran learning",
+        body:
+          "A Tajweed tutor can help correct pronunciation, makharij, fluency, pauses, and recitation habits while keeping lessons respectful and consistent.",
+      },
+      {
+        title: "Online and home Quran classes",
+        body:
+          "Families can request Quran classes at home where available, or online Quran tutoring for flexible schedules and regular follow-up.",
+      },
+    ],
+    popularLinks: [
+      { label: "Qur'an & Tajweed", to: "/quran-tajweed" },
+      { label: "Female home tutor Lahore", to: "/female-home-tutor-lahore" },
+      { label: "Online tutors Pakistan", to: "/online-tutors-pakistan" },
+    ],
+    faqs: [
+      ["Can children start from beginner level?", "Yes, Quran classes can start from basic Arabic letters and Nazra."],
+      ["Do you provide female Quran tutors?", "Female tutor availability depends on timing, location, and class mode."],
+    ],
+  }),
+  ieltsTutorPakistan: page({
+    slug: "ielts-tutor-pakistan",
+    title: "IELTS Tutor in Pakistan | Speaking, Writing & Band Improvement",
+    description:
+      "Find an IELTS tutor in Pakistan for speaking, writing task 1 and 2, listening, reading, mock tests, feedback, and band-score improvement.",
+    eyebrow: "IELTS Tutor Pakistan",
+    heading: "IELTS tutors in Pakistan for speaking, writing, reading and listening",
+    intro:
+      "Prepare for IELTS with tutor-led feedback on speaking fluency, writing structure, vocabulary, grammar, listening practice, and reading strategy.",
+    imageId: 5940831,
+    imageAlt: "Student writing IELTS preparation notes",
+    primaryCta: { label: "Find IELTS Tutors", to: "/teachers?subject=IELTS" },
+    highlights: ["Speaking practice", "Writing task feedback", "Mock tests and band improvement"],
+    sections: [
+      {
+        title: "IELTS preparation with correction",
+        body:
+          "IELTS learners improve faster when speaking and writing are corrected regularly. Tutors can help with task response, coherence, vocabulary, grammar, pronunciation, and timing.",
+      },
+      {
+        title: "Useful for study abroad and migration goals",
+        body:
+          "Students can prepare for IELTS Academic or General Training with module-wise practice and a realistic plan based on current ability and target band.",
+      },
+    ],
+    popularLinks: [
+      { label: "IELTS preparation", to: "/ielts" },
+      { label: "English language", to: "/english-language" },
+      { label: "Study abroad", to: "/study-abroad" },
+    ],
+    faqs: [
+      ["Can I study IELTS online?", "Yes, online IELTS tutoring is available for students across Pakistan."],
+      ["Do tutors check IELTS writing?", "Tutors can review writing task 1 and task 2 and explain how to improve."],
+    ],
+  }),
+  englishTutorLahore: page({
+    slug: "english-tutor-lahore",
+    title: "English Tutor in Lahore | Spoken English, Grammar & Writing",
+    description:
+      "Find an English tutor in Lahore for spoken English, grammar, school English, O Level English, writing, pronunciation, interviews, and IELTS basics.",
+    eyebrow: "English Tutor Lahore",
+    heading: "English tutors in Lahore for speaking, grammar and writing confidence",
+    intro:
+      "Improve spoken English, grammar, writing, pronunciation, school English, O Level English, interviews, and daily communication with one-to-one tutoring.",
+    imageId: 4145190,
+    imageAlt: "Student improving English through notes",
+    primaryCta: { label: "Find English Tutors", to: "/teachers?subject=English" },
+    highlights: ["Spoken English", "Grammar and writing", "School and O Level English"],
+    sections: [
+      {
+        title: "English learning for school and daily communication",
+        body:
+          "An English tutor can help students improve sentence structure, grammar, vocabulary, reading, writing, pronunciation, speaking confidence, and exam preparation.",
+      },
+      {
+        title: "Personal feedback makes the difference",
+        body:
+          "Students often know rules but struggle to use English naturally. One-to-one correction helps turn grammar, speaking, and writing practice into visible progress.",
+      },
+    ],
+    popularLinks: [
+      { label: "English Language", to: "/english-language" },
+      { label: "IELTS tutor Pakistan", to: "/ielts-tutor-pakistan" },
+      { label: "Female home tutor Lahore", to: "/female-home-tutor-lahore" },
+    ],
+    faqs: [
+      ["Can beginners learn spoken English?", "Yes, classes can start from basic sentence building and everyday conversation."],
+      ["Can I request an English tutor at home?", "Yes, share your area, class, timing, and learning goal to check availability."],
+    ],
+  }),
+  verifiedTutorsPakistan: page({
+    slug: "verified-tutors-pakistan",
+    title: "Verified Tutors in Pakistan | Home & Online Tutor Matching",
+    description:
+      "Find verified tutors in Pakistan for home tuition and online classes. Get tutors for school subjects, O/A Level, Quran, IELTS, English, programming, and exams.",
+    eyebrow: "Verified Tutors Pakistan",
+    heading: "Verified tutors in Pakistan for safe home and online learning",
+    intro:
+      "A Plus Home Tutors helps families connect with tutors based on subject, class, city, timing, experience, and learning needs.",
+    imageId: 8613089,
+    imageAlt: "Teacher guiding students in a classroom",
+    primaryCta: { label: "Find Verified Tutors", to: "/teachers" },
+    highlights: ["Tutor screening", "Home and online classes", "Subject and city-based matching"],
+    sections: [
+      {
+        title: "Why tutor verification matters",
+        body:
+          "Families need tutors who are suitable for the subject, class level, schedule, and learning style. Verification and matching help reduce uncertainty before classes begin.",
+      },
+      {
+        title: "Tutors for academic and skills subjects",
+        body:
+          "Requests commonly include school subjects, O/A Level, Matric, FSc, Quran, IELTS, English, programming, IT, university subjects, and creative skills.",
+      },
+    ],
+    popularLinks: [
+      { label: "Home tuition Lahore", to: "/home-tuition-lahore" },
+      { label: "Online tutors Pakistan", to: "/online-tutors-pakistan" },
+      { label: "Find a tutor", to: "/teachers" },
+    ],
+    faqs: [
+      ["Are all tutors available in every city?", "Availability depends on city, subject, timing, and tutor schedule."],
+      ["Can I choose online instead of home tuition?", "Yes, many subjects can be taught online depending on learner needs."],
+    ],
+  }),
+};
+
 export const allLandingPages = {
   ...landingPages,
   ...classLandingPages,
   ...extraSeoPages,
+  ...keywordSeoPages,
 };

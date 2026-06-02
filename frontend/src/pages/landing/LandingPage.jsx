@@ -289,7 +289,7 @@ const LandingPage = ({ page }) => {
           </Box>
           <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
             <CtaButton action={page.primaryCta} />
-            <CtaButton action={{ label: "WhatsApp", href: "https://wa.me/923066762289" }} variant="outlined" />
+            <CtaButton action={{ label: "WhatsApp", href: "https://wa.me/923197659491" }} variant="outlined" />
           </Stack>
         </Box>
       </Container>
