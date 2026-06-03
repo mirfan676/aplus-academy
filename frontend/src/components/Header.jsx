@@ -35,6 +35,7 @@ const Header = () => {
     { label: "Tutors", path: "/teachers" },
     { label: "Jobs", path: "/jobs" },
     { label: "Blog", path: "/blog" },
+    { label: "Learning Tools", path: "/learning-tools" },
     { label: "About Us", path: "/about" },
   ];
 
@@ -160,7 +161,9 @@ const Header = () => {
           {!isMobile && (
             <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
               {menuItems.map((item) => {
-                const isActive = location.pathname === item.path;
+                const isActive =
+                  location.pathname === item.path ||
+                  (item.path !== "/" && location.pathname.startsWith(`${item.path}/`));
                 return (
                   <Button
                     key={item.path}
@@ -270,7 +273,9 @@ const Header = () => {
       >
         <List>
           {menuItems.map((item) => {
-            const isActive = location.pathname === item.path;
+            const isActive =
+              location.pathname === item.path ||
+              (item.path !== "/" && location.pathname.startsWith(`${item.path}/`));
             return (
               <ListItem
                 key={item.path}
