@@ -201,6 +201,84 @@ IMAGE_POOL = [
 ]
 
 CATEGORY_IMAGES = {
+    "K-12": [
+        {
+            "url": "https://images.pexels.com/photos/5212345/pexels-photo-5212345.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/a-child-studying-with-a-tutor-5212345/",
+            "credit": "Pexels free photo",
+            "alt": "Child studying with a tutor at a desk",
+        },
+        {
+            "url": "https://images.pexels.com/photos/8422200/pexels-photo-8422200.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/children-in-a-classroom-8422200/",
+            "credit": "Pexels free photo",
+            "alt": "Children learning together in a classroom",
+        },
+        {
+            "url": "https://images.pexels.com/photos/8613089/pexels-photo-8613089.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/teacher-and-students-in-classroom-8613089/",
+            "credit": "Pexels free photo",
+            "alt": "Teacher guiding students during a school lesson",
+        },
+        {
+            "url": "https://images.pexels.com/photos/5427671/pexels-photo-5427671.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/kids-sitting-at-the-table-5427671/",
+            "credit": "Pexels free photo",
+            "alt": "Young learners working on classroom activities",
+        },
+    ],
+    "O & A Level": [
+        {
+            "url": "https://images.pexels.com/photos/256417/pexels-photo-256417.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/books-on-library-shelf-256417/",
+            "credit": "Pexels free photo",
+            "alt": "Books in a library for Cambridge exam preparation",
+        },
+        {
+            "url": "https://images.pexels.com/photos/4778621/pexels-photo-4778621.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/students-studying-together-4778621/",
+            "credit": "Pexels free photo",
+            "alt": "Students studying together for exams",
+        },
+        {
+            "url": "https://images.pexels.com/photos/5905902/pexels-photo-5905902.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/person-writing-on-notebook-5905902/",
+            "credit": "Pexels free photo",
+            "alt": "Student writing exam revision notes",
+        },
+        {
+            "url": "https://images.pexels.com/photos/5427659/pexels-photo-5427659.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/students-in-classroom-5427659/",
+            "credit": "Pexels free photo",
+            "alt": "Students focused during a classroom lesson",
+        },
+    ],
+    "Bachelors / Masters": [
+        {
+            "url": "https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/people-walking-in-a-campus-267885/",
+            "credit": "Pexels free photo",
+            "alt": "Students walking on a university campus",
+        },
+        {
+            "url": "https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/books-bookstore-book-reading-159711/",
+            "credit": "Pexels free photo",
+            "alt": "University books arranged for study",
+        },
+        {
+            "url": "https://images.pexels.com/photos/8197543/pexels-photo-8197543.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/group-of-students-studying-8197543/",
+            "credit": "Pexels free photo",
+            "alt": "University students collaborating on coursework",
+        },
+        {
+            "url": "https://images.pexels.com/photos/6146978/pexels-photo-6146978.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/students-using-laptop-6146978/",
+            "credit": "Pexels free photo",
+            "alt": "University students using a laptop for research",
+        },
+    ],
     "English Language": [
         {
             "url": "https://images.pexels.com/photos/8423402/pexels-photo-8423402.jpeg?auto=compress&cs=tinysrgb&w=1600",
@@ -225,6 +303,110 @@ CATEGORY_IMAGES = {
             "sourceUrl": "https://www.pexels.com/photo/students-in-the-classroom-5676741/",
             "credit": "Pexels free photo",
             "alt": "University students collaborating during class",
+        },
+    ],
+    "IELTS": [
+        {
+            "url": "https://images.pexels.com/photos/5940831/pexels-photo-5940831.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/person-writing-on-white-paper-5940831/",
+            "credit": "Pexels free photo",
+            "alt": "Student writing IELTS preparation notes",
+        },
+        {
+            "url": "https://images.pexels.com/photos/3768126/pexels-photo-3768126.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/person-holding-a-pencil-3768126/",
+            "credit": "Pexels free photo",
+            "alt": "Learner preparing written answers for an English test",
+        },
+        {
+            "url": "https://images.pexels.com/photos/4145153/pexels-photo-4145153.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/person-writing-on-notebook-4145153/",
+            "credit": "Pexels free photo",
+            "alt": "English language notebook for test preparation",
+        },
+        {
+            "url": "https://images.pexels.com/photos/4145190/pexels-photo-4145190.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/person-writing-on-a-notebook-4145190/",
+            "credit": "Pexels free photo",
+            "alt": "Student practising English writing skills",
+        },
+    ],
+    "IT & Technology": [
+        {
+            "url": "https://images.pexels.com/photos/1181354/pexels-photo-1181354.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/person-using-macbook-pro-1181354/",
+            "credit": "Pexels free photo",
+            "alt": "Student using a laptop for technology learning",
+        },
+        {
+            "url": "https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/person-holding-pen-near-laptop-computer-3861969/",
+            "credit": "Pexels free photo",
+            "alt": "Technology learner working beside a laptop",
+        },
+        {
+            "url": "https://images.pexels.com/photos/3861958/pexels-photo-3861958.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/person-using-laptop-computer-3861958/",
+            "credit": "Pexels free photo",
+            "alt": "Laptop workspace for digital skills learning",
+        },
+        {
+            "url": "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/people-sitting-down-near-table-with-assorted-laptop-computers-3184465/",
+            "credit": "Pexels free photo",
+            "alt": "Students collaborating with laptops in a training session",
+        },
+    ],
+    "Programming": [
+        {
+            "url": "https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/turned-on-monitor-screen-1181675/",
+            "credit": "Pexels free photo",
+            "alt": "Programming code displayed on a computer screen",
+        },
+        {
+            "url": "https://images.pexels.com/photos/546819/pexels-photo-546819.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/close-up-photo-of-programming-of-codes-546819/",
+            "credit": "Pexels free photo",
+            "alt": "Close-up of programming code for software learning",
+        },
+        {
+            "url": "https://images.pexels.com/photos/574071/pexels-photo-574071.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/person-using-macbook-pro-574071/",
+            "credit": "Pexels free photo",
+            "alt": "Developer working on a laptop for coding practice",
+        },
+        {
+            "url": "https://images.pexels.com/photos/270348/pexels-photo-270348.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/coding-script-270348/",
+            "credit": "Pexels free photo",
+            "alt": "Code editor for programming lessons",
+        },
+    ],
+    "Graphics & Multimedia": [
+        {
+            "url": "https://images.pexels.com/photos/196645/pexels-photo-196645.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/person-using-computer-196645/",
+            "credit": "Pexels free photo",
+            "alt": "Designer working on a laptop for multimedia projects",
+        },
+        {
+            "url": "https://images.pexels.com/photos/4348404/pexels-photo-4348404.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/person-drawing-on-paper-4348404/",
+            "credit": "Pexels free photo",
+            "alt": "Creative design sketching for multimedia learning",
+        },
+        {
+            "url": "https://images.pexels.com/photos/6476587/pexels-photo-6476587.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/woman-editing-photos-on-a-computer-6476587/",
+            "credit": "Pexels free photo",
+            "alt": "Designer editing visual media on a computer",
+        },
+        {
+            "url": "https://images.pexels.com/photos/5926382/pexels-photo-5926382.jpeg?auto=compress&cs=tinysrgb&w=1600",
+            "sourceUrl": "https://www.pexels.com/photo/person-working-on-creative-design-5926382/",
+            "credit": "Pexels free photo",
+            "alt": "Creative workspace for graphic design learning",
         },
     ],
     "Qur'an & Tajweed": [
@@ -451,6 +633,7 @@ AGGREGATOR_SNIPPETS = [
 ]
 
 MAX_SOURCE_AGE_DAYS = 180
+RECENT_IMAGE_LOOKBACK = 60
 
 
 def slugify(value: str) -> str:
@@ -775,6 +958,48 @@ def choose_topic(items: list[dict], forced_topic: str | None, category_label: st
     return phrase or "Pakistan Education Update"
 
 
+def image_key(url: str) -> str:
+    parsed = urllib.parse.urlparse(url or "")
+    return parsed._replace(query="", fragment="").geturl()
+
+
+def recently_used_image_urls(current_slug: str | None = None) -> set[str]:
+    if not BLOG_INDEX.exists():
+        return set()
+    try:
+        index = json.loads(BLOG_INDEX.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return set()
+
+    used: set[str] = set()
+    for item in index[:RECENT_IMAGE_LOOKBACK]:
+        if item.get("slug") == current_slug:
+            continue
+        hero_url = (item.get("heroImage") or {}).get("url", "")
+        if hero_url:
+            used.add(image_key(hero_url))
+    return used
+
+
+def with_image_metadata(images: list[dict]) -> list[dict]:
+    return [
+        {
+            **image,
+            "kind": "pexels",
+            "placement": ARTICLE_IMAGE_SLOTS[index],
+        }
+        for index, image in enumerate(images[:4])
+    ]
+
+
+def select_unique_image_set(candidate_sets: list[list[dict]], used_urls: set[str]) -> list[dict]:
+    first_non_empty = next((images for images in candidate_sets if images), [])
+    for images in candidate_sets:
+        if images and image_key(images[0].get("url", "")) not in used_urls:
+            return images
+    return first_non_empty
+
+
 def choose_images(
     topic: str,
     items: list[dict],
@@ -790,15 +1015,11 @@ def choose_images(
                 raise
             print(f"Warning: AI image generation failed, using Pexels fallback: {exc}", file=sys.stderr)
 
+    used_urls = recently_used_image_urls(slug)
+    candidate_sets: list[list[dict]] = []
     if category_label in CATEGORY_IMAGES:
-        return [
-            {
-                **image,
-                "kind": "pexels",
-                "placement": ARTICLE_IMAGE_SLOTS[index],
-            }
-            for index, image in enumerate(CATEGORY_IMAGES[category_label][:4])
-        ]
+        category_images = CATEGORY_IMAGES[category_label]
+        candidate_sets.extend(category_images[offset:] + category_images[:offset] for offset in range(len(category_images)))
 
     haystack = " ".join([topic] + [item["title"] for item in items]).lower()
     ranked = []
@@ -806,17 +1027,12 @@ def choose_images(
         score = sum(1 for keyword in image["keywords"] if keyword in haystack)
         ranked.append((score, image))
     ranked.sort(key=lambda item: item[0], reverse=True)
-
-    images = []
-    for index, (_, image) in enumerate(ranked[:4]):
-        images.append(
-            {
-                **image,
-                "kind": "pexels",
-                "placement": ARTICLE_IMAGE_SLOTS[index],
-            }
-        )
-    return images
+    fallback_images = [image for _, image in ranked]
+    candidate_sets.extend(fallback_images[offset:] + fallback_images[:offset] for offset in range(len(fallback_images)))
+    selected = select_unique_image_set(candidate_sets, used_urls)
+    if not selected:
+        raise RuntimeError("No image candidates are configured for blog generation.")
+    return with_image_metadata(selected)
 
 
 def generate_ai_images(topic: str, items: list[dict], slug: str) -> list[dict]:

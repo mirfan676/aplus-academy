@@ -8,17 +8,10 @@
     "publishedAt": "2026-06-03T08:29:06.515129+00:00",
     "readTime": "3 min read",
     "heroImage": {
-      "keywords": [
-        "ai",
-        "technology",
-        "online",
-        "digital",
-        "computer"
-      ],
-      "url": "https://images.pexels.com/photos/1181354/pexels-photo-1181354.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/person-using-macbook-pro-1181354/",
+      "url": "https://images.pexels.com/photos/5212345/pexels-photo-5212345.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/a-child-studying-with-a-tutor-5212345/",
       "credit": "Pexels free photo",
-      "alt": "Student using a laptop for online learning",
+      "alt": "Child studying with a tutor at a desk",
       "kind": "pexels",
       "placement": "hero"
     }
@@ -32,17 +25,10 @@
     "publishedAt": "2026-06-02T08:06:14.381153+00:00",
     "readTime": "3 min read",
     "heroImage": {
-      "keywords": [
-        "ai",
-        "technology",
-        "online",
-        "digital",
-        "computer"
-      ],
-      "url": "https://images.pexels.com/photos/1181354/pexels-photo-1181354.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/person-using-macbook-pro-1181354/",
+      "url": "https://images.pexels.com/photos/196645/pexels-photo-196645.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/person-using-computer-196645/",
       "credit": "Pexels free photo",
-      "alt": "Student using a laptop for online learning",
+      "alt": "Designer working on a laptop for multimedia projects",
       "kind": "pexels",
       "placement": "hero"
     }
