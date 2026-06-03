@@ -2,11 +2,9 @@ import React, { useEffect, useState } from "react";
 import {
   Alert,
   Box,
-  Button,
   Chip,
   Container,
-  Grid,
-  Paper,
+  IconButton,
   Stack,
   Typography,
 } from "@mui/material";
@@ -26,9 +24,9 @@ const BlogList = () => {
   const [error, setError] = useState("");
 
   useSEO({
-    title: "A Plus Academy Blog | Education News, Study Tips & Tutor Guidance",
+    title: "A Plus Academy Blog | Education News and Learning Trends",
     description:
-      "Read A Plus Academy education updates, tutoring guidance, exam news, study tips, and learning trends for students, parents, and tutors in Pakistan.",
+      "Read compact education summaries and trend analysis across tutoring, exams, language learning, Quran education, skills, and digital learning.",
     canonical: "https://www.aplusacademy.pk/blog",
     ogUrl: "https://www.aplusacademy.pk/blog",
     ogImage: "https://www.aplusacademy.pk/aplus-logo.png",
@@ -58,22 +56,22 @@ const BlogList = () => {
           <Chip
             label="Education Blog"
             color="primary"
-            sx={{ borderRadius: 1, color: "#fff", fontWeight: 700, mb: 2 }}
+            sx={{ borderRadius: 1, color: "#fff", fontWeight: 800, mb: 2 }}
           />
           <Typography
             component="h1"
             variant="h2"
-            sx={{ fontWeight: 800, lineHeight: 1.08, maxWidth: 850 }}
+            sx={{ fontWeight: 900, lineHeight: 1.08, maxWidth: 920 }}
           >
-            Education news and learning guidance for Pakistan
+            Education insights, trends, and learning updates
           </Typography>
           <Typography
             component="p"
             variant="h6"
-            sx={{ mt: 2, maxWidth: 760, opacity: 0.86, lineHeight: 1.7 }}
+            sx={{ mt: 2, maxWidth: 780, opacity: 0.86, lineHeight: 1.7 }}
           >
-            Fresh updates for students, parents, and tutors, with source references
-            and practical takeaways for home and online learning.
+            A magazine-style collection of education summaries covering tutoring,
+            exams, language learning, Quran education, skills, and digital learning.
           </Typography>
         </Container>
       </Box>
@@ -88,58 +86,79 @@ const BlogList = () => {
           </Alert>
         )}
 
-        <Grid container spacing={3}>
-          {posts.map((post) => (
-            <Grid item xs={12} md={6} lg={4} key={post.slug}>
-              <Paper
-                elevation={0}
+        <Stack sx={{ borderTop: "1px solid #dde9e1", bgcolor: "#fff" }}>
+          {posts.map((post, index) => (
+            <Box
+              key={post.slug}
+              component={RouterLink}
+              to={`/blog/${post.slug}`}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", md: "220px 1fr auto" },
+                gap: { xs: 2, md: 4 },
+                alignItems: "center",
+                py: { xs: 3, md: 3.5 },
+                color: "inherit",
+                textDecoration: "none",
+                borderBottom: "1px solid #dde9e1",
+                "&:hover h2": { color: "#29b554" },
+                "&:hover .blog-arrow": { bgcolor: "#29b554", color: "#fff" },
+              }}
+            >
+              <Box
+                component="img"
+                src={post.heroImage?.url}
+                alt={post.heroImage?.alt || post.title}
                 sx={{
-                  height: "100%",
-                  borderRadius: 1,
-                  overflow: "hidden",
+                  width: "100%",
+                  height: { xs: 180, md: 130 },
+                  objectFit: "cover",
+                  borderRadius: 2,
+                  display: "block",
+                }}
+              />
+              <Stack spacing={1}>
+                <Stack direction="row" spacing={1} alignItems="center" color="text.secondary">
+                  <CalendarMonth color="primary" fontSize="small" />
+                  <Typography variant="body2" fontWeight={700}>
+                    {formatDate(post.publishedAt)} · {post.readTime}
+                  </Typography>
+                  {index === 0 && (
+                    <Chip
+                      label="Latest"
+                      size="small"
+                      color="primary"
+                      sx={{ borderRadius: 1, color: "#fff", fontWeight: 800 }}
+                    />
+                  )}
+                </Stack>
+                <Typography
+                  component="h2"
+                  variant="h5"
+                  fontWeight={900}
+                  sx={{ transition: "color 0.2s ease", lineHeight: 1.25 }}
+                >
+                  {post.title}
+                </Typography>
+                <Typography color="text.secondary" sx={{ lineHeight: 1.65, maxWidth: 780 }}>
+                  {post.description}
+                </Typography>
+              </Stack>
+              <IconButton
+                className="blog-arrow"
+                aria-label={`Read ${post.title}`}
+                sx={{
+                  justifySelf: { xs: "flex-start", md: "end" },
                   border: "1px solid #dde9e1",
-                  display: "flex",
-                  flexDirection: "column",
+                  color: "#102019",
+                  transition: "all 0.2s ease",
                 }}
               >
-                <Box
-                  component="img"
-                  src={post.heroImage?.url}
-                  alt={post.heroImage?.alt || post.title}
-                  sx={{
-                    width: "100%",
-                    aspectRatio: "16 / 9",
-                    objectFit: "cover",
-                    display: "block",
-                  }}
-                />
-                <Stack spacing={2} sx={{ p: 3, flex: 1 }}>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <CalendarMonth color="primary" fontSize="small" />
-                    <Typography variant="body2" color="text.secondary">
-                      {formatDate(post.publishedAt)} · {post.readTime}
-                    </Typography>
-                  </Stack>
-                  <Typography component="h2" variant="h5" fontWeight={800}>
-                    {post.title}
-                  </Typography>
-                  <Typography color="text.secondary" sx={{ lineHeight: 1.7 }}>
-                    {post.description}
-                  </Typography>
-                  <Box sx={{ flex: 1 }} />
-                  <Button
-                    component={RouterLink}
-                    to={`/blog/${post.slug}`}
-                    endIcon={<ArrowForward />}
-                    sx={{ alignSelf: "flex-start", textTransform: "none", fontWeight: 700 }}
-                  >
-                    Read article
-                  </Button>
-                </Stack>
-              </Paper>
-            </Grid>
+                <ArrowForward />
+              </IconButton>
+            </Box>
           ))}
-        </Grid>
+        </Stack>
       </Container>
     </Box>
   );

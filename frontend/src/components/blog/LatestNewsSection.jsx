@@ -2,14 +2,12 @@ import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
-  Chip,
   Container,
-  Grid,
-  Paper,
+  IconButton,
   Stack,
   Typography,
 } from "@mui/material";
-import { ArrowForward, CalendarMonth, Newspaper } from "@mui/icons-material";
+import { ArrowForward } from "@mui/icons-material";
 import { Link as RouterLink } from "react-router-dom";
 
 const formatDate = (value) =>
@@ -35,102 +33,124 @@ const LatestNewsSection = () => {
     <Box
       component="section"
       sx={{
-        bgcolor: "#fff",
+        bgcolor: "#111514",
+        color: "#fff",
         py: { xs: 6, md: 9 },
-        borderTop: "1px solid #e8f0ec",
-        borderBottom: "1px solid #e8f0ec",
       }}
     >
       <Container>
-        <Grid container spacing={4} alignItems="flex-start">
-          <Grid item xs={12} md={4}>
-            <Stack direction="row" spacing={1.2} alignItems="center" sx={{ mb: 1.5 }}>
-              <Newspaper color="primary" />
-              <Chip
-                label="Latest News"
-                color="primary"
-                sx={{ borderRadius: 1, color: "#fff", fontWeight: 800 }}
-              />
-            </Stack>
-            <Typography component="h2" variant="h3" fontWeight={900} sx={{ color: "#004aad", lineHeight: 1.08 }}>
-              Education trends worth following
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          justifyContent="space-between"
+          alignItems={{ xs: "flex-start", sm: "center" }}
+          spacing={2}
+          sx={{ pb: { xs: 4, md: 6 }, borderBottom: "1px solid rgba(255,255,255,0.22)" }}
+        >
+          <Box>
+            <Typography component="p" sx={{ color: "#29b554", fontWeight: 900, mb: 1 }}>
+              Latest Education News
             </Typography>
-            <Typography color="text.secondary" sx={{ mt: 2, lineHeight: 1.75 }}>
-              Fresh education summaries from the blog, covering tutoring, exams,
-              language learning, Quran education, and digital learning trends.
-            </Typography>
-            <Button
-              component={RouterLink}
-              to="/blog"
-              endIcon={<ArrowForward />}
-              variant="contained"
-              sx={{ mt: 3, borderRadius: 1, textTransform: "none", fontWeight: 800 }}
+            <Typography
+              component="h2"
+              sx={{
+                fontSize: { xs: "2rem", md: "3.4rem" },
+                fontWeight: 900,
+                lineHeight: 1.05,
+                letterSpacing: 0,
+              }}
             >
-              View all articles
-            </Button>
-          </Grid>
+              Explore our expert insights
+            </Typography>
+          </Box>
+          <Button
+            component={RouterLink}
+            to="/blog"
+            variant="outlined"
+            sx={{
+              borderRadius: 999,
+              color: "#fff",
+              borderColor: "rgba(255,255,255,0.4)",
+              textTransform: "none",
+              fontWeight: 800,
+              px: 2.5,
+              "&:hover": { borderColor: "#29b554", bgcolor: "rgba(41,181,84,0.12)" },
+            }}
+          >
+            See all
+          </Button>
+        </Stack>
 
-          <Grid item xs={12} md={8}>
-            <Grid container spacing={2.5}>
-              {posts.map((post, index) => (
-                <Grid item xs={12} md={index === 0 ? 7 : 5} key={post.slug}>
-                  <Paper
-                    component={RouterLink}
-                    to={`/blog/${post.slug}`}
-                    elevation={0}
-                    sx={{
-                      display: "block",
-                      height: "100%",
-                      textDecoration: "none",
-                      color: "inherit",
-                      borderRadius: 1,
-                      overflow: "hidden",
-                      border: "1px solid #dde9e1",
-                      background: index === 0 ? "#f7fbf8" : "#fff",
-                      transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
-                      "&:hover": {
-                        transform: "translateY(-4px)",
-                        boxShadow: "0 14px 34px rgba(16, 32, 25, 0.12)",
-                        borderColor: "#29b554",
-                      },
-                    }}
-                  >
-                    <Box
-                      component="img"
-                      src={post.heroImage?.url}
-                      alt={post.heroImage?.alt || post.title}
-                      sx={{
-                        width: "100%",
-                        aspectRatio: index === 0 ? "16 / 10" : "16 / 9",
-                        objectFit: "cover",
-                        display: "block",
-                      }}
-                    />
-                    <Stack spacing={1.3} sx={{ p: { xs: 2.5, md: index === 0 ? 3 : 2.5 } }}>
-                      <Stack direction="row" spacing={1} alignItems="center" color="text.secondary">
-                        <CalendarMonth sx={{ fontSize: 17 }} />
-                        <Typography variant="caption" fontWeight={700}>
-                          {formatDate(post.publishedAt)}
-                        </Typography>
-                      </Stack>
-                      <Typography
-                        component="h3"
-                        variant={index === 0 ? "h5" : "h6"}
-                        fontWeight={900}
-                        sx={{ lineHeight: 1.25 }}
-                      >
-                        {post.title}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.65 }}>
-                        {post.description}
-                      </Typography>
-                    </Stack>
-                  </Paper>
-                </Grid>
-              ))}
-            </Grid>
-          </Grid>
-        </Grid>
+        <Stack>
+          {posts.map((post) => (
+            <Box
+              key={post.slug}
+              component={RouterLink}
+              to={`/blog/${post.slug}`}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", md: "260px 1fr auto" },
+                gap: { xs: 2.5, md: 5 },
+                alignItems: "center",
+                py: { xs: 4, md: 5 },
+                color: "inherit",
+                textDecoration: "none",
+                borderBottom: "1px solid rgba(255,255,255,0.22)",
+                "&:hover h3": { color: "#29b554" },
+                "&:hover .news-arrow": { bgcolor: "#29b554", color: "#fff", transform: "translate(4px, -4px)" },
+              }}
+            >
+              <Box
+                component="img"
+                src={post.heroImage?.url}
+                alt={post.heroImage?.alt || post.title}
+                sx={{
+                  width: "100%",
+                  height: { xs: 190, md: 150 },
+                  objectFit: "cover",
+                  borderRadius: 3,
+                  display: "block",
+                }}
+              />
+              <Stack spacing={1.4}>
+                <Stack direction="row" spacing={1.2} alignItems="center">
+                  <Box sx={{ width: 9, height: 9, borderRadius: "50%", bgcolor: "#29b554" }} />
+                  <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.72)", fontWeight: 800 }}>
+                    {formatDate(post.publishedAt)} · {post.readTime}
+                  </Typography>
+                </Stack>
+                <Typography
+                  component="h3"
+                  sx={{
+                    maxWidth: 780,
+                    fontSize: { xs: "1.35rem", md: "1.8rem" },
+                    fontWeight: 900,
+                    lineHeight: 1.18,
+                    transition: "color 0.2s ease",
+                  }}
+                >
+                  {post.title}
+                </Typography>
+                <Typography sx={{ maxWidth: 760, color: "rgba(255,255,255,0.68)", lineHeight: 1.65 }}>
+                  {post.description}
+                </Typography>
+              </Stack>
+              <IconButton
+                className="news-arrow"
+                aria-label={`Read ${post.title}`}
+                sx={{
+                  justifySelf: { xs: "flex-start", md: "end" },
+                  bgcolor: "rgba(255,255,255,0.08)",
+                  color: "#fff",
+                  width: 56,
+                  height: 56,
+                  transition: "all 0.2s ease",
+                }}
+              >
+                <ArrowForward />
+              </IconButton>
+            </Box>
+          ))}
+        </Stack>
       </Container>
     </Box>
   );

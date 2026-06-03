@@ -9,7 +9,6 @@ import AreasWeCover from "../components/sections/AreasWeCover";
 import FAQSection from "../components/sections/FAQSection";
 import FooterCTA from "../components/sections/FooterCTA";
 import LatestNewsSection from "../components/blog/LatestNewsSection";
-import PopularTutorSearches from "../components/sections/PopularTutorSearches";
 
 const Home = () => {
 
@@ -27,7 +26,6 @@ const Home = () => {
       <StepsSection />
       <WhyChooseUs />
       <AreasWeCover />
-      <PopularTutorSearches />
       <LatestNewsSection />
       <FAQSection />
       <FooterCTA />
