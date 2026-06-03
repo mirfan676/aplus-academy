@@ -335,40 +335,6 @@ const LearningTools = () => {
             );
           })}
 
-          <Grid item xs={12}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: { xs: 3, md: 4 },
-                borderRadius: 1,
-                border: "1px solid #dcebe2",
-                bgcolor: "#edf8f1",
-              }}
-            >
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} md={7}>
-                  <Typography component="h2" variant="h5" fontWeight={900} gutterBottom>
-                    More tools can be added here
-                  </Typography>
-                  <Typography color="text.secondary" sx={{ lineHeight: 1.8 }}>
-                    This section is ready for more student utilities like spelling quizzes,
-                    math formula sheets, IELTS word lists, exam timers, and reading practice.
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={5}>
-                  <Stack direction="row" flexWrap="wrap" gap={1}>
-                    {["IELTS writing", "Flashcards", "Exam timer", "Formula sheets"].map((label) => (
-                      <Chip
-                        key={label}
-                        label={label}
-                        sx={{ borderRadius: 1, bgcolor: "#fff", fontWeight: 800 }}
-                      />
-                    ))}
-                  </Stack>
-                </Grid>
-              </Grid>
-            </Paper>
-          </Grid>
         </Grid>
       </Container>
     </Box>
