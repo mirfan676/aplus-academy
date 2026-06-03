@@ -588,16 +588,16 @@ INTERNAL_LINKS = {
 }
 
 EDITORIAL_TOPICS = {
-    "K-12": "Global Trends in K-12 Education",
-    "O & A Level": "Global Trends in O and A Level Education",
-    "Bachelors / Masters": "Global Trends in Higher Education",
-    "Competitive Exams": "Global Trends in Competitive Exams and Assessment",
-    "IT & Technology": "Global Trends in IT and Technology Education",
-    "Programming": "Global Trends in Programming Education",
-    "Qur'an & Tajweed": "Global Trends in Quran Memorization and Tajweed Education",
-    "English Language": "Global Trends in English Language Learning",
-    "IELTS": "Global Trends in IELTS and English Proficiency Testing",
-    "Graphics & Multimedia": "Global Trends in Graphics and Multimedia Education",
+    "K-12": "K-12 Education: Curriculum and Classroom Learning",
+    "O & A Level": "O and A Level Exam Preparation Updates",
+    "Bachelors / Masters": "Higher Education: Admissions and Student Support",
+    "Competitive Exams": "Competitive Exams and Assessment Updates",
+    "IT & Technology": "Technology Education and Digital Skills",
+    "Programming": "Programming Education and Coding Skills",
+    "Qur'an & Tajweed": "Quran Memorization and Tajweed Education",
+    "English Language": "English Language Learning and Communication",
+    "IELTS": "IELTS and English Proficiency Testing",
+    "Graphics & Multimedia": "Design and Multimedia Education",
 }
 
 CATEGORY_KEYWORDS = {
@@ -947,7 +947,7 @@ def choose_topic(items: list[dict], forced_topic: str | None, category_label: st
         return forced_topic.strip()
 
     if category_label:
-        return EDITORIAL_TOPICS.get(category_label, f"Global Trends in {category_label} Education")
+        return EDITORIAL_TOPICS.get(category_label, f"{category_label} Education Updates")
 
     haystack = " ".join(item["title"] for item in items[:10]).lower()
     topic_rules = [
@@ -1233,7 +1233,7 @@ def source_analysis(item: dict, topic: str, index: int, category_label: str | No
         "title": title,
         "url": item["url"],
         "publishedAt": item.get("publishedAt", ""),
-        "heading": title,
+        "heading": source,
         "summary": body,
     }
 
@@ -1267,10 +1267,11 @@ def action_steps_section(category_label: str | None) -> dict:
 
 def global_context_section(topic: str, selected_items: list[dict], category_label: str | None) -> dict:
     source_names = ", ".join(item.get("source", "a referenced source") for item in selected_items[:3])
+    phrase = editorial_category_phrase(category_label)
     return {
         "heading": "Why this matters globally",
         "body": (
-            f"The sources from {source_names} show that {topic} is part of a wider education shift. "
+            f"The sources from {source_names} show how {phrase} is changing across different education systems. "
             "Institutions are paying more attention to measurable progress, flexible learning options, and the "
             "quality of student support. For readers, the important point is not that every country has the same "
             "system. The useful lesson is that learners who can prove their skills through writing, speaking, "
@@ -1281,10 +1282,11 @@ def global_context_section(topic: str, selected_items: list[dict], category_labe
 
 def emerging_themes_section(topic: str, selected_items: list[dict], category_label: str | None) -> dict:
     focus = category_focus(category_label)
+    phrase = editorial_category_phrase(category_label)
     return {
         "heading": "Emerging themes",
         "body": (
-            f"Several themes connect these developments. First, {topic} is becoming more structured, with programmes "
+            f"Several themes connect these developments. First, {phrase} is becoming more structured, with programmes "
             "and institutions placing greater emphasis on planned instruction rather than informal study alone. Second, "
             "families and learners continue to play an important role in maintaining progress outside the classroom, "
             "especially where revision, practice, or long-term skill development is required. Third, demand for qualified "
@@ -1332,10 +1334,11 @@ def conclusion_section(topic: str, selected_items: list[dict], category_label: s
             if region.lower() in text and region not in regions:
                 regions.append(region)
     region_text = ", ".join(regions[:3]) if regions else "different parts of the world"
+    phrase = editorial_category_phrase(category_label)
     return {
         "heading": "Conclusion",
         "body": (
-            f"The developments from {region_text} point to a broader interest in {topic.lower()}. While the models "
+            f"The developments from {region_text} point to broader interest in {phrase}. While the models "
             "differ by country and institution, the common thread is clear: learners are looking for more organised "
             "instruction, stronger guidance, and learning formats that can continue beyond a single classroom session. "
             "The trend is not only about more enrolment; it is about how education providers structure learning so that "
@@ -1447,7 +1450,7 @@ def build_post(
         {
             "heading": "Overview",
             "body": (
-                f"Interest in {chosen_topic.lower()} continues to develop across different regions and institutions. "
+                f"Interest in {editorial_category_phrase(category_label)} continues to develop across different regions and institutions. "
                 f"Recent items in the news point to a shared pattern: {source_observation}\n\n"
                 "While each story comes from a different context, the common theme is a move toward more structured "
                 "learning, clearer teaching standards, and sustained engagement beyond occasional study. The sections "

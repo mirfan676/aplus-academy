@@ -6,7 +6,6 @@ import {
   Chip,
   Container,
   Divider,
-  Link,
   Stack,
   Typography,
 } from "@mui/material";
@@ -223,15 +222,12 @@ const BlogPost = () => {
 
         {post.sourceAnalyses?.map((analysis, index) => (
           <Box key={`${analysis.source}-${analysis.title}`} sx={{ mb: 5 }}>
-            <Typography component="h2" variant="h4" fontWeight={800} gutterBottom>
-              {analysis.heading}
-            </Typography>
-            <Typography
-              component="p"
-              variant="subtitle1"
+            <Chip
+              label={analysis.source}
               color="primary"
-              sx={{ fontWeight: 800, mb: 2, lineHeight: 1.6 }}
-            >
+              sx={{ borderRadius: 1, color: "#fff", fontWeight: 800, mb: 1.5 }}
+            />
+            <Typography component="h2" variant="h4" fontWeight={800} gutterBottom>
               {analysis.title}
             </Typography>
             <Typography sx={{ lineHeight: 1.95, color: "text.secondary", whiteSpace: "pre-line" }}>
@@ -257,29 +253,69 @@ const BlogPost = () => {
         <Typography component="h2" variant="h4" fontWeight={800} gutterBottom>
           References
         </Typography>
-        <Stack spacing={1.5} component="ol" sx={{ pl: 3 }}>
+        <Stack spacing={1.5}>
           {post.references.map((reference) => (
-            <Typography component="li" key={`${reference.title}-${reference.url}`}>
-              <Link href={reference.url} target="_blank" rel="noopener noreferrer">
+            <Box
+              key={`${reference.title}-${reference.url}`}
+              component="a"
+              href={reference.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                display: "block",
+                p: 2,
+                borderRadius: 1,
+                border: "1px solid #e3eee7",
+                bgcolor: "#f7fbf8",
+                color: "inherit",
+                textDecoration: "none",
+                transition: "all 0.2s ease",
+                "&:hover": {
+                  borderColor: "#29b554",
+                  bgcolor: "#eef8f1",
+                },
+              }}
+            >
+              <Typography component="span" sx={{ fontWeight: 800, lineHeight: 1.6 }}>
                 {reference.title}
-              </Link>{" "}
-              <OpenInNew sx={{ fontSize: 14, verticalAlign: "text-top" }} />{" "}
+              </Typography>{" "}
+              <OpenInNew sx={{ fontSize: 14, verticalAlign: "text-top", color: "#198754" }} />{" "}
               <Typography component="span" color="text.secondary">
                 {reference.source ? `- ${reference.source}` : ""}
               </Typography>
-            </Typography>
+            </Box>
           ))}
           {(post.images || [post.heroImage]).filter(Boolean).map((image, index) => (
-            <Typography component="li" key={`${image.url}-${index}`}>
-              Image {index + 1}:{" "}
+            <Box
+              key={`${image.url}-${index}`}
+              component={image.sourceUrl ? "a" : "div"}
+              href={image.sourceUrl || undefined}
+              target={image.sourceUrl ? "_blank" : undefined}
+              rel={image.sourceUrl ? "noopener noreferrer" : undefined}
+              sx={{
+                display: "block",
+                p: 2,
+                borderRadius: 1,
+                border: "1px solid #e3eee7",
+                bgcolor: "#fff",
+                color: "inherit",
+                textDecoration: "none",
+                "&:hover": image.sourceUrl
+                  ? { borderColor: "#29b554", bgcolor: "#f7fbf8" }
+                  : undefined,
+              }}
+            >
+              <Typography component="span" sx={{ fontWeight: 800 }}>
+                Image {index + 1}:{" "}
+              </Typography>
               {image.sourceUrl ? (
-                <Link href={image.sourceUrl} target="_blank" rel="noopener noreferrer">
+                <Typography component="span" color="text.secondary">
                   {image.credit}
-                </Link>
+                </Typography>
               ) : (
                 image.credit
               )}
-            </Typography>
+            </Box>
           ))}
         </Stack>
       </Container>
