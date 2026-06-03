@@ -84,7 +84,7 @@ const Header = () => {
 
   const setTranslateCookie = (targetLanguage) => {
     const value = targetLanguage === "ur" ? "/en/ur" : "/en/en";
-    const maxAge = targetLanguage === "ur" ? 60 * 60 * 24 * 30 : 0;
+    const maxAge = targetLanguage === "ur" ? 60 * 60 * 24 * 30 : -1;
     document.cookie = `googtrans=${value}; path=/; max-age=${maxAge}; SameSite=Lax`;
 
     if (window.location.hostname.endsWith("aplusacademy.pk")) {
@@ -96,22 +96,9 @@ const Header = () => {
     setTranslateCookie(targetLanguage);
     setLanguage(targetLanguage);
 
-    const combo = document.querySelector(".goog-te-combo");
-    if (combo) {
-      combo.value = targetLanguage;
-      combo.dispatchEvent(new Event("change"));
-      return;
-    }
-
     window.setTimeout(() => {
-      const delayedCombo = document.querySelector(".goog-te-combo");
-      if (delayedCombo) {
-        delayedCombo.value = targetLanguage;
-        delayedCombo.dispatchEvent(new Event("change"));
-      } else {
-        window.location.reload();
-      }
-    }, 800);
+      window.location.reload();
+    }, 150);
   };
 
   const toggleLanguage = () => {

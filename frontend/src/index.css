@@ -67,11 +67,8 @@ body.urdu-site svg {
 .goog-te-banner-frame,
 .goog-te-gadget,
 .goog-te-balloon-frame,
-#goog-gt-tt {
-  display: none !important;
-}
-
-body > .skiptranslate {
+#goog-gt-tt,
+.VIpgJd-ZVi9od-ORHb-OEVmcd {
   display: none !important;
 }
 
