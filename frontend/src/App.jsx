@@ -18,6 +18,7 @@ import BlogList from "./pages/blog/BlogList";
 import BlogPost from "./pages/blog/BlogPost";
 import LearningTools from "./pages/learning-tools/LearningTools";
 import LearnEnglishVocabulary from "./pages/learning-tools/LearnEnglishVocabulary";
+import ImproveEnglishGrammar from "./pages/learning-tools/ImproveEnglishGrammar";
 
 
 import { ThemeProvider, CssBaseline, Container, Card, CardContent } from "@mui/material";
@@ -114,6 +115,7 @@ function App() {
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/learning-tools" element={<LearningTools />} />
           <Route path="/learning-tools/learn-english-vocabulary" element={<LearnEnglishVocabulary />} />
+          <Route path="/learning-tools/improve-english-grammar" element={<ImproveEnglishGrammar />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
 
