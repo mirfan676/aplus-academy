@@ -5,7 +5,6 @@ import {
   Button,
   Chip,
   Container,
-  Divider,
   Grid,
   Paper,
   Stack,
@@ -462,11 +461,6 @@ const TextToStudyQuestions = () => {
                   </Grid>
                 </Grid>
 
-                <Divider />
-                <Alert severity="info">
-                  Free rule-based output is best for quick revision. For advanced,
-                  teacher-like questions, this can later be upgraded with an AI API.
-                </Alert>
               </Stack>
             )}
           </Grid>
