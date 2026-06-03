@@ -1,5 +1,29 @@
 [
   {
+    "slug": "2026-06-03-global-trends-in-k-12-education",
+    "title": "Global Trends in K-12 Education",
+    "description": "A concise education-news summary covering recent developments in K-12 and the common themes connecting them.",
+    "topic": "Global Trends in K-12 Education",
+    "category": "K-12",
+    "publishedAt": "2026-06-03T08:29:06.515129+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "keywords": [
+        "ai",
+        "technology",
+        "online",
+        "digital",
+        "computer"
+      ],
+      "url": "https://images.pexels.com/photos/1181354/pexels-photo-1181354.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/person-using-macbook-pro-1181354/",
+      "credit": "Pexels free photo",
+      "alt": "Student using a laptop for online learning",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-06-02-global-trends-in-graphics-and-multimedia-education",
     "title": "Global Trends in Graphics and Multimedia Education",
     "description": "A concise education-news summary covering recent developments in Graphics & Multimedia and the common themes connecting them.",
