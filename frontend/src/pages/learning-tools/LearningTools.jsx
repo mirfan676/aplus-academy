@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
+import QuizIcon from "@mui/icons-material/Quiz";
 import SpellcheckIcon from "@mui/icons-material/Spellcheck";
 import TranslateIcon from "@mui/icons-material/Translate";
 import useSEO from "../../hooks/useSEO";
@@ -35,13 +36,21 @@ const tools = [
     to: "/learning-tools/improve-english-grammar",
     button: "Open grammar tool",
   },
+  {
+    title: "Text to Summary, Questions and MCQs",
+    description:
+      "Paste long study text and create a short summary, keywords, short questions, MCQs, blanks, and true/false statements.",
+    icon: QuizIcon,
+    to: "/learning-tools/text-to-mcqs-short-questions",
+    button: "Open study generator",
+  },
 ];
 
 const LearningTools = () => {
   useSEO({
     title: "Free Learning Tools for Students | A Plus Academy",
     description:
-      "Use free student learning tools from A Plus Academy, including English vocabulary translation and grammar improvement with explanations.",
+      "Use free student learning tools from A Plus Academy, including English vocabulary translation, grammar improvement, summaries, questions, and MCQs.",
     canonical: `${siteUrl}/learning-tools`,
     ogUrl: `${siteUrl}/learning-tools`,
     ogImage: `${siteUrl}/aplus-logo.png`,
