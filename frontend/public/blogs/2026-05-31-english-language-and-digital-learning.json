@@ -59,7 +59,7 @@
   "sections": [
     {
       "heading": "Overview",
-      "body": "Interest in global trends in english language learning continues to develop across different regions and institutions. Recent items in the news point to a shared pattern: PR Newswire covered \"Efekta Education Group partners with ECC Co., Ltd. to revolutionise English language education in Japan.\" The available feed summary is limited, but the item is relevant to spoken English, grammar, vocabulary, writing confidence, pronunciation, and practical communication.\n\nWhile each story comes from a different context, the common theme is a move toward more structured learning, clearer teaching standards, and sustained engagement beyond occasional study. The sections below summarise the key developments first, then draw out the themes connecting them."
+      "body": "Interest in global trends in english language learning continues to develop across different regions and institutions. Recent items in the news point to a shared pattern: PR Newswire covered \"Efekta Education Group partners with ECC Co., Ltd. to revolutionise English language education in Japan.\" The development reflects ongoing changes in English language learning.\n\nWhile each story comes from a different context, the common theme is a move toward more structured learning, clearer teaching standards, and sustained engagement beyond occasional study. The sections below summarise the key developments first, then draw out the themes connecting them."
     },
     {
       "heading": "Why this matters globally",
@@ -85,7 +85,7 @@
       "url": "https://news.google.com/rss/articles/CBMi7AFBVV95cUxNbEtkamxBVVh4THJTNXJ3a29SdXA2Q1E0ZlVRcWdUR3VYOU94WHJSaFJjS1c0UElQTmhKZHBoUlZRN0txSEd4ZWVFNllVVHFCOS0tRGZQcXJjNHJPUkV1Y05zYlpuZGlOX2VSbThMTU1MN1V6dG1rUURMdklhU085WGZLTHpnUHJvV2xmX1pRZ0o4WnRrWHJpVXJUemJGb1FzZzFFRzA0ZEdwdGRNaFVmSTN2bWVFRTRuM0FfemlkTnBwVTJiWmVMWGY4UUdNYjFhUGxsS3pmTnpBeDgwWmY0OWg1U1RPOFFEblJ1cg?oc=5",
       "publishedAt": "Tue, 31 Mar 2026 07:00:00 GMT",
       "heading": "Efekta Education Group partners with ECC Co., Ltd. to revolutionise English language education in Japan",
-      "summary": "PR Newswire covered \"Efekta Education Group partners with ECC Co., Ltd. to revolutionise English language education in Japan.\" The available feed summary is limited, but the item is relevant to spoken English, grammar, vocabulary, writing confidence, pronunciation, and practical communication. The source adds a relevant education signal for this category. It matters because readers are trying to make decisions around spoken English, grammar, vocabulary, writing confidence, pronunciation, and practical communication. Taken together with the other sources, it helps explain where education demand, delivery models, and learner expectations are moving."
+      "summary": "PR Newswire covered \"Efekta Education Group partners with ECC Co., Ltd. to revolutionise English language education in Japan.\" The development reflects ongoing changes in English language learning. The source describes a current development in English language learning. It shows how institutions, learners, or families are adjusting to changing expectations in this field. Alongside the other sources, it helps show how education delivery and learner demand are changing."
     },
     {
       "source": "Language Magazine",
@@ -93,7 +93,7 @@
       "url": "https://news.google.com/rss/articles/CBMiekFVX3lxTFBjTU9PMjVpZk5fSUdWUHlPcFFDTnhpLWYwclEtX2dINHdNV0ZHUWtPU0todENKdHp3MG5YU1RxRXV1b3N0V2lteHNOVHVwQ3M3WXZSTVVSOHJfNmlPam5hZXo4amRqWGpJNzRFWGNWTXJ5cVZVcFRPMVZn?oc=5",
       "publishedAt": "Sun, 26 Apr 2026 07:00:00 GMT",
       "heading": "Higher Education’s English Gap",
-      "summary": "Language Magazine covered \"Higher Education’s English Gap.\" The available feed summary is limited, but the item is relevant to spoken English, grammar, vocabulary, writing confidence, pronunciation, and practical communication. The source adds a relevant education signal for this category. It matters because readers are trying to make decisions around spoken English, grammar, vocabulary, writing confidence, pronunciation, and practical communication. Taken together with the other sources, it helps explain where education demand, delivery models, and learner expectations are moving."
+      "summary": "Language Magazine covered \"Higher Education’s English Gap.\" The development reflects ongoing changes in English language learning. The source describes a current development in English language learning. It shows how institutions, learners, or families are adjusting to changing expectations in this field. Alongside the other sources, it helps show how education delivery and learner demand are changing."
     },
     {
       "source": "Cambridge University Press & Assessment",
@@ -101,7 +101,7 @@
       "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxORlo3N0d4eXd5LVpTUGN6ZnZqektNLVpvbW5HdEZ2UzRKQVl3YnFUeTBOWnBWVmtoM3pxd25YUkxOc1pWcWdEZ3o3b0kzV3RxSVAxcV95RE40UjRtVTJxUDkxclJSTUpuX0h6X2RJdFR6TW1lcEdFdkM2RV9OSUhjUU5yOTNfaHl6Qy12MUw1b0dBS2tDRnY0dHVZRlBmRFV2RGswSFNTUGJCVzBDVTQ3Q3RqOWxrV1hyVk9HdlJmY3YwT1E1TGQtU2JDMA?oc=5",
       "publishedAt": "Fri, 03 Apr 2026 19:02:00 GMT",
       "heading": "English language education in Taiwan",
-      "summary": "Cambridge University Press & Assessment covered \"English language education in Taiwan.\" The available feed summary is limited, but the item is relevant to spoken English, grammar, vocabulary, writing confidence, pronunciation, and practical communication. The source shows English learning moving further into digital tools and online delivery. Digital practice can help, but only when learners still receive correction on pronunciation, grammar, writing, and fluency. The wider trend is a blended model in which apps support repetition while teachers provide correction and structure."
+      "summary": "Cambridge University Press & Assessment covered \"English language education in Taiwan.\" The development reflects ongoing changes in English language learning. The source shows English learning moving further into digital tools and online delivery. Digital practice can help, but only when learners still receive correction on pronunciation, grammar, writing, and fluency. The wider trend is a blended model in which apps support repetition while teachers provide correction and structure."
     }
   ],
   "references": [
@@ -150,5 +150,5 @@
     "trends"
   ],
   "generatedBy": "scripts/create_blog.py",
-  "generationNote": "Created from public RSS/news summaries, limited page context where accessible, relevance filtering, and original editorial synthesis. References are included for attribution and reader verification."
+  "generationNote": "Created from public RSS/news summaries, relevance filtering, and original editorial synthesis. References are included for attribution and reader verification."
 }

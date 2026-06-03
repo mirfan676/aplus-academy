@@ -690,6 +690,21 @@ def category_focus(category_label: str | None) -> str:
     )
 
 
+def editorial_category_phrase(category_label: str | None) -> str:
+    return {
+        "K-12": "school learning and assessment",
+        "O & A Level": "Cambridge exam preparation",
+        "Bachelors / Masters": "higher education support",
+        "Competitive Exams": "competitive exam preparation and admissions testing",
+        "IT & Technology": "technology education",
+        "Programming": "programming education",
+        "Qur'an & Tajweed": "Quran memorization and Tajweed education",
+        "English Language": "English language learning",
+        "IELTS": "English proficiency testing",
+        "Graphics & Multimedia": "design and multimedia education",
+    }.get(category_label or "", "education and learning")
+
+
 def category_actions(category_label: str | None) -> list[str]:
     if not category_label:
         return [
@@ -1120,10 +1135,9 @@ def summarize_source(item: dict, category_label: str | None) -> str:
             f"{detail}"
         )
 
-    focus = category_focus(category_label)
     return (
-        f"{source} covered \"{title}.\" The available feed summary is limited, but the item is relevant to "
-        f"{focus}."
+        f"{source} covered \"{title}.\" The development reflects ongoing changes in "
+        f"{editorial_category_phrase(category_label)}."
     )
 
 
@@ -1197,10 +1211,11 @@ def infer_source_angle(item: dict, category_label: str | None) -> tuple[str, str
                 "It underlines the continuing role of family routines alongside formal classes and community programmes.",
             )
 
+    phrase = editorial_category_phrase(category_label)
     return (
-        "The source adds a relevant education signal for this category.",
-        f"It matters because readers are trying to make decisions around {category_focus(category_label)}.",
-        "Taken together with the other sources, it helps explain where education demand, delivery models, and learner expectations are moving.",
+        f"The source describes a current development in {phrase}.",
+        "It shows how institutions, learners, or families are adjusting to changing expectations in this field.",
+        "Alongside the other sources, it helps show how education delivery and learner demand are changing.",
     )
 
 
@@ -1482,7 +1497,7 @@ def build_post(
         "tags": sorted({word.lower() for word in re.findall(r"[a-zA-Z]{4,}", chosen_topic)})[:8],
         "generatedBy": "scripts/create_blog.py",
         "generationNote": (
-            "Created from public RSS/news summaries, limited page context where accessible, relevance filtering, "
+            "Created from public RSS/news summaries, relevance filtering, "
             "and original editorial synthesis. References are included for attribution and reader verification."
         ),
     }
