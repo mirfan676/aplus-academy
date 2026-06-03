@@ -35,6 +35,46 @@ button {
   cursor: pointer;
 }
 
+body.urdu-site,
+body.urdu-site input,
+body.urdu-site textarea,
+body.urdu-site button,
+body.urdu-site select {
+  font-family: "Gulzar", "Noto Nastaliq Urdu", "Noto Naskh Arabic", serif;
+}
+
+body.urdu-site {
+  direction: rtl;
+  top: 0 !important;
+}
+
+body.urdu-site .MuiSvgIcon-root,
+body.urdu-site svg {
+  font-family: inherit;
+}
+
+#google_translate_element {
+  position: fixed;
+  left: -9999px;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.goog-te-banner-frame,
+.goog-te-gadget,
+.goog-te-balloon-frame,
+#goog-gt-tt {
+  display: none !important;
+}
+
+body > .skiptranslate {
+  display: none !important;
+}
+
 /* Make images responsive */
 img {
   max-width: 100%;

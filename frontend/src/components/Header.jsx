@@ -15,12 +15,18 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import TranslateIcon from "@mui/icons-material/Translate";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 
 const Header = () => {
   const isMobile = useMediaQuery("(max-width:900px)");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [language, setLanguage] = useState(() =>
+    typeof document !== "undefined" && document.cookie.includes("googtrans=/en/ur")
+      ? "ur"
+      : "en"
+  );
   const location = useLocation();
 
   const menuItems = [
@@ -41,6 +47,77 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const applyLanguageShell = (targetLanguage) => {
+      const isUrdu = targetLanguage === "ur";
+      document.documentElement.lang = isUrdu ? "ur" : "en";
+      document.documentElement.dir = isUrdu ? "rtl" : "ltr";
+      document.body.classList.toggle("urdu-site", isUrdu);
+    };
+
+    window.googleTranslateElementInit = () => {
+      if (!window.google?.translate?.TranslateElement) return;
+      new window.google.translate.TranslateElement(
+        {
+          pageLanguage: "en",
+          includedLanguages: "en,ur",
+          autoDisplay: false,
+          layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+        },
+        "google_translate_element"
+      );
+    };
+
+    applyLanguageShell(language);
+
+    if (!document.getElementById("google-translate-script")) {
+      const script = document.createElement("script");
+      script.id = "google-translate-script";
+      script.src =
+        "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      script.async = true;
+      document.body.appendChild(script);
+    } else if (window.googleTranslateElementInit) {
+      window.googleTranslateElementInit();
+    }
+  }, [language]);
+
+  const setTranslateCookie = (targetLanguage) => {
+    const value = targetLanguage === "ur" ? "/en/ur" : "/en/en";
+    const maxAge = targetLanguage === "ur" ? 60 * 60 * 24 * 30 : 0;
+    document.cookie = `googtrans=${value}; path=/; max-age=${maxAge}; SameSite=Lax`;
+
+    if (window.location.hostname.endsWith("aplusacademy.pk")) {
+      document.cookie = `googtrans=${value}; path=/; domain=.aplusacademy.pk; max-age=${maxAge}; SameSite=Lax`;
+    }
+  };
+
+  const applyGoogleTranslation = (targetLanguage) => {
+    setTranslateCookie(targetLanguage);
+    setLanguage(targetLanguage);
+
+    const combo = document.querySelector(".goog-te-combo");
+    if (combo) {
+      combo.value = targetLanguage;
+      combo.dispatchEvent(new Event("change"));
+      return;
+    }
+
+    window.setTimeout(() => {
+      const delayedCombo = document.querySelector(".goog-te-combo");
+      if (delayedCombo) {
+        delayedCombo.value = targetLanguage;
+        delayedCombo.dispatchEvent(new Event("change"));
+      } else {
+        window.location.reload();
+      }
+    }, 800);
+  };
+
+  const toggleLanguage = () => {
+    applyGoogleTranslation(language === "ur" ? "en" : "ur");
+  };
+
   // Gradient border + glass effect for active links
   const activeStyles = {
     border: "2px solid",
@@ -54,6 +131,7 @@ const Header = () => {
 
   return (
     <>
+      <Box id="google_translate_element" aria-hidden="true" />
       {/* Header */}
       <AppBar
         position="sticky"
@@ -93,7 +171,7 @@ const Header = () => {
 
           {/* Desktop Menu */}
           {!isMobile && (
-            <Box sx={{ display: "flex", gap: 2 }}>
+            <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
               {menuItems.map((item) => {
                 const isActive = location.pathname === item.path;
                 return (
@@ -139,22 +217,52 @@ const Header = () => {
                   </Button>
                 );
               })}
+              <Button
+                onClick={toggleLanguage}
+                startIcon={<TranslateIcon />}
+                variant="outlined"
+                color="primary"
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 700,
+                  borderRadius: "20px",
+                  px: 1.6,
+                  whiteSpace: "nowrap",
+                  borderColor: language === "ur" ? "#26b657" : "rgba(25,118,210,0.45)",
+                  bgcolor: language === "ur" ? "rgba(38,182,87,0.1)" : "transparent",
+                }}
+              >
+                {language === "ur" ? "English" : "اردو"}
+              </Button>
             </Box>
           )}
 
           {/* Mobile Menu Button */}
           {isMobile && (
-            <IconButton
-              color="primary"
-              edge="end"
-              onClick={() => setDrawerOpen(true)}
-              sx={{
-                transition: "0.3s",
-                "&:hover": { transform: "scale(1.15)" },
-              }}
-            >
-              <MenuIcon />
-            </IconButton>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <IconButton
+                color="primary"
+                onClick={toggleLanguage}
+                aria-label={language === "ur" ? "Switch to English" : "Switch to Urdu"}
+                sx={{
+                  border: "1px solid rgba(25,118,210,0.25)",
+                  bgcolor: language === "ur" ? "rgba(38,182,87,0.1)" : "transparent",
+                }}
+              >
+                <TranslateIcon />
+              </IconButton>
+              <IconButton
+                color="primary"
+                edge="end"
+                onClick={() => setDrawerOpen(true)}
+                sx={{
+                  transition: "0.3s",
+                  "&:hover": { transform: "scale(1.15)" },
+                }}
+              >
+                <MenuIcon />
+              </IconButton>
+            </Box>
           )}
         </Toolbar>
       </AppBar>
@@ -208,6 +316,25 @@ const Header = () => {
         </List>
 
         <Divider sx={{ my: 2 }} />
+
+        <Button
+          startIcon={<TranslateIcon />}
+          onClick={() => {
+            toggleLanguage();
+            setDrawerOpen(false);
+          }}
+          variant="contained"
+          fullWidth
+          sx={{
+            mb: 2,
+            textTransform: "none",
+            fontWeight: 700,
+            bgcolor: "#26b657",
+            "&:hover": { bgcolor: "#1f9a4a" },
+          }}
+        >
+          {language === "ur" ? "Switch to English" : "اردو میں دیکھیں"}
+        </Button>
 
         {/* Contact Section */}
         <Box sx={{ textAlign: "center", mt: 2 }}>
