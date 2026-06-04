@@ -1,5 +1,5 @@
 import { createContext, useEffect, useMemo, useState } from "react";
-import { onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
+import { getRedirectResult, onAuthStateChanged, signInWithRedirect, signOut } from "firebase/auth";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { adminEmails, auth, db, googleProvider, hasFirebaseConfig } from "../firebase";
 
@@ -14,6 +14,10 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
       return undefined;
     }
+
+    getRedirectResult(auth).catch((error) => {
+      console.error("Google sign-in redirect failed:", error);
+    });
 
     return onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
@@ -47,7 +51,7 @@ export const AuthProvider = ({ children }) => {
       hasFirebaseConfig,
       signInWithGoogle: () => {
         if (!auth) throw new Error("Firebase is not configured.");
-        return signInWithPopup(auth, googleProvider);
+        return signInWithRedirect(auth, googleProvider);
       },
       logout: () => (auth ? signOut(auth) : Promise.resolve()),
     }),

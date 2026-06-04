@@ -90,9 +90,7 @@ const FamilyStudentRegistration = ({ role }) => {
   const useGoogleProfile = async () => {
     setMessage("");
     try {
-      const result = await signInWithGoogle();
-      update("name", result.user.displayName || "");
-      update("email", result.user.email || "");
+      await signInWithGoogle();
     } catch (err) {
       console.error(err);
       setMessage("Google sign-in could not be completed. Check Firebase auth settings.");

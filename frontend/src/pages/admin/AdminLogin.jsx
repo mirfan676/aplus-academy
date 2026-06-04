@@ -2,10 +2,12 @@ import { Box, Button, Container, Paper, Stack, Typography, Alert } from "@mui/ma
 import GoogleIcon from "@mui/icons-material/Google";
 import LockIcon from "@mui/icons-material/Lock";
 import { Navigate } from "react-router-dom";
+import { useState } from "react";
 import { useAuth } from "../../contexts/useAuth";
 
 const AdminLogin = () => {
   const { hasFirebaseConfig, isAdmin, loading, signInWithGoogle, user } = useAuth();
+  const [error, setError] = useState("");
 
   if (!loading && isAdmin) return <Navigate to="/admin" replace />;
 
@@ -59,8 +61,22 @@ const AdminLogin = () => {
               </Alert>
             )}
 
+            {error && (
+              <Alert severity="error" sx={{ textAlign: "left" }}>
+                {error}
+              </Alert>
+            )}
+
             <Button
-              onClick={signInWithGoogle}
+              onClick={async () => {
+                setError("");
+                try {
+                  await signInWithGoogle();
+                } catch (err) {
+                  console.error(err);
+                  setError(err?.message || "Google sign-in could not be started.");
+                }
+              }}
               disabled={!hasFirebaseConfig}
               startIcon={<GoogleIcon />}
               variant="contained"
