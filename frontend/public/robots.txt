@@ -3,7 +3,3 @@ Allow: /
 
 # Sitemap location
 Sitemap: https://www.aplusacademy.pk/sitemap.xml
-
-# Disallow unnecessary paths (optional)
-Disallow: /admin
-Disallow: /api
