@@ -1,0 +1,21 @@
+import { Navigate } from "react-router-dom";
+import { Box, CircularProgress } from "@mui/material";
+import { useAuth } from "../../contexts/useAuth";
+
+const AdminRoute = ({ children }) => {
+  const { isAdmin, loading, user } = useAuth();
+
+  if (loading) {
+    return (
+      <Box sx={{ minHeight: "100vh", display: "grid", placeItems: "center" }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!user || !isAdmin) return <Navigate to="/admin/login" replace />;
+
+  return children;
+};
+
+export default AdminRoute;
