@@ -21,7 +21,10 @@ export const db = app ? getFirestore(app) : null;
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: "select_account" });
 
-export const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || "irfan.karor.mi@gmail.com")
+export const adminEmails = (
+  import.meta.env.VITE_ADMIN_EMAILS ||
+  "irfan.karor.mi@gmail.com,webservicesaplus@gmail.com,aplusacademylahore@gmail.com"
+)
   .split(",")
   .map((email) => email.trim().toLowerCase())
   .filter(Boolean);

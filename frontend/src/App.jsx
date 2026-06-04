@@ -21,6 +21,9 @@ import LearningTools from "./pages/learning-tools/LearningTools";
 import LearnEnglishVocabulary from "./pages/learning-tools/LearnEnglishVocabulary";
 import ImproveEnglishGrammar from "./pages/learning-tools/ImproveEnglishGrammar";
 import TextToStudyQuestions from "./pages/learning-tools/TextToStudyQuestions";
+import RegisterChoice from "./pages/register/RegisterChoice";
+import FamilyStudentRegistration from "./pages/register/FamilyStudentRegistration";
+import AccountDashboard from "./pages/account/AccountDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminRoute from "./pages/admin/AdminRoute";
@@ -58,8 +61,9 @@ function AppShell() {
 
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/register" element={<RegisterChoice />} />
         <Route
-          path="/register"
+          path="/register/teacher"
           element={
             <Container sx={{ py: 6 }}>
               <Card sx={{ maxWidth: 700, mx: "auto", boxShadow: 3 }}>
@@ -70,6 +74,8 @@ function AppShell() {
             </Container>
           }
         />
+        <Route path="/register/parent" element={<FamilyStudentRegistration role="parent" />} />
+        <Route path="/register/student" element={<FamilyStudentRegistration role="student" />} />
         <Route path="/teachers" element={<TeacherDirectory />} />
         <Route path="/tutors" element={<RouteRedirect to="/teachers" />} />
         <Route path="/tutors/o-levels" element={<RouteRedirect to="/o-a-level" />} />
@@ -113,6 +119,7 @@ function AppShell() {
         <Route path="/learning-tools/improve-english-grammar" element={<ImproveEnglishGrammar />} />
         <Route path="/learning-tools/text-to-mcqs-short-questions" element={<TextToStudyQuestions />} />
         <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/account" element={<AccountDashboard />} />
         <Route
           path="/admin"
           element={

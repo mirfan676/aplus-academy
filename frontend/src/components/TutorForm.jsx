@@ -17,6 +17,9 @@ import {
 } from "@mui/material";
 import api from "../api";
 import useSEO from "../hooks/useSEO";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { db } from "../firebase";
+import { useAuth } from "../contexts/useAuth";
 
 const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
@@ -117,6 +120,8 @@ const qualificationSuggestions = {
 };
 
 export default function TutorRegistration() {
+  const { user } = useAuth();
+
   useSEO({
     title: "Register as a Tutor - A Plus Home Tutors Pakistan",
     description:
@@ -271,6 +276,19 @@ export default function TutorRegistration() {
       });
 
       if (res.status === 200) {
+        if (db && user) {
+          await setDoc(
+            doc(db, "users", user.uid),
+            {
+              uid: user.uid,
+              name: formData.name || user.displayName || "",
+              email: user.email || "",
+              role: "teacher",
+              updatedAt: serverTimestamp(),
+            },
+            { merge: true },
+          );
+        }
         setMessage("✅ Tutor registered successfully!");
         setFormData({
           name: "",
