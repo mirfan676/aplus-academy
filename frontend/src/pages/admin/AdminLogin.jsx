@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useAuth } from "../../contexts/useAuth";
 
 const AdminLogin = () => {
-  const { hasFirebaseConfig, isAdmin, loading, signInWithGoogle, user } = useAuth();
+  const { authError, hasFirebaseConfig, isAdmin, loading, signInWithGoogle, user } = useAuth();
   const [error, setError] = useState("");
 
   if (!loading && isAdmin) return <Navigate to="/admin" replace />;
@@ -61,9 +61,9 @@ const AdminLogin = () => {
               </Alert>
             )}
 
-            {error && (
+            {(error || authError) && (
               <Alert severity="error" sx={{ textAlign: "left" }}>
-                {error}
+                {error || authError}
               </Alert>
             )}
 
