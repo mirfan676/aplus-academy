@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-06-05-higher-education-admissions-and-student-support",
+    "title": "Higher Education: Admissions and Student Support",
+    "description": "A concise education-news summary covering recent developments in Bachelors / Masters and the common themes connecting them.",
+    "topic": "Higher Education: Admissions and Student Support",
+    "category": "Bachelors / Masters",
+    "publishedAt": "2026-06-05T07:18:43.811400+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/people-walking-in-a-campus-267885/",
+      "credit": "Pexels free photo",
+      "alt": "Students walking on a university campus",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-06-04-o-and-a-level-exam-preparation-updates",
     "title": "O and A Level Exam Preparation Updates",
     "description": "A concise education-news summary covering recent developments in O & A Level and the common themes connecting them.",
