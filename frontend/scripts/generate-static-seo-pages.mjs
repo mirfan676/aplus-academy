@@ -20,15 +20,30 @@ const shell = fs.readFileSync(indexPath, "utf8");
 const baseLinks = [
   ["/", "Home"],
   ["/teachers", "Find a Tutor"],
+  ["/teachers?subject=Physics", "Physics Tutors"],
   ["/register", "Become a Tutor"],
   ["/jobs", "Tutor Jobs"],
   ["/blog", "Education Blog"],
   ["/learning-tools", "Learning Tools"],
+  ["/learning-tools/learn-english-vocabulary", "English Vocabulary Tool"],
+  ["/learning-tools/improve-english-grammar", "Grammar Tool"],
+  ["/learning-tools/text-to-mcqs-short-questions", "Study Questions Tool"],
   ["/k-12", "K-12"],
   ["/o-a-level", "O and A Level"],
+  ["/competitive-exams", "Competitive Exams"],
+  ["/career-opportunities", "Career Opportunities"],
+  ["/referral-program", "Referral Program"],
+  ["/buy-courses", "Buy Courses"],
+  ["/home-tutors-lahore", "Home Tutors Lahore"],
+  ["/a-level-tutors-pakistan", "A Level Tutors Pakistan"],
+  ["/ielts-tutor-pakistan", "IELTS Tutor Pakistan"],
+  ["/verified-tutors-pakistan", "Verified Tutors Pakistan"],
   ["/quran-tajweed", "Quran and Tajweed"],
+  ["/quran-tutor-with-tajweed", "Quran Tutor with Tajweed"],
   ["/ielts", "IELTS"],
   ["/about", "About"],
+  ["/privacy", "Privacy Policy"],
+  ["/terms", "Terms"],
 ];
 
 const basePages = [
@@ -168,6 +183,7 @@ const readJson = (filePath, fallback) => {
 };
 
 const blogIndex = readJson(path.join(publicDir, "blogs", "index.json"), []);
+const blogIndexLinks = blogIndex.map((post) => [`/blog/${post.slug}`, post.title]);
 const blogPages = blogIndex.flatMap((post) => {
   const fullPost = readJson(path.join(publicDir, "blogs", `${post.slug}.json`), post);
   const sourceSections = (fullPost.sourceAnalyses || []).slice(0, 2).map((source) => ({
@@ -204,7 +220,7 @@ const pagePath = (slug) => `/${slug}`.replace(/\/$/, "") || "/";
 const canonicalUrl = (slug) => `${siteUrl}${pagePath(slug) === "/" ? "" : pagePath(slug)}`;
 
 const renderLinks = (links = []) => {
-  const combined = [...links, ...baseLinks];
+  const combined = [...links, ...baseLinks, ...blogIndexLinks];
   const unique = new Map();
   combined.forEach(([href, label]) => {
     if (href && label && href.startsWith("/")) unique.set(href, label);
