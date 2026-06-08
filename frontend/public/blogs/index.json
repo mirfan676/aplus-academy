@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-06-08-competitive-exams-and-assessment-updates",
+    "title": "Competitive Exams and Assessment Updates",
+    "description": "A concise education-news summary covering recent developments in Competitive Exams and the common themes connecting them.",
+    "topic": "Competitive Exams and Assessment Updates",
+    "category": "Competitive Exams",
+    "publishedAt": "2026-06-08T08:22:49.453041+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/256417/pexels-photo-256417.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/books-on-library-shelf-256417/",
+      "credit": "Pexels free photo",
+      "alt": "Library books for competitive exam preparation",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-06-07-programming-education-and-coding-skills",
     "title": "Programming Education and Coding Skills",
     "description": "A concise education-news summary covering recent developments in Programming and the common themes connecting them.",
