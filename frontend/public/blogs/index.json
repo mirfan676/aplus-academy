@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-06-11-ielts-and-english-proficiency-testing",
+    "title": "IELTS and English Proficiency Testing",
+    "description": "A concise education-news summary covering recent developments in IELTS and the common themes connecting them.",
+    "topic": "IELTS and English Proficiency Testing",
+    "category": "IELTS",
+    "publishedAt": "2026-06-11T08:16:31.793904+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/3768126/pexels-photo-3768126.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/person-holding-a-pencil-3768126/",
+      "credit": "Pexels free photo",
+      "alt": "Learner preparing written answers for an English test",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-06-10-english-language-learning-and-communication",
     "title": "English Language Learning and Communication",
     "description": "A concise education-news summary covering recent developments in English Language and the common themes connecting them.",
