@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-06-12-design-and-multimedia-education",
+    "title": "Design and Multimedia Education",
+    "description": "A concise education-news summary covering recent developments in Graphics & Multimedia and the common themes connecting them.",
+    "topic": "Design and Multimedia Education",
+    "category": "Graphics & Multimedia",
+    "publishedAt": "2026-06-12T08:02:05.079105+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/4348404/pexels-photo-4348404.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/person-drawing-on-paper-4348404/",
+      "credit": "Pexels free photo",
+      "alt": "Creative design sketching for multimedia learning",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-06-11-ielts-and-english-proficiency-testing",
     "title": "IELTS and English Proficiency Testing",
     "description": "A concise education-news summary covering recent developments in IELTS and the common themes connecting them.",
