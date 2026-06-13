@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-06-13-k-12-education-curriculum-and-classroom-learning",
+    "title": "K-12 Education: Curriculum and Classroom Learning",
+    "description": "A concise education-news summary covering recent developments in K-12 and the common themes connecting them.",
+    "topic": "K-12 Education: Curriculum and Classroom Learning",
+    "category": "K-12",
+    "publishedAt": "2026-06-13T07:07:02.194305+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/8422200/pexels-photo-8422200.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/children-in-a-classroom-8422200/",
+      "credit": "Pexels free photo",
+      "alt": "Children learning together in a classroom",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-06-12-design-and-multimedia-education",
     "title": "Design and Multimedia Education",
     "description": "A concise education-news summary covering recent developments in Graphics & Multimedia and the common themes connecting them.",
