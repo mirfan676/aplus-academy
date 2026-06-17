@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-06-17-programming-education-and-coding-skills",
+    "title": "Programming Education and Coding Skills",
+    "description": "A concise education-news summary covering recent developments in Programming and the common themes connecting them.",
+    "topic": "Programming Education and Coding Skills",
+    "category": "Programming",
+    "publishedAt": "2026-06-17T08:37:24.625567+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/546819/pexels-photo-546819.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/close-up-photo-of-programming-of-codes-546819/",
+      "credit": "Pexels free photo",
+      "alt": "Close-up of programming code for software learning",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-06-16-technology-education-and-digital-skills",
     "title": "Technology Education and Digital Skills",
     "description": "A concise education-news summary covering recent developments in IT & Technology and the common themes connecting them.",
