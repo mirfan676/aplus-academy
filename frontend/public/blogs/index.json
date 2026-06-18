@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-06-18-quran-memorization-and-tajweed-education",
+    "title": "Quran Memorization and Tajweed Education",
+    "description": "A concise education-news summary covering recent developments in Qur'an & Tajweed and the common themes connecting them.",
+    "topic": "Quran Memorization and Tajweed Education",
+    "category": "Qur'an & Tajweed",
+    "publishedAt": "2026-06-18T08:19:57.096591+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/8522578/pexels-photo-8522578.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/close-up-shot-of-a-book-8522578/",
+      "credit": "Pexels free photo",
+      "alt": "Open Quran pages for tajweed and hifz revision",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-06-17-programming-education-and-coding-skills",
     "title": "Programming Education and Coding Skills",
     "description": "A concise education-news summary covering recent developments in Programming and the common themes connecting them.",
