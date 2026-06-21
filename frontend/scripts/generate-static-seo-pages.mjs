@@ -140,15 +140,15 @@ const basePages = [
     slug: "learning-tools/pte-essay-practice",
     title: "Free PTE Essay Practice and Writing Scorer | A Plus Academy",
     description:
-      "Practice PTE essay writing with original sample answers, a 20-minute writing workspace, editable structures, word count, and formative feedback.",
+      "Sign in with Google to practise PTE essay writing, submit timed responses, receive adaptive feedback, and compare scored student essays.",
     heading: "Practise PTE essay writing with structure and feedback",
     intro:
-      "Use original sample responses, write a timed essay, review practical writing indicators, and edit a clear four-paragraph structure for PTE preparation.",
+      "Study original sample responses, sign in with Google, submit a timed essay, review adaptive writing indicators, and compare scored student responses.",
     sections: [
       {
         title: "A complete PTE writing workspace",
         body:
-          "The practice module combines sample essays, topic selection, a 20-minute timer, automatic draft saving, word count, structured feedback, and editable planning templates. Results are formative estimates for learning and are not official Pearson scores.",
+          "The account-based practice module combines sample essays, Google sign-in, a 20-minute timer that stops on submission, private draft saving, structured feedback, scored community responses, and editable planning templates. Results are educational estimates and are not official Pearson scores.",
       },
     ],
   },

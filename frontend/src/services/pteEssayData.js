@@ -1,4 +1,4 @@
-import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
+import { addDoc, collection, getDocs, limit, orderBy, query, serverTimestamp, where } from "firebase/firestore";
 import { db, hasFirebaseConfig } from "../firebase";
 
 const fallbackUrl = "/pte/essays.json";
@@ -38,4 +38,57 @@ export const fetchPteEssays = async () => {
   return loadFallbackEssays();
 };
 
-export { normalizeEssay };
+const normalizeResponse = (response, index = 0) => ({
+  id: String(response.id || `response-${index + 1}`),
+  promptId: String(response.promptId || ""),
+  promptTitle: String(response.promptTitle || "PTE Essay"),
+  essayText: String(response.essayText || ""),
+  score: Number(response.score) || 0,
+  scoreMaximum: Number(response.scoreMaximum) || 90,
+  wordCount: Number(response.wordCount) || 0,
+  displayName: String(response.displayName || "A Plus learner"),
+  photoURL: String(response.photoURL || ""),
+  createdAt: response.createdAt?.toDate?.().toISOString?.() || response.createdAt || null,
+});
+
+export const fetchPteEssayResponses = async (promptId) => {
+  if (!hasFirebaseConfig || !db || !promptId) return [];
+  const snapshot = await getDocs(
+    query(collection(db, "pteEssayResponses"), where("promptId", "==", String(promptId)), limit(100)),
+  );
+  return snapshot.docs
+    .map((item, index) => normalizeResponse({ id: item.id, ...item.data() }, index))
+    .filter((response) => response.essayText)
+    .sort((a, b) => b.score - a.score);
+};
+
+export const submitPteEssayResponse = async ({ user, essay, text, result }) => {
+  if (!hasFirebaseConfig || !db) throw new Error("Firebase is not configured for essay submissions.");
+  if (!user?.uid) throw new Error("Google sign-in is required before submitting an essay.");
+
+  const response = {
+    promptId: essay.id,
+    promptTitle: essay.title,
+    promptText: essay.prompt,
+    essayText: text.trim(),
+    score: result.total,
+    scoreMaximum: result.maximum,
+    wordCount: result.analysis.wordCount,
+    criteria: result.criteria.reduce((output, item) => ({ ...output, [item.label]: item.score }), {}),
+    diagnostics: {
+      paragraphCount: result.analysis.paragraphCount,
+      complexSentenceCount: result.analysis.complexSentenceCount,
+      advancedVocabularyCount: result.analysis.advancedTerms.length,
+      contractionCount: result.analysis.contractionCount,
+    },
+    userId: user.uid,
+    displayName: user.displayName || "A Plus learner",
+    photoURL: user.photoURL || "",
+    createdAt: serverTimestamp(),
+  };
+
+  const saved = await addDoc(collection(db, "pteEssayResponses"), response);
+  return normalizeResponse({ ...response, id: saved.id, createdAt: new Date().toISOString() });
+};
+
+export { normalizeEssay, normalizeResponse };

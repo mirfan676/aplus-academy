@@ -5,6 +5,7 @@ import WorkIcon from "@mui/icons-material/Work";
 import EditIcon from "@mui/icons-material/Edit";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import LogoutIcon from "@mui/icons-material/Logout";
+import RateReviewIcon from "@mui/icons-material/RateReview";
 import { Link as RouterLink, Navigate } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
@@ -75,6 +76,19 @@ const AccountDashboard = () => {
             </Typography>
             <Button component={RouterLink} to={isTutor ? "/register/teacher" : isFamily ? `/register/${profileRole}` : "/register"} variant="contained">
               Edit profile
+            </Button>
+          </Paper>
+
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 2, border: "1px solid #dce8f1" }}>
+            <RateReviewIcon color="primary" fontSize="large" />
+            <Typography variant="h6" fontWeight={900} sx={{ mt: 1 }}>
+              PTE essay practice
+            </Typography>
+            <Typography color="text.secondary" sx={{ my: 2 }}>
+              Write timed essays, receive adaptive feedback, and compare your scored responses.
+            </Typography>
+            <Button component={RouterLink} to="/learning-tools/pte-essay-practice" variant="contained">
+              Practise writing
             </Button>
           </Paper>
 
