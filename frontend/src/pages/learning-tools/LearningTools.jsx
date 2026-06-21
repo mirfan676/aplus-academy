@@ -16,6 +16,7 @@ import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import QuizIcon from "@mui/icons-material/Quiz";
+import RateReviewIcon from "@mui/icons-material/RateReview";
 import SchoolIcon from "@mui/icons-material/School";
 import SpellcheckIcon from "@mui/icons-material/Spellcheck";
 import TranslateIcon from "@mui/icons-material/Translate";
@@ -56,6 +57,17 @@ const tools = [
     accent: "#7c3aed",
     bg: "#f4efff",
     features: ["Summary", "MCQs", "Short questions"],
+  },
+  {
+    title: "PTE Essay Practice",
+    description:
+      "Study original sample essays, write under a 20-minute timer, receive instant practice feedback, and build an editable response structure.",
+    icon: RateReviewIcon,
+    to: "/learning-tools/pte-essay-practice",
+    button: "Open PTE essay practice",
+    accent: "#c2410c",
+    bg: "#fff3ed",
+    features: ["Sample essays", "20-minute timer", "Writing feedback"],
   },
 ];
 
@@ -240,7 +252,7 @@ const LearningTools = () => {
           {tools.map((tool) => {
             const ToolIcon = tool.icon;
             return (
-              <Grid item xs={12} md={4} key={tool.title}>
+              <Grid item xs={12} md={6} lg={3} key={tool.title}>
                 <Paper
                   elevation={0}
                   sx={{

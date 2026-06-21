@@ -21,12 +21,14 @@ import LearningTools from "./pages/learning-tools/LearningTools";
 import LearnEnglishVocabulary from "./pages/learning-tools/LearnEnglishVocabulary";
 import ImproveEnglishGrammar from "./pages/learning-tools/ImproveEnglishGrammar";
 import TextToStudyQuestions from "./pages/learning-tools/TextToStudyQuestions";
+import PteEssayPractice from "./pages/learning-tools/PteEssayPractice";
 import RegisterChoice from "./pages/register/RegisterChoice";
 import FamilyStudentRegistration from "./pages/register/FamilyStudentRegistration";
 import AccountDashboard from "./pages/account/AccountDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminRoute from "./pages/admin/AdminRoute";
+import PteEssayAdmin from "./pages/admin/PteEssayAdmin";
 import { AuthProvider } from "./contexts/AuthContext";
 import theme from "./theme";
 import Header from "./components/Header";
@@ -118,6 +120,7 @@ function AppShell() {
         <Route path="/learning-tools/learn-english-vocabulary" element={<LearnEnglishVocabulary />} />
         <Route path="/learning-tools/improve-english-grammar" element={<ImproveEnglishGrammar />} />
         <Route path="/learning-tools/text-to-mcqs-short-questions" element={<TextToStudyQuestions />} />
+        <Route path="/learning-tools/pte-essay-practice" element={<PteEssayPractice />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/account" element={<AccountDashboard />} />
         <Route
@@ -125,6 +128,14 @@ function AppShell() {
           element={
             <AdminRoute>
               <AdminDashboard />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/pte-essays"
+          element={
+            <AdminRoute>
+              <PteEssayAdmin />
             </AdminRoute>
           }
         />

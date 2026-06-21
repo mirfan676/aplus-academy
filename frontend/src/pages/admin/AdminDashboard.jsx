@@ -17,6 +17,8 @@ import SchoolIcon from "@mui/icons-material/School";
 import ArticleIcon from "@mui/icons-material/Article";
 import TravelExploreIcon from "@mui/icons-material/TravelExplore";
 import LogoutIcon from "@mui/icons-material/Logout";
+import RateReviewIcon from "@mui/icons-material/RateReview";
+import { Link as RouterLink } from "react-router-dom";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import L from "leaflet";
 import { collection, getCountFromServer } from "firebase/firestore";
@@ -139,6 +141,12 @@ const AdminDashboard = () => {
 
       <Container maxWidth="xl" sx={{ py: 4 }}>
         {error && <Alert severity="warning" sx={{ mb: 3 }}>{error}</Alert>}
+
+        <Stack direction={{ xs: "column", sm: "row" }} justifyContent="flex-end" sx={{ mb: 2 }}>
+          <Button component={RouterLink} to="/admin/pte-essays" variant="contained" startIcon={<RateReviewIcon />} sx={{ fontWeight: 900 }}>
+            Manage PTE essays
+          </Button>
+        </Stack>
 
         <Box
           sx={{

@@ -28,6 +28,7 @@ const baseLinks = [
   ["/learning-tools/learn-english-vocabulary", "English Vocabulary Tool"],
   ["/learning-tools/improve-english-grammar", "Grammar Tool"],
   ["/learning-tools/text-to-mcqs-short-questions", "Study Questions Tool"],
+  ["/learning-tools/pte-essay-practice", "PTE Essay Practice"],
   ["/k-12", "K-12"],
   ["/o-a-level", "O and A Level"],
   ["/competitive-exams", "Competitive Exams"],
@@ -134,6 +135,22 @@ const basePages = [
     heading: "Convert long study text into MCQs and short questions",
     intro:
       "Paste study notes, lesson text, or a long paragraph to create a compact revision pack with summary points, short questions, and MCQs.",
+  },
+  {
+    slug: "learning-tools/pte-essay-practice",
+    title: "Free PTE Essay Practice and Writing Scorer | A Plus Academy",
+    description:
+      "Practice PTE essay writing with original sample answers, a 20-minute writing workspace, editable structures, word count, and formative feedback.",
+    heading: "Practise PTE essay writing with structure and feedback",
+    intro:
+      "Use original sample responses, write a timed essay, review practical writing indicators, and edit a clear four-paragraph structure for PTE preparation.",
+    sections: [
+      {
+        title: "A complete PTE writing workspace",
+        body:
+          "The practice module combines sample essays, topic selection, a 20-minute timer, automatic draft saving, word count, structured feedback, and editable planning templates. Results are formative estimates for learning and are not official Pearson scores.",
+      },
+    ],
   },
   {
     slug: "about",
