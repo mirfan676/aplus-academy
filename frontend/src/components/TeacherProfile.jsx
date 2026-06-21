@@ -13,8 +13,8 @@ import {
   Alert,
 } from "@mui/material";
 import { CheckCircle, Star } from "@mui/icons-material";
-import api from "../api";
 import useSEO from "../hooks/useSEO";
+import { fetchTeacherFromFirestore } from "../services/teacherData";
 
 const TeacherProfile = () => {
   const { id } = useParams();
@@ -38,30 +38,30 @@ const TeacherProfile = () => {
     const fetchTeacher = async () => {
       try {
         setLoading(true);
-        const res = await api.get(`/tutors/${id}`);
-        const t = res.data;
+        const t = await fetchTeacherFromFirestore(id);
+        if (!t) throw new Error("Teacher not found in Firestore");
         setTeacher({
-          id: Number(id),
-          name: t["Name"] || "Unknown",
-          subjects: Array.isArray(t["Subjects"]) ? t["Subjects"] : [],
-          qualification: t["Qualification"] || "",
-          experience: t["Experience"] || "",
-          city: t["District"] ? String(t["District"]) : t["City"] || "",
-          bio: t["Bio"] || "",
-          price: t["Price"] || "Rs 2000",
-          thumbnail: t["Thumbnail"] || "",
-          lat: isNaN(parseFloat(t["Latitude"])) ? 31.5204 : parseFloat(t["Latitude"]),
-          lng: isNaN(parseFloat(t["Longitude"])) ? 74.3587 : parseFloat(t["Longitude"]),
-          verified: t["Verified"]?.trim(),
-          featured: t["Featured"]?.trim(),
-          Area1: t["Area1"] || "",
-          Area2: t["Area2"] || "",
-          Area3: t["Area3"] || "",
-          rating: t["Rating"] || 5,
+          id: t.id,
+          name: t.name || "Unknown",
+          subjects: Array.isArray(t.subjects) ? t.subjects : [],
+          qualification: t.qualification || "",
+          experience: t.experience || "",
+          city: t.District ? String(t.District) : t.city || "",
+          bio: t.bio || "",
+          price: t.Price || t.price || "Rs 2000",
+          thumbnail: t.thumbnail || "",
+          lat: Number(t.Latitude) || 31.5204,
+          lng: Number(t.Longitude) || 74.3587,
+          verified: t.Verified || (t.verified ? "Yes" : ""),
+          featured: t.Featured || "",
+          Area1: t.Area1 || "",
+          Area2: t.Area2 || "",
+          Area3: t.Area3 || "",
+          rating: t.Rating || 5,
         });
       } catch (err) {
         console.error(err);
-        setError("Failed to load teacher profile.");
+        setError("Failed to load teacher profile from Firebase.");
       } finally {
         setLoading(false);
       }

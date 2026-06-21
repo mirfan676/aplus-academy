@@ -44,7 +44,7 @@ const page = ({
 export const landingPages = {
   studyAbroad: page({
     slug: "study-abroad",
-    title: "Study Abroad Support in Pakistan | IELTS, English & Academic Guidance",
+    title: "Study Abroad Support Pakistan | IELTS & English",
     description:
       "Prepare for study abroad from Pakistan with IELTS, English language, academic writing, subject tutoring, and one-to-one learning support from A Plus Academy.",
     eyebrow: "Study Abroad",
@@ -79,7 +79,7 @@ export const landingPages = {
   }),
   referralProgram: page({
     slug: "referral-program",
-    title: "A Plus Academy Referral Program | Refer Students & Tutors in Pakistan",
+    title: "Referral Program Pakistan | A Plus Academy",
     description:
       "Refer students or qualified tutors to A Plus Academy and help families across Pakistan find trusted home and online tuition.",
     eyebrow: "Referral Program",
@@ -115,7 +115,7 @@ export const landingPages = {
   }),
   careerOpportunities: page({
     slug: "career-opportunities",
-    title: "Tutor Jobs in Pakistan | Career Opportunities at A Plus Academy",
+    title: "Tutor Jobs in Pakistan | A Plus Academy Careers",
     description:
       "Explore home tutor jobs, online teaching opportunities, and education careers with A Plus Academy in Lahore, Karachi, Islamabad, and across Pakistan.",
     eyebrow: "Career Opportunities",
@@ -298,7 +298,7 @@ export const classLandingPages = {
   }),
   bachelorsMasters: page({
     slug: "bachelors-masters",
-    title: "Bachelors and Masters Tutors in Pakistan | University Subject Support",
+    title: "Bachelors & Masters Tutors | University Support Pakistan",
     description:
       "Get bachelors and masters tutoring in Pakistan for business, computer science, maths, statistics, English, accounting, economics, and research support.",
     eyebrow: "Bachelors / Masters",
@@ -334,7 +334,7 @@ export const classLandingPages = {
   }),
   competitiveExams: page({
     slug: "competitive-exams",
-    title: "Competitive Exam Preparation in Pakistan | MDCAT, ECAT, CSS, NTS",
+    title: "Competitive Exam Preparation Pakistan | MDCAT, ECAT, CSS",
     description:
       "Prepare for competitive exams in Pakistan including MDCAT, ECAT, CSS, PMS, NTS, entry tests, aptitude tests, English, maths, and general knowledge.",
     eyebrow: "Competitive Exams",
@@ -369,7 +369,7 @@ export const classLandingPages = {
   }),
   itTechnology: page({
     slug: "it-technology",
-    title: "IT and Technology Courses in Pakistan | Computer Science Tutors",
+    title: "IT & Technology Courses Pakistan | Computer Tutors",
     description:
       "Learn IT and technology in Pakistan with tutors for computer science, web development, AI basics, data analysis, networking, office skills, and digital tools.",
     eyebrow: "IT & Technology",
@@ -405,7 +405,7 @@ export const classLandingPages = {
   }),
   programming: page({
     slug: "programming",
-    title: "Programming Tutors in Pakistan | Python, JavaScript, C++ & Web Development",
+    title: "Programming Tutors in Pakistan | Python, JS, C++",
     description:
       "Find programming tutors in Pakistan for Python, JavaScript, C++, Java, web development, data structures, algorithms, school CS, and university coding help.",
     eyebrow: "Programming",
@@ -477,7 +477,7 @@ export const classLandingPages = {
   }),
   englishLanguage: page({
     slug: "english-language",
-    title: "English Language Tutors in Pakistan | Spoken English & Grammar",
+    title: "English Language Tutors Pakistan | Spoken English",
     description:
       "Improve spoken English, grammar, writing, pronunciation, interview English, academic English, and IELTS speaking with language tutors in Pakistan.",
     eyebrow: "English Language",
@@ -839,7 +839,7 @@ export const keywordSeoPages = {
   }),
   ieltsTutorPakistan: page({
     slug: "ielts-tutor-pakistan",
-    title: "IELTS Tutor in Pakistan | Speaking, Writing & Band Improvement",
+    title: "IELTS Tutor Pakistan | Speaking & Writing",
     description:
       "Find an IELTS tutor in Pakistan for speaking, writing task 1 and 2, listening, reading, mock tests, feedback, and band-score improvement.",
     eyebrow: "IELTS Tutor Pakistan",

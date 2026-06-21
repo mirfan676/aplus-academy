@@ -1,6 +1,5 @@
 // TeacherDirectory.jsx
 import React, { useState, useEffect, useMemo } from "react";
-import api from "../../api";
 import {
   Container,
   Typography,
@@ -15,6 +14,7 @@ import TeacherMapSection from "./TeacherMapSection";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import useSEO from "../../hooks/useSEO";
+import { fetchTeachersFromFirestore, hasTeacherDataConfig } from "../../services/teacherData";
 
 // ------------------------------------------------------
 // FIX LEAFLET ICON ISSUE
@@ -54,7 +54,7 @@ function filterTeachers(
     .filter((tutor) => {
       const matchesCity = selectedCity ? tutor.city === selectedCity : true;
       const matchesSubject = selectedSubject
-        ? tutor.subjects.includes(selectedSubject)
+        ? tutor.subjects.some((subject) => subject.toLowerCase() === selectedSubject.toLowerCase())
         : true;
       const matchesSearch = search
         ? tutor.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -96,33 +96,34 @@ export default function TeacherDirectory() {
   const [showMoreSubjects, setShowMoreSubjects] = useState({});
 
   // ------------------------------------------------------
-  // FETCH TEACHERS + NORMALIZE API FIELDS
+  // FETCH TEACHERS FROM FIRESTORE
   // ------------------------------------------------------
   useEffect(() => {
-    api
-      .get("/tutors/")
-      .then((res) =>
-        setTeachers(
-          res.data.map((t, index) => ({
-            id: Number.isInteger(Number(t.id)) ? Number(t.id) : index,
-            name: t.Name || "",
-            city: t.City || "",
-            subjects: t.Subjects || [],
-            bio: t.Bio || "",
-            experience: t.Experience || 0,
-            qualification: t.Qualification || "",
-            thumbnail: t.Thumbnail || "",
-            phone: t.Phone || "",
-            verified: t.Verified === "Yes",
-            location: {
-              lat: Number(t.Latitude) || 31.5204,
-              lng: Number(t.Longitude) || 74.3587,
-            },
-          }))
-        )
-      )
-      .catch(() => setError("Unable to fetch teacher data"))
-      .finally(() => setLoading(false));
+    const loadTeachers = async () => {
+      setLoading(true);
+      setError("");
+
+      if (!hasTeacherDataConfig) {
+        setError("Firebase is not configured yet, so teachers cannot load directly from Firestore.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const firestoreTeachers = await fetchTeachersFromFirestore();
+        setTeachers(firestoreTeachers);
+        if (!firestoreTeachers.length) {
+          setError("No teacher records were found in Firestore. Add or sync teachers to the teachers/tutors collection.");
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Unable to fetch teacher data from Firebase Firestore.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTeachers();
   }, []);
 
   // ------------------------------------------------------

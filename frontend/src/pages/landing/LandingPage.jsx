@@ -22,6 +22,25 @@ import useSEO from "../../hooks/useSEO";
 
 const siteUrl = "https://www.aplusacademy.pk";
 
+const plainTitle = (title = "") => title.replace(/\s*\|\s*/g, " and ");
+
+const buildSeoParagraphs = (page) => {
+  const topic = plainTitle(page.title);
+  const focus = page.eyebrow || page.heading || topic;
+  const sectionTopics = page.sections.map((section) => section.title.toLowerCase()).join(", ");
+  const relatedLinks = page.popularLinks.map((link) => link.label).join(", ");
+
+  return [
+    `This page focuses on ${topic}. ${page.heading} is written for students, parents, and working learners who want a practical way to choose support instead of guessing from generic course lists. A Plus Academy looks at the learner's class level, subject gaps, target exam or skill goal, preferred timing, city, and whether home tuition or online tutoring will fit the routine better.`,
+    `For ${focus} requests, the right tutor match usually depends on more than subject knowledge. Families often need someone who can explain concepts patiently, set a realistic study pace, notice weak areas early, and keep lessons consistent. Students may need help with homework, exam preparation, speaking confidence, coding practice, Quran reading, university topics, or a short course plan, so the learning path should stay flexible.`,
+    `The sections on this page cover ${sectionTopics}. These details help searchers understand what the service includes before contacting the team. Instead of using the same message for every learner, A Plus Academy encourages students to share their current level, syllabus, book or exam board, recent marks, available days, and the outcome they want from classes.`,
+    `A useful tutoring plan also considers accountability. Regular lessons, revision targets, practice questions, feedback after mistakes, and parent or student updates make it easier to see whether progress is happening. This matters for school children, O Level and A Level students, IELTS learners, Quran students, university learners, and people building technology or communication skills.`,
+    `Before starting classes, it helps to write down the learner's strongest topics, weakest topics, recent test results, preferred language of explanation, and whether the goal is long-term improvement or urgent exam preparation. Clear details make the first conversation more useful and help the tutor plan lessons with less delay.`,
+    `This extra context also helps avoid mismatched expectations about fees, lesson frequency, travel, online class setup, and the amount of practice needed between sessions.`,
+    `If this is not the exact page you need, related searches such as ${relatedLinks} can help you move to a closer option. You can also contact A Plus Academy on WhatsApp with the subject, class, city, area, timing, learning goal, and preferred tutor type so the team can suggest the next practical step.`,
+  ];
+};
+
 const CtaButton = ({ action, variant = "contained" }) => {
   if (!action) return null;
 
@@ -64,6 +83,7 @@ const CtaButton = ({ action, variant = "contained" }) => {
 
 const LandingPage = ({ page }) => {
   const canonical = `${siteUrl}/${page.slug}`;
+  const seoParagraphs = buildSeoParagraphs(page);
 
   useSEO({
     title: page.title,
@@ -194,6 +214,24 @@ const LandingPage = ({ page }) => {
             </Grid>
           ))}
         </Grid>
+
+        <Box sx={{ py: { xs: 6, md: 8 } }}>
+          <Typography component="h2" variant="h4" fontWeight={800} gutterBottom>
+            {page.eyebrow} learning guide
+          </Typography>
+          <Box sx={{ maxWidth: 980 }}>
+            {seoParagraphs.map((paragraph) => (
+              <Typography
+                key={paragraph}
+                component="p"
+                color="text.secondary"
+                sx={{ lineHeight: 1.85, mb: 2 }}
+              >
+                {paragraph}
+              </Typography>
+            ))}
+          </Box>
+        </Box>
 
         <Box sx={{ py: { xs: 6, md: 8 } }}>
           <Grid container spacing={4}>

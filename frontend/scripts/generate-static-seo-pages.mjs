@@ -52,7 +52,7 @@ const basePages = [
     title: "A Plus Home Tutors - Home and Online Tuition in Pakistan",
     description:
       "A Plus Academy helps students find verified home tutors, online tutors, Quran teachers, IELTS coaches, English tutors, and subject specialists across Pakistan.",
-    heading: "A Plus Home Tutors - Home and Online Tuition in Pakistan",
+    heading: "Trusted home and online tutors for Pakistani students",
     intro:
       "A Plus Academy connects families with tutors for school subjects, O and A Level, Quran with Tajweed, IELTS, English language, programming, IT skills, competitive exams, and university support.",
     sections: [
@@ -170,6 +170,7 @@ const landingPages = Object.values(allLandingPages).map((page) => ({
   description: page.description,
   heading: page.heading,
   intro: page.intro,
+  eyebrow: page.eyebrow,
   sections: page.sections,
   links: page.popularLinks?.map((link) => [link.to || link.href, link.label]),
 }));
@@ -194,7 +195,7 @@ const blogPages = blogIndex.flatMap((post) => {
   return [
     {
       slug: `blog/${post.slug}`,
-      title: fullPost.seoTitle || post.title,
+      title: fullPost.seoTitle || `${post.title} | A Plus Academy Blog`,
       description: post.description,
       heading: post.title,
       intro: post.description,
@@ -218,6 +219,27 @@ const escapeHtml = (value = "") =>
 
 const pagePath = (slug) => `/${slug}`.replace(/\/$/, "") || "/";
 const canonicalUrl = (slug) => `${siteUrl}${pagePath(slug) === "/" ? "" : pagePath(slug)}`;
+const plainTitle = (title = "") => title.replace(/\s*\|\s*/g, " and ");
+
+const buildSeoParagraphs = (page) => {
+  const topic = plainTitle(page.title);
+  const focus = page.eyebrow || page.heading || topic;
+  const sectionTopics = (page.sections || []).map((section) => section.title || section.heading).filter(Boolean);
+  const relatedLinks = (page.links || []).map(([, label]) => label).filter(Boolean);
+
+  return [
+    `This page focuses on ${topic}. ${page.heading || topic} is written for students, parents, and working learners who want a practical way to choose support instead of guessing from generic course lists. A Plus Academy looks at the learner's class level, subject gaps, target exam or skill goal, preferred timing, city, and whether home tuition or online tutoring will fit the routine better.`,
+    `For ${focus} requests, the right tutor match usually depends on more than subject knowledge. Families often need someone who can explain concepts patiently, set a realistic study pace, notice weak areas early, and keep lessons consistent. Students may need help with homework, exam preparation, speaking confidence, coding practice, Quran reading, university topics, or a short course plan, so the learning path should stay flexible.`,
+    `The sections on this page cover ${sectionTopics.join(", ") || "learning goals, tutor matching, study planning, and student support"}. These details help searchers understand what the service includes before contacting the team. Instead of using the same message for every learner, A Plus Academy encourages students to share their current level, syllabus, book or exam board, recent marks, available days, and the outcome they want from classes.`,
+    `A useful tutoring plan also considers accountability. Regular lessons, revision targets, practice questions, feedback after mistakes, and parent or student updates make it easier to see whether progress is happening. This matters for school children, O Level and A Level students, IELTS learners, Quran students, university learners, and people building technology or communication skills.`,
+    `Before starting classes, it helps to write down the learner's strongest topics, weakest topics, recent test results, preferred language of explanation, and whether the goal is long-term improvement or urgent exam preparation. Clear details make the first conversation more useful and help the tutor plan lessons with less delay.`,
+    `This extra context also helps avoid mismatched expectations about fees, lesson frequency, travel, online class setup, and the amount of practice needed between sessions.`,
+    `Parents and learners should also think about how success will be measured. A school student may need better marks in monthly tests, an IELTS learner may need a higher writing band, a Quran learner may need smoother recitation, and a programming student may need working projects. Clear targets make lessons easier to review and improve.`,
+    `For many families, consistency is more important than a dramatic first lesson. Short revision tasks, weekly feedback, topic checklists, and honest communication help the tutor adjust the pace before small problems become large gaps. This is why A Plus Academy pages include context about subjects, class levels, study goals, and tutor matching instead of only showing a contact form.`,
+    `Online tutoring and home tuition can both work well when the setup matches the learner. Home tuition can be useful for younger students who need supervision, while online classes can save travel time for language practice, Quran reading, coding, university topics, and exam revision. The best option depends on the student's routine, attention span, internet access, and need for direct monitoring.`,
+    `If this is not the exact page you need, related searches such as ${relatedLinks.join(", ") || "Find a Tutor, Tutor Jobs, Learning Tools, and Education Blog"} can help you move to a closer option. You can also contact A Plus Academy on WhatsApp with the subject, class, city, area, timing, learning goal, and preferred tutor type so the team can suggest the next practical step.`,
+  ];
+};
 
 const renderLinks = (links = []) => {
   const combined = [...links, ...baseLinks, ...blogIndexLinks];
@@ -229,7 +251,7 @@ const renderLinks = (links = []) => {
   return [...unique.entries()]
     .map(
       ([href, label]) =>
-        `<a href="${escapeHtml(href)}" style="margin-right:14px;color:#198754;">${escapeHtml(label)}</a>`,
+        `<a href="${escapeHtml(href)}">${escapeHtml(label)}</a>`,
     )
     .join("\n          ");
 };
@@ -245,11 +267,18 @@ const renderFallback = (page) => {
         </section>`,
     )
     .join("");
+  const seoParagraphs = buildSeoParagraphs(page)
+    .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
+    .join("\n          ");
 
   return `<main style="font-family:Roboto,Arial,sans-serif;max-width:1120px;margin:0 auto;padding:40px 20px;line-height:1.7;color:#102019;">
         <h1>${escapeHtml(page.heading || page.title)}</h1>
         <p>${escapeHtml(page.intro || page.description)}</p>
         ${sections}
+        <section>
+          <h2>${escapeHtml(page.eyebrow || "A Plus Academy")} learning guide</h2>
+          ${seoParagraphs}
+        </section>
         <nav aria-label="A Plus Academy important pages">
           ${renderLinks(page.links)}
         </nav>

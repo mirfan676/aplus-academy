@@ -12,8 +12,8 @@ import {
 } from "@mui/material";
 import { useParams, useLocation } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
-import api from "../api";
 import useSEO from "../hooks/useSEO";
+import { fetchTeacherFromFirestore } from "../services/teacherData";
 
 const RECAPTCHA_SITE_KEY = "6LcTdf8rAAAAAHUIrbcURlFEKtL4-4siGvJgYpxl";
 
@@ -53,9 +53,8 @@ const HireForm = () => {
         return;
       }
       try {
-        const response = await api.get(`/tutors/${teacherId}`);
-        const data = response.data;
-        setTeacher(data);
+        const data = await fetchTeacherFromFirestore(teacherId);
+        setTeacher(data || { Name: teacherNameFromState || "Unknown Teacher" });
       } catch (err) {
         console.error("Error fetching teacher:", err);
         setTeacher({ Name: teacherNameFromState || "Unknown Teacher" });
