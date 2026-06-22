@@ -18,12 +18,13 @@ import ArticleIcon from "@mui/icons-material/Article";
 import TravelExploreIcon from "@mui/icons-material/TravelExplore";
 import LogoutIcon from "@mui/icons-material/Logout";
 import RateReviewIcon from "@mui/icons-material/RateReview";
+import CloudSyncIcon from "@mui/icons-material/CloudSync";
 import { Link as RouterLink } from "react-router-dom";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import L from "leaflet";
 import { collection, getCountFromServer } from "firebase/firestore";
-import api from "../../api";
 import { db } from "../../firebase";
+import { fetchTeachersForAdmin } from "../../services/appData";
 import { useAuth } from "../../contexts/useAuth";
 import "leaflet/dist/leaflet.css";
 
@@ -64,12 +65,12 @@ const AdminDashboard = () => {
       setError("");
 
       try {
-        const [tutorRes, blogRes] = await Promise.all([
-          api.get("/tutors/"),
+        const [tutorRecords, blogRes] = await Promise.all([
+          fetchTeachersForAdmin(),
           fetch("/blogs/index.json", { cache: "no-store" }).then((res) => (res.ok ? res.json() : [])),
         ]);
 
-        setTutors((tutorRes.data || []).map(normalizeTutor));
+        setTutors((tutorRecords || []).map(normalizeTutor));
         setBlogs(Array.isArray(blogRes) ? blogRes : []);
 
         if (db) {
@@ -142,7 +143,10 @@ const AdminDashboard = () => {
       <Container maxWidth="xl" sx={{ py: 4 }}>
         {error && <Alert severity="warning" sx={{ mb: 3 }}>{error}</Alert>}
 
-        <Stack direction={{ xs: "column", sm: "row" }} justifyContent="flex-end" sx={{ mb: 2 }}>
+        <Stack direction={{ xs: "column", sm: "row" }} justifyContent="flex-end" spacing={1.5} sx={{ mb: 2 }}>
+          <Button component={RouterLink} to="/admin/firestore" variant="outlined" startIcon={<CloudSyncIcon />} sx={{ fontWeight: 900 }}>
+            Firestore data
+          </Button>
           <Button component={RouterLink} to="/admin/pte-essays" variant="contained" startIcon={<RateReviewIcon />} sx={{ fontWeight: 900 }}>
             Manage PTE essays
           </Button>
@@ -179,7 +183,7 @@ const AdminDashboard = () => {
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
               <Box>
                 <Typography variant="h5" fontWeight={900}>Pakistan tutor map</Typography>
-                <Typography color="text.secondary">Based on verified tutor coordinates from your current tutor API.</Typography>
+                <Typography color="text.secondary">Based on verified tutor coordinates stored in Firestore.</Typography>
               </Box>
               <Chip label={`${mappedTutors.length} mapped`} color="primary" sx={{ color: "#fff", fontWeight: 800 }} />
             </Stack>

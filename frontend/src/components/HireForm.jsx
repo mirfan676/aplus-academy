@@ -10,14 +10,19 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
+import GoogleIcon from "@mui/icons-material/Google";
 import { useParams, useLocation } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import useSEO from "../hooks/useSEO";
+import { db } from "../firebase";
+import { useAuth } from "../contexts/useAuth";
 import { fetchTeacherFromFirestore } from "../services/teacherData";
 
 const RECAPTCHA_SITE_KEY = "6LcTdf8rAAAAAHUIrbcURlFEKtL4-4siGvJgYpxl";
 
 const HireForm = () => {
+  const { hasFirebaseConfig, signInWithGoogle, user } = useAuth();
   const formRef = useRef();
   const { id: urlId } = useParams();
   const location = useLocation();
@@ -63,6 +68,15 @@ const HireForm = () => {
     fetchTeacher();
   }, [teacherId, teacherNameFromState]);
 
+  useEffect(() => {
+    if (!user) return;
+    setFormData((current) => ({
+      ...current,
+      student_name: current.student_name || user.displayName || "",
+      student_email: current.student_email || user.email || "",
+    }));
+  }, [user]);
+
   const handleChange = (e) =>
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
@@ -98,14 +112,32 @@ const HireForm = () => {
     setLoading(true);
 
     try {
-      await emailjs.sendForm(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        formRef.current,
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-      );
+      if (!db || !user) throw new Error("Google sign-in is required before sending a tutor request.");
+      await addDoc(collection(db, "tutorRequests"), {
+        userId: user.uid,
+        studentName: formData.student_name,
+        studentEmail: user.email || formData.student_email,
+        studentPhone: formData.student_phone,
+        message: formData.message,
+        teacherId: String(teacherId || ""),
+        teacherName: teacher?.Name || teacher?.name || "Unknown Teacher",
+        status: "new",
+        source: "website",
+        createdAt: serverTimestamp(),
+      });
 
-      setSuccess("✅ Hire request sent successfully!");
+      try {
+        await emailjs.sendForm(
+          import.meta.env.VITE_EMAILJS_SERVICE_ID,
+          import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+          formRef.current,
+          import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+        );
+      } catch (notificationError) {
+        console.warn("Tutor request saved, but email notification failed:", notificationError);
+      }
+
+      setSuccess("Tutor request saved successfully.");
       setFormData({
         student_name: "",
         student_email: "",
@@ -115,12 +147,40 @@ const HireForm = () => {
       setCaptchaVerified(false);
       formRef.current.reset();
     } catch (err) {
-      console.error("EmailJS Error:", err);
-      setError("❌ Failed to send request. Try again later.");
+      console.error("Tutor request error:", err);
+      setError(err.message || "Failed to save request. Try again later.");
     } finally {
       setLoading(false);
     }
   };
+
+  if (!user) {
+    return (
+      <Container maxWidth="sm" sx={{ py: 6 }}>
+        <Card sx={{ p: 4, borderRadius: 1, textAlign: "center" }}>
+          <GoogleIcon sx={{ fontSize: 48, color: "#198754" }} />
+          <Typography component="h1" variant="h4" fontWeight={900} sx={{ mt: 1 }}>
+            Sign in to request a tutor
+          </Typography>
+          <Typography color="text.secondary" sx={{ my: 2 }}>
+            Google sign-in connects this request to your A Plus Academy account.
+          </Typography>
+          {!hasFirebaseConfig && <Alert severity="warning" sx={{ mb: 2 }}>Firebase is not configured.</Alert>}
+          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+          <Button variant="contained" startIcon={<GoogleIcon />} disabled={!hasFirebaseConfig} onClick={async () => {
+            setError("");
+            try {
+              await signInWithGoogle();
+            } catch (signInError) {
+              setError(signInError.message || "Google sign-in could not be started.");
+            }
+          }}>
+            Continue with Google
+          </Button>
+        </Card>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="sm" sx={{ py: 4 }}>

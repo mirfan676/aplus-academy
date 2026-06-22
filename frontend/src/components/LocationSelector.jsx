@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, TextField, MenuItem, CircularProgress } from "@mui/material";
-import api from "../api";
+import { fetchLocationsFromFirestore } from "../services/appData";
 
 export default function LocationSelector({ onChange }) {
   const [locations, setLocations] = useState({});
@@ -20,15 +20,15 @@ export default function LocationSelector({ onChange }) {
 
   const [loading, setLoading] = useState(true);
 
-  // Fetch locations from backend
+  // Fetch locations from Firestore.
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-       const res = await api.get("/locations");
+        const data = await fetchLocationsFromFirestore();
 
-        if (res.data) {
-          setLocations(res.data);
-          const provs = Object.keys(res.data);
+        if (data) {
+          setLocations(data);
+          const provs = Object.keys(data);
           setProvinces(provs);
 
           // Auto-select Punjab if it's the only one

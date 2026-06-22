@@ -3,7 +3,7 @@ import { db, hasFirebaseConfig } from "../firebase";
 
 export const hasTeacherDataConfig = hasFirebaseConfig && !!db;
 
-const teacherCollections = ["teachers", "tutors", "tutorSubmissions"];
+const teacherCollection = "teachers";
 
 const asArray = (value) => {
   if (Array.isArray(value)) return value.filter(Boolean);
@@ -84,12 +84,8 @@ const fetchTeachersFromCollection = async (collectionName) => {
       const snapshot = await getDocs(approvedQuery);
       if (!snapshot.empty) snapshots.push(snapshot);
     } catch {
-      // Collection may not have this field/index shape. Fall back to the plain collection read.
+      // A legacy field may not exist. Continue with the remaining approved-only query shapes.
     }
-  }
-
-  if (!snapshots.length) {
-    snapshots.push(await getDocs(query(baseCollection, limit(300))));
   }
 
   const teachersById = new Map();
@@ -108,32 +104,20 @@ export const fetchTeachersFromFirestore = async () => {
     throw new Error("Firebase is not configured.");
   }
 
-  for (const collectionName of teacherCollections) {
-    try {
-      const teachers = await fetchTeachersFromCollection(collectionName);
-      if (teachers.length) return teachers;
-    } catch {
-      // Try the next likely collection name.
-    }
-  }
-
-  return [];
+  return fetchTeachersFromCollection(teacherCollection);
 };
 
 export const fetchTeacherFromFirestore = async (id) => {
   if (!hasTeacherDataConfig || !id) return null;
 
-  for (const collectionName of teacherCollections) {
-    try {
-      const snapshot = await getDoc(doc(db, collectionName, String(id)));
-      if (snapshot.exists()) {
-        return normalizeTeacher({ id: snapshot.id, ...snapshot.data() }, 0, collectionName);
-      }
-    } catch {
-      // Try the next likely collection name.
+  try {
+    const snapshot = await getDoc(doc(db, teacherCollection, String(id)));
+    if (snapshot.exists()) {
+      const teacher = normalizeTeacher({ id: snapshot.id, ...snapshot.data() }, 0, teacherCollection);
+      return teacher.verified ? teacher : null;
     }
+  } catch {
+    return null;
   }
-
-  const teachers = await fetchTeachersFromFirestore();
-  return teachers.find((teacher) => String(teacher.id) === String(id)) || null;
+  return null;
 };

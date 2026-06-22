@@ -1,6 +1,6 @@
 // src/pages/Jobs.jsx
 import { useEffect, useState, useRef, useCallback } from "react";
-import { fetchJobs } from "../api";
+import { fetchJobsFromFirestore } from "../services/appData";
 import JobCard from "../components/JobCard";
 import JobFilters from "../components/JobFilters";
 import { Container, Box, Typography, Chip, Stack } from "@mui/material";
@@ -33,7 +33,7 @@ export default function Jobs() {
   // Fetch jobs
   useEffect(() => {
     setLoading(true);
-    fetchJobs()
+    fetchJobsFromFirestore()
       .then((res) => {
         const data = res?.jobs ?? res ?? [];
         setJobs(Array.isArray(data) ? data : []);

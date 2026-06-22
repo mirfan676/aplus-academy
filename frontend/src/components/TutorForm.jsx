@@ -15,13 +15,12 @@ import {
   Link as MuiLink,
   Autocomplete,
 } from "@mui/material";
-import api from "../api";
+import GoogleIcon from "@mui/icons-material/Google";
 import useSEO from "../hooks/useSEO";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
-import { db } from "../firebase";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { db, storage } from "../firebase";
 import { useAuth } from "../contexts/useAuth";
-
-const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
 // ----------------------------------------------------------
 // QUALIFICATIONS
@@ -120,7 +119,7 @@ const qualificationSuggestions = {
 };
 
 export default function TutorRegistration() {
-  const { user } = useAuth();
+  const { hasFirebaseConfig, signInWithGoogle, user } = useAuth();
 
   useSEO({
     title: "Register as a Tutor - A Plus Home Tutors Pakistan",
@@ -149,18 +148,10 @@ export default function TutorRegistration() {
   const [imageError, setImageError] = useState(false);
   const [locationBlocked, setLocationBlocked] = useState(false);
 
-  // ----------------------------------------------------------
-  // LOAD reCAPTCHA
-  // ----------------------------------------------------------
   useEffect(() => {
-    if (!window.grecaptcha) {
-      const script = document.createElement("script");
-      script.src = `https://www.google.com/recaptcha/enterprise.js?render=${RECAPTCHA_SITE_KEY}`;
-      script.async = true;
-      script.defer = true;
-      document.body.appendChild(script);
-    }
-  }, []);
+    if (!user) return;
+    setFormData((current) => ({ ...current, name: current.name || user.displayName || "" }));
+  }, [user]);
 
   // ----------------------------------------------------------
   // GEOLOCATION WITH IP FALLBACK
@@ -242,9 +233,10 @@ export default function TutorRegistration() {
     setMessage("");
 
     if (!formData.agree) return setMessage("⚠️ Please agree to Terms.");
-    if (!formData.image) {
+    if (!user || !db || !storage) return setMessage("Please sign in with Google before registering.");
+    if (!formData.image && !user.photoURL) {
       setImageError(true);
-      return setMessage("⚠️ Please upload a profile picture.");
+      return setMessage("Please upload a profile picture or add one to your Google account.");
     }
     if (higherEducation.includes(formData.qualification) && !selectedHigherSubject)
       return setMessage("⚠️ Please select your subject for higher qualification.");
@@ -252,63 +244,64 @@ export default function TutorRegistration() {
     setLoading(true);
 
     try {
-      const token = await new Promise((resolve) => {
-        window.grecaptcha?.enterprise?.ready(() => {
-          window.grecaptcha.enterprise
-            .execute(RECAPTCHA_SITE_KEY, { action: "tutor_register" })
-            .then(resolve);
-        });
-      });
-
-      const submissionData = new FormData();
-      submissionData.append("subject", selectedHigherSubject || "");
-      submissionData.append("major_subjects", majorSubjects.join(","));
-      Object.entries(formData).forEach(([k, v]) => {
-        if (k !== "image") submissionData.append(k, v ?? "");
-      });
-      submissionData.append("image", formData.image);
-      submissionData.append("lat", coords.lat ?? "");
-      submissionData.append("lng", coords.lng ?? "");
-      submissionData.append("recaptcha_token", token);
-
-      const res = await api.post("/tutors/register", submissionData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      if (res.status === 200) {
-        if (db && user) {
-          await setDoc(
-            doc(db, "users", user.uid),
-            {
-              uid: user.uid,
-              name: formData.name || user.displayName || "",
-              email: user.email || "",
-              role: "teacher",
-              updatedAt: serverTimestamp(),
-            },
-            { merge: true },
-          );
-        }
-        setMessage("✅ Tutor registered successfully!");
-        setFormData({
-          name: "",
-          qualification: "",
-          subject: "",
-          major_subjects: "",
-          experience: "",
-          phone: "",
-          bio: "",
-          image: null,
-          agree: false,
-        });
-        setMajorSubjects([]);
-        setSelectedHigherSubject("");
-      } else {
-        setMessage("⚠️ Failed to submit. Try again.");
+      let photoURL = user.photoURL || "";
+      if (formData.image) {
+        if (formData.image.size > 5 * 1024 * 1024) throw new Error("Profile image must be smaller than 5 MB.");
+        const extension = formData.image.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+        const imageRef = ref(storage, `teacher-applications/${user.uid}/profile.${extension}`);
+        await uploadBytes(imageRef, formData.image, { contentType: formData.image.type || "image/jpeg" });
+        photoURL = await getDownloadURL(imageRef);
       }
+
+      const primarySubject = selectedHigherSubject || formData.subject || majorSubjects[0] || "Teaching";
+      const subjects = [...new Set([primarySubject, ...majorSubjects].filter(Boolean))];
+      await setDoc(
+        doc(db, "teacherApplications", user.uid),
+        {
+          uid: user.uid,
+          email: user.email || "",
+          name: formData.name || user.displayName || "",
+          displayName: formData.name || user.displayName || "",
+          qualification: formData.qualification,
+          subject: primarySubject,
+          subjects,
+          majorSubjects,
+          experience: Number(formData.experience) || 0,
+          phone: formData.phone,
+          bio: formData.bio,
+          photoURL,
+          thumbnail: photoURL,
+          latitude: Number(coords.lat) || null,
+          longitude: Number(coords.lng) || null,
+          verified: false,
+          status: "pending",
+          source: "firestore-registration",
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
+      await setDoc(
+        doc(db, "users", user.uid),
+        {
+          uid: user.uid,
+          name: formData.name || user.displayName || "",
+          email: user.email || "",
+          photoURL: user.photoURL || "",
+          role: "teacher",
+          applicationStatus: "pending",
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
+
+      setMessage("Tutor application saved to Firebase for review.");
+      setFormData((current) => ({ ...current, image: null, agree: false }));
+      setMajorSubjects([]);
+      setSelectedHigherSubject("");
     } catch (err) {
       console.error(err);
-      setMessage("❌ Error submitting form. Server might be down.");
+      setMessage(err.message || "Tutor application could not be saved to Firebase.");
     }
     setLoading(false);
   };
@@ -316,6 +309,41 @@ export default function TutorRegistration() {
   // ----------------------------------------------------------
   // RENDER
   // ----------------------------------------------------------
+  if (!user) {
+    return (
+      <Box sx={{ bgcolor: "#f9f9f9", minHeight: "70vh", display: "grid", placeItems: "center", px: 2, py: 6 }}>
+        <Paper elevation={0} sx={{ maxWidth: 620, p: { xs: 3, md: 5 }, border: "1px solid #dce8f1", borderRadius: 1, textAlign: "center" }}>
+          <GoogleIcon sx={{ fontSize: 48, color: "#198754" }} />
+          <Typography component="h1" variant="h4" fontWeight={900} sx={{ mt: 1 }}>
+            Sign in before registering as a tutor
+          </Typography>
+          <Typography color="text.secondary" sx={{ my: 2, lineHeight: 1.7 }}>
+            Your Google account verifies your email and connects the application to your A Plus Academy profile.
+          </Typography>
+          {!hasFirebaseConfig && <Alert severity="warning" sx={{ mb: 2 }}>Firebase web app variables are not configured.</Alert>}
+          {message && <Alert severity="warning" sx={{ mb: 2 }}>{message}</Alert>}
+          <Button
+            variant="contained"
+            size="large"
+            startIcon={<GoogleIcon />}
+            disabled={!hasFirebaseConfig}
+            onClick={async () => {
+              setMessage("");
+              try {
+                await signInWithGoogle();
+              } catch (error) {
+                setMessage(error.message || "Google sign-in could not be started.");
+              }
+            }}
+            sx={{ fontWeight: 900 }}
+          >
+            Continue with Google
+          </Button>
+        </Paper>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ bgcolor: "#f9f9f9", minHeight: "100vh", py: 6 }}>
       <Box
@@ -349,9 +377,12 @@ export default function TutorRegistration() {
                   Upload Profile Picture
                   <input type="file" hidden accept="image/*" name="image" onChange={handleChange} />
                 </Button>
-                {formData.image && (
-                  <Avatar src={URL.createObjectURL(formData.image)} sx={{ width: 100, height: 100, mx: "auto", mt: 2 }} />
-                )}
+                <Avatar
+                  src={formData.image ? URL.createObjectURL(formData.image) : user.photoURL || undefined}
+                  sx={{ width: 100, height: 100, mx: "auto", mt: 2 }}
+                >
+                  {(formData.name || user.displayName || "T")[0]}
+                </Avatar>
               </Box>
 
               {/* NAME */}

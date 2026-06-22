@@ -29,6 +29,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminRoute from "./pages/admin/AdminRoute";
 import PteEssayAdmin from "./pages/admin/PteEssayAdmin";
+import FirestoreMigrationAdmin from "./pages/admin/FirestoreMigrationAdmin";
 import { AuthProvider } from "./contexts/AuthContext";
 import theme from "./theme";
 import Header from "./components/Header";
@@ -136,6 +137,14 @@ function AppShell() {
           element={
             <AdminRoute>
               <PteEssayAdmin />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/firestore"
+          element={
+            <AdminRoute>
+              <FirestoreMigrationAdmin />
             </AdminRoute>
           }
         />
