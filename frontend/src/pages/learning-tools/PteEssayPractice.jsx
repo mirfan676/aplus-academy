@@ -13,6 +13,7 @@ import {
   FormControlLabel,
   IconButton,
   InputLabel,
+  LinearProgress,
   MenuItem,
   Paper,
   Select,
@@ -43,9 +44,17 @@ import {
   submitPteEssayResponse,
 } from "../../services/pteEssayData";
 import { getWordCount, scorePteEssay } from "../../services/pteEssayScoring";
+import { requestAiPteScore } from "../../services/pteAiScoring";
 
 const siteUrl = "https://www.aplusacademy.pk";
 const practiceSeconds = 20 * 60;
+const analysisSteps = [
+  "Reading your argument and checking relevance",
+  "Analysing grammar and sentence control",
+  "Reviewing vocabulary and academic tone",
+  "Comparing structure, coherence, and development",
+  "Preparing corrections and your score",
+];
 
 const structureTemplates = [
   `Introduction\nThe question of [topic] has attracted considerable debate. While some people argue that [view one], others believe [view two]. This essay will examine both perspectives before explaining why [your position].\n\nBody paragraph 1\nThe first important point is that [main reason one]. This is significant because [explanation]. For example, [specific example]. Therefore, [link the example back to the prompt].\n\nBody paragraph 2\nAnother relevant consideration is [main reason two or opposing view]. Although [brief concession], [your response]. For instance, [specific example or consequence]. Consequently, [result].\n\nConclusion\nIn conclusion, both sides present valid concerns; however, [restate your position]. A balanced approach should [recommendation or final implication].`,
@@ -80,6 +89,9 @@ const PteEssayPractice = () => {
   const [submittedResponse, setSubmittedResponse] = useState(null);
   const [submitError, setSubmitError] = useState("");
   const [signInError, setSignInError] = useState("");
+  const [analysisStep, setAnalysisStep] = useState(-1);
+  const [analysisNotice, setAnalysisNotice] = useState("");
+  const [pasteNotice, setPasteNotice] = useState("");
 
   useSEO({
     title: "Free PTE Essay Practice and Writing Scorer | A Plus Academy",
@@ -163,6 +175,9 @@ const PteEssayPractice = () => {
     setShareConsent(false);
     setSecondsLeft(practiceSeconds);
     setTimerRunning(false);
+    setAnalysisStep(-1);
+    setAnalysisNotice("");
+    setPasteNotice("");
     if (user?.uid) localStorage.removeItem(`aplus-pte-essay-draft-${user.uid}`);
   };
 
@@ -184,10 +199,26 @@ const PteEssayPractice = () => {
     if (!user || !selectedEssay) return setSubmitError("Google sign-in and an essay prompt are required.");
     if (!shareConsent) return setSubmitError("Confirm publication of your name, profile photo, score, and essay before submitting.");
 
-    const result = scorePteEssay(draft, benchmarkTexts);
-    setScore(result);
     setSubmitting(true);
+    setAnalysisStep(0);
+    setAnalysisNotice("");
+    const stageTimer = window.setInterval(() => setAnalysisStep((current) => Math.min(current + 1, analysisSteps.length - 1)), 850);
     try {
+      const localResult = { ...scorePteEssay(draft, benchmarkTexts), essayText: draft };
+      const minimumAnalysisTime = new Promise((resolve) => window.setTimeout(resolve, 3600));
+      let result = localResult;
+      try {
+        [result] = await Promise.all([
+          requestAiPteScore({ user, essay: selectedEssay, text: draft, localResult }),
+          minimumAnalysisTime,
+        ]);
+        result.essayText = draft;
+      } catch (aiError) {
+        console.warn("AI scoring unavailable; adaptive scoring used.", aiError);
+        await minimumAnalysisTime;
+        setAnalysisNotice("AI scoring is not configured for this deployment, so the adaptive educational scorer was used.");
+      }
+      setScore(result);
       const saved = await submitPteEssayResponse({ user, essay: selectedEssay, text: draft, result });
       setSubmittedResponse(saved);
       setResponses((current) => [saved, ...current.filter((item) => item.id !== saved.id)].sort((a, b) => b.score - a.score));
@@ -196,8 +227,15 @@ const PteEssayPractice = () => {
       console.error(error);
       setSubmitError(error.message || "Your essay could not be published. Check Firestore access and try again.");
     } finally {
+      window.clearInterval(stageTimer);
+      setAnalysisStep(-1);
       setSubmitting(false);
     }
+  };
+
+  const blockPaste = (event) => {
+    event.preventDefault();
+    setPasteNotice("Pasting is disabled in timed practice. Type your response to build genuine exam fluency.");
   };
 
   const randomizeStructure = () => {
@@ -336,9 +374,17 @@ const PteEssayPractice = () => {
                         minRows={16}
                         fullWidth
                         placeholder="Write your essay here..."
-                        inputProps={{ "aria-label": "PTE essay draft" }}
+                        inputProps={{
+                          "aria-label": "PTE essay draft",
+                          onPaste: blockPaste,
+                          onDrop: blockPaste,
+                          onKeyDown: (event) => {
+                            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "v") blockPaste(event);
+                          },
+                        }}
                         sx={{ "& .MuiInputBase-root": { alignItems: "flex-start", bgcolor: "#fff", lineHeight: 1.8 } }}
                       />
+                      {pasteNotice && <Alert severity="info" onClose={() => setPasteNotice("")}>{pasteNotice}</Alert>}
                       <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems={{ xs: "stretch", sm: "center" }} gap={2}>
                         <Stack direction="row" spacing={1} flexWrap="wrap">
                           <Chip label={`${wordCount} words`} color={wordCount >= 250 && wordCount <= 300 ? "success" : "default"} sx={{ borderRadius: 1, fontWeight: 800 }} />
@@ -357,6 +403,7 @@ const PteEssayPractice = () => {
                           />
                           {wordCount > 0 && wordCount < 120 && <Alert severity="info" sx={{ mt: 1.5 }}>Write at least 120 words before submitting. The ideal target is 250-300.</Alert>}
                           {submitError && <Alert severity="warning" sx={{ mt: 1.5 }}>{submitError}</Alert>}
+                          {submitting && analysisStep >= 0 && <Box sx={{ mt: 2 }}><Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}><AutoAwesomeIcon color="primary" /><Typography fontWeight={800}>{analysisSteps[analysisStep]}</Typography></Stack><LinearProgress variant="determinate" value={((analysisStep + 1) / analysisSteps.length) * 100} /></Box>}
                           <Button variant="contained" size="large" startIcon={submitting ? <CircularProgress size={18} color="inherit" /> : <SendIcon />} disabled={submitting || wordCount < 120 || !shareConsent} onClick={submitEssay} sx={{ mt: 2, fontWeight: 900 }}>
                             Submit essay and stop timer
                           </Button>
@@ -367,6 +414,7 @@ const PteEssayPractice = () => {
                   </Box>
 
                   {submittedResponse && <Alert severity="success">Essay submitted. The timer stopped at {formatTime(secondsLeft)}, and your scored response is now included below.</Alert>}
+                  {analysisNotice && <Alert severity="info">{analysisNotice}</Alert>}
                   {score && <PteCoachResult result={score} />}
                   {responseError && <Alert severity="warning">{responseError}</Alert>}
                   {responsesLoading ? <CircularProgress /> : <PteResponseList responses={responses} />}

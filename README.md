@@ -50,3 +50,11 @@ images when `OPENAI_API_KEY` is available and falls back to credited Pexels imag
 otherwise. A GitHub Actions workflow also runs this daily and pushes a new post
 when sources are available.
 aplus academy developer notes
+
+## PTE AI scoring
+
+The essay scorer uses the authenticated Vercel endpoint at `/api/pte-score`.
+Set `OPENAI_API_KEY` as a server-only Production and Preview environment variable
+in Vercel. `OPENAI_MODEL` is optional and defaults to `gpt-5-mini`. When the AI
+service is unavailable, the browser uses the bundled adaptive scorer and labels
+the result accordingly.

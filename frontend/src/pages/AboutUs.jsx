@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import useSEO from "../hooks/useSEO";
+import ExpertTeamSection from "../components/sections/ExpertTeamSection";
 
 const AboutUs = () => {
   useSEO({
@@ -110,6 +111,10 @@ const AboutUs = () => {
         Our Quran classes include Tajweed, daily duas, prayer guidance, and moral
         training — available online or at home.
       </Typography>
+
+      <Divider sx={{ my: 4 }} />
+
+      <ExpertTeamSection />
 
       <Divider sx={{ my: 4 }} />
 

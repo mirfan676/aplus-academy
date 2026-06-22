@@ -201,9 +201,26 @@ export const scorePteEssay = (text, benchmarkTexts = []) => {
       : "It demonstrates most high-scoring writing features, although this remains an educational estimate rather than an official Pearson score."
   } Your response contains ${analysis.wordCount} words and ${analysis.complexSentenceCount} detected complex sentence${analysis.complexSentenceCount === 1 ? "" : "s"}. The current comparison benchmark is based on ${benchmark.responseCount || "the bundled"} strong sample${benchmark.responseCount === 1 ? "" : "s"}.`;
 
+  const annotations = [];
+  const annotationPatterns = [
+    { pattern: /\b(can't)\b/i, type: "replace", suggestion: "cannot", explanation: "Use the full form in formal academic writing." },
+    { pattern: /\b(don't)\b/i, type: "replace", suggestion: "do not", explanation: "Contractions weaken the requested formal tone." },
+    { pattern: /\b(a lot)\b/i, type: "replace", suggestion: "considerably", explanation: "Choose more precise academic vocabulary." },
+    { pattern: /\b(kids)\b/i, type: "replace", suggestion: "children", explanation: "This word is too informal for an academic essay." },
+    { pattern: /\b(very)\b/i, type: "delete", suggestion: "", explanation: "Remove weak intensifiers and use a more precise adjective." },
+  ];
+  annotationPatterns.forEach((item) => {
+    const match = text.match(item.pattern);
+    if (match) annotations.push({ original: match[0], type: item.type, suggestion: item.suggestion, explanation: item.explanation });
+  });
+
   return {
     total,
     maximum: 90,
+    mode: "adaptive",
+    annotations,
+    vocabularyRange: Math.round(clamp(analysis.uniqueRatio * 120, 0, 100)),
+    argumentQuality: Math.round(clamp((development + organization) / 30 * 100, 0, 100)),
     analysis,
     benchmark,
     narrative,

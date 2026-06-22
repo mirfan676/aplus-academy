@@ -19,6 +19,7 @@ import TravelExploreIcon from "@mui/icons-material/TravelExplore";
 import LogoutIcon from "@mui/icons-material/Logout";
 import RateReviewIcon from "@mui/icons-material/RateReview";
 import CloudSyncIcon from "@mui/icons-material/CloudSync";
+import EditNoteIcon from "@mui/icons-material/EditNote";
 import { Link as RouterLink } from "react-router-dom";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import L from "leaflet";
@@ -144,6 +145,9 @@ const AdminDashboard = () => {
         {error && <Alert severity="warning" sx={{ mb: 3 }}>{error}</Alert>}
 
         <Stack direction={{ xs: "column", sm: "row" }} justifyContent="flex-end" spacing={1.5} sx={{ mb: 2 }}>
+          <Button component={RouterLink} to="/admin/manage" variant="outlined" startIcon={<EditNoteIcon />} sx={{ fontWeight: 900 }}>
+            Manage jobs, teachers and team
+          </Button>
           <Button component={RouterLink} to="/admin/firestore" variant="outlined" startIcon={<CloudSyncIcon />} sx={{ fontWeight: 900 }}>
             Firestore data
           </Button>
