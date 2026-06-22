@@ -4,7 +4,6 @@ import {
   getRedirectResult,
   onAuthStateChanged,
   setPersistence,
-  signInWithPopup,
   signInWithRedirect,
   signOut,
 } from "firebase/auth";
@@ -66,24 +65,7 @@ export const AuthProvider = ({ children }) => {
         if (!auth) throw new Error("Firebase is not configured.");
         setAuthError("");
         await setPersistence(auth, browserLocalPersistence);
-
-        try {
-          return await signInWithPopup(auth, googleProvider);
-        } catch (error) {
-          const redirectFallbackCodes = [
-            "auth/popup-blocked",
-            "auth/popup-closed-by-user",
-            "auth/cancelled-popup-request",
-            "auth/operation-not-supported-in-this-environment",
-          ];
-
-          if (redirectFallbackCodes.includes(error?.code)) {
-            return signInWithRedirect(auth, googleProvider);
-          }
-
-          setAuthError(error?.message || "Google sign-in could not be started.");
-          throw error;
-        }
+        return signInWithRedirect(auth, googleProvider);
       },
       logout: () => (auth ? signOut(auth) : Promise.resolve()),
     }),
