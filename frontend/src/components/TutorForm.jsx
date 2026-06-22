@@ -233,8 +233,8 @@ export default function TutorRegistration() {
     setMessage("");
 
     if (!formData.agree) return setMessage("⚠️ Please agree to Terms.");
-    if (!user || !db || !storage) return setMessage("Please sign in with Google before registering.");
-    if (!formData.image && !user.photoURL) {
+    if (!user || !db) return setMessage("Please sign in with Google before registering.");
+    if (storage && !formData.image && !user.photoURL) {
       setImageError(true);
       return setMessage("Please upload a profile picture or add one to your Google account.");
     }
@@ -245,7 +245,7 @@ export default function TutorRegistration() {
 
     try {
       let photoURL = user.photoURL || "";
-      if (formData.image) {
+      if (formData.image && storage) {
         if (formData.image.size > 5 * 1024 * 1024) throw new Error("Profile image must be smaller than 5 MB.");
         const extension = formData.image.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
         const imageRef = ref(storage, `teacher-applications/${user.uid}/profile.${extension}`);
@@ -373,10 +373,12 @@ export default function TutorRegistration() {
             <Box component="form" onSubmit={handleSubmit}>
               {/* IMAGE UPLOAD */}
               <Box textAlign="center" mb={2}>
-                <Button variant="contained" component="label" color={imageError ? "error" : "primary"}>
-                  Upload Profile Picture
-                  <input type="file" hidden accept="image/*" name="image" onChange={handleChange} />
-                </Button>
+                {storage && (
+                  <Button variant="contained" component="label" color={imageError ? "error" : "primary"}>
+                    Upload Profile Picture
+                    <input type="file" hidden accept="image/*" name="image" onChange={handleChange} />
+                  </Button>
+                )}
                 <Avatar
                   src={formData.image ? URL.createObjectURL(formData.image) : user.photoURL || undefined}
                   sx={{ width: 100, height: 100, mx: "auto", mt: 2 }}

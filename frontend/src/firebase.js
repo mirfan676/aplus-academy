@@ -23,10 +23,11 @@ export const hasFirebaseConfig = [
 ].every(Boolean);
 
 const app = hasFirebaseConfig ? initializeApp(firebaseConfig) : null;
+export const hasFirebaseStorage = hasFirebaseConfig && import.meta.env.VITE_FIREBASE_STORAGE_ENABLED === "true";
 
 export const auth = app ? getAuth(app) : null;
 export const db = app ? getFirestore(app) : null;
-export const storage = app ? getStorage(app) : null;
+export const storage = app && hasFirebaseStorage ? getStorage(app) : null;
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: "select_account" });
 

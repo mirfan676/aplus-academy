@@ -47,7 +47,7 @@ export const getFirestoreMigrationCounts = async () => {
 };
 
 export const migrateLegacyData = async (onProgress = () => {}) => {
-  if (!db || !storage) throw new Error("Firebase is not configured.");
+  if (!db) throw new Error("Firebase is not configured.");
   const tutorResponse = await fetch(`${legacyApi}/tutors/`);
   if (!tutorResponse.ok) throw new Error("Legacy teacher API could not be loaded.");
   const tutors = await tutorResponse.json();
@@ -57,12 +57,14 @@ export const migrateLegacyData = async (onProgress = () => {}) => {
     const legacy = tutors[index];
     const teacherId = `legacy-${String(index).padStart(3, "0")}`;
     onProgress({ stage: "teachers", current: index + 1, total: tutors.length, label: legacy.Name || "Tutor" });
-    let thumbnail = "";
-    try {
-      thumbnail = await migrateThumbnail(legacy.Thumbnail, teacherId);
-    } catch (error) {
-      console.warn(`Image migration failed for ${teacherId}:`, error);
-      imageFailures += 1;
+    let thumbnail = legacy.Thumbnail || "";
+    if (storage && thumbnail) {
+      try {
+        thumbnail = await migrateThumbnail(thumbnail, teacherId);
+      } catch (error) {
+        console.warn(`Image migration failed for ${teacherId}:`, error);
+        imageFailures += 1;
+      }
     }
 
     const subjects = [...new Set([
