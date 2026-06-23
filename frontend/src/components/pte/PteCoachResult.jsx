@@ -5,14 +5,23 @@ import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 
 const PteCoachResult = ({ result }) => {
   if (!result) return null;
+  const analysis = {
+    wordCount: 0,
+    advancedTerms: [],
+    complexSentenceCount: 0,
+    paragraphCount: 0,
+    contractionCount: 0,
+    informalCount: 0,
+    ...(result.analysis || {}),
+  };
 
   const checks = [
-    { label: "270-290 words (ideal PTE range)", passed: result.analysis.wordCount >= 270 && result.analysis.wordCount <= 290 },
-    { label: "Advanced vocabulary throughout", passed: result.analysis.advancedTerms.length >= 6 },
-    { label: "At least 3 complex sentence structures", passed: result.analysis.complexSentenceCount >= 3 },
-    { label: "Clear 4-5 paragraph organization", passed: result.analysis.paragraphCount >= 4 && result.analysis.paragraphCount <= 5 },
-    { label: "No contractions", passed: result.analysis.contractionCount === 0 },
-    { label: "Formal academic tone", passed: result.analysis.informalCount === 0 },
+    { label: "270-290 words (ideal PTE range)", passed: analysis.wordCount >= 270 && analysis.wordCount <= 290 },
+    { label: "Advanced vocabulary throughout", passed: analysis.advancedTerms.length >= 6 },
+    { label: "At least 3 complex sentence structures", passed: analysis.complexSentenceCount >= 3 },
+    { label: "Clear 4-5 paragraph organization", passed: analysis.paragraphCount >= 4 && analysis.paragraphCount <= 5 },
+    { label: "No contractions", passed: analysis.contractionCount === 0 },
+    { label: "Formal academic tone", passed: analysis.informalCount === 0 },
   ];
 
   const annotationColors = { replace: "#fee2e2", delete: "#dbeafe", insert: "#ede9fe" };
@@ -31,7 +40,7 @@ const PteCoachResult = ({ result }) => {
     <Paper elevation={0} sx={{ p: { xs: 2.5, md: 3.5 }, border: "1px solid #cfe4d5", borderRadius: 1, bgcolor: "#fbfefc" }}>
       <Stack direction={{ xs: "column", md: "row" }} spacing={4}>
         <Box sx={{ minWidth: { md: 220 } }}>
-          <Chip icon={<AutoAwesomeIcon />} label={result.mode === "ai" ? "AI essay coach" : "Adaptive essay coach"} sx={{ borderRadius: 1, bgcolor: "#102019", color: "#fff", fontWeight: 900, "& .MuiChip-icon": { color: "#29b554" } }} />
+          <Chip icon={<AutoAwesomeIcon />} label={result.mode === "ai" ? "AI PTE coach" : "Adaptive PTE coach"} sx={{ borderRadius: 1, bgcolor: "#102019", color: "#fff", fontWeight: 900, "& .MuiChip-icon": { color: "#29b554" } }} />
           <Typography variant="h2" fontWeight={900} color="primary.main" sx={{ mt: 1.5 }}>
             {result.total}<Typography component="span" variant="h5" color="text.secondary">/{result.maximum}</Typography>
           </Typography>
@@ -72,11 +81,11 @@ const PteCoachResult = ({ result }) => {
           <Stack component="ul" spacing={1} sx={{ pl: 2.5, my: 0 }}>
             {result.guidance.map((item) => <Typography component="li" key={item}>{item}</Typography>)}
           </Stack>
-          {result.analysis.advancedTerms.length > 0 && (
+          {analysis.advancedTerms.length > 0 && (
             <Box sx={{ mt: 2.5 }}>
               <Typography fontWeight={900} sx={{ mb: 1 }}>Advanced vocabulary detected</Typography>
               <Stack direction="row" gap={0.8} flexWrap="wrap">
-                {result.analysis.advancedTerms.slice(0, 12).map((term) => <Chip key={term} label={term} size="small" sx={{ borderRadius: 1 }} />)}
+                {analysis.advancedTerms.slice(0, 12).map((term) => <Chip key={term} label={term} size="small" sx={{ borderRadius: 1 }} />)}
               </Stack>
             </Box>
           )}

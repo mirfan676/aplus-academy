@@ -63,7 +63,7 @@ const tools = [
     description:
       "Study original sample essays, write under a 20-minute timer, receive instant practice feedback, and build an editable response structure.",
     icon: RateReviewIcon,
-    to: "/learning-tools/pte-essay-practice",
+    to: "/pte/write-essay",
     button: "Open PTE essay practice",
     accent: "#c2410c",
     bg: "#fff3ed",

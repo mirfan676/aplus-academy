@@ -87,7 +87,7 @@ const AccountDashboard = () => {
             <Typography color="text.secondary" sx={{ my: 2 }}>
               Write timed essays, receive adaptive feedback, and compare your scored responses.
             </Typography>
-            <Button component={RouterLink} to="/learning-tools/pte-essay-practice" variant="contained">
+            <Button component={RouterLink} to="/pte/write-essay" variant="contained">
               Practise writing
             </Button>
           </Paper>

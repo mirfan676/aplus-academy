@@ -6,6 +6,8 @@ import {
   Box,
   Button,
   IconButton,
+  Menu,
+  MenuItem,
   Drawer,
   List,
   ListItem,
@@ -15,12 +17,14 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import TranslateIcon from "@mui/icons-material/Translate";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 
 const Header = () => {
   const isMobile = useMediaQuery("(max-width:900px)");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [careerAnchor, setCareerAnchor] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const [language, setLanguage] = useState(() =>
     typeof document !== "undefined" && document.cookie.includes("googtrans=/en/ur")
@@ -35,9 +39,19 @@ const Header = () => {
     { label: "Tutors", path: "/teachers" },
     { label: "Jobs", path: "/jobs" },
     { label: "Blog", path: "/blog" },
-    { label: "Learning Tools", path: "/learning-tools" },
+    { label: "Career Roadmap", path: "/career-roadmap", dropdown: true },
     { label: "Account", path: "/account" },
     { label: "About Us", path: "/about" },
+  ];
+
+  const careerMenuItems = [
+    { label: "All Career Roadmaps", path: "/career-roadmap" },
+    { label: "Study Abroad & PTE", path: "/career-roadmap#study-abroad-pte" },
+    { label: "After Graduation", path: "/career-roadmap#after-graduation" },
+    { label: "Healthcare Abroad", path: "/career-roadmap#healthcare-abroad" },
+    { label: "IT & Engineering Abroad", path: "/career-roadmap#it-engineering-abroad" },
+    { label: "After Matric", path: "/career-roadmap#after-matric" },
+    { label: "PTE Practice", path: "/pte" },
   ];
 
   // Sticky shadow animation on scroll
@@ -165,6 +179,78 @@ const Header = () => {
                 const isActive =
                   location.pathname === item.path ||
                   (item.path !== "/" && location.pathname.startsWith(`${item.path}/`));
+                if (item.dropdown) {
+                  return (
+                    <Box key={item.path}>
+                      <Button
+                        onClick={(event) => setCareerAnchor(event.currentTarget)}
+                        color="primary"
+                        endIcon={<KeyboardArrowDownIcon />}
+                        sx={{
+                          textTransform: "none",
+                          fontWeight: 700,
+                          fontSize: "16px",
+                          px: 1.8,
+                          py: 0.7,
+                          borderRadius: "0px",
+                          position: "relative",
+                          transition: "all 0.3s ease",
+                          ...(isActive && activeStyles),
+                          "&:hover": {
+                            transform: "translateY(-2px) scale(1.04)",
+                            background: "rgba(255,255,255,0.2)",
+                            backdropFilter: "blur(10px)",
+                            borderRadius: "0px",
+                          },
+                          "&::after": {
+                            content: '""',
+                            position: "absolute",
+                            left: 0,
+                            bottom: "-3px",
+                            width: isActive ? "100%" : "0%",
+                            height: "2px",
+                            background: "linear-gradient(90deg, #0f766e, #f59e0b, #be123c)",
+                            transition: "width 0.3s ease",
+                          },
+                          "&:hover::after": { width: "100%" },
+                        }}
+                      >
+                        {item.label}
+                      </Button>
+                      <Menu
+                        anchorEl={careerAnchor}
+                        open={Boolean(careerAnchor)}
+                        onClose={() => setCareerAnchor(null)}
+                        MenuListProps={{ "aria-label": "Career Roadmap menu" }}
+                        PaperProps={{
+                          sx: {
+                            mt: 1,
+                            minWidth: 260,
+                            borderRadius: 1,
+                            border: "1px solid #dcebe2",
+                            boxShadow: "0 18px 42px rgba(16,32,25,0.14)",
+                          },
+                        }}
+                      >
+                        {careerMenuItems.map((careerItem) => (
+                          <MenuItem
+                            key={careerItem.path}
+                            component={Link}
+                            to={careerItem.path}
+                            onClick={() => setCareerAnchor(null)}
+                            sx={{
+                              fontWeight: 800,
+                              py: 1.1,
+                              color: careerItem.label.includes("PTE") ? "#0f766e" : "#102019",
+                            }}
+                          >
+                            {careerItem.label}
+                          </MenuItem>
+                        ))}
+                      </Menu>
+                    </Box>
+                  );
+                }
                 return (
                   <Button
                     key={item.path}
@@ -278,32 +364,53 @@ const Header = () => {
               location.pathname === item.path ||
               (item.path !== "/" && location.pathname.startsWith(`${item.path}/`));
             return (
-              <ListItem
-                key={item.path}
-                component={Link}
-                to={item.path}
-                onClick={() => setDrawerOpen(false)}
-                sx={{
-                  mb: 1,
-                  py: 1.3,
-                  borderRadius: 1,
-                  textAlign: "center",
-                  fontWeight: 600,
-                  background: isActive
-                    ? "rgba(25,118,210,0.9)"
-                    : "rgba(255,255,255,0.25)",
-                  color: isActive ? "#2f3ad3" : "black",
-                  transition: "all 0.25s ease",
-                  ...(isActive && activeStyles),
+              <React.Fragment key={item.path}>
+                <ListItem
+                  component={Link}
+                  to={item.path}
+                  onClick={() => !item.dropdown && setDrawerOpen(false)}
+                  sx={{
+                    mb: 1,
+                    py: 1.3,
+                    borderRadius: 1,
+                    textAlign: "center",
+                    fontWeight: 600,
+                    background: isActive
+                      ? "rgba(25,118,210,0.9)"
+                      : "rgba(255,255,255,0.25)",
+                    color: isActive ? "#2f3ad3" : "black",
+                    transition: "all 0.25s ease",
+                    ...(isActive && activeStyles),
 
-                  "&:hover": {
-                    background: "rgba(255,255,255,0.35)",
-                    transform: "scale(1.03)",
-                  },
-                }}
-              >
-                <ListItemText primary={item.label} />
-              </ListItem>
+                    "&:hover": {
+                      background: "rgba(255,255,255,0.35)",
+                      transform: "scale(1.03)",
+                    },
+                  }}
+                >
+                  <ListItemText primary={item.label} />
+                </ListItem>
+                {item.dropdown &&
+                  careerMenuItems.map((careerItem) => (
+                    <ListItem
+                      key={careerItem.path}
+                      component={Link}
+                      to={careerItem.path}
+                      onClick={() => setDrawerOpen(false)}
+                      sx={{
+                        mb: 0.7,
+                        ml: 1.5,
+                        width: "calc(100% - 12px)",
+                        py: 0.9,
+                        borderRadius: 1,
+                        bgcolor: careerItem.label.includes("PTE") ? "rgba(20,184,166,0.14)" : "rgba(255,255,255,0.38)",
+                        color: careerItem.label.includes("PTE") ? "#0f766e" : "#102019",
+                      }}
+                    >
+                      <ListItemText primary={careerItem.label} primaryTypographyProps={{ fontWeight: 800, fontSize: 14 }} />
+                    </ListItem>
+                  ))}
+              </React.Fragment>
             );
           })}
         </List>

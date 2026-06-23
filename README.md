@@ -54,7 +54,14 @@ aplus academy developer notes
 ## PTE AI scoring
 
 The essay scorer uses the authenticated Vercel endpoint at `/api/pte-score`.
-Set `OPENAI_API_KEY` as a server-only Production and Preview environment variable
-in Vercel. `OPENAI_MODEL` is optional and defaults to `gpt-5-mini`. When the AI
-service is unavailable, the browser uses the bundled adaptive scorer and labels
-the result accordingly.
+Shorter text-based PTE tasks use `/api/pte-task-score`. Set `OPENAI_API_KEY` as
+a server-only Production and Preview environment variable in Vercel. `OPENAI_MODEL`
+is optional and defaults to `gpt-5-mini`.
+
+Set `PTE_AI_MONTHLY_FREE_LIMIT` to control the shared free AI scoring pool. For
+example, `900` is roughly 30 scores each for 30 learners in a month. OpenAI API
+calls are billed to the OpenAI API project that owns `OPENAI_API_KEY`; they do
+not use ChatGPT Plus or Codex subscription credits.
+
+When the AI service is unavailable, the browser uses the bundled adaptive scorer
+and labels the result accordingly.

@@ -32,6 +32,7 @@ const schema = {
   },
 };
 const rateLimits = new Map();
+const monthlyPool = new Map();
 
 const send = (response, status, body) => response.status(status).json(body);
 
@@ -55,6 +56,11 @@ export default async function handler(request, response) {
   const recentRequests = (rateLimits.get(userId) || []).filter((time) => now - time < 10 * 60 * 1000);
   if (recentRequests.length >= 5) return send(response, 429, { error: "Please wait before requesting another AI score." });
   rateLimits.set(userId, [...recentRequests, now]);
+  const monthKey = new Date().toISOString().slice(0, 7);
+  const monthlyRequests = (monthlyPool.get(monthKey) || []).filter((time) => now - time < 31 * 24 * 60 * 60 * 1000);
+  const monthlyLimit = Number(process.env.PTE_AI_MONTHLY_FREE_LIMIT || 900);
+  if (monthlyRequests.length >= monthlyLimit) return send(response, 429, { error: "This month's free AI scoring pool has been used. Please try again later." });
+  monthlyPool.set(monthKey, [...monthlyRequests, now]);
 
   if (!process.env.OPENAI_API_KEY) return send(response, 503, { error: "AI scoring is not configured." });
   const aiResponse = await fetch("https://api.openai.com/v1/chat/completions", {

@@ -1,3 +1,4 @@
+import { Link as RouterLink } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import {
   Alert,
@@ -45,6 +46,7 @@ import {
 } from "../../services/pteEssayData";
 import { getWordCount, scorePteEssay } from "../../services/pteEssayScoring";
 import { requestAiPteScore } from "../../services/pteAiScoring";
+import { pteSections, textScoredTasks } from "../pte/ptePracticeData";
 
 const siteUrl = "https://www.aplusacademy.pk";
 const practiceSeconds = 20 * 60;
@@ -94,11 +96,11 @@ const PteEssayPractice = () => {
   const [pasteNotice, setPasteNotice] = useState("");
 
   useSEO({
-    title: "Free PTE Essay Practice and Writing Scorer | A Plus Academy",
+    title: "Free PTE Essay Practice with AI Scoring | A Plus Academy",
     description:
-      "Sign in with Google to practise PTE essay writing, submit timed responses, receive adaptive feedback, and compare scored student essays.",
-    canonical: `${siteUrl}/learning-tools/pte-essay-practice`,
-    ogUrl: `${siteUrl}/learning-tools/pte-essay-practice`,
+      "Free PTE essay practice with AI scoring, 20-minute timer, Google login, writing corrections, and student response examples.",
+    canonical: `${siteUrl}/pte/write-essay`,
+    ogUrl: `${siteUrl}/pte/write-essay`,
     ogImage: `${siteUrl}/aplus-logo.png`,
   });
 
@@ -196,8 +198,8 @@ const PteEssayPractice = () => {
   const submitEssay = async () => {
     setTimerRunning(false);
     setSubmitError("");
-    if (!user || !selectedEssay) return setSubmitError("Google sign-in and an essay prompt are required.");
-    if (!shareConsent) return setSubmitError("Confirm publication of your name, profile photo, score, and essay before submitting.");
+    if (!user || !selectedEssay) return setSubmitError("Login with Google to submit your essay.");
+    if (!shareConsent) return setSubmitError("Allow your essay response to appear in student examples before submitting.");
 
     setSubmitting(true);
     setAnalysisStep(0);
@@ -262,16 +264,24 @@ const PteEssayPractice = () => {
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#f4f8f6" }}>
       <Box component="header" sx={{ bgcolor: "#102019", color: "#fff", borderBottom: "4px solid #29b554" }}>
-        <Container sx={{ py: { xs: 5, md: 7 } }}>
+        <Container sx={{ py: { xs: 3.5, md: 4.5 } }}>
           <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" alignItems={{ md: "flex-end" }} gap={3}>
             <Stack spacing={2} sx={{ maxWidth: 860 }}>
               <Chip icon={<EditNoteIcon />} label="PTE Writing Practice" sx={{ alignSelf: "flex-start", borderRadius: 1, bgcolor: "#29b554", color: "#fff", fontWeight: 800, "& .MuiChip-icon": { color: "#fff" } }} />
-              <Typography component="h1" variant="h2" sx={{ fontWeight: 900, fontSize: { xs: "2.2rem", md: "3.7rem" }, lineHeight: 1.08 }}>
+              <Typography component="h1" variant="h2" sx={{ fontWeight: 900, fontSize: { xs: "1.9rem", md: "2.75rem" }, lineHeight: 1.12 }}>
                 Build a clear PTE essay in 20 minutes
               </Typography>
               <Typography variant="h6" sx={{ maxWidth: 760, opacity: 0.86, lineHeight: 1.7 }}>
                 Study original samples, sign in to submit a timed response, receive adaptive feedback, and compare scored student essays.
               </Typography>
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={1.3}>
+                <Button component={RouterLink} to="/pte" variant="contained" sx={{ alignSelf: "flex-start", borderRadius: 1, textTransform: "none", fontWeight: 900, bgcolor: "#fff", color: "#102019", "&:hover": { bgcolor: "rgba(255,255,255,0.9)" } }}>
+                  View all PTE sections
+                </Button>
+                <Button component={RouterLink} to="/pte/summarize-written-text" variant="outlined" sx={{ alignSelf: "flex-start", borderRadius: 1, textTransform: "none", fontWeight: 900, color: "#fff", borderColor: "rgba(255,255,255,0.45)", "&:hover": { borderColor: "#fff", bgcolor: "rgba(255,255,255,0.1)" } }}>
+                  Try another AI task
+                </Button>
+              </Stack>
             </Stack>
             {user && (
               <Stack direction="row" spacing={1.2} alignItems="center" sx={{ bgcolor: "rgba(255,255,255,0.09)", border: "1px solid rgba(255,255,255,0.18)", p: 1.2, pr: 2, borderRadius: 1 }}>
@@ -283,7 +293,47 @@ const PteEssayPractice = () => {
         </Container>
       </Box>
 
-      <Container component="main" sx={{ py: { xs: 4, md: 6 } }}>
+      <Container component="main" sx={{ py: { xs: 2.5, md: 4 } }}>
+        <Paper elevation={0} sx={{ mb: 3, p: { xs: 2.2, md: 3 }, border: "1px solid #d8e6dd", borderRadius: 1, bgcolor: "#fff" }}>
+          <Stack spacing={2}>
+            <Box>
+              <Typography component="h2" variant="h5" fontWeight={900}>
+                PTE practice sections
+              </Typography>
+              <Typography color="text.secondary" sx={{ mt: 0.5 }}>
+                You are currently inside Write Essay. Open the full PTE module to practise other question types.
+              </Typography>
+            </Box>
+            <Stack direction="row" gap={1} flexWrap="wrap">
+              {pteSections.map((section) => (
+                <Button
+                  key={section.id}
+                  component={RouterLink}
+                  to={`/pte#${section.id}`}
+                  variant="outlined"
+                  sx={{ borderRadius: 1, textTransform: "none", fontWeight: 900, borderColor: section.color, color: section.color }}
+                >
+                  {section.title}
+                </Button>
+              ))}
+              <Button component={RouterLink} to="/pte" variant="contained" sx={{ borderRadius: 1, textTransform: "none", fontWeight: 900 }}>
+                All PTE questions
+              </Button>
+            </Stack>
+            <Stack direction="row" gap={1} flexWrap="wrap">
+              {textScoredTasks.slice(0, 7).map((task) => (
+                <Chip
+                  key={task.slug}
+                  component={RouterLink}
+                  to={task.slug === "write-essay" ? "/pte/write-essay" : `/pte/${task.slug}`}
+                  clickable
+                  label={task.shortTitle}
+                  sx={{ borderRadius: 1, fontWeight: 800, bgcolor: task.slug === "write-essay" ? "#e8f7ee" : "#f8fafc" }}
+                />
+              ))}
+            </Stack>
+          </Stack>
+        </Paper>
         <Paper elevation={0} sx={{ border: "1px solid #d8e6dd", borderRadius: 1, overflow: "hidden" }}>
           <Tabs value={tab} onChange={(_, value) => setTab(value)} variant="scrollable" scrollButtons="auto" aria-label="PTE essay practice modes" sx={{ px: { xs: 1, md: 2 }, borderBottom: "1px solid #d8e6dd", bgcolor: "#fff" }}>
             <Tab icon={<MenuBookIcon />} iconPosition="start" label="Sample Essays" />
@@ -333,14 +383,14 @@ const PteEssayPractice = () => {
               {!user ? (
                 <Paper elevation={0} sx={{ maxWidth: 720, mx: "auto", p: { xs: 3, md: 5 }, border: "1px solid #cfe4d5", borderRadius: 1, textAlign: "center" }}>
                   <GoogleIcon sx={{ fontSize: 48, color: "#198754" }} />
-                  <Typography component="h2" variant="h4" fontWeight={900} sx={{ mt: 1 }}>Google account required for writing</Typography>
+                  <Typography component="h2" variant="h4" fontWeight={900} sx={{ mt: 1 }}>Login to write essay</Typography>
                   <Typography color="text.secondary" sx={{ mt: 1.5, mb: 3, lineHeight: 1.75 }}>
-                    Sign in so your draft, score, display name, and profile photo can be attached to your submitted response. Reading samples remains open to everyone.
+                    Use Google login to start PTE essay writing practice and receive your score.
                   </Typography>
                   {(signInError || authError) && <Alert severity="error" sx={{ mb: 2, textAlign: "left" }}>{signInError || authError}</Alert>}
                   {!hasFirebaseConfig && <Alert severity="warning" sx={{ mb: 2, textAlign: "left" }}>Google sign-in is unavailable until Firebase web app variables are configured.</Alert>}
                   <Button onClick={startGoogleSignIn} disabled={authLoading || !hasFirebaseConfig} variant="contained" size="large" startIcon={authLoading ? <CircularProgress size={18} color="inherit" /> : <GoogleIcon />} sx={{ fontWeight: 900 }}>
-                    Continue with Google
+                    Login with Google
                   </Button>
                 </Paper>
               ) : (
@@ -399,7 +449,7 @@ const PteEssayPractice = () => {
                         <Paper elevation={0} sx={{ p: 2.2, border: "1px solid #d8e6dd", borderRadius: 1 }}>
                           <FormControlLabel
                             control={<Checkbox checked={shareConsent} onChange={(event) => setShareConsent(event.target.checked)} />}
-                            label="Publish my Google display name, profile photo, essay, and practice score in student responses. My email will not be displayed."
+                            label="Allow my essay response and practice score to appear in student examples."
                           />
                           {wordCount > 0 && wordCount < 120 && <Alert severity="info" sx={{ mt: 1.5 }}>Write at least 120 words before submitting. The ideal target is 250-300.</Alert>}
                           {submitError && <Alert severity="warning" sx={{ mt: 1.5 }}>{submitError}</Alert>}

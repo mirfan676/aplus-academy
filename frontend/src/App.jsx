@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigationType } from "react-router-dom";
 import { ThemeProvider, CssBaseline, Container, Card, CardContent } from "@mui/material";
 import Home from "./pages/Home";
 import Jobs from "./pages/Jobs";
@@ -17,6 +17,9 @@ import LandingPage from "./pages/landing/LandingPage";
 import { allLandingPages } from "./pages/landing/landingPages";
 import BlogList from "./pages/blog/BlogList";
 import BlogPost from "./pages/blog/BlogPost";
+import CareerRoadmap from "./pages/career-roadmap/CareerRoadmap";
+import PtePracticeHome from "./pages/pte/PtePracticeHome";
+import PteTaskPractice from "./pages/pte/PteTaskPractice";
 import LearningTools from "./pages/learning-tools/LearningTools";
 import LearnEnglishVocabulary from "./pages/learning-tools/LearnEnglishVocabulary";
 import ImproveEnglishGrammar from "./pages/learning-tools/ImproveEnglishGrammar";
@@ -53,6 +56,43 @@ function PageTracker() {
   return null;
 }
 
+function ScrollManager() {
+  const location = useLocation();
+  const navigationType = useNavigationType();
+  const scrollPath = `${location.pathname}${location.search}${location.hash}`;
+
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+  }, []);
+
+  useEffect(() => {
+    const savePosition = () => {
+      sessionStorage.setItem(`scroll:${location.key}`, String(window.scrollY));
+      sessionStorage.setItem(`scroll-path:${scrollPath}`, String(window.scrollY));
+    };
+    window.addEventListener("scroll", savePosition, { passive: true });
+    return () => {
+      savePosition();
+      window.removeEventListener("scroll", savePosition);
+    };
+  }, [location.key, scrollPath]);
+
+  useEffect(() => {
+    if (navigationType === "POP") {
+      const saved =
+        sessionStorage.getItem(`scroll:${location.key}`) ||
+        sessionStorage.getItem(`scroll-path:${scrollPath}`);
+      window.requestAnimationFrame(() => window.scrollTo(0, saved ? Number(saved) : 0));
+      return;
+    }
+    window.requestAnimationFrame(() => window.scrollTo(0, 0));
+  }, [location.key, navigationType, scrollPath]);
+
+  return null;
+}
+
 function AppShell() {
   const location = useLocation();
   const isAdminPage = location.pathname.startsWith("/admin");
@@ -60,6 +100,7 @@ function AppShell() {
   return (
     <>
       <PageTracker />
+      <ScrollManager />
       {!isAdminPage && <CookieConsent />}
       {!isAdminPage && <Header />}
 
@@ -118,11 +159,17 @@ function AppShell() {
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/blog" element={<BlogList />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
+        <Route path="/career-roadmap" element={<CareerRoadmap />} />
+        <Route path="/career-roadmap/pte-practice" element={<RouteRedirect to="/pte" />} />
+        <Route path="/career-roadmap/*" element={<CareerRoadmap />} />
+        <Route path="/pte" element={<PtePracticeHome />} />
+        <Route path="/pte/write-essay" element={<PteEssayPractice />} />
+        <Route path="/pte/:slug" element={<PteTaskPractice />} />
         <Route path="/learning-tools" element={<LearningTools />} />
         <Route path="/learning-tools/learn-english-vocabulary" element={<LearnEnglishVocabulary />} />
         <Route path="/learning-tools/improve-english-grammar" element={<ImproveEnglishGrammar />} />
         <Route path="/learning-tools/text-to-mcqs-short-questions" element={<TextToStudyQuestions />} />
-        <Route path="/learning-tools/pte-essay-practice" element={<PteEssayPractice />} />
+        <Route path="/learning-tools/pte-essay-practice" element={<RouteRedirect to="/pte/write-essay" />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/account" element={<AccountDashboard />} />
         <Route
