@@ -10,6 +10,7 @@ import {
   CircularProgress,
   Drawer,
   IconButton,
+  Collapse,
   Paper,
   Stack,
   TextField,
@@ -96,6 +97,7 @@ const SiteAiTutor = () => {
   const [suggestionEmail, setSuggestionEmail] = useState("");
   const [suggestionStatus, setSuggestionStatus] = useState("");
   const [suggestionLoading, setSuggestionLoading] = useState(false);
+  const [suggestionOpen, setSuggestionOpen] = useState(false);
   const messageListRef = useRef(null);
   const bottomRef = useRef(null);
 
@@ -391,58 +393,67 @@ const SiteAiTutor = () => {
                 }
               }}
               multiline
-              minRows={3}
+              minRows={2}
               fullWidth
               placeholder="Ask about tutors, PTE practice, jobs or registration..."
             />
             <Button onClick={ask} disabled={loading || !question.trim()} variant="contained" endIcon={loading ? <CircularProgress color="inherit" size={16} /> : <AutoAwesomeIcon />} sx={{ borderRadius: 1, textTransform: "none", fontWeight: 950 }}>
               Ask AI Tutor
             </Button>
-
-            <Paper elevation={0} sx={{ mt: 1, p: 1.5, borderRadius: 1, border: "1px solid #d4dbe3", bgcolor: "#fff" }}>
-              <Stack spacing={1}>
-                <Typography fontWeight={900}>Suggestion box</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Share a missing page, a fix, or a helpful idea. We will email it to A Plus Academy.
-                </Typography>
-                <TextField
-                  label="Your name"
-                  value={suggestionName}
-                  onChange={(event) => setSuggestionName(event.target.value)}
-                  size="small"
-                  fullWidth
-                />
-                <TextField
-                  label="Your email"
-                  type="email"
-                  value={suggestionEmail}
-                  onChange={(event) => setSuggestionEmail(event.target.value)}
-                  size="small"
-                  fullWidth
-                />
-                <TextField
-                  label="Your suggestion"
-                  value={suggestion}
-                  onChange={(event) => setSuggestion(event.target.value)}
-                  multiline
-                  minRows={3}
-                  fullWidth
-                />
-                <Button
-                  onClick={sendSuggestion}
-                  disabled={suggestionLoading || !suggestion.trim()}
-                  variant="outlined"
-                  sx={{ borderRadius: 1, textTransform: "none", fontWeight: 900 }}
-                >
-                  {suggestionLoading ? "Sending..." : "Send Suggestion"}
-                </Button>
-                {suggestionStatus && (
-                  <Typography variant="caption" color={suggestionStatus.includes("sent") ? "success.main" : "text.secondary"}>
-                    {suggestionStatus}
-                  </Typography>
-                )}
-              </Stack>
-            </Paper>
+            <Button
+              onClick={() => setSuggestionOpen((current) => !current)}
+              variant="text"
+              size="small"
+              sx={{ alignSelf: "flex-start", px: 0.5, textTransform: "none", fontWeight: 800, color: "text.secondary" }}
+            >
+              {suggestionOpen ? "Hide feedback" : "Send feedback"}
+            </Button>
+            <Collapse in={suggestionOpen} timeout="auto" unmountOnExit>
+              <Paper elevation={0} sx={{ mt: 0.5, p: 1.25, borderRadius: 1, border: "1px solid #d4dbe3", bgcolor: "#fafbfc" }}>
+                <Stack spacing={0.9}>
+                  <Typography fontWeight={900} sx={{ fontSize: 14 }}>Feedback</Typography>
+                  <TextField
+                    label="Your name"
+                    value={suggestionName}
+                    onChange={(event) => setSuggestionName(event.target.value)}
+                    size="small"
+                    fullWidth
+                  />
+                  <TextField
+                    label="Your email"
+                    type="email"
+                    value={suggestionEmail}
+                    onChange={(event) => setSuggestionEmail(event.target.value)}
+                    size="small"
+                    fullWidth
+                  />
+                  <TextField
+                    label="Your suggestion"
+                    value={suggestion}
+                    onChange={(event) => setSuggestion(event.target.value)}
+                    multiline
+                    minRows={2}
+                    fullWidth
+                  />
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Button
+                      onClick={sendSuggestion}
+                      disabled={suggestionLoading || !suggestion.trim()}
+                      variant="outlined"
+                      size="small"
+                      sx={{ borderRadius: 1, textTransform: "none", fontWeight: 900 }}
+                    >
+                      {suggestionLoading ? "Sending..." : "Send"}
+                    </Button>
+                    {suggestionStatus && (
+                      <Typography variant="caption" color={suggestionStatus.includes("sent") ? "success.main" : "text.secondary"}>
+                        {suggestionStatus}
+                      </Typography>
+                    )}
+                  </Stack>
+                </Stack>
+              </Paper>
+            </Collapse>
           </Stack>
         </Box>
       </Drawer>
