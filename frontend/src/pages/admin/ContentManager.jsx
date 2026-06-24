@@ -14,8 +14,9 @@ import SaveIcon from "@mui/icons-material/Save";
 import WorkIcon from "@mui/icons-material/Work";
 import SchoolIcon from "@mui/icons-material/School";
 import GroupsIcon from "@mui/icons-material/Groups";
+import SmartToyIcon from "@mui/icons-material/SmartToy";
 import {
-  fetchAdminJobs, fetchTeacherRecords, fetchTeamMembers, removeJob, removeTeamMember, saveJob,
+  fetchAdminJobs, fetchSiteAiTutorLogs, fetchTeacherRecords, fetchTeamMembers, removeJob, removeTeamMember, saveJob,
   saveTeacherApplication, saveTeamMember, saveVerifiedTeacher,
 } from "../../services/adminContent";
 import { approveTeacherApplication } from "../../services/firestoreMigration";
@@ -35,6 +36,7 @@ const ContentManager = () => {
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState([]);
   const [members, setMembers] = useState([]);
+  const [aiLogs, setAiLogs] = useState([]);
   const [editor, setEditor] = useState(null);
   const [editorType, setEditorType] = useState("");
   const [loading, setLoading] = useState(true);
@@ -45,12 +47,13 @@ const ContentManager = () => {
   const refresh = async () => {
     setLoading(true);
     try {
-      const [nextJobs, nextApplications, nextMembers] = await Promise.all([
-        fetchAdminJobs(), fetchTeacherRecords(), fetchTeamMembers(),
+      const [nextJobs, nextApplications, nextMembers, nextAiLogs] = await Promise.all([
+        fetchAdminJobs(), fetchTeacherRecords(), fetchTeamMembers(), fetchSiteAiTutorLogs(),
       ]);
       setJobs(nextJobs.sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || ""))));
       setApplications(nextApplications);
       setMembers(nextMembers.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)));
+      setAiLogs(nextAiLogs);
     } catch (loadError) {
       setError(loadError.message || "Dashboard content could not be loaded.");
     } finally {
@@ -128,6 +131,7 @@ const ContentManager = () => {
             <Tab icon={<WorkIcon />} iconPosition="start" label={`Jobs (${jobs.length})`} />
             <Tab icon={<SchoolIcon />} iconPosition="start" label={`Teachers (${applications.length})`} />
             <Tab icon={<GroupsIcon />} iconPosition="start" label={`Expert team (${members.length})`} />
+            <Tab icon={<SmartToyIcon />} iconPosition="start" label={`AI questions (${aiLogs.length})`} />
           </Tabs>
           <Box sx={{ p: { xs: 2, md: 3 } }}>
             {loading ? <CircularProgress /> : tab === 0 ? (
@@ -140,8 +144,23 @@ const ContentManager = () => {
               </Stack>
             ) : tab === 1 ? (
               <Stack spacing={2}>{applications.map((application) => <Paper key={application.id} variant="outlined" sx={{ p: 2, borderRadius: 1 }}><Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" gap={2}><Stack direction="row" spacing={1.5}><Avatar src={application.photoURL || undefined}>{application.name?.[0] || "T"}</Avatar><Box><Stack direction="row" gap={1} alignItems="center"><Typography fontWeight={900}>{application.name || "Teacher applicant"}</Typography><Chip size="small" label={application.recordState === "verified" ? "Verified" : "Pending"} color={application.recordState === "verified" ? "success" : "warning"} /></Stack><Typography color="text.secondary">{application.qualification || "Qualification missing"} · {application.subject || "Subject missing"}</Typography><Typography variant="body2">{application.city || "City missing"} · {application.experience || 0} years</Typography></Box></Stack><Button onClick={() => openEditor("teacher", application)} variant={application.recordState === "verified" ? "outlined" : "contained"} startIcon={<EditIcon />}>{application.recordState === "verified" ? "Edit profile" : "Complete and verify"}</Button></Stack></Paper>)}{!applications.length && <Alert severity="info">No teacher records found.</Alert>}</Stack>
-            ) : (
+            ) : tab === 2 ? (
               <Stack spacing={2}><Button onClick={() => openEditor("team", emptyMember)} variant="contained" startIcon={<AddIcon />} sx={{ alignSelf: "flex-start" }}>Add team member</Button>{members.map((member) => <Paper key={member.id} variant="outlined" sx={{ p: 2, borderRadius: 1 }}><Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" gap={2}><Stack direction="row" spacing={1.5}><Avatar src={member.photoURL || undefined}>{member.name?.[0] || "A"}</Avatar><Box><Typography fontWeight={900}>{member.name}</Typography><Typography color="text.secondary">{member.role}</Typography><Chip size="small" label={member.active ? "Public" : "Hidden"} color={member.active ? "success" : "default"} /></Box></Stack><Stack direction="row"><Tooltip title="Edit profile"><IconButton onClick={() => openEditor("team", member)}><EditIcon /></IconButton></Tooltip><Tooltip title="Delete profile"><IconButton color="error" onClick={() => remove("team", member.id)}><DeleteOutlineIcon /></IconButton></Tooltip></Stack></Stack></Paper>)}</Stack>
+            ) : (
+              <Stack spacing={2}>
+                {aiLogs.map((log) => <Paper key={log.id} variant="outlined" sx={{ p: 2, borderRadius: 1 }}>
+                  <Stack spacing={1}>
+                    <Stack direction="row" gap={1} alignItems="center" flexWrap="wrap">
+                      <Chip size="small" label={log.topic || "A Plus Academy"} color="primary" sx={{ color: "#fff", borderRadius: 1 }} />
+                      <Typography variant="body2" color="text.secondary">{log.createdAt?.toDate?.().toLocaleString?.() || "Recent"}</Typography>
+                    </Stack>
+                    <Typography fontWeight={900}>{log.question}</Typography>
+                    <Typography color="text.secondary">{log.answer}</Typography>
+                    <Stack direction="row" gap={1} flexWrap="wrap">{(log.links || []).map((link) => <Chip key={link.url} size="small" label={link.label} sx={{ borderRadius: 1 }} />)}</Stack>
+                  </Stack>
+                </Paper>)}
+                {!aiLogs.length && <Alert severity="info">No AI tutor questions recorded yet.</Alert>}
+              </Stack>
             )}
           </Box>
         </Paper>

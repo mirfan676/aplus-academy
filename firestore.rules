@@ -98,5 +98,14 @@ service cloud.firestore {
         signedIn() && resource.data.userId == request.auth.uid
       );
     }
+
+    match /siteAiTutorLogs/{logId} {
+      allow create: if request.resource.data.question is string
+        && request.resource.data.question.size() >= 2
+        && request.resource.data.question.size() <= 800
+        && request.resource.data.answer is string
+        && request.resource.data.answer.size() <= 1600;
+      allow read, update, delete: if isAdmin();
+    }
   }
 }

@@ -8,6 +8,7 @@ import {
   query,
   serverTimestamp,
   setDoc,
+  orderBy,
 } from "firebase/firestore";
 import { db } from "../firebase";
 
@@ -23,6 +24,11 @@ const listCollection = async (name) => {
 
 export const fetchAdminJobs = () => listCollection("jobs");
 export const fetchTeamMembers = () => listCollection("teamMembers");
+export const fetchSiteAiTutorLogs = async () => {
+  requireDb();
+  const snapshot = await getDocs(query(collection(db, "siteAiTutorLogs"), orderBy("createdAt", "desc"), limit(200)));
+  return snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
+};
 
 export const fetchTeacherRecords = async () => {
   const [teachers, applications, privateProfiles] = await Promise.all([

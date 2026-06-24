@@ -38,6 +38,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import theme from "./theme";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import SiteAiTutor from "./components/SiteAiTutor";
 
 function usePageTracking() {
   const location = useLocation();
@@ -103,6 +104,7 @@ function AppShell() {
       <ScrollManager />
       {!isAdminPage && <CookieConsent />}
       {!isAdminPage && <Header />}
+      {!isAdminPage && <SiteAiTutor />}
 
       <Routes>
         <Route path="/" element={<Home />} />

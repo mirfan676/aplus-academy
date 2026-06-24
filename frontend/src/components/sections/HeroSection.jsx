@@ -133,7 +133,7 @@ export default function HeroSection() {
           alt="Students"
           width={430}
           height={322}
-          fetchpriority="high"
+          fetchPriority="high"
           loading="eager"
           sx={{
             width: { xs: 260, sm: 350, md: 430 },

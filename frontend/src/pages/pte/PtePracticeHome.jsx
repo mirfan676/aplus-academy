@@ -1,11 +1,12 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import {
-  Alert,
+  Avatar,
   Box,
   Button,
   Chip,
   Container,
+  Divider,
   Grid,
   Paper,
   Stack,
@@ -14,95 +15,341 @@ import {
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import GoogleIcon from "@mui/icons-material/Google";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
+import { collection, getDocs, limit, query, where } from "firebase/firestore";
+import { useAuth } from "../../contexts/useAuth";
+import { db, hasFirebaseConfig } from "../../firebase";
 import useSEO from "../../hooks/useSEO";
 import { getSectionTasks, pteSections, pteTasks, textScoredTasks } from "./ptePracticeData";
 
 const siteUrl = "https://www.aplusacademy.pk";
 
-function TaskCard({ task, color }) {
+const quickFilters = [
+  { label: "Writing", href: "#speaking-writing" },
+  { label: "Reading", href: "#reading" },
+  { label: "Listening", href: "#listening" },
+  { label: "AI Scoring", href: "#free-ai-scoring" },
+  { label: "Premium Help", href: "#premium-pte" },
+];
+
+const popularTaskSlugs = [
+  "write-essay",
+  "summarize-written-text",
+  "summarize-spoken-text",
+  "write-from-dictation",
+  "reading-writing-fill-blanks",
+  "reorder-paragraphs",
+];
+
+const taskHref = (task) => (task.slug === "write-essay" ? "/pte/write-essay" : `/pte/${task.slug}`);
+
+const criteriaToSections = {
+  Form: "Writing form",
+  Organization: "Essay structure",
+  Development: "Idea development",
+  Grammar: "Grammar",
+  Vocabulary: "Vocabulary",
+  "Linguistic range": "Sentence variety",
+  Content: "Content accuracy",
+  Coherence: "Coherence",
+  "Task Accuracy": "Task accuracy",
+};
+
+const getImprovementAreas = (responses) => {
+  const totals = new Map();
+  responses.forEach((response) => {
+    Object.entries(response.criteria || {}).forEach(([label, score]) => {
+      if (!Number.isFinite(Number(score))) return;
+      const current = totals.get(label) || { total: 0, count: 0 };
+      totals.set(label, { total: current.total + Number(score), count: current.count + 1 });
+    });
+  });
+
+  const weakAreas = [...totals.entries()]
+    .map(([label, value]) => ({ label: criteriaToSections[label] || label, average: value.total / value.count }))
+    .sort((a, b) => a.average - b.average)
+    .slice(0, 3)
+    .map((item) => item.label);
+
+  if (weakAreas.length) return weakAreas;
+  if (responses.length) return ["Vocabulary", "Grammar", "Writing structure"];
+  return ["Start with essay writing", "Try summarize text", "Build dictation accuracy"];
+};
+
+function TaskPill({ task, color = "#111827" }) {
   const Icon = task.icon;
-  const href = task.slug === "write-essay" ? "/pte/write-essay" : `/pte/${task.slug}`;
 
   return (
-    <Paper
-      elevation={0}
+    <Button
+      component={RouterLink}
+      to={taskHref(task)}
+      variant="outlined"
+      startIcon={<Icon />}
       sx={{
-        height: "100%",
-        p: 2.5,
+        justifyContent: "flex-start",
         borderRadius: 1,
-        border: "1px solid #dfe9e4",
-        bgcolor: "#fff",
-        transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
+        minHeight: 44,
+        px: 1.4,
+        py: 1,
+        textTransform: "none",
+        fontWeight: 850,
+        color: "#111827",
+        borderColor: "#d4dbe3",
+        bgcolor: task.textScoring ? "#f0fdf4" : "#fff",
+        "& .MuiButton-startIcon": { color },
         "&:hover": {
-          transform: "translateY(-5px)",
-          boxShadow: "0 16px 38px rgba(17,24,39,0.12)",
+          bgcolor: task.textScoring ? "#dcfce7" : "#f8fafc",
           borderColor: color,
         },
       }}
     >
-      <Stack spacing={1.8}>
-        <Stack direction="row" justifyContent="space-between" gap={1} alignItems="flex-start">
+      <Box component="span" sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+        {task.shortTitle || task.title}
+      </Box>
+    </Button>
+  );
+}
+
+function PopularTaskCard({ task }) {
+  const Icon = task.icon;
+
+  return (
+    <Paper
+      component={RouterLink}
+      to={taskHref(task)}
+      elevation={0}
+      sx={{
+        display: "block",
+        height: "100%",
+        p: 2,
+        borderRadius: 1,
+        textDecoration: "none",
+        color: "inherit",
+        border: "1px solid #d4dbe3",
+        bgcolor: "#fff",
+        transition: "border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease",
+        "&:hover": {
+          borderColor: "#111827",
+          boxShadow: "0 12px 28px rgba(15, 23, 42, 0.10)",
+          transform: "translateY(-3px)",
+        },
+      }}
+    >
+      <Stack spacing={1.3}>
+        <Stack direction="row" spacing={1.2} alignItems="center">
           <Box
             sx={{
-              width: 48,
-              height: 48,
+              width: 38,
+              height: 38,
+              borderRadius: 1,
+              bgcolor: task.textScoring ? "#dcfce7" : "#f1f5f9",
+              color: task.textScoring ? "#047857" : "#334155",
               display: "grid",
               placeItems: "center",
-              borderRadius: 1,
-              bgcolor: `${color}18`,
-              color,
             }}
           >
-            <Icon />
+            <Icon fontSize="small" />
           </Box>
-          <Chip
-            size="small"
-            label={task.textScoring ? "Free AI scoring" : "Practice guide"}
-            sx={{
-              borderRadius: 1,
-              fontWeight: 900,
-              bgcolor: task.textScoring ? "#ecfdf5" : "#f8fafc",
-              color: task.textScoring ? "#047857" : "#475569",
-            }}
-          />
+          <Box sx={{ minWidth: 0 }}>
+            <Typography component="h3" fontWeight={950} sx={{ lineHeight: 1.25 }}>
+              {task.title}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {task.textScoring ? "Free AI scoring" : "Practice guide"}
+            </Typography>
+          </Box>
         </Stack>
-        <Box>
-          <Typography component="h3" variant="h6" fontWeight={900}>
-            {task.title}
-          </Typography>
-          <Typography color="text.secondary" sx={{ mt: 0.8, lineHeight: 1.65 }}>
-            {task.description}
-          </Typography>
-        </Box>
-        <Button
-          component={RouterLink}
-          to={href}
-          variant={task.textScoring ? "contained" : "outlined"}
-          endIcon={<ArrowForwardIcon />}
-          sx={{
-            alignSelf: "flex-start",
-            borderRadius: 1,
-            textTransform: "none",
-            fontWeight: 900,
-            bgcolor: task.textScoring ? color : "transparent",
-            borderColor: color,
-            color: task.textScoring ? "#fff" : color,
-            "&:hover": {
-              bgcolor: task.textScoring ? color : `${color}18`,
-              borderColor: color,
-              filter: task.textScoring ? "brightness(0.96)" : "none",
-            },
-          }}
-        >
-          {task.textScoring ? "Start free scoring" : "View practice"}
-        </Button>
+        <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+          {task.description}
+        </Typography>
       </Stack>
     </Paper>
   );
 }
 
+function LearnerProgressPanel() {
+  const { hasFirebaseConfig: authConfigReady, loading: authLoading, signInWithGoogle, user } = useAuth();
+  const [responses, setResponses] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!user?.uid || !hasFirebaseConfig || !db) {
+      setResponses([]);
+      return undefined;
+    }
+    let active = true;
+    setLoading(true);
+    getDocs(query(collection(db, "pteEssayResponses"), where("userId", "==", user.uid), limit(100)))
+      .then((snapshot) => {
+        if (!active) return;
+        setResponses(snapshot.docs.map((item) => ({ id: item.id, ...item.data() })));
+      })
+      .catch((error) => {
+        console.warn("PTE learner progress unavailable.", error);
+        if (active) setResponses([]);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [user?.uid]);
+
+  const progress = useMemo(() => {
+    const practised = responses.length;
+    const averageScore = practised
+      ? Math.round(responses.reduce((sum, response) => sum + (Number(response.score) || 0), 0) / practised)
+      : 0;
+    const improvementAreas = getImprovementAreas(responses);
+    return { practised, averageScore, improvementAreas };
+  }, [responses]);
+
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        mx: "auto",
+        width: "100%",
+        maxWidth: 980,
+        p: { xs: 2, md: 2.5 },
+        borderRadius: 1,
+        border: "1px solid #d4dbe3",
+        bgcolor: "#fff",
+      }}
+    >
+      <Grid container spacing={2.5} alignItems="center">
+        <Grid item xs={12} md={4}>
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Avatar src={user?.photoURL || undefined} alt={user?.displayName || "PTE learner"} sx={{ width: 54, height: 54 }}>
+              {user?.displayName?.[0] || "P"}
+            </Avatar>
+            <Box sx={{ minWidth: 0 }}>
+              <Typography fontWeight={950}>{user ? user.displayName || "PTE learner" : "Your PTE progress"}</Typography>
+              <Typography variant="body2" color="text.secondary">
+                {user ? "Track your practice and weak areas" : "Login to track practice progress"}
+              </Typography>
+            </Box>
+          </Stack>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 1 }}>
+            <Box sx={{ p: 1.5, borderRadius: 1, bgcolor: "#f8fafc", textAlign: "center" }}>
+              <Typography fontWeight={950} sx={{ fontSize: "1.65rem", lineHeight: 1 }}>
+                {loading ? "..." : progress.practised}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" fontWeight={800}>
+                questions practised
+              </Typography>
+            </Box>
+            <Box sx={{ p: 1.5, borderRadius: 1, bgcolor: "#f0fdf4", textAlign: "center" }}>
+              <Typography fontWeight={950} sx={{ fontSize: "1.65rem", lineHeight: 1 }}>
+                {progress.averageScore || "-"}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" fontWeight={800}>
+                average score
+              </Typography>
+            </Box>
+          </Box>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Stack spacing={1.2}>
+            <Typography variant="body2" color="text.secondary" fontWeight={900}>
+              Improve next
+            </Typography>
+            <Stack direction="row" gap={0.8} flexWrap="wrap">
+              {progress.improvementAreas.map((area) => (
+                <Chip key={area} label={area} size="small" sx={{ borderRadius: 1, bgcolor: "#eef2ff", color: "#3730a3", fontWeight: 900 }} />
+              ))}
+            </Stack>
+            {user ? (
+              <Button
+                component="a"
+                href="#premium-pte"
+                variant="contained"
+                startIcon={<WorkspacePremiumIcon />}
+                sx={{ alignSelf: "flex-start", borderRadius: 1, textTransform: "none", fontWeight: 950, bgcolor: "#111827", "&:hover": { bgcolor: "#263142" } }}
+              >
+                Go premium and get expert level help from top instructors
+              </Button>
+            ) : (
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+                <Button
+                  onClick={signInWithGoogle}
+                  disabled={authLoading || !authConfigReady}
+                  variant="contained"
+                  startIcon={<GoogleIcon />}
+                  sx={{ borderRadius: 1, textTransform: "none", fontWeight: 950, bgcolor: "#111827", "&:hover": { bgcolor: "#263142" } }}
+                >
+                  Login with Google
+                </Button>
+                <Button
+                  component="a"
+                  href="#premium-pte"
+                  variant="outlined"
+                  startIcon={<WorkspacePremiumIcon />}
+                  sx={{ borderRadius: 1, textTransform: "none", fontWeight: 950, color: "#111827", borderColor: "#111827" }}
+                >
+                  Go premium
+                </Button>
+              </Stack>
+            )}
+          </Stack>
+        </Grid>
+      </Grid>
+    </Paper>
+  );
+}
+
+function SectionRoadmap({ section }) {
+  const tasks = getSectionTasks(section.id);
+
+  return (
+    <Box component="section" id={section.id} sx={{ scrollMarginTop: 96 }}>
+      <Stack
+        direction={{ xs: "column", md: "row" }}
+        spacing={1}
+        justifyContent="space-between"
+        alignItems={{ xs: "flex-start", md: "center" }}
+        sx={{ mb: 1.4 }}
+      >
+        <Box>
+          <Typography component="h2" variant="h5" fontWeight={950}>
+            {section.title}
+          </Typography>
+          <Typography color="text.secondary" sx={{ lineHeight: 1.65 }}>
+            {section.description}
+          </Typography>
+        </Box>
+        <Chip
+          label={`${tasks.filter((task) => task.textScoring).length} scored`}
+          sx={{
+            borderRadius: 1,
+            bgcolor: `${section.color}18`,
+            color: section.color,
+            fontWeight: 950,
+          }}
+        />
+      </Stack>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))", lg: "repeat(3, minmax(0, 1fr))" },
+          gap: 1,
+        }}
+      >
+        {tasks.map((task) => (
+          <TaskPill key={task.slug} task={task} color={section.color} />
+        ))}
+      </Box>
+    </Box>
+  );
+}
+
 export default function PtePracticeHome() {
+  const popularTasks = popularTaskSlugs.map((slug) => pteTasks.find((task) => task.slug === slug)).filter(Boolean);
+
   useSEO({
     title: "Free PTE Practice with AI Scoring | A Plus Academy",
     description:
@@ -113,133 +360,186 @@ export default function PtePracticeHome() {
   });
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#f6fbf9" }}>
-      <Box
-        component="section"
-        sx={{
-          color: "#fff",
-          background: "linear-gradient(135deg, #0f766e 0%, #2563eb 52%, #be123c 100%)",
-          borderBottom: "8px solid #f59e0b",
-        }}
-      >
-        <Container sx={{ py: { xs: 4, md: 5.5 } }}>
-          <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={8}>
-              <Stack spacing={2.3}>
-                <Chip
-                  icon={<AutoAwesomeIcon />}
-                  label="Free PTE Practice"
+    <Box sx={{ minHeight: "100vh", bgcolor: "#f8fafc", color: "#111827" }}>
+      <Container sx={{ py: { xs: 3, md: 4 }, maxWidth: "1100px !important" }}>
+        <Stack spacing={3.5}>
+          <Box component="section" sx={{ textAlign: "center", maxWidth: 920, mx: "auto" }}>
+            <Chip
+              icon={<AutoAwesomeIcon />}
+              label="Free PTE Practice"
+              sx={{
+                mb: 1.5,
+                borderRadius: 1,
+                bgcolor: "#111827",
+                color: "#fff",
+                fontWeight: 950,
+                "& .MuiChip-icon": { color: "#22c55e" },
+              }}
+            />
+            <Typography
+              component="h1"
+              sx={{
+                fontWeight: 950,
+                letterSpacing: 0,
+                lineHeight: 1.08,
+                fontSize: { xs: "2rem", md: "3.15rem" },
+              }}
+            >
+              PTE practice questions with free AI scoring
+            </Typography>
+            <Typography
+              sx={{
+                mt: 1.5,
+                mx: "auto",
+                maxWidth: 760,
+                color: "#475569",
+                lineHeight: 1.7,
+                fontSize: { xs: "1rem", md: "1.08rem" },
+              }}
+            >
+              Choose a PTE task, practise with original A Plus Academy questions, and use AI scoring
+              for text-based answers such as essays, summaries, dictation, and fill-in-the-blanks.
+            </Typography>
+            <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap" useFlexGap sx={{ mt: 2.2 }}>
+              <Button
+                component={RouterLink}
+                to="/pte/write-essay"
+                variant="contained"
+                endIcon={<ArrowForwardIcon />}
+                sx={{ borderRadius: 1, textTransform: "none", fontWeight: 950, bgcolor: "#111827", "&:hover": { bgcolor: "#263142" } }}
+              >
+                Start Essay Scoring
+              </Button>
+              <Button
+                component={RouterLink}
+                to="/pte/summarize-written-text"
+                variant="outlined"
+                sx={{ borderRadius: 1, textTransform: "none", fontWeight: 950, color: "#111827", borderColor: "#111827" }}
+              >
+                Try Summarize Text
+              </Button>
+            </Stack>
+          </Box>
+
+          <Paper elevation={0} sx={{ p: { xs: 1.3, md: 1.5 }, borderRadius: 1, border: "1px solid #d4dbe3", bgcolor: "#fff" }}>
+            <Stack direction="row" gap={1} justifyContent="center" flexWrap="wrap">
+              {quickFilters.map((filter) => (
+                <Button
+                  key={filter.label}
+                  component="a"
+                  href={filter.href}
+                  size="small"
                   sx={{
-                    alignSelf: "flex-start",
                     borderRadius: 1,
-                    color: "#fff",
-                    bgcolor: "rgba(255,255,255,0.16)",
+                    textTransform: "none",
                     fontWeight: 900,
-                    "& .MuiChip-icon": { color: "#fff" },
+                    color: "#334155",
+                    bgcolor: "#f8fafc",
+                    px: 1.4,
+                    "&:hover": { bgcolor: "#e2e8f0" },
                   }}
-                />
-                <Typography component="h1" variant="h2" sx={{ fontWeight: 900, lineHeight: 1.1, fontSize: { xs: "1.95rem", md: "3rem" } }}>
-                  Free PTE practice with AI scoring for text-based tasks
+                >
+                  {filter.label}
+                </Button>
+              ))}
+            </Stack>
+          </Paper>
+
+          <LearnerProgressPanel />
+
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "repeat(2, minmax(0, 1fr))", md: "repeat(4, minmax(0, 1fr))" },
+              gap: 2,
+              maxWidth: 760,
+              mx: "auto",
+              width: "100%",
+            }}
+          >
+            {[
+              [`${pteTasks.length}+`, "PTE task pages"],
+              [`${textScoredTasks.length}`, "AI-scored text tasks"],
+              ["20 min", "timed essay practice"],
+              ["Free", "starter scoring pool"],
+            ].map(([value, label]) => (
+              <Paper key={label} elevation={0} sx={{ p: 2, borderRadius: 1, border: "1px solid #d4dbe3", bgcolor: "#fff", textAlign: "center" }}>
+                <Typography fontWeight={950} sx={{ fontSize: { xs: "1.55rem", md: "2.1rem" }, lineHeight: 1 }}>
+                  {value}
                 </Typography>
-                <Typography variant="h6" sx={{ lineHeight: 1.75, opacity: 0.92, maxWidth: 850 }}>
-                  Practise PTE Academic writing, reading, and listening tasks with original
-                  A Plus Academy questions. Use free AI scoring where a typed answer can be
-                  checked, and use strategy guides for speaking and audio-first tasks.
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.7, fontWeight: 800 }}>
+                  {label}
                 </Typography>
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
-                  <Button
-                    component={RouterLink}
-                    to="/pte/write-essay"
-                    variant="contained"
-                    endIcon={<ArrowForwardIcon />}
-                    sx={{ borderRadius: 1, textTransform: "none", fontWeight: 900, bgcolor: "#fff", color: "#0f766e", "&:hover": { bgcolor: "rgba(255,255,255,0.92)" } }}
-                  >
-                    Start PTE Essay Scoring
-                  </Button>
-                  <Button
-                    component={RouterLink}
-                    to="/pte/summarize-written-text"
-                    variant="outlined"
-                    sx={{ borderRadius: 1, textTransform: "none", fontWeight: 900, color: "#fff", borderColor: "rgba(255,255,255,0.55)", "&:hover": { borderColor: "#fff", bgcolor: "rgba(255,255,255,0.12)" } }}
-                  >
-                    Try Summarize Written Text
-                  </Button>
-                </Stack>
-              </Stack>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Paper elevation={0} sx={{ p: 2.2, borderRadius: 1, bgcolor: "rgba(255,255,255,0.14)", color: "#fff", border: "1px solid rgba(255,255,255,0.22)" }}>
-                <Stack spacing={1.4}>
-                  {[
-                    `${pteTasks.length} PTE task pages`,
-                    `${textScoredTasks.length} text-based scoring tasks`,
-                    "Google login for scored writing",
-                    "No image generation usage",
-                  ].map((item) => (
-                    <Stack key={item} direction="row" spacing={1.2} alignItems="center" sx={{ p: 1.2, bgcolor: "rgba(255,255,255,0.12)", borderRadius: 1 }}>
-                      <CheckCircleIcon sx={{ color: "#fef08a" }} />
-                      <Typography fontWeight={900}>{item}</Typography>
-                    </Stack>
-                  ))}
-                </Stack>
               </Paper>
+            ))}
+          </Box>
+
+          <Box component="section" id="free-ai-scoring" sx={{ scrollMarginTop: 96 }}>
+            <Stack direction={{ xs: "column", md: "row" }} spacing={1.5} justifyContent="center" alignItems="center" sx={{ mb: 1.6, textAlign: "center" }}>
+              <Box sx={{ maxWidth: 700 }}>
+                <Typography component="h2" variant="h5" fontWeight={950}>
+                  Popular free AI scoring tasks
+                </Typography>
+                <Typography color="text.secondary" sx={{ lineHeight: 1.65 }}>
+                  Start with the most searched PTE practice areas and move task by task.
+                </Typography>
+              </Box>
+              <Chip label="Text-based scoring only" sx={{ borderRadius: 1, bgcolor: "#dcfce7", color: "#047857", fontWeight: 950 }} />
+            </Stack>
+            <Grid container spacing={1.5}>
+              {popularTasks.map((task) => (
+                <Grid item xs={12} sm={6} md={4} key={task.slug}>
+                  <PopularTaskCard task={task} />
+                </Grid>
+              ))}
             </Grid>
-          </Grid>
-        </Container>
-      </Box>
+          </Box>
 
-      <Container component="main" sx={{ py: { xs: 3, md: 4.5 } }}>
-        <Stack spacing={4.5}>
-          <Alert severity="info">
-            This is an independent practice tool for learners. It is not an official Pearson scoring report, but it helps students improve grammar, form, vocabulary, and written accuracy.
-          </Alert>
+          <Paper elevation={0} sx={{ p: { xs: 2, md: 2.5 }, borderRadius: 1, border: "1px solid #d4dbe3", bgcolor: "#fff" }}>
+            <Stack spacing={3}>
+              {pteSections.map((section) => (
+                <React.Fragment key={section.id}>
+                  <SectionRoadmap section={section} />
+                  {section.id !== pteSections[pteSections.length - 1].id && <Divider />}
+                </React.Fragment>
+              ))}
+            </Stack>
+          </Paper>
 
-          {pteSections.map((section) => (
-            <Box component="section" id={section.id} key={section.id} sx={{ scrollMarginTop: 96 }}>
-              <Stack direction={{ xs: "column", md: "row" }} spacing={2} justifyContent="space-between" alignItems={{ xs: "flex-start", md: "flex-end" }} sx={{ mb: 2.5 }}>
-                <Box>
-                  <Typography component="h2" variant="h4" fontWeight={900}>
-                    {section.title}
+          <Paper
+            id="premium-pte"
+            elevation={0}
+            sx={{
+              scrollMarginTop: 96,
+              p: { xs: 2.5, md: 3 },
+              borderRadius: 1,
+              border: "1px solid #111827",
+              bgcolor: "#111827",
+              color: "#fff",
+            }}
+          >
+            <Grid container spacing={2.5} alignItems="center">
+              <Grid item xs={12} md={7}>
+                <Stack spacing={1.2}>
+                  <Chip
+                    icon={<WorkspacePremiumIcon />}
+                    label="Premium student plan"
+                    sx={{ alignSelf: "flex-start", borderRadius: 1, bgcolor: "rgba(255,255,255,0.12)", color: "#fff", fontWeight: 950, "& .MuiChip-icon": { color: "#fbbf24" } }}
+                  />
+                  <Typography component="h2" variant="h5" fontWeight={950}>
+                    Get personal PTE help when practice is not enough
                   </Typography>
-                  <Typography color="text.secondary" sx={{ mt: 0.7, lineHeight: 1.7, maxWidth: 760 }}>
-                    {section.description}
-                  </Typography>
-                </Box>
-                <Chip
-                  label={`${getSectionTasks(section.id).filter((task) => task.textScoring).length} AI scoring tasks`}
-                  sx={{ borderRadius: 1, bgcolor: `${section.color}18`, color: section.color, fontWeight: 900 }}
-                />
-              </Stack>
-              <Grid container spacing={2.5}>
-                {getSectionTasks(section.id).map((task) => (
-                  <Grid item xs={12} md={6} lg={4} key={task.slug}>
-                    <TaskCard task={task} color={section.color} />
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
-          ))}
-
-          <Paper elevation={0} sx={{ p: { xs: 3, md: 4 }, borderRadius: 1, color: "#fff", background: "linear-gradient(135deg, #111827, #7c2d12)", border: "1px solid rgba(255,255,255,0.12)" }}>
-            <Grid container spacing={3} alignItems="center">
-              <Grid item xs={12} md={8}>
-                <Stack spacing={1.5}>
-                  <Chip icon={<WorkspacePremiumIcon />} label="Premium student plan" sx={{ alignSelf: "flex-start", borderRadius: 1, bgcolor: "rgba(255,255,255,0.15)", color: "#fff", fontWeight: 900, "& .MuiChip-icon": { color: "#fff" } }} />
-                  <Typography component="h2" variant="h4" fontWeight={900}>
-                    Premium PTE support can be added for serious learners
-                  </Typography>
-                  <Typography sx={{ lineHeight: 1.75, opacity: 0.9 }}>
-                    Add paid offers for checked writing practice, teacher feedback, speaking
-                    sessions, weekly targets, mock test planning, and personal study support.
-                    Free users can continue using limited AI scoring for text-based tasks.
+                  <Typography sx={{ lineHeight: 1.75, color: "#cbd5e1" }}>
+                    Keep the free practice open for everyone, then offer paid support for writing review,
+                    speaking correction, weekly targets, and study abroad English guidance.
                   </Typography>
                 </Stack>
               </Grid>
-              <Grid item xs={12} md={4}>
-                <Stack spacing={1.2}>
-                  {["Teacher feedback add-on", "Weekly PTE writing plan", "Speaking and pronunciation class", "Study abroad English guidance"].map((item) => (
+              <Grid item xs={12} md={5}>
+                <Stack spacing={1}>
+                  {["Teacher feedback", "Speaking sessions", "Weekly writing plan", "Study abroad English guide"].map((item) => (
                     <Stack key={item} direction="row" spacing={1} alignItems="center">
-                      <CheckCircleIcon sx={{ color: "#fbbf24" }} />
+                      <CheckCircleIcon sx={{ color: "#22c55e" }} />
                       <Typography fontWeight={900}>{item}</Typography>
                     </Stack>
                   ))}
