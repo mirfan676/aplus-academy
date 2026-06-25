@@ -16,15 +16,15 @@ const requireDb = () => {
   if (!db) throw new Error("Firebase is not configured.");
 };
 
-const listCollection = async (name) => {
+const listCollection = async (name, max = 500) => {
   requireDb();
-  const snapshot = await getDocs(query(collection(db, name), limit(500)));
+  const snapshot = await getDocs(query(collection(db, name), limit(max)));
   return snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
 };
 
 export const fetchAdminJobs = () => listCollection("jobs");
 export const fetchTeamMembers = () => listCollection("teamMembers");
-export const fetchTeacherLeads = () => listCollection("teacherLeads");
+export const fetchTeacherLeads = () => listCollection("teacherLeads", 2000);
 export const fetchSiteAiTutorLogs = async () => {
   requireDb();
   const snapshot = await getDocs(query(collection(db, "siteAiTutorLogs"), orderBy("createdAt", "desc"), limit(200)));
@@ -161,9 +161,9 @@ export const saveTeacherLead = async (lead) => {
   return id;
 };
 
-export const importTeacherLeads = async (leads) => {
+export const importTeacherLeads = async (leads, onProgress) => {
   requireDb();
-  const validLeads = leads
+  const normalizedLeads = leads
     .map((lead) => ({
       name: String(lead.name || lead.teacher || lead.fullName || "").trim(),
       phone: normalizeLeadPhone(lead.phone || lead.whatsapp || lead.mobile || lead.contact),
@@ -175,6 +175,33 @@ export const importTeacherLeads = async (leads) => {
     }))
     .filter((lead) => lead.phone);
 
-  await Promise.all(validLeads.map((lead) => saveTeacherLead(lead)));
-  return validLeads.length;
+  const uniqueByPhone = new Map();
+  normalizedLeads.forEach((lead) => {
+    if (!uniqueByPhone.has(lead.phone)) uniqueByPhone.set(lead.phone, lead);
+  });
+
+  const existingLeads = await fetchTeacherLeads();
+  const existingPhones = new Set(existingLeads.map((lead) => normalizeLeadPhone(lead.phone || lead.id)));
+  const uniqueLeads = [...uniqueByPhone.values()];
+  const duplicatesInFile = normalizedLeads.length - uniqueLeads.length;
+  const duplicateExisting = uniqueLeads.filter((lead) => existingPhones.has(lead.phone)).length;
+  const toCreate = uniqueLeads.filter((lead) => !existingPhones.has(lead.phone));
+
+  let completed = 0;
+  for (const lead of toCreate) {
+    await saveTeacherLead(lead);
+    completed += 1;
+    onProgress?.({
+      completed,
+      total: toCreate.length,
+      imported: completed,
+      duplicates: duplicatesInFile + duplicateExisting,
+    });
+  }
+
+  return {
+    imported: toCreate.length,
+    duplicates: duplicatesInFile + duplicateExisting,
+    totalValid: normalizedLeads.length,
+  };
 };

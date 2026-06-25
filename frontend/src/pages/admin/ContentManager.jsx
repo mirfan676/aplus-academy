@@ -3,7 +3,7 @@ import { Link as RouterLink } from "react-router-dom";
 import {
   Alert, Avatar, Box, Button, Checkbox, Chip, CircularProgress, Container, Dialog,
   DialogActions, DialogContent, DialogTitle, FormControlLabel, IconButton, MenuItem,
-  Paper, Stack, Tab, Tabs, TextField, Tooltip, Typography,
+  LinearProgress, Paper, Stack, Tab, Tabs, TextField, Tooltip, Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -95,6 +95,8 @@ const extractLeadsFromCsv = (text) => {
 const hasRecognizedLeadData = (rows) =>
   rows.some((row) => normalizePhone(row.phone || row.whatsapp || row.mobile || row.contact));
 
+const LEADS_PER_PAGE = 50;
+
 const ContentManager = () => {
   const [tab, setTab] = useState(0);
   const [jobs, setJobs] = useState([]);
@@ -104,6 +106,8 @@ const ContentManager = () => {
   const [teacherLeads, setTeacherLeads] = useState([]);
   const [selectedLeadIds, setSelectedLeadIds] = useState([]);
   const [leadMessage, setLeadMessage] = useState("Assalam o Alaikum {name}, A Plus Academy invites teachers to join our platform for free. Create your profile here: https://www.aplusacademy.pk/register");
+  const [leadPage, setLeadPage] = useState(1);
+  const [importProgress, setImportProgress] = useState(null);
   const [editor, setEditor] = useState(null);
   const [editorType, setEditorType] = useState("");
   const [loading, setLoading] = useState(true);
@@ -122,6 +126,7 @@ const ContentManager = () => {
       setMembers(nextMembers.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)));
       setAiLogs(nextAiLogs);
       setTeacherLeads(nextTeacherLeads.sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || ""))));
+      setLeadPage((current) => Math.min(current, Math.max(1, Math.ceil(nextTeacherLeads.length / LEADS_PER_PAGE))));
     } catch (loadError) {
       setError(loadError.message || "Dashboard content could not be loaded.");
     } finally {
@@ -199,19 +204,22 @@ const ContentManager = () => {
     setSaving(true);
     setError("");
     setMessage("");
+    setImportProgress({ completed: 0, total: 0, imported: 0, duplicates: 0 });
 
     try {
       const text = await file.text();
       const rows = parseCsvText(text);
-      const imported = await importTeacherLeads(
-        rows.length && hasRecognizedLeadData(rows) ? rows : extractLeadsFromCsv(text)
+      const result = await importTeacherLeads(
+        rows.length && hasRecognizedLeadData(rows) ? rows : extractLeadsFromCsv(text),
+        (progress) => setImportProgress(progress),
       );
-      setMessage(`${imported} teacher leads imported or updated.`);
+      setMessage(`${result.imported} leads imported. ${result.duplicates} duplicates skipped.`);
       await refresh();
     } catch (importError) {
       setError(importError.message || "Teacher leads could not be imported.");
     } finally {
       setSaving(false);
+      setTimeout(() => setImportProgress(null), 1200);
     }
   };
 
@@ -253,6 +261,9 @@ const ContentManager = () => {
     }
     openWhatsAppLead(nextLead);
   };
+
+  const totalLeadPages = Math.max(1, Math.ceil(teacherLeads.length / LEADS_PER_PAGE));
+  const visibleTeacherLeads = teacherLeads.slice((leadPage - 1) * LEADS_PER_PAGE, leadPage * LEADS_PER_PAGE);
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#eef5ff" }}>
@@ -317,6 +328,17 @@ const ContentManager = () => {
                     </Button>
                   </Stack>
                   <Stack spacing={1.2} sx={{ mt: 2 }}>
+                    {importProgress && (
+                      <Box>
+                        <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.8 }}>
+                          <Typography variant="body2" fontWeight={800}>Uploading leads</Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {importProgress.total ? `${importProgress.completed}/${importProgress.total}` : "Preparing"}
+                          </Typography>
+                        </Stack>
+                        <LinearProgress variant={importProgress.total ? "determinate" : "indeterminate"} value={importProgress.total ? (importProgress.completed / importProgress.total) * 100 : 0} sx={{ height: 8, borderRadius: 99 }} />
+                      </Box>
+                    )}
                     <TextField
                       label="WhatsApp message template"
                       value={leadMessage}
@@ -334,7 +356,7 @@ const ContentManager = () => {
                     </Stack>
                   </Stack>
                 </Paper>
-                {teacherLeads.map((lead) => (
+                {visibleTeacherLeads.map((lead) => (
                   <Paper key={lead.id} variant="outlined" sx={{ p: 2, borderRadius: 1 }}>
                     <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" gap={2}>
                       <Stack direction="row" spacing={1.2} sx={{ flex: 1 }}>
@@ -369,6 +391,18 @@ const ContentManager = () => {
                     </Stack>
                   </Paper>
                 ))}
+                {teacherLeads.length > LEADS_PER_PAGE && (
+                  <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems={{ xs: "flex-start", sm: "center" }} gap={1}>
+                    <Typography variant="body2" color="text.secondary">
+                      Showing {Math.min((leadPage - 1) * LEADS_PER_PAGE + 1, teacherLeads.length)}-{Math.min(leadPage * LEADS_PER_PAGE, teacherLeads.length)} of {teacherLeads.length}
+                    </Typography>
+                    <Stack direction="row" gap={1}>
+                      <Button variant="outlined" size="small" disabled={leadPage === 1} onClick={() => setLeadPage((current) => Math.max(1, current - 1))}>Previous</Button>
+                      <Chip label={`Page ${leadPage} / ${totalLeadPages}`} sx={{ borderRadius: 1 }} />
+                      <Button variant="outlined" size="small" disabled={leadPage === totalLeadPages} onClick={() => setLeadPage((current) => Math.min(totalLeadPages, current + 1))}>Next</Button>
+                    </Stack>
+                  </Stack>
+                )}
                 {!teacherLeads.length && <Alert severity="info">No teacher leads imported yet.</Alert>}
               </Stack>
             )}
