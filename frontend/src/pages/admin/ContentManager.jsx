@@ -92,6 +92,9 @@ const extractLeadsFromCsv = (text) => {
   return leads;
 };
 
+const hasRecognizedLeadData = (rows) =>
+  rows.some((row) => normalizePhone(row.phone || row.whatsapp || row.mobile || row.contact));
+
 const ContentManager = () => {
   const [tab, setTab] = useState(0);
   const [jobs, setJobs] = useState([]);
@@ -200,7 +203,9 @@ const ContentManager = () => {
     try {
       const text = await file.text();
       const rows = parseCsvText(text);
-      const imported = await importTeacherLeads(rows.length ? rows : extractLeadsFromCsv(text));
+      const imported = await importTeacherLeads(
+        rows.length && hasRecognizedLeadData(rows) ? rows : extractLeadsFromCsv(text)
+      );
       setMessage(`${imported} teacher leads imported or updated.`);
       await refresh();
     } catch (importError) {
