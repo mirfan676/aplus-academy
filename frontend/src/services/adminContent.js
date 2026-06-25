@@ -24,10 +24,19 @@ const listCollection = async (name) => {
 
 export const fetchAdminJobs = () => listCollection("jobs");
 export const fetchTeamMembers = () => listCollection("teamMembers");
+export const fetchTeacherLeads = () => listCollection("teacherLeads");
 export const fetchSiteAiTutorLogs = async () => {
   requireDb();
   const snapshot = await getDocs(query(collection(db, "siteAiTutorLogs"), orderBy("createdAt", "desc"), limit(200)));
   return snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
+};
+
+const normalizeLeadPhone = (phone) => String(phone || "").replace(/\D/g, "");
+
+const leadDocId = (lead) => {
+  const normalizedPhone = normalizeLeadPhone(lead.phone);
+  if (!normalizedPhone) throw new Error("Each teacher lead needs a phone number.");
+  return normalizedPhone;
 };
 
 export const fetchTeacherRecords = async () => {
@@ -131,4 +140,41 @@ export const saveTeamMember = async (member) => {
 export const removeTeamMember = async (id) => {
   requireDb();
   await deleteDoc(doc(db, "teamMembers", id));
+};
+
+export const saveTeacherLead = async (lead) => {
+  requireDb();
+  const id = leadDocId(lead);
+  await setDoc(doc(db, "teacherLeads", id), {
+    name: String(lead.name || "").trim(),
+    phone: normalizeLeadPhone(lead.phone),
+    subject: String(lead.subject || "").trim(),
+    city: String(lead.city || "").trim(),
+    notes: String(lead.notes || "").trim(),
+    source: String(lead.source || "admin-import").trim(),
+    status: String(lead.status || "pending").trim(),
+    contactedAt: lead.contactedAt || null,
+    joinedAt: lead.joinedAt || null,
+    updatedAt: serverTimestamp(),
+    createdAt: lead.createdAt || serverTimestamp(),
+  }, { merge: true });
+  return id;
+};
+
+export const importTeacherLeads = async (leads) => {
+  requireDb();
+  const validLeads = leads
+    .map((lead) => ({
+      name: String(lead.name || lead.teacher || lead.fullName || "").trim(),
+      phone: normalizeLeadPhone(lead.phone || lead.whatsapp || lead.mobile || lead.contact),
+      subject: String(lead.subject || lead.subjects || "").trim(),
+      city: String(lead.city || lead.location || "").trim(),
+      notes: String(lead.notes || lead.message || "").trim(),
+      source: String(lead.source || "excel-csv-import").trim(),
+      status: "pending",
+    }))
+    .filter((lead) => lead.phone);
+
+  await Promise.all(validLeads.map((lead) => saveTeacherLead(lead)));
+  return validLeads.length;
 };

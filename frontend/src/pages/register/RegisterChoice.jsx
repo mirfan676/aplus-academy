@@ -3,6 +3,7 @@ import {
   Button,
   Chip,
   Container,
+  Alert,
   Paper,
   Stack,
   Typography,
@@ -10,9 +11,12 @@ import {
 import SchoolIcon from "@mui/icons-material/School";
 import FamilyRestroomIcon from "@mui/icons-material/FamilyRestroom";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
+import GoogleIcon from "@mui/icons-material/Google";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { Link as RouterLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useSEO from "../../hooks/useSEO";
+import { useAuth } from "../../contexts/useAuth";
 
 const options = [
   {
@@ -42,6 +46,8 @@ const options = [
 ];
 
 const RegisterChoice = () => {
+  const navigate = useNavigate();
+  const { hasFirebaseConfig, signInWithGoogle, user } = useAuth();
   useSEO({
     title: "Register with A Plus Academy | Teacher, Parent or Student",
     description:
@@ -66,6 +72,7 @@ const RegisterChoice = () => {
         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" }, gap: 3 }}>
           {options.map((option) => {
             const Icon = option.icon;
+            const isTeacher = option.to === "/register/teacher";
             return (
               <Paper
                 key={option.title}
@@ -111,6 +118,32 @@ const RegisterChoice = () => {
                     </Typography>
                   ))}
                 </Stack>
+                {isTeacher && (
+                  <Stack spacing={1} sx={{ mb: 2 }}>
+                    {!user && (
+                      <Alert severity="info" sx={{ borderRadius: 1 }}>
+                        Sign in with Google first to save your teacher profile and photo.
+                      </Alert>
+                    )}
+                    <Button
+                      startIcon={<GoogleIcon />}
+                      variant="outlined"
+                      disabled={!hasFirebaseConfig}
+                      onClick={async () => {
+                        await signInWithGoogle();
+                        navigate("/register/teacher");
+                      }}
+                      sx={{
+                        justifyContent: "flex-start",
+                        borderRadius: 1,
+                        textTransform: "none",
+                        fontWeight: 800,
+                      }}
+                    >
+                      Continue with Google
+                    </Button>
+                  </Stack>
+                )}
                 <Button
                   component={RouterLink}
                   to={option.to}

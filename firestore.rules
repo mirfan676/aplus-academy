@@ -107,5 +107,9 @@ service cloud.firestore {
         && request.resource.data.answer.size() <= 1600;
       allow read, update, delete: if isAdmin();
     }
+
+    match /teacherLeads/{leadId} {
+      allow read, create, update, delete: if isAdmin();
+    }
   }
 }
