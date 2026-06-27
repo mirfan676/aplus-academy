@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-06-27-programming-education-and-coding-skills",
+    "title": "Programming Education and Coding Skills",
+    "description": "A concise education-news summary covering recent developments in Programming and the common themes connecting them.",
+    "topic": "Programming Education and Coding Skills",
+    "category": "Programming",
+    "publishedAt": "2026-06-27T06:37:25.169496+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/574071/pexels-photo-574071.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/person-using-macbook-pro-574071/",
+      "credit": "Pexels free photo",
+      "alt": "Developer working on a laptop for coding practice",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-06-26-technology-education-and-digital-skills",
     "title": "Technology Education and Digital Skills",
     "description": "A concise education-news summary covering recent developments in IT & Technology and the common themes connecting them.",
