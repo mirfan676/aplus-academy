@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigationType } from "react-router-dom";
 import { ThemeProvider, CssBaseline, Container, Card, CardContent } from "@mui/material";
 import Home from "./pages/Home";
@@ -39,6 +39,7 @@ import theme from "./theme";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import SiteAiTutor from "./components/SiteAiTutor";
+import SiteLoader from "./components/SiteLoader";
 
 function usePageTracking() {
   const location = useLocation();
@@ -215,9 +216,35 @@ function AppShell() {
 }
 
 function App() {
+  const [showLoader, setShowLoader] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    const finish = () => {
+      window.setTimeout(() => {
+        if (!cancelled) {
+          setShowLoader(false);
+        }
+      }, 900);
+    };
+
+    if (document.readyState === "complete") {
+      finish();
+    } else {
+      window.addEventListener("load", finish, { once: true });
+      window.setTimeout(finish, 1800);
+    }
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener("load", finish);
+    };
+  }, []);
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      {showLoader ? <SiteLoader /> : null}
       <Router>
         <AuthProvider>
           <AppShell />

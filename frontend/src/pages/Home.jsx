@@ -1,34 +1,20 @@
 import React from "react";
-import useSEO from "../hooks/useSEO";  // <-- REQUIRED IMPORT
-
-import HeroSection from "../components/sections/HeroSection";
-import AdvantagesSection from "../components/sections/AdvantagesSection";
-import StepsSection from "../components/sections/StepsSection";
-import WhyChooseUs from "../components/sections/WhyChooseUs";
-import AreasWeCover from "../components/sections/AreasWeCover";
-import FAQSection from "../components/sections/FAQSection";
-import FooterCTA from "../components/sections/FooterCTA";
 import LatestNewsSection from "../components/blog/LatestNewsSection";
+import ContentRichHome from "../components/sections/ContentRichHome";
+import useSEO from "../hooks/useSEO";
 
 const Home = () => {
-
   useSEO({
-    title: "A Plus Home Tutors — Trusted Home & Online Tuition in Pakistan",
+    title: "A Plus Academy | Home Tutors, Career Roadmaps, PTE Practice and Student Guidance",
     description:
-      "Pakistan’s trusted platform for home and online tuition — connecting students with expert tutors for O/A Levels, Matric, and Quran classes.",
+      "Find home and online tutors in Pakistan, explore class-wise academic guidance, career roadmaps, PTE practice, exam help, and trusted teacher support for parents and students.",
     canonical: "https://www.aplusacademy.pk/",
   });
 
   return (
     <>
-      <HeroSection />
-      <AdvantagesSection />
-      <StepsSection />
-      <WhyChooseUs />
-      <AreasWeCover />
+      <ContentRichHome />
       <LatestNewsSection />
-      <FAQSection />
-      <FooterCTA />
     </>
   );
 };

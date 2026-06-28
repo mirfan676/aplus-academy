@@ -17,15 +17,46 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import QuizIcon from "@mui/icons-material/Quiz";
 import {
-  fetchAdminJobs, fetchSiteAiTutorLogs, fetchTeacherLeads, fetchTeacherRecords, fetchTeamMembers, importTeacherLeads,
-  removeJob, removeTeamMember, saveJob, saveTeacherApplication, saveTeacherLead, saveTeamMember, saveVerifiedTeacher,
+  fetchAdminJobs, fetchPteQuestions, fetchSiteAiTutorLogs, fetchTeacherLeads, fetchTeacherRecords, fetchTeamMembers, importTeacherLeads,
+  removeJob, removePteQuestion, removeTeamMember, saveJob, savePteQuestion, saveTeacherApplication, saveTeacherLead, saveTeamMember, saveVerifiedTeacher,
 } from "../../services/adminContent";
 import { approveTeacherApplication } from "../../services/firestoreMigration";
+import { pteSections, pteTasks } from "../pte/ptePracticeData";
 
 const emptyJob = { title: "", grade: "", school: "", subjects: "", timing: "", fee: "", location: "", city: "", gender: "Both", contact: "", status: "Open", students: 1 };
 const emptyMember = { name: "", role: "", bio: "", photoURL: "", expertise: "", linkedin: "", email: "", sortOrder: 0, active: true };
+const emptyPteQuestion = {
+  title: "",
+  section: "speaking-writing",
+  taskSlug: "read-aloud",
+  questionType: "text",
+  difficulty: "medium",
+  source: "A Plus Academy original",
+  prompt: "",
+  transcript: "",
+  audioText: "",
+  audioUrl: "",
+  sample: "",
+  explanation: "",
+  notes: "",
+  options: "",
+  tips: "",
+  acceptableAnswers: "",
+  correctAnswers: "",
+  minWords: "",
+  maxWords: "",
+  order: 0,
+  published: true,
+};
 const leadStatuses = ["pending", "contacted", "joined", "skip"];
+const pteQuestionTypes = [
+  ["text", "Text response"],
+  ["short-answer", "Short answer"],
+  ["choice", "Multiple choice"],
+];
+const pteDifficulties = ["easy", "medium", "hard"];
 const teacherFields = [
   ["name", "Full name"], ["qualification", "Qualification"], ["subject", "Primary subject"],
   ["subjects", "Subjects (comma separated)"], ["experience", "Years of experience"], ["phone", "Phone"],
@@ -104,6 +135,7 @@ const ContentManager = () => {
   const [members, setMembers] = useState([]);
   const [aiLogs, setAiLogs] = useState([]);
   const [teacherLeads, setTeacherLeads] = useState([]);
+  const [pteQuestions, setPteQuestions] = useState([]);
   const [selectedLeadIds, setSelectedLeadIds] = useState([]);
   const [leadMessage, setLeadMessage] = useState("Assalam o Alaikum {name}, A Plus Academy invites teachers to join our platform for free. Create your profile here: https://www.aplusacademy.pk/register");
   const [leadPage, setLeadPage] = useState(1);
@@ -118,14 +150,19 @@ const ContentManager = () => {
   const refresh = async () => {
     setLoading(true);
     try {
-      const [nextJobs, nextApplications, nextMembers, nextAiLogs, nextTeacherLeads] = await Promise.all([
-        fetchAdminJobs(), fetchTeacherRecords(), fetchTeamMembers(), fetchSiteAiTutorLogs(), fetchTeacherLeads(),
+      const [nextJobs, nextApplications, nextMembers, nextAiLogs, nextTeacherLeads, nextPteQuestions] = await Promise.all([
+        fetchAdminJobs(), fetchTeacherRecords(), fetchTeamMembers(), fetchSiteAiTutorLogs(), fetchTeacherLeads(), fetchPteQuestions(),
       ]);
       setJobs(nextJobs.sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || ""))));
       setApplications(nextApplications);
       setMembers(nextMembers.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)));
       setAiLogs(nextAiLogs);
       setTeacherLeads(nextTeacherLeads.sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || ""))));
+      setPteQuestions(nextPteQuestions.sort((a, b) => {
+        const sectionCompare = String(a.section || "").localeCompare(String(b.section || ""));
+        if (sectionCompare !== 0) return sectionCompare;
+        return Number(a.order || 0) - Number(b.order || 0);
+      }));
       setLeadPage((current) => Math.min(current, Math.max(1, Math.ceil(nextTeacherLeads.length / LEADS_PER_PAGE))));
     } catch (loadError) {
       setError(loadError.message || "Dashboard content could not be loaded.");
@@ -140,6 +177,15 @@ const ContentManager = () => {
     setEditorType(type);
     if (type === "teacher") {
       setEditor({ ...record, subjects: Array.isArray(record.subjects) ? record.subjects.join(", ") : record.subjects || "" });
+    } else if (type === "pte-question") {
+      setEditor({
+        ...emptyPteQuestion,
+        ...record,
+        options: Array.isArray(record?.options) ? record.options.join("\n") : record?.options || "",
+        tips: Array.isArray(record?.tips) ? record.tips.join("\n") : record?.tips || "",
+        acceptableAnswers: Array.isArray(record?.acceptableAnswers) ? record.acceptableAnswers.join("\n") : record?.acceptableAnswers || "",
+        correctAnswers: Array.isArray(record?.correctAnswers) ? record.correctAnswers.join("\n") : record?.correctAnswers || "",
+      });
     } else if (type === "team") {
       setEditor({ ...emptyMember, ...record, expertise: Array.isArray(record?.expertise) ? record.expertise.join(", ") : record?.expertise || "" });
     } else if (type === "lead") {
@@ -157,9 +203,10 @@ const ContentManager = () => {
     try {
       if (editorType === "job") await saveJob(editor);
       if (editorType === "teacher") {
-        if (editor.recordState === "verified") await saveVerifiedTeacher(editor);
-        else await saveTeacherApplication(editor);
-      }
+      if (editor.recordState === "verified") await saveVerifiedTeacher(editor);
+      else await saveTeacherApplication(editor);
+    }
+      if (editorType === "pte-question") await savePteQuestion(editor);
       if (editorType === "lead") await saveTeacherLead(editor);
       if (editorType === "team") await saveTeamMember(editor);
       setMessage(`${editorType === "team" ? "Team member" : editorType} saved.`);
@@ -185,8 +232,10 @@ const ContentManager = () => {
   const remove = async (type, id) => {
     setError("");
     try {
-      if (type === "job") await removeJob(id); else await removeTeamMember(id);
-      setMessage(`${type === "job" ? "Job" : "Team member"} deleted.`);
+      if (type === "job") await removeJob(id);
+      else if (type === "pte-question") await removePteQuestion(id);
+      else await removeTeamMember(id);
+      setMessage(`${type === "job" ? "Job" : type === "pte-question" ? "PTE question" : "Team member"} deleted.`);
       await refresh();
     } catch (removeError) { setError(removeError.message || "Record could not be deleted."); }
   };
@@ -282,6 +331,7 @@ const ContentManager = () => {
             <Tab icon={<SchoolIcon />} iconPosition="start" label={`Teachers (${applications.length})`} />
             <Tab icon={<GroupsIcon />} iconPosition="start" label={`Expert team (${members.length})`} />
             <Tab icon={<SmartToyIcon />} iconPosition="start" label={`AI questions (${aiLogs.length})`} />
+            <Tab icon={<QuizIcon />} iconPosition="start" label={`PTE questions (${pteQuestions.length})`} />
             <Tab icon={<WhatsAppIcon />} iconPosition="start" label={`Teacher leads (${teacherLeads.length})`} />
           </Tabs>
           <Box sx={{ p: { xs: 2, md: 3 } }}>
@@ -311,6 +361,51 @@ const ContentManager = () => {
                   </Stack>
                 </Paper>)}
                 {!aiLogs.length && <Alert severity="info">No AI tutor questions recorded yet.</Alert>}
+              </Stack>
+            ) : tab === 4 ? (
+              <Stack spacing={2}>
+                <Paper variant="outlined" sx={{ p: 2, borderRadius: 1 }}>
+                  <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" gap={2}>
+                    <Box sx={{ maxWidth: 860 }}>
+                      <Typography fontWeight={900}>How to add PTE question material correctly</Typography>
+                      <Typography color="text.secondary" sx={{ mt: 0.7, lineHeight: 1.7 }}>
+                        Add one practice item per record. Use original or licensed content only. For listening and speaking tasks, fill
+                        <strong> Audio text </strong>with the exact sentence or lecture script you want the browser to read for free. Add
+                        <strong> Transcript </strong>when the learner should see the spoken script after trying the task. Use
+                        <strong> Options </strong>for multiple choice, <strong>Acceptable answers</strong> for exact text matches like
+                        dictation or fill blanks, and <strong>Sample / model answer</strong> for writing or speaking guidance.
+                      </Typography>
+                    </Box>
+                    <Button onClick={() => openEditor("pte-question", emptyPteQuestion)} variant="contained" startIcon={<AddIcon />} sx={{ alignSelf: { xs: "flex-start", md: "center" } }}>
+                      Add PTE question
+                    </Button>
+                  </Stack>
+                </Paper>
+                {pteQuestions.map((question) => (
+                  <Paper key={question.id} variant="outlined" sx={{ p: 2, borderRadius: 1 }}>
+                    <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" gap={2}>
+                      <Box sx={{ minWidth: 0 }}>
+                        <Stack direction="row" gap={1} alignItems="center" flexWrap="wrap">
+                          <Typography fontWeight={900}>{question.title || "Untitled PTE question"}</Typography>
+                          <Chip size="small" label={pteTasks.find((task) => task.slug === question.taskSlug)?.title || question.taskSlug || "Task"} />
+                          <Chip size="small" label={question.questionType || "text"} color="primary" sx={{ color: "#fff" }} />
+                          <Chip size="small" label={question.published ? "Published" : "Draft"} color={question.published ? "success" : "default"} />
+                        </Stack>
+                        <Typography color="text.secondary" sx={{ mt: 0.7 }}>
+                          {(pteSections.find((section) => section.id === question.section)?.title || question.section || "Section")} · {question.source || "A Plus Academy original"} · Order {question.order || 0}
+                        </Typography>
+                        <Typography variant="body2" sx={{ mt: 0.8, lineHeight: 1.65 }}>
+                          {String(question.prompt || "").slice(0, 220)}{String(question.prompt || "").length > 220 ? "..." : ""}
+                        </Typography>
+                      </Box>
+                      <Stack direction="row">
+                        <Tooltip title="Edit question"><IconButton onClick={() => openEditor("pte-question", question)}><EditIcon /></IconButton></Tooltip>
+                        <Tooltip title="Delete question"><IconButton color="error" onClick={() => remove("pte-question", question.id)}><DeleteOutlineIcon /></IconButton></Tooltip>
+                      </Stack>
+                    </Stack>
+                  </Paper>
+                ))}
+                {!pteQuestions.length && <Alert severity="info">No PTE questions have been stored in Firestore yet.</Alert>}
               </Stack>
             ) : (
               <Stack spacing={2}>
@@ -411,7 +506,7 @@ const ContentManager = () => {
       </Container>
 
       <Dialog open={Boolean(editor)} onClose={() => setEditor(null)} fullWidth maxWidth="md">
-        <DialogTitle>{editorType === "job" ? "Job details" : editorType === "team" ? "Expert team profile" : editorType === "lead" ? "Teacher lead" : editor?.recordState === "verified" ? "Edit verified teacher" : "Complete teacher profile"}</DialogTitle>
+        <DialogTitle>{editorType === "job" ? "Job details" : editorType === "team" ? "Expert team profile" : editorType === "lead" ? "Teacher lead" : editorType === "pte-question" ? "PTE question material" : editor?.recordState === "verified" ? "Edit verified teacher" : "Complete teacher profile"}</DialogTitle>
         {editor && <DialogContent dividers><Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)" }, gap: 2 }}>
           {editorType === "job" && <>
             {[["title","Job title"],["grade","Grade / level"],["school","School"],["subjects","Subjects"],["timing","Timing"],["fee","Monthly fee"],["location","Location"],["city","City"],["contact","Contact"],["students","Students"]].map(([field,label]) => <TextField key={field} label={label} value={editor[field] ?? ""} onChange={change(field)} required={["title","subjects","city"].includes(field)} />)}
@@ -419,6 +514,46 @@ const ContentManager = () => {
             <TextField select label="Status" value={editor.status || "Open"} onChange={change("status")}><MenuItem value="Open">Open</MenuItem><MenuItem value="Closed">Closed</MenuItem></TextField>
           </>}
           {editorType === "teacher" && <>{teacherFields.map(([field,label]) => <TextField key={field} label={label} value={editor[field] ?? ""} onChange={change(field)} />)}<TextField label="Professional biography" value={editor.bio || ""} onChange={change("bio")} multiline minRows={4} sx={{ gridColumn: "1 / -1" }} /></>}
+          {editorType === "pte-question" && <>
+            <TextField label="Question title" value={editor.title || ""} onChange={change("title")} />
+            <TextField select label="Section" value={editor.section || "speaking-writing"} onChange={change("section")}>
+              {pteSections.map((section) => <MenuItem key={section.id} value={section.id}>{section.title}</MenuItem>)}
+            </TextField>
+            <TextField
+              select
+              label="Task"
+              value={editor.taskSlug || ""}
+              onChange={(event) => {
+                const taskSlug = event.target.value;
+                const task = pteTasks.find((item) => item.slug === taskSlug);
+                setEditor((current) => ({ ...current, taskSlug, section: task?.section || current.section }));
+              }}
+            >
+              {pteTasks.map((task) => <MenuItem key={task.slug} value={task.slug}>{task.title}</MenuItem>)}
+            </TextField>
+            <TextField select label="Question type" value={editor.questionType || "text"} onChange={change("questionType")}>
+              {pteQuestionTypes.map(([value, label]) => <MenuItem key={value} value={value}>{label}</MenuItem>)}
+            </TextField>
+            <TextField select label="Difficulty" value={editor.difficulty || "medium"} onChange={change("difficulty")}>
+              {pteDifficulties.map((difficulty) => <MenuItem key={difficulty} value={difficulty}>{difficulty}</MenuItem>)}
+            </TextField>
+            <TextField label="Display order" type="number" value={editor.order ?? 0} onChange={change("order")} />
+            <TextField label="Source label" value={editor.source || ""} onChange={change("source")} helperText="Example: A Plus Academy original, Pearson free sample adapted, teacher-contributed." sx={{ gridColumn: "1 / -1" }} />
+            <TextField label="Prompt / question text" value={editor.prompt || ""} onChange={change("prompt")} multiline minRows={5} sx={{ gridColumn: "1 / -1" }} />
+            <TextField label="Audio text for free browser playback" value={editor.audioText || ""} onChange={change("audioText")} multiline minRows={3} sx={{ gridColumn: "1 / -1" }} helperText="Use this when you want the browser to read the sentence or lecture aloud without storing an audio file." />
+            <TextField label="Hosted audio URL (optional)" value={editor.audioUrl || ""} onChange={change("audioUrl")} sx={{ gridColumn: "1 / -1" }} helperText="Leave blank if browser text-to-speech is enough. Use this later if you upload MP3 audio to storage." />
+            <TextField label="Transcript (shown after attempt)" value={editor.transcript || ""} onChange={change("transcript")} multiline minRows={4} sx={{ gridColumn: "1 / -1" }} />
+            <TextField label="Sample or model answer" value={editor.sample || ""} onChange={change("sample")} multiline minRows={4} sx={{ gridColumn: "1 / -1" }} />
+            <TextField label="Options (one per line)" value={editor.options || ""} onChange={change("options")} multiline minRows={4} helperText="Use only for multiple-choice tasks." sx={{ gridColumn: "1 / -1" }} />
+            <TextField label="Correct answers (one per line)" value={editor.correctAnswers || ""} onChange={change("correctAnswers")} multiline minRows={3} helperText="For choice tasks, use the exact matching option text or option id; for reorder, use formats like B C A." sx={{ gridColumn: "1 / -1" }} />
+            <TextField label="Acceptable typed answers (one per line)" value={editor.acceptableAnswers || ""} onChange={change("acceptableAnswers")} multiline minRows={3} helperText="Use for dictation, fill blanks, repeat sentence, or short-answer tasks." sx={{ gridColumn: "1 / -1" }} />
+            <TextField label="Tips (one per line)" value={editor.tips || ""} onChange={change("tips")} multiline minRows={3} sx={{ gridColumn: "1 / -1" }} />
+            <TextField label="Explanation / feedback note" value={editor.explanation || ""} onChange={change("explanation")} multiline minRows={3} sx={{ gridColumn: "1 / -1" }} />
+            <TextField label="Admin notes" value={editor.notes || ""} onChange={change("notes")} multiline minRows={3} sx={{ gridColumn: "1 / -1" }} />
+            <TextField label="Minimum words" type="number" value={editor.minWords ?? ""} onChange={change("minWords")} />
+            <TextField label="Maximum words" type="number" value={editor.maxWords ?? ""} onChange={change("maxWords")} />
+            <FormControlLabel control={<Checkbox checked={Boolean(editor.published)} onChange={change("published")} />} label="Published for learners" />
+          </>}
           {editorType === "team" && <>
             <TextField label="Full name" value={editor.name} onChange={change("name")} required /><TextField label="Role / title" value={editor.role} onChange={change("role")} required />
             <TextField label="Profile image URL" value={editor.photoURL} onChange={change("photoURL")} sx={{ gridColumn: "1 / -1" }} /><TextField label="Expertise (comma separated)" value={editor.expertise} onChange={change("expertise")} sx={{ gridColumn: "1 / -1" }} />

@@ -10,6 +10,7 @@ import {
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { db, storage } from "../firebase";
+import { pteQuestionBank } from "../pages/pte/pteQuestionBank";
 
 const legacyApi = "https://aplus-academy.onrender.com";
 
@@ -34,7 +35,7 @@ const migrateThumbnail = async (sourceUrl, teacherId) => {
 };
 
 export const getFirestoreMigrationCounts = async () => {
-  const names = ["teachers", "teacherApplications", "jobs", "pteEssays", "pteEssayResponses"];
+  const names = ["teachers", "teacherApplications", "jobs", "pteEssays", "pteQuestions", "pteEssayResponses"];
   const counts = {};
   await Promise.all(names.map(async (name) => {
     try {
@@ -44,6 +45,60 @@ export const getFirestoreMigrationCounts = async () => {
     }
   }));
   return counts;
+};
+
+export const seedBundledPteQuestions = async (onProgress = () => {}) => {
+  if (!db) throw new Error("Firebase is not configured.");
+
+  const entries = Object.entries(pteQuestionBank).flatMap(([taskSlug, questions]) =>
+    questions.map((question, index) => ({ taskSlug, question, index })),
+  );
+
+  let completed = 0;
+  for (const entry of entries) {
+    const { taskSlug, question, index } = entry;
+    const docId = `bundled-${taskSlug}-${question.id}`;
+    const options = Array.isArray(question.options)
+      ? question.options.map((option) => (typeof option === "string" ? option : option.text || ""))
+      : [];
+    const correctAnswers = Array.isArray(question.correctOptionIds)
+      ? question.correctOptionIds
+      : Array.isArray(question.correctAnswers)
+        ? question.correctAnswers
+        : [];
+
+    await setDoc(doc(db, "pteQuestions", docId), {
+      title: question.title || `${taskSlug} practice ${index + 1}`,
+      section: question.section || "",
+      taskSlug,
+      questionType: question.practiceMode || "text",
+      difficulty: question.difficulty || "medium",
+      source: question.source || "A Plus Academy starter library",
+      prompt: question.prompt || "",
+      transcript: question.transcript || "",
+      audioText: question.audioText || "",
+      audioUrl: question.audioUrl || "",
+      sample: question.sample || "",
+      explanation: question.explanation || "",
+      notes: question.notes || "",
+      options,
+      tips: Array.isArray(question.tips) ? question.tips : [],
+      acceptableAnswers: Array.isArray(question.acceptableAnswers) ? question.acceptableAnswers : [],
+      correctAnswers,
+      minWords: Number.isFinite(Number(question.minWords)) ? Number(question.minWords) : null,
+      maxWords: Number.isFinite(Number(question.maxWords)) ? Number(question.maxWords) : null,
+      order: Number(question.order) || index,
+      published: true,
+      starterLibrary: true,
+      updatedAt: serverTimestamp(),
+      createdAt: serverTimestamp(),
+    }, { merge: true });
+
+    completed += 1;
+    onProgress({ stage: "pte-questions", current: completed, total: entries.length, label: `${taskSlug} ${index + 1}` });
+  }
+
+  return { imported: entries.length };
 };
 
 export const migrateLegacyData = async (onProgress = () => {}) => {

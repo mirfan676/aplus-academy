@@ -24,7 +24,9 @@ import SearchIcon from "@mui/icons-material/Search";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { useAuth } from "../contexts/useAuth";
 import { askSiteAiTutor, logSiteAiTutorQuestion } from "../services/siteAiTutor";
+import { fetchPublishedPteQuestionCounts } from "../services/pteQuestionsData";
 import { fetchTeachersFromFirestore } from "../services/teacherData";
+import { pteTasks } from "../pages/pte/ptePracticeData";
 
 const quickActions = [
   { label: "Find Tutors", to: "/teachers", icon: SearchIcon },
@@ -60,6 +62,7 @@ const loadHistory = () => {
 const isBestTutorQuestion = (text) => /\b(best|find|recommend|suggest|need|want)\b.*\b(tutor|teacher)\b|\b(tutor|teacher)\b.*\b(best|recommend|suggest)\b/i.test(text);
 
 const termsFrom = (text) => String(text || "").toLowerCase().match(/[a-z0-9]+/g) || [];
+const isPteQuestion = (text) => /\bpte\b|\bessay\b|\bdictation\b|\bdescribe image\b|\bsummarize\b|\bread aloud\b|\brepeat sentence\b|\bretell lecture\b|\bfill in the blanks\b|\bwrite from dictation\b/i.test(text);
 
 const scoreTeacher = (teacher, terms) => {
   const haystack = [
@@ -132,6 +135,31 @@ const SiteAiTutor = () => {
     setMessages((current) => [...current, { role: "assistant", ...result }]);
   };
 
+  const findPteGuidance = async (text) => {
+    const terms = termsFrom(text);
+    const { countsByTask, total } = await fetchPublishedPteQuestionCounts();
+    const rankedTasks = pteTasks
+      .map((task) => {
+        const haystack = `${task.title} ${task.description} ${task.slug}`.toLowerCase();
+        const score = terms.reduce((sum, term) => sum + (haystack.includes(term) ? 6 : 0), 0) + (haystack.includes("pte") ? 1 : 0);
+        return { task, score };
+      })
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 4)
+      .filter((item, index, array) => item.score > 0 || index < Math.min(3, array.length));
+
+    const links = rankedTasks.map(({ task }) => ({
+      label: `${task.title} (${countsByTask?.[task.slug] || 0})`,
+      url: task.slug === "write-essay" ? "/pte/write-essay" : `/pte/${task.slug}`,
+    }));
+
+    return {
+      answer: `A Plus Academy currently has ${total || 0} published PTE practice questions across its task library. Based on your question, these are the most relevant sections to open first.`,
+      topic: "pte guidance",
+      links: links.length ? links : [{ label: "Free PTE Practice", url: "/pte" }],
+    };
+  };
+
   const findBestTeachers = async (text) => {
     const teachers = await fetchTeachersFromFirestore();
     const terms = termsFrom(text).filter((term) => !["find", "best", "teacher", "tutor", "me", "a", "the", "for", "in"].includes(term));
@@ -177,6 +205,12 @@ const SiteAiTutor = () => {
     try {
       if (isBestTutorQuestion(text)) {
         const result = await findBestTeachers(text);
+        appendAssistant(result);
+        logSiteAiTutorQuestion({ question: text, result }).catch(console.warn);
+        return;
+      }
+      if (isPteQuestion(text)) {
+        const result = await findPteGuidance(text);
         appendAssistant(result);
         logSiteAiTutorQuestion({ question: text, result }).catch(console.warn);
         return;

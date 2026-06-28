@@ -20,6 +20,7 @@ import {
   fetchPendingTeacherApplications,
   getFirestoreMigrationCounts,
   migrateLegacyData,
+  seedBundledPteQuestions,
 } from "../../services/firestoreMigration";
 
 const FirestoreMigrationAdmin = () => {
@@ -54,6 +55,22 @@ const FirestoreMigrationAdmin = () => {
     } catch (migrationError) {
       console.error(migrationError);
       setError(migrationError.message || "Migration failed.");
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  const runPteSeed = async () => {
+    setRunning(true);
+    setMessage("");
+    setError("");
+    try {
+      const result = await seedBundledPteQuestions(setProgress);
+      setMessage(`Seeded ${result.imported} bundled PTE questions into Firestore.`);
+      await refresh();
+    } catch (seedError) {
+      console.error(seedError);
+      setError(seedError.message || "PTE question seeding failed.");
     } finally {
       setRunning(false);
     }
@@ -98,8 +115,11 @@ const FirestoreMigrationAdmin = () => {
             <Button variant="contained" startIcon={running ? <CircularProgress size={18} color="inherit" /> : <CloudSyncIcon />} disabled={running} onClick={runMigration} fullWidth sx={{ fontWeight: 900 }}>
               Import legacy data
             </Button>
+            <Button variant="outlined" disabled={running} onClick={runPteSeed} fullWidth sx={{ fontWeight: 900, mt: 1.2 }}>
+              Seed bundled PTE questions
+            </Button>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 2, lineHeight: 1.6 }}>
-              This operation is repeatable: documents use stable IDs and are merged, not duplicated.
+              Both operations are repeatable: documents use stable IDs and are merged, not duplicated.
             </Typography>
           </Paper>
 

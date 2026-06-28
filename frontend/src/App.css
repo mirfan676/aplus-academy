@@ -181,3 +181,15 @@ img {
   75% { transform: translateX(-5px); }
   100% { transform: translateX(0px); }
 }
+@keyframes siteLoaderFill {
+  0% {
+    clip-path: inset(100% 0 0 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.site-loader-fill {
+  animation: siteLoaderFill 1.25s ease-in-out infinite alternate;
+}

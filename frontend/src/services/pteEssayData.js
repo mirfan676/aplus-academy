@@ -1,5 +1,6 @@
 import { addDoc, collection, getDocs, limit, orderBy, query, serverTimestamp, where } from "firebase/firestore";
 import { db, hasFirebaseConfig } from "../firebase";
+import { getTaskQuestions } from "../pages/pte/pteQuestionBank";
 
 const fallbackUrl = "/pte/essays.json";
 
@@ -17,7 +18,27 @@ const loadFallbackEssays = async () => {
   const response = await fetch(fallbackUrl, { cache: "no-store" });
   if (!response.ok) throw new Error("PTE sample essays could not be loaded.");
   const data = await response.json();
-  return (Array.isArray(data) ? data : []).map(normalizeEssay);
+  const records = (Array.isArray(data) ? data : []).map(normalizeEssay);
+  const bundledQuestions = getTaskQuestions("write-essay").map((question, index) =>
+    normalizeEssay(
+      {
+        id: question.id,
+        title: `PTE Essay Practice ${index + 1}`,
+        prompt: String(question.prompt || "").replace(/^Write a 200-300 word essay on the following topic:\n\n/, ""),
+        sampleEssay:
+          "This prompt is included in the bundled A Plus Academy starter library. Use the practice structure, write a full response in formal academic style, and compare your essay with scored examples after submission.",
+        score: 80,
+        category: "General",
+        tags: ["bundled", "starter", "essay"],
+      },
+      index + records.length,
+    ),
+  );
+  const unique = new Map();
+  [...records, ...bundledQuestions].forEach((essay) => {
+    if (!unique.has(essay.id)) unique.set(essay.id, essay);
+  });
+  return [...unique.values()];
 };
 
 export const fetchPteEssays = async () => {

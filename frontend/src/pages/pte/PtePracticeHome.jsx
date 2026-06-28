@@ -21,7 +21,9 @@ import { collection, getDocs, limit, query, where } from "firebase/firestore";
 import { useAuth } from "../../contexts/useAuth";
 import { db, hasFirebaseConfig } from "../../firebase";
 import useSEO from "../../hooks/useSEO";
+import { fetchPublishedPteQuestionCounts } from "../../services/pteQuestionsData";
 import { getSectionTasks, pteSections, pteTasks, textScoredTasks } from "./ptePracticeData";
+import { getSectionQuestionCount, getTaskQuestions, getTotalQuestionCount } from "./pteQuestionBank";
 
 const siteUrl = "https://www.aplusacademy.pk";
 
@@ -39,7 +41,7 @@ const popularTaskSlugs = [
   "summarize-spoken-text",
   "write-from-dictation",
   "reading-writing-fill-blanks",
-  "reorder-paragraphs",
+  "describe-image",
 ];
 
 const taskHref = (task) => (task.slug === "write-essay" ? "/pte/write-essay" : `/pte/${task.slug}`);
@@ -77,8 +79,9 @@ const getImprovementAreas = (responses) => {
   return ["Start with essay writing", "Try summarize text", "Build dictation accuracy"];
 };
 
-function TaskPill({ task, color = "#111827" }) {
+function TaskPill({ task, color = "#111827", questionCount }) {
   const Icon = task.icon;
+  const starterCount = questionCount ?? getTaskQuestions(task.slug).length;
 
   return (
     <Button
@@ -87,9 +90,9 @@ function TaskPill({ task, color = "#111827" }) {
       variant="outlined"
       startIcon={<Icon />}
       sx={{
-        justifyContent: "flex-start",
+        justifyContent: "space-between",
         borderRadius: 1,
-        minHeight: 44,
+        minHeight: 48,
         px: 1.4,
         py: 1,
         textTransform: "none",
@@ -104,15 +107,19 @@ function TaskPill({ task, color = "#111827" }) {
         },
       }}
     >
-      <Box component="span" sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
-        {task.shortTitle || task.title}
-      </Box>
+      <Stack direction="row" spacing={1} alignItems="center" sx={{ width: "100%", justifyContent: "space-between" }}>
+        <Box component="span" sx={{ overflow: "hidden", textOverflow: "ellipsis", textAlign: "left" }}>
+          {task.shortTitle || task.title}
+        </Box>
+        <Chip size="small" label={`${starterCount}`} sx={{ borderRadius: 1, fontWeight: 900, bgcolor: "#fff" }} />
+      </Stack>
     </Button>
   );
 }
 
-function PopularTaskCard({ task }) {
+function PopularTaskCard({ task, questionCount }) {
   const Icon = task.icon;
+  const starterCount = questionCount ?? getTaskQuestions(task.slug).length;
 
   return (
     <Paper
@@ -156,7 +163,7 @@ function PopularTaskCard({ task }) {
               {task.title}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {task.textScoring ? "Free AI scoring" : "Practice guide"}
+              {starterCount} starter questions
             </Typography>
           </Box>
         </Stack>
@@ -302,8 +309,10 @@ function LearnerProgressPanel() {
   );
 }
 
-function SectionRoadmap({ section }) {
+function SectionRoadmap({ section, questionCounts }) {
   const tasks = getSectionTasks(section.id);
+  const starterCount = getSectionQuestionCount(tasks.map((task) => ({ ...task, slug: task.slug })));
+  const effectiveCount = tasks.reduce((sum, task) => sum + (questionCounts[task.slug] ?? getTaskQuestions(task.slug).length), 0) || starterCount;
 
   return (
     <Box component="section" id={section.id} sx={{ scrollMarginTop: 96 }}>
@@ -322,15 +331,18 @@ function SectionRoadmap({ section }) {
             {section.description}
           </Typography>
         </Box>
-        <Chip
-          label={`${tasks.filter((task) => task.textScoring).length} scored`}
-          sx={{
-            borderRadius: 1,
-            bgcolor: `${section.color}18`,
-            color: section.color,
-            fontWeight: 950,
-          }}
-        />
+        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+          <Chip
+            label={`${effectiveCount} starter questions`}
+            sx={{
+              borderRadius: 1,
+              bgcolor: `${section.color}18`,
+              color: section.color,
+              fontWeight: 950,
+            }}
+          />
+          <Chip label={`${tasks.filter((task) => task.textScoring).length} AI tasks`} sx={{ borderRadius: 1, bgcolor: "#f8fafc", fontWeight: 900 }} />
+        </Stack>
       </Stack>
       <Box
         sx={{
@@ -340,7 +352,7 @@ function SectionRoadmap({ section }) {
         }}
       >
         {tasks.map((task) => (
-          <TaskPill key={task.slug} task={task} color={section.color} />
+          <TaskPill key={task.slug} task={task} color={section.color} questionCount={questionCounts[task.slug]} />
         ))}
       </Box>
     </Box>
@@ -349,6 +361,26 @@ function SectionRoadmap({ section }) {
 
 export default function PtePracticeHome() {
   const popularTasks = popularTaskSlugs.map((slug) => pteTasks.find((task) => task.slug === slug)).filter(Boolean);
+  const [questionCounts, setQuestionCounts] = useState({});
+  const [totalStarterQuestions, setTotalStarterQuestions] = useState(getTotalQuestionCount());
+
+  useEffect(() => {
+    let active = true;
+    fetchPublishedPteQuestionCounts()
+      .then((data) => {
+        if (!active) return;
+        setQuestionCounts(data.countsByTask || {});
+        setTotalStarterQuestions(data.total || getTotalQuestionCount());
+      })
+      .catch(() => {
+        if (!active) return;
+        setQuestionCounts({});
+        setTotalStarterQuestions(getTotalQuestionCount());
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useSEO({
     title: "Free PTE Practice with AI Scoring | A Plus Academy",
@@ -385,7 +417,7 @@ export default function PtePracticeHome() {
                 fontSize: { xs: "2rem", md: "3.15rem" },
               }}
             >
-              PTE practice questions with free AI scoring
+              PTE practice questions with free starter sets in every task
             </Typography>
             <Typography
               sx={{
@@ -397,8 +429,7 @@ export default function PtePracticeHome() {
                 fontSize: { xs: "1rem", md: "1.08rem" },
               }}
             >
-              Choose a PTE task, practise with original A Plus Academy questions, and use AI scoring
-              for text-based answers such as essays, summaries, dictation, and fill-in-the-blanks.
+              Choose a PTE task, practise with bundled A Plus Academy starter questions, use AI scoring for text-based answers, and keep moving through a larger day-one practice library.
             </Typography>
             <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap" useFlexGap sx={{ mt: 2.2 }}>
               <Button
@@ -412,11 +443,11 @@ export default function PtePracticeHome() {
               </Button>
               <Button
                 component={RouterLink}
-                to="/pte/summarize-written-text"
+                to="/pte/describe-image"
                 variant="outlined"
                 sx={{ borderRadius: 1, textTransform: "none", fontWeight: 950, color: "#111827", borderColor: "#111827" }}
               >
-                Try Summarize Text
+                Try Describe Image
               </Button>
             </Stack>
           </Box>
@@ -460,8 +491,8 @@ export default function PtePracticeHome() {
             {[
               [`${pteTasks.length}+`, "PTE task pages"],
               [`${textScoredTasks.length}`, "AI-scored text tasks"],
+              [`${totalStarterQuestions}+`, "starter questions"],
               ["20 min", "timed essay practice"],
-              ["Free", "starter scoring pool"],
             ].map(([value, label]) => (
               <Paper key={label} elevation={0} sx={{ p: 2, borderRadius: 1, border: "1px solid #d4dbe3", bgcolor: "#fff", textAlign: "center" }}>
                 <Typography fontWeight={950} sx={{ fontSize: { xs: "1.55rem", md: "2.1rem" }, lineHeight: 1 }}>
@@ -478,18 +509,18 @@ export default function PtePracticeHome() {
             <Stack direction={{ xs: "column", md: "row" }} spacing={1.5} justifyContent="center" alignItems="center" sx={{ mb: 1.6, textAlign: "center" }}>
               <Box sx={{ maxWidth: 700 }}>
                 <Typography component="h2" variant="h5" fontWeight={950}>
-                  Popular free AI scoring tasks
+                  Popular free PTE practice tasks
                 </Typography>
                 <Typography color="text.secondary" sx={{ lineHeight: 1.65 }}>
-                  Start with the most searched PTE practice areas and move task by task.
+                  Start with the most searched areas, then move task by task through the bundled question sets.
                 </Typography>
               </Box>
-              <Chip label="Text-based scoring only" sx={{ borderRadius: 1, bgcolor: "#dcfce7", color: "#047857", fontWeight: 950 }} />
+              <Chip label="15 starter questions per task" sx={{ borderRadius: 1, bgcolor: "#dcfce7", color: "#047857", fontWeight: 950 }} />
             </Stack>
             <Grid container spacing={1.5}>
               {popularTasks.map((task) => (
                 <Grid item xs={12} sm={6} md={4} key={task.slug}>
-                  <PopularTaskCard task={task} />
+                  <PopularTaskCard task={task} questionCount={questionCounts[task.slug]} />
                 </Grid>
               ))}
             </Grid>
@@ -499,7 +530,7 @@ export default function PtePracticeHome() {
             <Stack spacing={3}>
               {pteSections.map((section) => (
                 <React.Fragment key={section.id}>
-                  <SectionRoadmap section={section} />
+                  <SectionRoadmap section={section} questionCounts={questionCounts} />
                   {section.id !== pteSections[pteSections.length - 1].id && <Divider />}
                 </React.Fragment>
               ))}
@@ -530,8 +561,7 @@ export default function PtePracticeHome() {
                     Get personal PTE help when practice is not enough
                   </Typography>
                   <Typography sx={{ lineHeight: 1.75, color: "#cbd5e1" }}>
-                    Keep the free practice open for everyone, then offer paid support for writing review,
-                    speaking correction, weekly targets, and study abroad English guidance.
+                    Keep the free practice open for everyone, then offer paid support for writing review, speaking correction, weekly targets, and study abroad English guidance.
                   </Typography>
                 </Stack>
               </Grid>

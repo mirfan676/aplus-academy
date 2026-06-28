@@ -25,6 +25,11 @@ const listCollection = async (name, max = 500) => {
 export const fetchAdminJobs = () => listCollection("jobs");
 export const fetchTeamMembers = () => listCollection("teamMembers");
 export const fetchTeacherLeads = () => listCollection("teacherLeads", 2000);
+export const fetchPteQuestions = async () => {
+  requireDb();
+  const snapshot = await getDocs(query(collection(db, "pteQuestions"), orderBy("updatedAt", "desc"), limit(500)));
+  return snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
+};
 export const fetchSiteAiTutorLogs = async () => {
   requireDb();
   const snapshot = await getDocs(query(collection(db, "siteAiTutorLogs"), orderBy("createdAt", "desc"), limit(200)));
@@ -140,6 +145,63 @@ export const saveTeamMember = async (member) => {
 export const removeTeamMember = async (id) => {
   requireDb();
   await deleteDoc(doc(db, "teamMembers", id));
+};
+
+export const savePteQuestion = async (question) => {
+  requireDb();
+  const payload = {
+    title: String(question.title || "").trim(),
+    section: String(question.section || "").trim(),
+    taskSlug: String(question.taskSlug || "").trim(),
+    questionType: String(question.questionType || "text").trim(),
+    difficulty: String(question.difficulty || "medium").trim(),
+    source: String(question.source || "A Plus Academy original").trim(),
+    prompt: String(question.prompt || "").trim(),
+    transcript: String(question.transcript || "").trim(),
+    audioText: String(question.audioText || "").trim(),
+    audioUrl: String(question.audioUrl || "").trim(),
+    sample: String(question.sample || "").trim(),
+    explanation: String(question.explanation || "").trim(),
+    notes: String(question.notes || "").trim(),
+    options: String(question.options || "")
+      .split("\n")
+      .map((item) => item.trim())
+      .filter(Boolean),
+    tips: String(question.tips || "")
+      .split("\n")
+      .map((item) => item.trim())
+      .filter(Boolean),
+    acceptableAnswers: String(question.acceptableAnswers || "")
+      .split("\n")
+      .map((item) => item.trim())
+      .filter(Boolean),
+    correctAnswers: String(question.correctAnswers || "")
+      .split("\n")
+      .map((item) => item.trim())
+      .filter(Boolean),
+    minWords: question.minWords === "" ? null : Number(question.minWords) || null,
+    maxWords: question.maxWords === "" ? null : Number(question.maxWords) || null,
+    order: Number(question.order) || 0,
+    published: Boolean(question.published),
+    updatedAt: serverTimestamp(),
+  };
+
+  if (question.id) {
+    await setDoc(doc(db, "pteQuestions", question.id), payload, { merge: true });
+    return question.id;
+  }
+
+  return (
+    await addDoc(collection(db, "pteQuestions"), {
+      ...payload,
+      createdAt: serverTimestamp(),
+    })
+  ).id;
+};
+
+export const removePteQuestion = async (id) => {
+  requireDb();
+  await deleteDoc(doc(db, "pteQuestions", id));
 };
 
 export const saveTeacherLead = async (lead) => {
