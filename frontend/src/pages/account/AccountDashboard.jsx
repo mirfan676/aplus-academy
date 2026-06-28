@@ -10,10 +10,12 @@ import { Link as RouterLink, Navigate } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useAuth } from "../../contexts/useAuth";
+import { fetchUserPteTaskResponses } from "../../services/pteTaskResponseData";
 
 const AccountDashboard = () => {
   const { isAdmin, loading, logout, user } = useAuth();
   const [profileRole, setProfileRole] = useState("user");
+  const [ptePracticeCount, setPtePracticeCount] = useState(0);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -23,6 +25,16 @@ const AccountDashboard = () => {
     };
     loadProfile();
   }, [user]);
+
+  useEffect(() => {
+    if (!user?.uid) {
+      setPtePracticeCount(0);
+      return;
+    }
+    fetchUserPteTaskResponses(user.uid)
+      .then((records) => setPtePracticeCount(records.length))
+      .catch(() => setPtePracticeCount(0));
+  }, [user?.uid]);
 
   if (!loading && !user) return <Navigate to="/admin/login" replace />;
 
@@ -82,13 +94,16 @@ const AccountDashboard = () => {
           <Paper elevation={0} sx={{ p: 3, borderRadius: 2, border: "1px solid #dce8f1" }}>
             <RateReviewIcon color="primary" fontSize="large" />
             <Typography variant="h6" fontWeight={900} sx={{ mt: 1 }}>
-              PTE essay practice
+              PTE practice
             </Typography>
             <Typography color="text.secondary" sx={{ my: 2 }}>
-              Write timed essays, receive adaptive feedback, and compare your scored responses.
+              Track your saved PTE attempts, practise text tasks, and continue with essay and section-based drills.
             </Typography>
-            <Button component={RouterLink} to="/pte/write-essay" variant="contained">
-              Practise writing
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
+              <Chip label={`${ptePracticeCount} saved attempts`} color="primary" sx={{ color: "#fff", fontWeight: 800 }} />
+            </Stack>
+            <Button component={RouterLink} to="/pte" variant="contained">
+              Open PTE practice
             </Button>
           </Paper>
 

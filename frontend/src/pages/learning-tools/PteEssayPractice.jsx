@@ -206,7 +206,7 @@ const PteEssayPractice = () => {
     setAnalysisNotice("");
     const stageTimer = window.setInterval(() => setAnalysisStep((current) => Math.min(current + 1, analysisSteps.length - 1)), 850);
     try {
-      const localResult = { ...scorePteEssay(draft, benchmarkTexts), essayText: draft };
+      const localResult = { ...scorePteEssay(draft, benchmarkTexts), essayText: draft, taskSlug: "write-essay" };
       const minimumAnalysisTime = new Promise((resolve) => window.setTimeout(resolve, 3600));
       let result = localResult;
       try {
@@ -215,12 +215,13 @@ const PteEssayPractice = () => {
           minimumAnalysisTime,
         ]);
         result.essayText = draft;
+        result.taskSlug = "write-essay";
       } catch (aiError) {
         console.warn("AI scoring unavailable; adaptive scoring used.", aiError);
         await minimumAnalysisTime;
         setAnalysisNotice("AI scoring is not configured for this deployment, so the adaptive educational scorer was used.");
       }
-      setScore(result);
+      setScore({ ...result, taskSlug: "write-essay" });
       const saved = await submitPteEssayResponse({ user, essay: selectedEssay, text: draft, result });
       setSubmittedResponse(saved);
       setResponses((current) => [saved, ...current.filter((item) => item.id !== saved.id)].sort((a, b) => b.score - a.score));

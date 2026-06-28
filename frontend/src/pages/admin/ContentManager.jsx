@@ -38,6 +38,8 @@ const emptyPteQuestion = {
   transcript: "",
   audioText: "",
   audioUrl: "",
+  imageUrl: "",
+  imageAlt: "",
   sample: "",
   explanation: "",
   notes: "",
@@ -542,6 +544,8 @@ const ContentManager = () => {
             <TextField label="Prompt / question text" value={editor.prompt || ""} onChange={change("prompt")} multiline minRows={5} sx={{ gridColumn: "1 / -1" }} />
             <TextField label="Audio text for free browser playback" value={editor.audioText || ""} onChange={change("audioText")} multiline minRows={3} sx={{ gridColumn: "1 / -1" }} helperText="Use this when you want the browser to read the sentence or lecture aloud without storing an audio file." />
             <TextField label="Hosted audio URL (optional)" value={editor.audioUrl || ""} onChange={change("audioUrl")} sx={{ gridColumn: "1 / -1" }} helperText="Leave blank if browser text-to-speech is enough. Use this later if you upload MP3 audio to storage." />
+            <TextField label="Image URL (optional)" value={editor.imageUrl || ""} onChange={change("imageUrl")} sx={{ gridColumn: "1 / -1" }} helperText="Use for Describe Image or other visual tasks when you want to show a hosted chart or image." />
+            <TextField label="Image alt text" value={editor.imageAlt || ""} onChange={change("imageAlt")} sx={{ gridColumn: "1 / -1" }} />
             <TextField label="Transcript (shown after attempt)" value={editor.transcript || ""} onChange={change("transcript")} multiline minRows={4} sx={{ gridColumn: "1 / -1" }} />
             <TextField label="Sample or model answer" value={editor.sample || ""} onChange={change("sample")} multiline minRows={4} sx={{ gridColumn: "1 / -1" }} />
             <TextField label="Options (one per line)" value={editor.options || ""} onChange={change("options")} multiline minRows={4} helperText="Use only for multiple-choice tasks." sx={{ gridColumn: "1 / -1" }} />

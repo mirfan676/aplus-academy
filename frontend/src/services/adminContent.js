@@ -160,6 +160,8 @@ export const savePteQuestion = async (question) => {
     transcript: String(question.transcript || "").trim(),
     audioText: String(question.audioText || "").trim(),
     audioUrl: String(question.audioUrl || "").trim(),
+    imageUrl: String(question.imageUrl || "").trim(),
+    imageAlt: String(question.imageAlt || "").trim(),
     sample: String(question.sample || "").trim(),
     explanation: String(question.explanation || "").trim(),
     notes: String(question.notes || "").trim(),

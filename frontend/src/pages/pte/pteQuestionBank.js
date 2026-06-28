@@ -251,6 +251,13 @@ const buildDescribeImage = (theme, index) => {
   const sample = `The bar chart presents data on ${theme.title}. It shows a clear upward trend from junior learners to senior learners, and the highest performance appears after guided practice programs. Overall, the image suggests that structured support leads to better outcomes in this area.`;
   return makeTextQuestion(`di-${index + 1}`, prompt, sample, {
     audioText: `A bar chart about ${theme.title} compares three groups. Awareness rises from ${low} percent in junior learners to ${mid} percent in senior learners, while strong performance grows further to ${high} percent after guided practice programs.`,
+    imageSpec: {
+      type: "bar-chart",
+      title: `Performance in ${theme.title}`,
+      labels: ["Junior learners", "Senior learners", "Guided practice"],
+      values: [low, mid, high],
+      unit: "%",
+    },
     tips: ["Start with the image type.", "Mention the main trend.", "End with a short overall conclusion."],
   });
 };

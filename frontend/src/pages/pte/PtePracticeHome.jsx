@@ -22,6 +22,7 @@ import { useAuth } from "../../contexts/useAuth";
 import { db, hasFirebaseConfig } from "../../firebase";
 import useSEO from "../../hooks/useSEO";
 import { fetchPublishedPteQuestionCounts } from "../../services/pteQuestionsData";
+import { fetchUserPteTaskResponses } from "../../services/pteTaskResponseData";
 import { getSectionTasks, pteSections, pteTasks, textScoredTasks } from "./ptePracticeData";
 import { getSectionQuestionCount, getTaskQuestions, getTotalQuestionCount } from "./pteQuestionBank";
 
@@ -187,10 +188,14 @@ function LearnerProgressPanel() {
     }
     let active = true;
     setLoading(true);
-    getDocs(query(collection(db, "pteEssayResponses"), where("userId", "==", user.uid), limit(100)))
-      .then((snapshot) => {
+    Promise.all([
+      getDocs(query(collection(db, "pteEssayResponses"), where("userId", "==", user.uid), limit(100))),
+      fetchUserPteTaskResponses(user.uid),
+    ])
+      .then(([essaySnapshot, taskResponses]) => {
         if (!active) return;
-        setResponses(snapshot.docs.map((item) => ({ id: item.id, ...item.data() })));
+        const essayResponses = essaySnapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
+        setResponses([...essayResponses, ...taskResponses]);
       })
       .catch((error) => {
         console.warn("PTE learner progress unavailable.", error);
@@ -206,8 +211,9 @@ function LearnerProgressPanel() {
 
   const progress = useMemo(() => {
     const practised = responses.length;
-    const averageScore = practised
-      ? Math.round(responses.reduce((sum, response) => sum + (Number(response.score) || 0), 0) / practised)
+    const scoredResponses = responses.filter((response) => Number.isFinite(Number(response.score)));
+    const averageScore = scoredResponses.length
+      ? Math.round(scoredResponses.reduce((sum, response) => sum + (Number(response.score) || 0), 0) / scoredResponses.length)
       : 0;
     const improvementAreas = getImprovementAreas(responses);
     return { practised, averageScore, improvementAreas };

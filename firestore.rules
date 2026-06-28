@@ -104,6 +104,23 @@ service cloud.firestore {
       );
     }
 
+    match /pteTaskResponses/{responseId} {
+      allow read: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.taskSlug is string
+        && request.resource.data.taskSlug.size() >= 2
+        && request.resource.data.taskSlug.size() <= 120
+        && request.resource.data.taskTitle is string
+        && request.resource.data.taskTitle.size() >= 2
+        && request.resource.data.taskTitle.size() <= 160
+        && request.resource.data.responseText is string
+        && request.resource.data.responseText.size() <= 6000;
+      allow update, delete: if isAdmin() || (
+        signedIn() && resource.data.userId == request.auth.uid
+      );
+    }
+
     match /siteAiTutorLogs/{logId} {
       allow create: if request.resource.data.question is string
         && request.resource.data.question.size() >= 2

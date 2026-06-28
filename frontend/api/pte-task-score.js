@@ -61,9 +61,18 @@ const consumeQuota = (userId) => {
   return "";
 };
 
+const taskPrompts = {
+  "respond-to-a-situation":
+    "Score this as a short practical response. Use criteria: Task Accuracy, Content, Form, Grammar, Vocabulary, Coherence. Reward polite tone, relevance, completion of the situation, and natural phrasing. Do not use essay-only ideas such as paragraph count or argument quality.",
+  "summarize-written-text":
+    "Score this as Summarize Written Text. Use criteria: Content, Form, Grammar, Vocabulary, Coherence. Reward a single-sentence summary, accurate main idea coverage, concise wording, and grammatical control. Do not use essay-only ideas such as argument quality, paragraph count, or advanced vocabulary checklists.",
+  "summarize-spoken-text":
+    "Score this as Summarize Spoken Text. Use criteria: Content, Form, Grammar, Vocabulary, Coherence. Reward accurate summary of the lecture, concise academic wording, and clear sentence control. Do not use essay-only ideas such as paragraph count, argument quality, or counterarguments.",
+};
+
 export default async function handler(request, response) {
   if (request.method !== "POST") return send(response, 405, { error: "Method not allowed." });
-  const { idToken, taskTitle, prompt, responseText, minWords = 1, maxWords = 500 } = request.body || {};
+  const { idToken, taskSlug, taskTitle, prompt, responseText, minWords = 1, maxWords = 500 } = request.body || {};
   if (!idToken || !taskTitle || !prompt || !responseText) return send(response, 400, { error: "Authentication, task, prompt, and response text are required." });
   const wordCount = String(responseText).trim().split(/\s+/).filter(Boolean).length;
   if (wordCount < Number(minWords) || wordCount > Number(maxWords)) return send(response, 400, { error: `Response must contain ${minWords}-${maxWords} words.` });
@@ -95,7 +104,7 @@ export default async function handler(request, response) {
         {
           role: "system",
           content:
-            "You are a PTE Academic practice coach for text-based tasks. Score educationally, never claim to be Pearson, and avoid official-score guarantees. Use criteria such as Content, Form, Grammar, Vocabulary, Coherence, and Task Accuracy when relevant, each out of 15. Annotation original text must be an exact short substring from the learner response.",
+            `You are a PTE Academic practice coach for text-based tasks. Score educationally, never claim to be Pearson, and avoid official-score guarantees. Use only task-appropriate criteria out of 15 each. Annotation original text must be an exact short substring from the learner response. ${taskPrompts[taskSlug] || "Use criteria such as Content, Form, Grammar, Vocabulary, Coherence, and Task Accuracy only when they truly fit the task."}`,
         },
         {
           role: "user",
