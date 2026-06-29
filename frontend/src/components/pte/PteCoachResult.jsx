@@ -17,14 +17,15 @@ const objectiveTasks = new Set([
   "reading-multiple-choice-single-answer",
   "highlight-correct-summary",
   "select-missing-word",
-  "answer-short-question",
 ]);
+const speakingTasks = new Set(["read-aloud", "repeat-sentence", "describe-image", "retell-lecture", "answer-short-question"]);
 
 const getTaskMode = (taskSlug) => {
   if (taskSlug === "write-essay") return "essay";
   if (summaryTasks.has(taskSlug)) return "summary";
   if (taskSlug === "respond-to-a-situation") return "situation";
   if (objectiveTasks.has(taskSlug)) return "objective";
+  if (speakingTasks.has(taskSlug)) return "speaking";
   return "general";
 };
 
@@ -64,6 +65,14 @@ const buildChecks = (taskSlug, analysis = {}) => {
       { label: "Polite and complete response", passed: (analysis.sentenceCount || 0) >= 2 },
       { label: "No contractions", passed: analysis.contractionCount === 0 },
       { label: "Natural formal tone", passed: analysis.informalCount === 0 },
+    ];
+  }
+
+  if (speakingTasks.has(taskSlug)) {
+    return [
+      { label: "Clear task response", passed: analysis.wordCount >= 8 },
+      { label: "Complete spoken answer", passed: (analysis.sentenceCount || 0) >= 1 },
+      { label: "Natural academic wording", passed: analysis.informalCount === 0 },
     ];
   }
 
@@ -212,6 +221,15 @@ const PteCoachResult = ({ result }) => {
           )}
 
           {taskMode === "objective" && <ObjectiveComparison result={result} />}
+
+          {taskMode === "speaking" && (
+            <Box sx={{ mt: 2.5, p: 2, border: "1px solid #dce8f1", borderRadius: 1 }}>
+              <Typography fontWeight={900} sx={{ mb: 0.8 }}>Transcript</Typography>
+              <Typography sx={{ whiteSpace: "pre-wrap", lineHeight: 1.8 }}>
+                {result.transcript || result.responseText || "Transcript not available."}
+              </Typography>
+            </Box>
+          )}
 
           <Typography component="h3" variant="h6" fontWeight={900} sx={{ mt: 3, mb: 1 }}>
             {taskMode === "objective" ? "What to improve next" : "Weaknesses and next improvements"}

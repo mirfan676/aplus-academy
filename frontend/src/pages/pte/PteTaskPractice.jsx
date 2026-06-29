@@ -29,6 +29,7 @@ import { useAuth } from "../../contexts/useAuth";
 import useSEO from "../../hooks/useSEO";
 import { fetchPublishedPteQuestions } from "../../services/pteQuestionsData";
 import { submitPteTaskResponse } from "../../services/pteTaskResponseData";
+import { requestAiPteSpeechScore } from "../../services/pteSpeechScoring";
 import { requestAiPteTaskScore } from "../../services/pteTaskAiScoring";
 import { getPteTask, pteSections } from "./ptePracticeData";
 
@@ -45,10 +46,8 @@ const objectiveTasks = new Set([
   "reading-multiple-choice-single-answer",
   "highlight-correct-summary",
   "select-missing-word",
-  "answer-short-question",
-  "repeat-sentence",
 ]);
-const speakingRecorderTasks = new Set(["read-aloud", "repeat-sentence", "describe-image", "retell-lecture"]);
+const speakingRecorderTasks = new Set(["read-aloud", "repeat-sentence", "describe-image", "retell-lecture", "answer-short-question"]);
 const analysisSteps = [
   "Reading your PTE response",
   "Checking task form and content",
@@ -60,6 +59,7 @@ const countWords = (text) => String(text || "").trim().split(/\s+/).filter(Boole
 const countSentences = (text) => String(text || "").split(/[.!?]+/).map((item) => item.trim()).filter(Boolean).length;
 const clean = (value) => String(value || "").toLowerCase().replace(/\s+/g, " ").replace(/[^\w\s>,-]/g, "").trim();
 const normalizedTokens = (value) => clean(value).split(/[\s,]+/).filter(Boolean);
+const blankPattern = /_{4,}/g;
 
 const buildAnalysis = (responseText) => ({
   wordCount: countWords(responseText),
@@ -106,7 +106,41 @@ const getExpectedAnswer = (question) => {
   return question.sample || question.explanation || "";
 };
 
-const evaluateObjectiveTask = ({ task, question, responseText, selectedOptions }) => {
+const buildBlankPromptParts = (prompt) => String(prompt || "").split(blankPattern);
+
+const getBlankCount = (question) => Math.max(0, buildBlankPromptParts(question?.prompt).length - 1);
+
+const getExpectedBlankAnswers = (question) => {
+  const source = Array.isArray(question?.acceptableAnswers) ? question.acceptableAnswers.find(Boolean) : "";
+  const blankCount = getBlankCount(question);
+  if (!source) return [];
+  const splitByComma = source.split(",").map((item) => item.trim()).filter(Boolean);
+  if (splitByComma.length === blankCount) return splitByComma;
+  const splitByWhitespace = source.split(/\s+/).map((item) => item.trim()).filter(Boolean);
+  if (splitByWhitespace.length === blankCount) return splitByWhitespace;
+  return [source.trim()];
+};
+
+const getReorderItems = (prompt) =>
+  String(prompt || "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => /^[A-Z]\.\s+/.test(line))
+    .map((line) => ({ id: line[0], text: line.slice(3).trim() }));
+
+const buildStructuredResponseText = ({ task, responseText, blankResponses, reorderItems }) => {
+  if (task.slug === "reorder-paragraphs") {
+    return reorderItems.map((item) => item.id).join(" ");
+  }
+
+  if (task.slug.includes("fill-blanks")) {
+    return blankResponses.map((value) => String(value || "").trim()).filter(Boolean).join(", ");
+  }
+
+  return responseText;
+};
+
+const evaluateObjectiveTask = ({ task, question, responseText, selectedOptions, blankResponses = [], reorderItems = [] }) => {
   const expectedAnswer = getExpectedAnswer(question);
   const practiceMode = question.practiceMode || "text";
   const answers = Array.isArray(question.acceptableAnswers) ? question.acceptableAnswers : [];
@@ -119,6 +153,14 @@ const evaluateObjectiveTask = ({ task, question, responseText, selectedOptions }
     isCorrect = JSON.stringify(selected) === JSON.stringify(correctIds);
     const overlap = selected.filter((item) => correctIds.includes(item)).length;
     accuracyRatio = correctIds.length ? overlap / correctIds.length : 0;
+  } else if (task.slug.includes("fill-blanks")) {
+    const expectedParts = getExpectedBlankAnswers(question);
+    const learnerParts = blankResponses.map((value) => clean(value)).filter(Boolean);
+    const matchCount = expectedParts.reduce((sum, expected, index) => (
+      learnerParts[index] === clean(expected) ? sum + 1 : sum
+    ), 0);
+    accuracyRatio = expectedParts.length ? matchCount / expectedParts.length : 0;
+    isCorrect = expectedParts.length > 0 && matchCount === expectedParts.length;
   } else if (task.slug === "write-from-dictation") {
     accuracyRatio = compareTokenOverlap(responseText, expectedAnswer);
     isCorrect = accuracyRatio === 1;
@@ -128,7 +170,8 @@ const evaluateObjectiveTask = ({ task, question, responseText, selectedOptions }
     isCorrect = learner === expected;
     accuracyRatio = isCorrect ? 1 : 0;
   } else if (task.slug === "reorder-paragraphs") {
-    isCorrect = tokensMatch(responseText, answers);
+    const learnerOrder = reorderItems.length ? reorderItems.map((item) => item.id).join(" ") : responseText;
+    isCorrect = tokensMatch(learnerOrder, answers);
     accuracyRatio = isCorrect ? 1 : compareTokenOverlap(responseText, expectedAnswer);
   } else {
     isCorrect = exactMatch(responseText, answers) || tokensMatch(responseText, answers);
@@ -139,13 +182,44 @@ const evaluateObjectiveTask = ({ task, question, responseText, selectedOptions }
   const formScore = Math.max(4, task.slug === "write-from-dictation" ? Math.round(Math.min(1, accuracyRatio + 0.15) * 15) : 15);
   const controlScore = Math.max(3, Math.round((practiceMode === "choice" ? accuracyRatio : Math.min(1, accuracyRatio + 0.1)) * 15));
   const reviewScore = isCorrect ? 15 : Math.max(4, Math.round((0.35 + accuracyRatio * 0.5) * 15));
-  const criteria = buildCriteria([
-    ["Task Accuracy", accuracyScore],
-    ["Content", accuracyScore],
-    ["Form", formScore],
-    [task.slug === "write-from-dictation" ? "Spelling" : "Control", controlScore],
-    ["Review", reviewScore],
-  ]);
+  let criteria;
+  if (task.slug === "write-from-dictation") {
+    criteria = buildCriteria([
+      ["Content", accuracyScore],
+      ["Form", formScore],
+      ["Spelling", controlScore],
+      ["Grammar", reviewScore],
+    ]);
+  } else if (task.slug === "reorder-paragraphs") {
+    criteria = buildCriteria([
+      ["Order Accuracy", accuracyScore],
+      ["Logical Flow", reviewScore],
+      ["Control", controlScore],
+      ["Review", 15],
+    ]);
+  } else if (task.slug.includes("fill-blanks")) {
+    criteria = buildCriteria([
+      ["Blank Accuracy", accuracyScore],
+      ["Grammar Fit", controlScore],
+      ["Meaning Fit", reviewScore],
+      ["Form", formScore],
+    ]);
+  } else if (practiceMode === "choice") {
+    criteria = buildCriteria([
+      ["Answer Accuracy", accuracyScore],
+      ["Selection Control", controlScore],
+      ["Review", reviewScore],
+      ["Task Form", formScore],
+    ]);
+  } else {
+    criteria = buildCriteria([
+      ["Task Accuracy", accuracyScore],
+      ["Content", accuracyScore],
+      ["Form", formScore],
+      ["Control", controlScore],
+      ["Review", reviewScore],
+    ]);
+  }
   const total = Math.min(90, Math.round((criteria.reduce((sum, item) => sum + item.score, 0) / (criteria.length * 15)) * 90));
 
   return {
@@ -166,7 +240,11 @@ const evaluateObjectiveTask = ({ task, question, responseText, selectedOptions }
     guidance: [
       question.explanation || "Check the model answer and compare each missing or incorrect part.",
       task.slug.includes("fill") ? "Read the whole sentence again after filling the blank so grammar and meaning both fit." : "Match the exact meaning and form expected by the task.",
-      task.slug === "write-from-dictation" ? "For dictation, check every word, plural ending, and article." : "Use another question to reinforce the same pattern.",
+      task.slug === "write-from-dictation"
+        ? "For dictation, check every word, plural ending, and article."
+        : task.slug === "reorder-paragraphs"
+          ? "Place the opening idea first, then the logical support, and end with the conclusion or review step."
+          : "Use another question to reinforce the same pattern.",
     ],
     annotations: [],
     analysis: buildAnalysis(responseText),
@@ -271,8 +349,11 @@ export default function PteTaskPractice() {
   const [analysisStep, setAnalysisStep] = useState(-1);
   const [submitting, setSubmitting] = useState(false);
   const [notice, setNotice] = useState("");
+  const [blankResponses, setBlankResponses] = useState([]);
+  const [reorderItems, setReorderItems] = useState([]);
   const [recording, setRecording] = useState(false);
   const [recordedUrl, setRecordedUrl] = useState("");
+  const [recordedBlob, setRecordedBlob] = useState(null);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [savingAttempt, setSavingAttempt] = useState(false);
   const mediaRecorderRef = useRef(null);
@@ -316,6 +397,8 @@ export default function PteTaskPractice() {
     setQuestionIndex(0);
     setResponseText("");
     setSelectedOptions([]);
+    setBlankResponses([]);
+    setReorderItems([]);
     setResult(null);
     setError("");
     setNotice("");
@@ -325,11 +408,24 @@ export default function PteTaskPractice() {
       if (current) URL.revokeObjectURL(current);
       return "";
     });
+    setRecordedBlob(null);
   }, [slug]);
 
   useEffect(() => () => {
     if (recordedUrl) URL.revokeObjectURL(recordedUrl);
   }, [recordedUrl]);
+
+  useEffect(() => {
+    if (!currentQuestion) {
+      setBlankResponses([]);
+      setReorderItems([]);
+      return;
+    }
+    const blankCount = getBlankCount(currentQuestion);
+    setBlankResponses(blankCount ? Array.from({ length: blankCount }, () => "") : []);
+    const reorder = getReorderItems(currentQuestion.prompt);
+    setReorderItems(reorder);
+  }, [currentQuestion]);
 
   useEffect(() => {
     if (!recording) return undefined;
@@ -352,6 +448,8 @@ export default function PteTaskPractice() {
     setQuestionIndex(nextIndex);
     setResponseText("");
     setSelectedOptions([]);
+    setBlankResponses([]);
+    setReorderItems([]);
     setResult(null);
     setError("");
     setNotice("");
@@ -359,6 +457,7 @@ export default function PteTaskPractice() {
     setRecordingSeconds(0);
     if (recordedUrl) URL.revokeObjectURL(recordedUrl);
     setRecordedUrl("");
+    setRecordedBlob(null);
   };
 
   const toggleOption = (optionIdValue) => {
@@ -399,6 +498,24 @@ export default function PteTaskPractice() {
     window.speechSynthesis.speak(utterance);
   };
 
+  const updateBlankResponse = (index, value) => {
+    setBlankResponses((current) => current.map((item, itemIndex) => (itemIndex === index ? value : item)));
+    setResult(null);
+    setError("");
+  };
+
+  const moveReorderItem = (index, direction) => {
+    setReorderItems((current) => {
+      const nextIndex = index + direction;
+      if (nextIndex < 0 || nextIndex >= current.length) return current;
+      const next = [...current];
+      [next[index], next[nextIndex]] = [next[nextIndex], next[index]];
+      return next;
+    });
+    setResult(null);
+    setError("");
+  };
+
   const startRecording = async () => {
     setError("");
     setNotice("");
@@ -416,6 +533,7 @@ export default function PteTaskPractice() {
       recorder.onstop = () => {
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || "audio/webm" });
         if (recordedUrl) URL.revokeObjectURL(recordedUrl);
+        setRecordedBlob(blob);
         setRecordedUrl(URL.createObjectURL(blob));
         setNotice("Speaking attempt recorded. Play it back, then save the attempt to your account if needed.");
         stream.getTracks().forEach((track) => track.stop());
@@ -485,29 +603,78 @@ export default function PteTaskPractice() {
       return;
     }
 
-    if ((requiresAi || supportsObjectiveCheck) && currentQuestion?.practiceMode !== "choice" && !responseText.trim()) {
+    const structuredResponseText = buildStructuredResponseText({
+      task: effectiveTask,
+      responseText,
+      blankResponses,
+      reorderItems,
+    });
+
+    if ((requiresAi || supportsObjectiveCheck) && currentQuestion?.practiceMode !== "choice" && !structuredResponseText.trim() && !isSpeakingPractice) {
       setError("Write your response before checking the question.");
       return;
     }
 
-    if (isSpeakingPractice && !requiresAi && !supportsObjectiveCheck) {
+    if (isSpeakingPractice) {
       if (!user) {
         setError("Login with Google to save your speaking practice.");
         return;
       }
-      if (!recordedUrl) {
+      if (!recordedBlob) {
         setError("Record your speaking attempt first.");
         return;
       }
-      await saveSpeakingAttempt();
+      setSubmitting(true);
+      setAnalysisStep(0);
+      const stageTimer = window.setInterval(() => setAnalysisStep((current) => Math.min(current + 1, analysisSteps.length - 1)), 700);
+      try {
+        const minimumTime = new Promise((resolve) => window.setTimeout(resolve, 2600));
+        const [scored] = await Promise.all([
+          requestAiPteSpeechScore({
+            user,
+            task,
+            question: currentQuestion || effectiveTask,
+            audioBlob: recordedBlob,
+            durationSeconds: recordingSeconds,
+            notes: responseText,
+          }),
+          minimumTime,
+        ]);
+        const finalResult = {
+          ...scored,
+          taskSlug: task.slug,
+          responseText: scored.transcript,
+          analysis: { ...buildAnalysis(scored.transcript), wordCount: countWords(scored.transcript) },
+        };
+        setResponseText(scored.transcript);
+        setResult(finalResult);
+        await submitPteTaskResponse({
+          user,
+          task,
+          question: currentQuestion || effectiveTask,
+          responseText: scored.transcript,
+          result: finalResult,
+          attemptKind: "speaking-score",
+          durationSeconds: recordingSeconds,
+        });
+        setNotice("Recording transcribed and scored. This remains a practice estimate, not an official Pearson score.");
+      } catch (speechError) {
+        setError(speechError.message || "Speaking response could not be transcribed.");
+      } finally {
+        window.clearInterval(stageTimer);
+        setSubmitting(false);
+        setAnalysisStep(-1);
+      }
       return;
     }
 
     const localResult = requiresAi ? localFreeformScore(effectiveTask, responseText) : evaluateObjectiveTask({
       task: effectiveTask,
       question: currentQuestion || effectiveTask,
-      responseText,
+      responseText: structuredResponseText,
       selectedOptions,
+      blankResponses,
+      reorderItems,
     });
 
     setSubmitting(true);
@@ -537,10 +704,10 @@ export default function PteTaskPractice() {
       const finalResult = {
         ...scored,
         taskSlug: task.slug,
-        responseText,
+        responseText: structuredResponseText,
         vocabularyRange: scored.vocabularyRange ?? 0,
         argumentQuality: scored.argumentQuality ?? 0,
-        analysis: { ...buildAnalysis(responseText), ...(scored.analysis || {}) },
+        analysis: { ...buildAnalysis(structuredResponseText), ...(scored.analysis || {}) },
       };
       setResult(finalResult);
 
@@ -549,7 +716,7 @@ export default function PteTaskPractice() {
           user,
           task,
           question: currentQuestion || effectiveTask,
-          responseText,
+          responseText: structuredResponseText,
           result: finalResult,
           attemptKind: requiresAi ? "ai-score" : "objective-check",
         });
@@ -682,7 +849,7 @@ export default function PteTaskPractice() {
                         </Button>
                       )}
                       {recordedUrl ? (
-                        <Button variant="outlined" component="a" href={recordedUrl} target="_blank" rel="noreferrer" sx={{ borderRadius: 1, textTransform: "none", fontWeight: 900 }}>
+                      <Button variant="outlined" component="a" href={recordedUrl} target="_blank" rel="noreferrer" sx={{ borderRadius: 1, textTransform: "none", fontWeight: 900 }}>
                           Play recording
                         </Button>
                       ) : null}
@@ -726,6 +893,49 @@ export default function PteTaskPractice() {
                     );
                   })}
                 </Stack>
+              ) : task.slug.includes("fill-blanks") ? (
+                <Paper variant="outlined" sx={{ p: 2, borderRadius: 1, bgcolor: "#fbfefc" }}>
+                  <Stack spacing={2}>
+                    <Typography fontWeight={900}>Fill each blank with the exact word or phrase.</Typography>
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, alignItems: "center", lineHeight: 2.2 }}>
+                      {buildBlankPromptParts(effectiveTask.prompt).map((part, index) => (
+                        <React.Fragment key={`blank-part-${index}`}>
+                          {part ? <Typography component="span" sx={{ whiteSpace: "pre-wrap" }}>{part}</Typography> : null}
+                          {index < blankResponses.length ? (
+                            <TextField
+                              value={blankResponses[index] || ""}
+                              onChange={(event) => updateBlankResponse(index, event.target.value)}
+                              size="small"
+                              placeholder={`Blank ${index + 1}`}
+                              sx={{ minWidth: { xs: 140, md: 180 } }}
+                            />
+                          ) : null}
+                        </React.Fragment>
+                      ))}
+                    </Box>
+                  </Stack>
+                </Paper>
+              ) : task.slug === "reorder-paragraphs" ? (
+                <Stack spacing={1.4}>
+                  {reorderItems.map((item, index) => (
+                    <Paper key={item.id} variant="outlined" sx={{ p: 2, borderRadius: 1 }}>
+                      <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" gap={1.5}>
+                        <Box>
+                          <Typography fontWeight={900} sx={{ mb: 0.6 }}>Paragraph {item.id}</Typography>
+                          <Typography sx={{ lineHeight: 1.8 }}>{item.text}</Typography>
+                        </Box>
+                        <Stack direction="row" gap={1} sx={{ flexShrink: 0 }}>
+                          <Button variant="outlined" disabled={index === 0} onClick={() => moveReorderItem(index, -1)} sx={{ borderRadius: 1, textTransform: "none", fontWeight: 800 }}>
+                            Move up
+                          </Button>
+                          <Button variant="outlined" disabled={index === reorderItems.length - 1} onClick={() => moveReorderItem(index, 1)} sx={{ borderRadius: 1, textTransform: "none", fontWeight: 800 }}>
+                            Move down
+                          </Button>
+                        </Stack>
+                      </Stack>
+                    </Paper>
+                  ))}
+                </Stack>
               ) : (
                 <TextField
                   value={responseText}
@@ -761,12 +971,12 @@ export default function PteTaskPractice() {
                   (requiresAi && (!user || wordCount < (effectiveTask.minWords || 1))) ||
                   (!requiresAi && supportsObjectiveCheck && currentQuestion?.practiceMode !== "choice" && !responseText.trim()) ||
                   (!requiresAi && supportsObjectiveCheck && currentQuestion?.practiceMode === "choice" && !selectedOptions.length) ||
-                  (!requiresAi && !supportsObjectiveCheck && isSpeakingPractice && !recordedUrl)
+                  (!requiresAi && !supportsObjectiveCheck && isSpeakingPractice && !recordedBlob)
                 }
                 onClick={submit}
                 sx={{ alignSelf: "flex-start", borderRadius: 1, textTransform: "none", fontWeight: 900, bgcolor: section?.color || "#0f766e", "&:hover": { bgcolor: section?.color || "#0f766e", filter: "brightness(0.95)" } }}
               >
-                {requiresAi ? "Score my answer" : supportsObjectiveCheck ? "Check my answer" : "Save speaking attempt"}
+                {requiresAi ? "Score my answer" : supportsObjectiveCheck ? "Check my answer" : "Submit speaking response"}
               </Button>
             </Stack>
           </Paper>

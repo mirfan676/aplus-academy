@@ -4,6 +4,13 @@ import { getTaskQuestions, getTotalQuestionCount } from "../pages/pte/pteQuestio
 
 const normalizeOptionId = (index) => String.fromCharCode(97 + index);
 const clean = (value) => String(value || "").trim().toLowerCase();
+const prefer = (primary, fallback) => {
+  if (primary == null) return fallback;
+  if (typeof primary === "string") return primary.trim() ? primary : fallback;
+  if (Array.isArray(primary)) return primary.length ? primary : fallback;
+  if (typeof primary === "object") return Object.keys(primary).length ? primary : fallback;
+  return primary;
+};
 
 const normalizeQuestion = (record, index = 0) => {
   const options = Array.isArray(record.options)
@@ -60,8 +67,31 @@ export const fetchPublishedPteQuestions = async (taskSlug) => {
         where("taskSlug", "==", String(taskSlug)),
       ),
     );
+    const bundledById = new Map(fallback.map((question) => [String(question.id), question]));
     const records = snapshot.docs
-      .map((item, index) => normalizeQuestion({ id: item.id, ...item.data() }, index))
+      .map((item, index) => {
+        const normalized = normalizeQuestion({ id: item.id, ...item.data() }, index);
+        const bundled = bundledById.get(normalized.id);
+        if (!bundled) return normalized;
+        return {
+          ...bundled,
+          ...normalized,
+          transcript: prefer(normalized.transcript, bundled.transcript || ""),
+          audioText: prefer(normalized.audioText, bundled.audioText || ""),
+          audioUrl: prefer(normalized.audioUrl, bundled.audioUrl || ""),
+          imageUrl: prefer(normalized.imageUrl, bundled.imageUrl || ""),
+          imageAlt: prefer(normalized.imageAlt, bundled.imageAlt || ""),
+          imageSpec: prefer(normalized.imageSpec, bundled.imageSpec || null),
+          sample: prefer(normalized.sample, bundled.sample || ""),
+          explanation: prefer(normalized.explanation, bundled.explanation || ""),
+          notes: prefer(normalized.notes, bundled.notes || ""),
+          options: prefer(normalized.options, bundled.options || []),
+          correctAnswers: prefer(normalized.correctAnswers, bundled.correctAnswers || []),
+          correctOptionIds: prefer(normalized.correctOptionIds, bundled.correctOptionIds || []),
+          acceptableAnswers: prefer(normalized.acceptableAnswers, bundled.acceptableAnswers || []),
+          tips: prefer(normalized.tips, bundled.tips || []),
+        };
+      })
       .filter((question) => question.prompt);
     return records.length ? records.sort((a, b) => (a.order || 0) - (b.order || 0)) : fallback;
   } catch (error) {
