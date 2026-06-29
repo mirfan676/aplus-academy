@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-06-29-english-language-learning-and-communication",
+    "title": "English Language Learning and Communication",
+    "description": "A concise education-news summary covering recent developments in English Language and the common themes connecting them.",
+    "topic": "English Language Learning and Communication",
+    "category": "English Language",
+    "publishedAt": "2026-06-29T08:25:50.042942+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/5676741/pexels-photo-5676741.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/students-in-the-classroom-5676741/",
+      "credit": "Pexels free photo",
+      "alt": "University students collaborating during class",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-06-28-quran-memorization-and-tajweed-education",
     "title": "Quran Memorization and Tajweed Education",
     "description": "A concise education-news summary covering recent developments in Qur'an & Tajweed and the common themes connecting them.",
