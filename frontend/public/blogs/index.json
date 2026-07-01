@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-07-01-ielts-and-english-proficiency-testing",
+    "title": "IELTS and English Proficiency Testing",
+    "description": "A concise education-news summary covering recent developments in IELTS and the common themes connecting them.",
+    "topic": "IELTS and English Proficiency Testing",
+    "category": "IELTS",
+    "publishedAt": "2026-07-01T07:49:34.656811+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/4145190/pexels-photo-4145190.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/person-writing-on-a-notebook-4145190/",
+      "credit": "Pexels free photo",
+      "alt": "Student practising English writing skills",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-06-30-competitive-exams-and-assessment-updates",
     "title": "Competitive Exams and Assessment Updates",
     "description": "A concise education-news summary covering recent developments in Competitive Exams and the common themes connecting them.",
