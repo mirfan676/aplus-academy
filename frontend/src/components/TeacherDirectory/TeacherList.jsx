@@ -55,10 +55,10 @@ export default function TeacherList({
             xs={12}
             sm={6}
             md={4}
-            sx={{ display: "flex" }}
+            sx={{ display: "flex", justifyContent: "center" }}
           >
             {/* Wrapper ensures real text exists in DOM */}
-            <Box sx={{ width: "100%" }}>
+            <Box sx={{ width: "100%", display: "flex", justifyContent: "center" }}>
               {/* Hidden semantic heading for crawlers */}
               <Typography
                 component="h3"

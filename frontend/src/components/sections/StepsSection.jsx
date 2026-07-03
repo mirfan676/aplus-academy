@@ -1,4 +1,4 @@
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Button, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
@@ -6,9 +6,31 @@ import SchoolIcon from "@mui/icons-material/School";
 import CheckIcon from "@mui/icons-material/Check";
 
 const steps = [
-  { icon: <PersonSearchIcon sx={{ fontSize: 42 }} />, text: "Find the required Tutor" },
-  { icon: <SchoolIcon sx={{ fontSize: 42 }} />, text: "We Match the Best Tutor" },
-  { icon: <CheckIcon sx={{ fontSize: 42 }} />, text: "Start Free Trial Class" },
+  {
+    icon: <PersonSearchIcon sx={{ fontSize: 42 }} />,
+    title: "Tell us what kind of tutor you need",
+    text:
+      "Share the student's class, subject, city, area, timing, school board, and whether you want home tuition, online classes, or a female tutor preference.",
+    detail:
+      "This helps A Plus Academy avoid random matching and focus on the student's actual syllabus, exam pressure, weak concepts, and learning routine.",
+    button: { label: "Find Tutor", to: "/teachers" },
+  },
+  {
+    icon: <SchoolIcon sx={{ fontSize: 42 }} />,
+    title: "We shortlist suitable tutors",
+    text:
+      "The platform compares subject fit, teaching experience, class level, communication style, and location so parents do not have to search blindly.",
+    detail:
+      "This is especially useful for Matric, FSc, O Level, A Level, Quran, IELTS, English language, and university-level support where tutor quality matters more than just availability.",
+  },
+  {
+    icon: <CheckIcon sx={{ fontSize: 42 }} />,
+    title: "Start with trial, then review progress",
+    text:
+      "Families can evaluate punctuality, concept clarity, student comfort, homework follow-up, and whether the tutor understands the required syllabus.",
+    detail:
+      "Once classes begin, the goal is not only coverage of books but also confidence building, revision planning, test preparation, and long-term academic consistency.",
+  },
 ];
 
 const StepsSection = () => {
@@ -18,13 +40,29 @@ const StepsSection = () => {
         variant="h4"
         fontWeight={700}
         sx={{
-          mb: 6,
+          mb: 1.5,
           textAlign: "center",
           color: "#004aad",
           fontSize: { xs: "1.5rem", sm: "1.8rem", md: "2rem", lg: "2.2rem" },
         }}
       >
-        How It Works
+        How A Plus Academy Works
+      </Typography>
+
+      <Typography
+        sx={{
+          maxWidth: 900,
+          mx: "auto",
+          mb: 5,
+          textAlign: "center",
+          color: "#445",
+          lineHeight: 1.8,
+          fontSize: { xs: "0.95rem", md: "1rem" },
+        }}
+      >
+        A strong tutor match starts with accurate student needs, a relevant shortlist, and clear progress expectations.
+        This process helps parents find better support for school classes, board exams, Quran learning, language
+        development, and future academic planning.
       </Typography>
 
       <Box
@@ -32,20 +70,21 @@ const StepsSection = () => {
           display: "flex",
           flexDirection: { xs: "column", sm: "row" },
           justifyContent: "center",
-          alignItems: "center",
-          gap: { xs: 6, sm: 4, md: 5 },
+          alignItems: "stretch",
+          gap: { xs: 4, sm: 3, md: 4 },
           position: "relative",
         }}
       >
         {steps.map((step, i) => (
-          <motion.div key={i} whileHover={{ y: -10 }}>
+          <motion.div key={step.title} whileHover={{ y: -10 }} style={{ width: "100%" }}>
             <Box
               sx={{
                 position: "relative",
                 borderRadius: "22px",
                 overflow: "hidden",
-                width: { xs: "300px", sm: "280px", md: "350px" },
-                minHeight: 150,
+                width: "100%",
+                maxWidth: { xs: 360, sm: 310, md: 380 },
+                minHeight: 290,
                 mx: "auto",
                 "&::before": {
                   content: '""',
@@ -76,7 +115,7 @@ const StepsSection = () => {
                   borderRadius: "20px",
                   position: "relative",
                   zIndex: 2,
-                  minHeight: 150,
+                  minHeight: 290,
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
@@ -86,108 +125,62 @@ const StepsSection = () => {
                     transform: "translateY(-10px)",
                     boxShadow: "0 25px 70px rgba(0,0,0,0.3)",
                   },
-                  "&::after": {
-                    content: '""',
-                    position: "absolute",
-                    top: 0,
-                    left: "-100%",
-                    width: "60%",
-                    height: "100%",
-                    background:
-                      "linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 50%, rgba(255,255,255,0) 100%)",
-                    transform: "skewX(-20deg)",
-                    transition: "0.7s",
-                  },
-                  "&:hover::after": { left: "150%" },
                 }}
               >
-                {/* Step Number */}
-                <Typography variant="h6" fontWeight={700} sx={{ color: "#29b554", mb: 1 }}>
-                  Step {i + 1}
-                </Typography>
+                <Stack spacing={1.3}>
+                  <Typography variant="h6" fontWeight={700} sx={{ color: "#29b554" }}>
+                    Step {i + 1}
+                  </Typography>
+                  <Typography sx={{ fontSize: "1.05rem", color: "#004aad", fontWeight: 700, pr: 6 }}>
+                    {step.title}
+                  </Typography>
+                  <Typography sx={{ color: "#333", lineHeight: 1.8 }}>
+                    {step.text}
+                  </Typography>
+                  <Typography sx={{ color: "#556", lineHeight: 1.75, fontSize: "0.95rem" }}>
+                    {step.detail}
+                  </Typography>
+                </Stack>
 
-                {/* Step Text */}
-                <Typography sx={{ fontSize: "1rem", color: "#333", fontWeight: 500, mb: i === 0 ? 2 : 0 }}>
-                  {step.text}
-                </Typography>
-
-                {/* Button only in first step */}
-                {i === 0 && (
-                   <Button
+                <Stack spacing={1.5} sx={{ mt: 2 }}>
+                  {step.button && (
+                    <Button
                       component={Link}
-                      to="/teachers"
+                      to={step.button.to}
                       variant="contained"
                       size="medium"
                       sx={{
-                        mt: 2,
-                        px: 4, // smaller padding for compact design
-                        py: 1, 
-                        borderRadius: "12px",
-                        fontSize: { xs: "0.85rem", sm: "0.9rem", md: "0.95rem" },
-                        width: { xs: "70%", sm: "70%" , md: "70%"},
-                        color: "#29b554",
-                        background: "rgba(255, 255, 255, 0.2)", // glass effect
-                        backdropFilter: "blur(10px)",
-                        border: "1px solid rgba(40, 200, 100, 0.4)",
-                        boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
-                        transition: "all 0.3s ease",
+                        alignSelf: "flex-start",
+                        px: 4.5,
+                        py: 1.35,
+                        borderRadius: "10px",
+                        fontSize: { xs: "0.95rem", sm: "1rem", md: "1.02rem" },
+                        background: "#29b554",
+                        textTransform: "none",
+                        fontWeight: 700,
                         "&:hover": {
-                          background: "rgba(255, 255, 255, 0.35)",
-                          boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
+                          background: "#22a049",
                         },
                       }}
                     >
-                      Find Tutor
+                      {step.button.label}
                     </Button>
-                )}
+                  )}
+                </Stack>
 
-                {/* Icon */}
                 <Box
                   sx={{
                     position: "absolute",
-                    bottom: 12,
-                    right: 16,
-                    opacity: 0.85,
+                    top: 18,
+                    right: 18,
+                    opacity: 0.9,
                     color: "#29b554",
-                    transition: "transform 0.3s ease",
-                    "&:hover": { transform: "scale(1.2) rotate(-10deg)" },
                   }}
                 >
                   {step.icon}
                 </Box>
               </Box>
             </Box>
-
-            {/* Arrows */}
-            {i !== steps.length - 1 && (
-              <Box
-                sx={{
-                  display: { xs: "none", sm: "block" },
-                  position: "absolute",
-                  top: "50%",
-                  right: "-38px",
-                  transform: "translateY(-50%)",
-                  width: 0,
-                  height: 0,
-                  borderTop: "12px solid transparent",
-                  borderBottom: "12px solid transparent",
-                  borderLeft: "18px solid #00d9a5",
-                }}
-              />
-            )}
-            {i !== steps.length - 1 && (
-              <Box sx={{ display: { xs: "flex", sm: "none" }, justifyContent: "center", mt: 1 }}>
-                <Box
-                  sx={{
-                    width: 0,
-                    height: 0,
-                    borderLeft: "12px solid transparent",
-                    borderRight: "12px solid transparent",
-                    borderTop: "18px solid #00d9a5",
-                  }}
-                />
-              </Box>
-            )}
           </motion.div>
         ))}
       </Box>

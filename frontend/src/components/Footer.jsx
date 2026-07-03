@@ -19,6 +19,7 @@ const academyLinks = [
   { label: "Career Opportunities", href: "/career-opportunities" },
   { label: "Blog", href: "/blog" },
   { label: "Languages", href: "/languages" },
+  { label: "Language Courses", href: "/courses/languages" },
   { label: "Buy Courses", href: "/buy-courses" },
 ];
 

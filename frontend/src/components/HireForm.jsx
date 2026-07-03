@@ -248,7 +248,7 @@ const HireForm = () => {
           <input
             type="hidden"
             name="teacher_profile_link"
-            value={`https://aplusacademy.pk/teacher/${teacherId}`}
+            value={`https://www.aplusacademy.pk/teacher/${teacherId}`}
           />
 
           {/* reCAPTCHA */}

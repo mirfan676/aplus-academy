@@ -1,240 +1,162 @@
-import { Box, Typography } from "@mui/material";
-import { useRef } from "react";
+import { Box, Typography, Grid, Chip } from "@mui/material";
 import { motion } from "framer-motion";
 
-// FEATURES
 const features = [
   {
-    icon: "/icons/experienced.jpg",
-    title: "Top Experienced Tutors",
-    desc: "Subject experts with years of teaching experience.",
+    image: "/icons/experienced.jpg",
+    fit: "cover",
+    badge: "Academic support",
+    title: "Experienced tutors for real academic needs",
+    desc:
+      "Students need clear concept teaching, steady revision, and subject guidance that actually matches their class level, board, and exam pressure.",
   },
   {
-    icon: "/icons/trusted.jpg",
-    title: "Highly Trusted by Parents",
-    desc: "Hundreds of parents rely on APlus for home tutoring.",
+    image: "/icons/trusted.jpg",
+    fit: "cover",
+    badge: "Parent confidence",
+    title: "Trusted support for parents and families",
+    desc:
+      "Parents look for punctual classes, reliable communication, and safe tutor matching. The process should feel organized, not uncertain.",
   },
   {
-    icon: "/icons/success.jpg",
-    title: "1000+ Successful Students",
-    desc: "Proven results and improved academic performance.",
+    image: "/icons/success.jpg",
+    fit: "cover",
+    badge: "Long-term growth",
+    title: "Support beyond one subject or one exam",
+    desc:
+      "Many families need help across school years, entry tests, language learning, and future planning. Strong tutoring should support that wider journey.",
+  },
+  {
+    image: "/icons/verified.svg",
+    fit: "contain",
+    badge: "Modern learning",
+    title: "Modern learning guidance for this era",
+    desc:
+      "Students now benefit from better planning, digital study habits, and practical learning systems alongside tutor hiring and subject selection.",
   },
 ];
 
 const WhyChooseUs = () => {
-  const scrollRef = useRef(null);
-
-  const scrollLeft = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: -300, behavior: "smooth" });
-    }
-  };
-
-  const scrollRight = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: 300, behavior: "smooth" });
-    }
-  };
-
   return (
     <Box
       sx={{
         py: 8,
         px: { xs: 2, md: 6 },
         background: "#e8f2ff",
-        position: "relative",
       }}
     >
-      {/* TITLE */}
       <Typography
         variant="h4"
         fontWeight={700}
         sx={{
-          mb: 6,
+          mb: 1.5,
           textAlign: "center",
           color: "#004aad",
           fontSize: { xs: "1.6rem", sm: "1.9rem", md: "2.1rem" },
         }}
       >
-        Why Choose APlus Home Tutors?
+        Why Families Choose A Plus Academy
       </Typography>
 
-      {/* DESKTOP GRID */}
-      <Box
+      <Typography
         sx={{
-          display: { xs: "none", md: "grid" },
-          gridTemplateColumns: "1fr 1fr 1fr",
-          gap: 4,
+          maxWidth: 920,
+          mx: "auto",
+          mb: 5,
+          textAlign: "center",
+          color: "#445",
+          lineHeight: 1.8,
+          fontSize: { xs: "0.95rem", md: "1rem" },
         }}
       >
-        {features.map((f, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-          >
-            <Box
-              sx={{
-                position: "relative",
-                p: 4,
-                borderRadius: "22px",
-                minHeight: 260,
-                background: "rgba(255,255,255,0.25)",
-                backdropFilter: "blur(12px)",
-                boxShadow: "0 12px 28px rgba(0,0,0,0.15)",
+        A tutoring platform should help with tutor discovery, class-level guidance, exam preparation, and future study
+        direction. The aim is to make academic decisions easier for parents and more effective for students.
+      </Typography>
 
-                "&::before": {
-                  content: '""',
-                  position: "absolute",
-                  inset: 0,
-                  padding: "2px",
-                  borderRadius: "22px",
-                  background:
-                    "linear-gradient(120deg,#00a6ff,#00ff8f,#00a6ff)",
-                  backgroundSize: "200% 200%",
-                  animation: "gradientMove 4s linear infinite",
-                  WebkitMask:
-                    "linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0)",
-                  WebkitMaskComposite: "xor",
-                  maskComposite: "exclude",
-                },
-              }}
+      <Grid container spacing={3}>
+        {features.map((feature) => (
+          <Grid item xs={12} sm={6} md={3} key={feature.title} sx={{ display: "flex" }}>
+            <motion.div
+              initial={{ opacity: 0, y: 36 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.45, ease: "easeOut" }}
+              style={{ width: "100%", height: "100%" }}
             >
               <Box
-                component="img"
-                src={f.icon}
-                alt={f.title}
                 sx={{
-                  width: "100%",
-                  aspectRatio: "16/9",
-                  borderRadius: "12px",
-                  objectFit: "cover",
-                  mb: 2,
+                  borderRadius: "18px",
+                  overflow: "hidden",
+                  bgcolor: "#fff",
+                  border: "1px solid #dce8f1",
+                  boxShadow: "0 12px 24px rgba(16,32,25,0.08)",
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
                 }}
-              />
+              >
+                <Box
+                  sx={{
+                    position: "relative",
+                    minHeight: 220,
+                    background:
+                      "linear-gradient(180deg, rgba(244,249,255,1) 0%, rgba(233,244,255,1) 100%)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    p: 2,
+                  }}
+                >
+                  <Chip
+                    label={feature.badge}
+                    size="small"
+                    sx={{
+                      position: "absolute",
+                      top: 16,
+                      left: 16,
+                      borderRadius: 1,
+                      bgcolor: "rgba(255,255,255,0.92)",
+                      color: "#0f172a",
+                      fontWeight: 800,
+                    }}
+                  />
+                  <Box
+                    component="img"
+                    src={feature.image}
+                    alt={feature.title}
+                    sx={{
+                      width: "100%",
+                      height: 180,
+                      objectFit: feature.fit,
+                      objectPosition: "center",
+                      display: "block",
+                      borderRadius: feature.fit === "cover" ? "16px" : 0,
+                    }}
+                  />
+                </Box>
 
-              <Typography variant="h6" fontWeight={700} sx={{ color: "#004aad" }}>
-                {f.title}
-              </Typography>
+                <Box
+                  sx={{
+                    p: 3,
+                    borderRadius: "18px",
+                    display: "flex",
+                    flexDirection: "column",
+                    flex: 1,
+                  }}
+                >
+                  <Typography variant="h6" fontWeight={800} sx={{ color: "#102019", lineHeight: 1.35 }}>
+                    {feature.title}
+                  </Typography>
 
-              <Typography sx={{ mt: 1, color: "#333", fontSize: "0.95rem" }}>
-                {f.desc}
-              </Typography>
-            </Box>
-          </motion.div>
+                  <Typography sx={{ mt: 1.2, color: "#475569", fontSize: "0.95rem", lineHeight: 1.85 }}>
+                    {feature.desc}
+                  </Typography>
+                </Box>
+              </Box>
+            </motion.div>
+          </Grid>
         ))}
-      </Box>
-
-      {/* MOBILE SLIDER */}
-      <Box
-        sx={{
-          position: "relative",
-          display: { xs: "block", md: "none" },
-        }}
-      >
-        {/* LEFT ARROW */}
-        <Box
-          onClick={scrollLeft}
-          sx={{
-            position: "absolute",
-            top: "45%",
-            left: -5,
-            zIndex: 20,
-            width: 44,
-            height: 44,
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.3)",
-            backdropFilter: "blur(10px)",
-            boxShadow: "0 4px 14px rgba(0,0,0,0.15)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            cursor: "pointer",
-          }}
-        >
-          <Typography fontSize={"1.8rem"} color="#004aad">
-            ←
-          </Typography>
-        </Box>
-
-        {/* RIGHT ARROW */}
-        <Box
-          onClick={scrollRight}
-          sx={{
-            position: "absolute",
-            top: "45%",
-            right: -5,
-            zIndex: 20,
-            width: 44,
-            height: 44,
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.3)",
-            backdropFilter: "blur(10px)",
-            boxShadow: "0 4px 14px rgba(0,0,0,0.15)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            cursor: "pointer",
-          }}
-        >
-          <Typography fontSize={"1.8rem"} color="#004aad">
-            →
-          </Typography>
-        </Box>
-
-        {/* MOBILE SCROLL WRAPPER */}
-        <Box
-          ref={scrollRef}
-          sx={{
-            overflowX: "scroll",
-            display: "flex",
-            gap: 3,
-            px: 1,
-            py: 2,
-            scrollbarWidth: "none",
-            "&::-webkit-scrollbar": { display: "none" },
-          }}
-        >
-          {features.map((f, i) => (
-            <Box
-              key={i}
-              sx={{
-                position: "relative",
-                minWidth: "78%", // shows next card shadow
-                p: 3,
-                borderRadius: "20px",
-                background: "rgba(255,255,255,0.25)",
-                backdropFilter: "blur(12px)",
-                boxShadow: "0 10px 25px rgba(0,0,0,0.12)",
-              }}
-            >
-              {/* MOBILE IMAGE FIX */}
-              <Box
-                component="img"
-                src={f.icon}
-                alt={f.title}
-                sx={{
-                  width: "100%",
-                  aspectRatio: "16/9",
-                  borderRadius: "12px",
-                  objectFit: "cover",
-                  mb: 2,
-                }}
-              />
-
-              <Typography variant="h6" fontWeight={700} sx={{ color: "#004aad" }}>
-                {f.title}
-              </Typography>
-
-              <Typography sx={{ mt: 1, color: "#333", fontSize: "0.9rem" }}>
-                {f.desc}
-              </Typography>
-            </Box>
-          ))}
-        </Box>
-      </Box>
+      </Grid>
     </Box>
   );
 };

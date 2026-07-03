@@ -64,9 +64,9 @@ export default function TeacherCard({
             flexDirection: "column",
             position: "relative",
             overflow: "hidden",
-            minWidth: 320,
-            maxWidth: 320,
             width: "100%",
+            maxWidth: { xs: 360, sm: 320 },
+            mx: "auto",
             boxShadow: "0px 4px 12px rgba(0,0,0,0.08)",
             transition: "all 0.25s ease"
           }}

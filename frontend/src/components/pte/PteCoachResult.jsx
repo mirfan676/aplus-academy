@@ -224,6 +224,12 @@ const PteCoachResult = ({ result }) => {
 
           {taskMode === "speaking" && (
             <Box sx={{ mt: 2.5, p: 2, border: "1px solid #dce8f1", borderRadius: 1 }}>
+              {result.audioUrl ? (
+                <Box sx={{ mb: 1.5 }}>
+                  <Typography fontWeight={900} sx={{ mb: 0.8 }}>Audio replay</Typography>
+                  <audio controls src={result.audioUrl} style={{ width: "100%" }} />
+                </Box>
+              ) : null}
               <Typography fontWeight={900} sx={{ mb: 0.8 }}>Transcript</Typography>
               <Typography sx={{ whiteSpace: "pre-wrap", lineHeight: 1.8 }}>
                 {result.transcript || result.responseText || "Transcript not available."}

@@ -1,47 +1,53 @@
 import React from "react";
-import { Box, Grid, Typography, useMediaQuery } from "@mui/material";
+import { Box, Button, Grid, Typography, useMediaQuery } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const cardsData = [
   {
-    title: "Verified & Qualified Tutors",
+    title: "Trusted and verified tutors",
     description:
-      "Every tutor goes through a strict verification process, academic screening, and background check. Only experienced teachers are selected.",
+      "Families can search for tutors with stronger subject matching, clearer academic screening, and more confidence in who is coming to teach.",
     icon: "/icons/verified.svg",
+    href: "/teachers",
   },
   {
-    title: "2 Days Free Trial",
+    title: "Guidance before you confirm",
     description:
-      "Experience teaching quality with a completely free 2-day trial. No payments, no commitments — just learning.",
+      "Use trial classes, learning goals, and teaching plans to judge whether the tutor fits the child's pace, board, and weak areas.",
     icon: "/icons/trial.svg",
+    href: "/teachers",
   },
   {
-    title: "All Subjects & Classes",
+    title: "Class-wise academic support",
     description:
-      "Math, English, Science, Islamiat, O/A Levels & more — expert tutors for every class and subject.",
+      "Support now covers school classes, O and A Level, exam preparation, career roadmaps, PTE practice, and future planning guidance.",
     icon: "/icons/subjects.svg",
+    href: "/teachers",
   },
   {
-    title: "Affordable Monthly Fee",
+    title: "Friendly support for parents",
     description:
-      "Premium-quality tutoring with budget-friendly monthly packages. Transparent pricing with no hidden charges.",
+      "Parents can get clearer help on syllabus coverage, exam readiness, tutor communication, and choosing between home and online classes.",
     icon: "/icons/affordable.svg",
+    href: "/teachers",
   },
   {
-    title: "Personalised Study Plans",
+    title: "Better study planning",
     description:
-      "Customized study plans based on your child's strengths, weaknesses & goals for faster improvement.",
+      "Use tutoring alongside revision blocks, digital tools, and structured routines so students build stronger long-term learning habits.",
     icon: "/icons/plans.svg",
+    href: "/teachers",
   },
   {
-    title: "Safe & Reliable Home Tutoring",
+    title: "Modern learning direction",
     description:
-      "Background-checked tutors, verified identities, and safe home/online learning trusted by parents nationwide.",
+      "Students can move from school support into career roadmaps, AI-aware study habits, and higher-level preparation without leaving the platform.",
     icon: "/icons/safe.svg",
+    href: "/career-roadmap",
   },
 ];
 
-// Animation variants
 const containerVariants = {
   show: {
     transition: {
@@ -55,8 +61,7 @@ const cardVariants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
 };
 
-const AdvantagesSection = () => {
-  // ❗ Disable animation if screen < 900px (xs + sm)
+export default function AdvantagesSection() {
   const isMobile = useMediaQuery("(max-width:900px)");
 
   return (
@@ -64,7 +69,7 @@ const AdvantagesSection = () => {
       <Typography
         variant="h4"
         sx={{
-          mb: 6,
+          mb: 1.5,
           textAlign: "center",
           color: "#004aad",
           fontWeight: 700,
@@ -76,10 +81,23 @@ const AdvantagesSection = () => {
           },
         }}
       >
-        Why Parents Trust APlus Home Tutors
+        Why Families Use A Plus Academy
       </Typography>
 
-      {/* ❗ If mobile → no motion wrapper, static grid */}
+      <Typography
+        sx={{
+          maxWidth: 900,
+          mx: "auto",
+          mb: 5,
+          textAlign: "center",
+          color: "#445",
+          lineHeight: 1.8,
+        }}
+      >
+        The homepage should immediately explain why the platform is useful, what type of support it offers, and how
+        parents or students can move from search to action.
+      </Typography>
+
       <motion.div
         initial={isMobile ? "show" : "hidden"}
         whileInView="show"
@@ -88,7 +106,7 @@ const AdvantagesSection = () => {
       >
         <Grid
           container
-          spacing={4}
+          spacing={3}
           sx={{
             display: "grid",
             gridTemplateColumns: {
@@ -98,40 +116,33 @@ const AdvantagesSection = () => {
             },
           }}
         >
-          {cardsData.map((card, index) => {
+          {cardsData.map((card) => {
             const MotionWrapper = isMobile ? "div" : motion.div;
 
             return (
-              <MotionWrapper
-                key={index}
-                variants={isMobile ? {} : cardVariants}
-                style={{ width: "100%" }}
-              >
+              <MotionWrapper key={card.title} variants={isMobile ? {} : cardVariants} style={{ width: "100%", height: "100%" }}>
                 <Box
                   sx={{
                     position: "relative",
                     borderRadius: "22px",
                     overflow: "hidden",
                     width: "100%",
-                    minHeight: { xs: 260, sm: 300, md: 330 },
-
+                    height: "100%",
+                    minHeight: { xs: 280, sm: 320, md: 340 },
                     "&::before": {
                       content: '""',
                       position: "absolute",
                       inset: 0,
                       padding: "2px",
                       borderRadius: "22px",
-                      background:
-                        "linear-gradient(120deg, #00a6ff, #00ff8f, #00a6ff)",
+                      background: "linear-gradient(120deg, #00a6ff, #00ff8f, #00a6ff)",
                       backgroundSize: "200% 200%",
                       animation: "gradientMove 4s linear infinite",
-                      WebkitMask:
-                        "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                      WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
                       WebkitMaskComposite: "xor",
                       maskComposite: "exclude",
                       zIndex: 1,
                     },
-
                     "@keyframes gradientMove": {
                       "0%": { backgroundPosition: "0% 50%" },
                       "50%": { backgroundPosition: "100% 50%" },
@@ -149,13 +160,11 @@ const AdvantagesSection = () => {
                       backdropFilter: "blur(15px)",
                       boxShadow: "0 12px 32px rgba(0, 0, 0, 0.15)",
                       transition: "transform 0.4s ease, box-shadow 0.4s ease",
-
-                      minHeight: { xs: 260, sm: 320, md: 360 },
+                      minHeight: { xs: 280, sm: 320, md: 340 },
                       height: "100%",
                       display: "flex",
                       flexDirection: "column",
                       justifyContent: "space-between",
-
                       "&:hover": {
                         transform: isMobile ? "none" : "translateY(-10px)",
                         boxShadow: isMobile
@@ -164,48 +173,28 @@ const AdvantagesSection = () => {
                       },
                     }}
                   >
-                    {/* Shine effect — disabled on mobile */}
-                    {!isMobile && (
-                      <Box
-                        sx={{
-                          position: "absolute",
-                          inset: 0,
-                          overflow: "hidden",
-                          "&::after": {
-                            content: '""',
-                            position: "absolute",
-                            top: 0,
-                            left: "-100%",
-                            width: "60%",
-                            height: "100%",
-                            background:
-                              "linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 50%, rgba(255,255,255,0) 100%)",
-                            transform: "skewX(-20deg)",
-                            transition: "0.7s",
-                          },
-                          "&:hover::after": {
-                            left: "150%",
-                          },
-                        }}
-                      />
-                    )}
-
-                    {/* Text */}
-                    <Box sx={{ maxWidth: "260px" }}>
+                    <Box sx={{ maxWidth: "280px", pr: 6 }}>
                       <Typography
+                        component={RouterLink}
+                        to={card.href}
                         variant="h6"
                         fontWeight={700}
-                        sx={{ mb: 1, color: "#29b554" }}
+                        sx={{
+                          display: "inline-block",
+                          mb: 1,
+                          color: "#29b554",
+                          textDecoration: "none",
+                          "&:hover": { color: "#004aad" },
+                        }}
                       >
                         {card.title}
                       </Typography>
 
-                      <Typography sx={{ fontSize: "0.95rem", color: "#333" }}>
+                      <Typography sx={{ fontSize: "0.95rem", color: "#333", lineHeight: 1.8 }}>
                         {card.description}
                       </Typography>
                     </Box>
 
-                    {/* Icon */}
                     <Box
                       component="img"
                       src={card.icon}
@@ -216,15 +205,11 @@ const AdvantagesSection = () => {
                         right: 16,
                         width: { xs: 42, sm: 52, md: 64, lg: 70 },
                         height: "auto",
-                        transform: isMobile
-                          ? "rotate(-15deg)"
-                          : "rotate(-15deg)",
+                        transform: "rotate(-15deg)",
                         filter: "drop-shadow(0px 6px 20px rgba(0,0,0,0.25))",
                         transition: "all 0.35s ease",
                         "&:hover": {
-                          transform: isMobile
-                            ? "rotate(-15deg)"
-                            : "rotate(-10deg) scale(1.15)",
+                          transform: isMobile ? "rotate(-15deg)" : "rotate(-10deg) scale(1.15)",
                         },
                       }}
                     />
@@ -237,6 +222,4 @@ const AdvantagesSection = () => {
       </motion.div>
     </Box>
   );
-};
-
-export default AdvantagesSection;
+}

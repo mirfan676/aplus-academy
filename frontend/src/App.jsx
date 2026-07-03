@@ -27,6 +27,8 @@ import TextToStudyQuestions from "./pages/learning-tools/TextToStudyQuestions";
 import PteEssayPractice from "./pages/learning-tools/PteEssayPractice";
 import RegisterChoice from "./pages/register/RegisterChoice";
 import FamilyStudentRegistration from "./pages/register/FamilyStudentRegistration";
+import LanguageCoursesHome from "./pages/courses/LanguageCoursesHome";
+import LanguageCoursePage from "./pages/courses/LanguageCoursePage";
 import AccountDashboard from "./pages/account/AccountDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -165,6 +167,9 @@ function AppShell() {
         <Route path="/career-roadmap" element={<CareerRoadmap />} />
         <Route path="/career-roadmap/pte-practice" element={<RouteRedirect to="/pte" />} />
         <Route path="/career-roadmap/*" element={<CareerRoadmap />} />
+        <Route path="/courses" element={<RouteRedirect to="/courses/languages" />} />
+        <Route path="/courses/languages" element={<LanguageCoursesHome />} />
+        <Route path="/courses/languages/:slug" element={<LanguageCoursePage />} />
         <Route path="/pte" element={<PtePracticeHome />} />
         <Route path="/pte/write-essay" element={<PteEssayPractice />} />
         <Route path="/pte/:slug" element={<PteTaskPractice />} />

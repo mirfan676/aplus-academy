@@ -1,6 +1,5 @@
 import React from "react";
-import LatestNewsSection from "../components/blog/LatestNewsSection";
-import ContentRichHome from "../components/sections/ContentRichHome";
+import RestoredHomeExperience from "../components/sections/RestoredHomeExperience";
 import useSEO from "../hooks/useSEO";
 
 const Home = () => {
@@ -12,10 +11,7 @@ const Home = () => {
   });
 
   return (
-    <>
-      <ContentRichHome />
-      <LatestNewsSection />
-    </>
+    <RestoredHomeExperience />
   );
 };
 

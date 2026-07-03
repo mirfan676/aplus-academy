@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { allLandingPages } from "../src/pages/landing/landingPages.js";
+import { languageCourses } from "../src/pages/courses/languageCoursesData.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const frontendRoot = path.resolve(__dirname, "..");
@@ -29,6 +30,13 @@ const baseLinks = [
   ["/learning-tools/improve-english-grammar", "Grammar Tool"],
   ["/learning-tools/text-to-mcqs-short-questions", "Study Questions Tool"],
   ["/learning-tools/pte-essay-practice", "PTE Essay Practice"],
+  ["/courses/languages", "Language Courses"],
+  ["/courses/languages/english", "English Language Course"],
+  ["/courses/languages/german", "German Language Course"],
+  ["/courses/languages/chinese", "Chinese Language Course"],
+  ["/courses/languages/korean", "Korean Language Course"],
+  ["/courses/languages/japanese", "Japanese Language Course"],
+  ["/courses/languages/arabic", "Arabic Language Course"],
   ["/k-12", "K-12"],
   ["/o-a-level", "O and A Level"],
   ["/competitive-exams", "Competitive Exams"],
@@ -153,6 +161,27 @@ const basePages = [
     ],
   },
   {
+    slug: "courses/languages",
+    title: "Language Courses in Pakistan | Learn Any Language from Home",
+    description:
+      "Explore English, German, Chinese, Korean, Japanese, and Arabic language courses from home with guided levels, speaking practice, and structured learning paths.",
+    heading: "Learn any language from home",
+    intro:
+      "A Plus Academy offers language course guidance for English, German, Chinese, Korean, Japanese, and Arabic with beginner to advanced pathways for students and working learners.",
+    sections: [
+      {
+        title: "What language courses usually include",
+        body:
+          "Strong language courses combine structured levels, speaking practice, listening activities, grammar support, reading tasks, vocabulary building, writing correction, and regular revision instead of isolated word memorization.",
+      },
+      {
+        title: "Choose a course by goal",
+        body:
+          "Some learners want spoken confidence, others need exam preparation, university pathways, migration support, workplace communication, travel readiness, or a new language foundation from home.",
+      },
+    ],
+  },
+  {
     slug: "about",
     title: "About A Plus Academy | Home Tutors in Pakistan",
     description:
@@ -180,6 +209,34 @@ const basePages = [
       "This privacy policy explains how A Plus Academy handles information submitted through forms, tutor requests, cookies, and analytics tools.",
   },
 ];
+
+const languageCoursePages = languageCourses.map((course) => ({
+  slug: `courses/languages/${course.slug}`,
+  title: `${course.name} Course in Pakistan | A Plus Academy`,
+  description: course.seoDescription,
+  heading: course.heroTitle,
+  intro: course.heroIntro,
+  eyebrow: "Language Course",
+  sections: [
+    {
+      title: "Course focus",
+      body: `${course.name} learners usually work on ${course.focusPoints.join(", ").toLowerCase()} through a guided teacher-led pathway.`,
+    },
+    {
+      title: "Course structure",
+      body: course.framework,
+    },
+    ...course.modules.slice(0, 2).map((module, index) => ({
+      title: `Learning module ${index + 1}`,
+      body: module,
+    })),
+  ],
+  links: [
+    ["/courses/languages", "Language Courses"],
+    ["/register", "Register"],
+    ["/teachers", "Find a Tutor"],
+  ],
+}));
 
 const landingPages = Object.values(allLandingPages).map((page) => ({
   slug: page.slug,
@@ -225,7 +282,7 @@ const blogPages = blogIndex.flatMap((post) => {
   ];
 });
 
-const pages = [...basePages, ...landingPages, ...blogPages];
+const pages = [...basePages, ...languageCoursePages, ...landingPages, ...blogPages];
 
 const escapeHtml = (value = "") =>
   String(value)

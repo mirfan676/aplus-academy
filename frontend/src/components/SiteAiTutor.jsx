@@ -292,8 +292,8 @@ const SiteAiTutor = () => {
         elevation={4}
         sx={{
           position: "fixed",
-          left: { xs: 12, md: 16 },
-          bottom: { xs: 12, md: 24 },
+          right: { xs: 12, md: 20 },
+          bottom: { xs: 88, md: 32 },
           zIndex: 1200,
         }}
       >
@@ -307,16 +307,41 @@ const SiteAiTutor = () => {
             minWidth: 0,
             borderRadius: "50%",
             p: 0,
-            bgcolor: "#111827",
+            position: "relative",
+            overflow: "hidden",
+            background: "linear-gradient(135deg, #00b9ff 0%, #1ddc88 100%)",
             color: "#fff",
-            boxShadow: "0 10px 24px rgba(17,24,39,0.25)",
-            border: "1px solid rgba(255,255,255,0.08)",
+            boxShadow: "0 14px 30px rgba(0, 121, 191, 0.32), 0 0 0 1px rgba(255,255,255,0.24) inset",
+            border: "1px solid rgba(255,255,255,0.22)",
             textTransform: "none",
             fontWeight: 950,
-            "&:hover": { bgcolor: "#263142" },
+            "&::before": {
+              content: '""',
+              position: "absolute",
+              inset: 3,
+              borderRadius: "50%",
+              background: "linear-gradient(160deg, rgba(255,255,255,0.42), rgba(255,255,255,0.05) 55%, rgba(255,255,255,0))",
+              pointerEvents: "none",
+            },
+            "&::after": {
+              content: '""',
+              position: "absolute",
+              top: 6,
+              left: 10,
+              width: "58%",
+              height: "26%",
+              borderRadius: "999px",
+              background: "linear-gradient(90deg, rgba(255,255,255,0.58), rgba(255,255,255,0.08))",
+              transform: "rotate(-18deg)",
+              filter: "blur(1px)",
+              pointerEvents: "none",
+            },
+            "&:hover": {
+              background: "linear-gradient(135deg, #00c4ff 0%, #16c977 100%)",
+            },
           }}
         >
-          <Stack spacing={0} alignItems="center" justifyContent="center" sx={{ lineHeight: 1, textAlign: "center" }}>
+          <Stack spacing={0} alignItems="center" justifyContent="center" sx={{ lineHeight: 1, textAlign: "center", position: "relative", zIndex: 1 }}>
             <AutoAwesomeIcon sx={{ fontSize: 18 }} />
             <Typography component="span" sx={{ fontSize: 13, fontWeight: 950, lineHeight: 1 }}>
               AI+

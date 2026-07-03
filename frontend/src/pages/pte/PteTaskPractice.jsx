@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link as RouterLink, Navigate, useParams } from "react-router-dom";
 import {
   Alert,
@@ -7,7 +7,11 @@ import {
   Chip,
   CircularProgress,
   Container,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   Divider,
+  IconButton,
   LinearProgress,
   Paper,
   Stack,
@@ -24,11 +28,12 @@ import SaveIcon from "@mui/icons-material/Save";
 import SendIcon from "@mui/icons-material/Send";
 import ShuffleIcon from "@mui/icons-material/Shuffle";
 import StopIcon from "@mui/icons-material/Stop";
+import CloseIcon from "@mui/icons-material/Close";
 import PteCoachResult from "../../components/pte/PteCoachResult";
 import { useAuth } from "../../contexts/useAuth";
 import useSEO from "../../hooks/useSEO";
 import { fetchPublishedPteQuestions } from "../../services/pteQuestionsData";
-import { submitPteTaskResponse } from "../../services/pteTaskResponseData";
+import { fetchUserPteTaskResponses, submitPteTaskResponse } from "../../services/pteTaskResponseData";
 import { requestAiPteSpeechScore } from "../../services/pteSpeechScoring";
 import { requestAiPteTaskScore } from "../../services/pteTaskAiScoring";
 import { getPteTask, pteSections } from "./ptePracticeData";
@@ -55,6 +60,39 @@ const analysisSteps = [
   "Preparing improvement tips",
 ];
 
+const speakingRecommendations = {
+  "read-aloud": [
+    "Read Aloud: Basic Information",
+    "Read Aloud: Exam Strategies",
+    "Stress and unstress for pronunciation precision",
+    "Shadowing for stronger reading rhythm",
+  ],
+  "repeat-sentence": [
+    "Repeat Sentence exam strategies",
+    "Second language acquisition for RS and WFD",
+    "Vocabulary learning strategies",
+    "Repeat Sentence: Basic Information",
+  ],
+  "describe-image": [
+    "Describe Image: Data graph structure",
+    "Describe Image: Flowchart structure",
+    "Describe Image: Picture structure",
+    "PTE key tasks and scoring secret",
+  ],
+  "retell-lecture": [
+    "Retell Lecture note-taking method",
+    "Retell Lecture response structure",
+    "PTE key tasks and scoring secret",
+    "Listening to lecture signals and transitions",
+  ],
+  "answer-short-question": [
+    "Build short-answer vocabulary",
+    "Campus and science quick-answer practice",
+    "PTE key tasks and scoring secret",
+    "Speaking precision under time pressure",
+  ],
+};
+
 const countWords = (text) => String(text || "").trim().split(/\s+/).filter(Boolean).length;
 const countSentences = (text) => String(text || "").split(/[.!?]+/).map((item) => item.trim()).filter(Boolean).length;
 const clean = (value) => String(value || "").toLowerCase().replace(/\s+/g, " ").replace(/[^\w\s>,-]/g, "").trim();
@@ -72,6 +110,8 @@ const buildAnalysis = (responseText) => ({
 });
 
 const buildCriteria = (pairs) => pairs.map(([label, score]) => ({ label, score, maximum: 15 }));
+const criteriaObjectToList = (criteriaObject) =>
+  Object.entries(criteriaObject || {}).map(([label, score]) => ({ label, score: Number(score) || 0, maximum: 15 }));
 
 const exactMatch = (responseText, answers) => {
   const normalized = clean(responseText);
@@ -138,6 +178,18 @@ const buildStructuredResponseText = ({ task, responseText, blankResponses, reord
   }
 
   return responseText;
+};
+
+const formatAttemptDate = (value) => {
+  const date = value ? new Date(value) : null;
+  if (!date || Number.isNaN(date.getTime())) return "Recent attempt";
+  return date.toLocaleString("en-PK", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 };
 
 const evaluateObjectiveTask = ({ task, question, responseText, selectedOptions, blankResponses = [], reorderItems = [] }) => {
@@ -335,6 +387,65 @@ const DescribeImagePreview = ({ question, sectionColor }) => {
   );
 };
 
+const AttemptHistoryDialog = ({ attempt, onClose, task, sectionColor }) => {
+  if (!attempt) return null;
+
+  const result = {
+    taskSlug: attempt.taskSlug,
+    total: Number(attempt.score) || 0,
+    maximum: Number(attempt.scoreMaximum) || 90,
+    criteria: criteriaObjectToList(attempt.criteria),
+    narrative: attempt.narrative || `Review this saved ${task.title} attempt and compare it with your next response.`,
+    guidance: attempt.guidance?.length
+      ? attempt.guidance
+      : ["Review the transcript carefully and compare this attempt with your next speaking response."],
+    transcript: attempt.transcript || attempt.responseText,
+    responseText: attempt.transcript || attempt.responseText,
+    audioUrl: attempt.audioUrl || "",
+    mode: attempt.mode || "ai",
+    resultType: attempt.resultType || "speaking",
+    annotations: attempt.annotations || [],
+    analysis: buildAnalysis(attempt.transcript || attempt.responseText || ""),
+  };
+
+  return (
+    <Dialog open onClose={onClose} fullWidth maxWidth="lg">
+      <DialogTitle sx={{ pb: 1.2 }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Box>
+            <Typography component="div" fontWeight={950}>{task.title} attempt</Typography>
+            <Typography variant="body2" color="text.secondary">{formatAttemptDate(attempt.createdAt)}</Typography>
+          </Box>
+          <IconButton onClick={onClose}>
+            <CloseIcon />
+          </IconButton>
+        </Stack>
+      </DialogTitle>
+      <DialogContent sx={{ pb: 3 }}>
+        {attempt.audioUrl ? (
+          <Paper variant="outlined" sx={{ p: 2, borderRadius: 1, mb: 2, bgcolor: "#fbfefc" }}>
+            <Typography fontWeight={900} sx={{ mb: 1 }}>Recorded audio</Typography>
+            <audio controls src={attempt.audioUrl} style={{ width: "100%" }} />
+          </Paper>
+        ) : null}
+        <PteCoachResult result={result} />
+        <Paper variant="outlined" sx={{ p: 2, borderRadius: 1, mt: 2, bgcolor: "#fbfefc" }}>
+          <Typography fontWeight={900} sx={{ mb: 1.2 }}>Recommended next lessons</Typography>
+          <Stack direction="row" gap={1} flexWrap="wrap">
+            {(speakingRecommendations[task.slug] || []).map((item) => (
+              <Chip
+                key={item}
+                label={item}
+                sx={{ borderRadius: 1, fontWeight: 800, bgcolor: `${sectionColor}14`, color: sectionColor }}
+              />
+            ))}
+          </Stack>
+        </Paper>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 export default function PteTaskPractice() {
   const { slug } = useParams();
   const task = getPteTask(slug);
@@ -355,8 +466,13 @@ export default function PteTaskPractice() {
   const [recordedUrl, setRecordedUrl] = useState("");
   const [recordedBlob, setRecordedBlob] = useState(null);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
-  const [savingAttempt, setSavingAttempt] = useState(false);
+  const [taskPhase, setTaskPhase] = useState("idle");
+  const [phaseSeconds, setPhaseSeconds] = useState(0);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [attemptHistory, setAttemptHistory] = useState([]);
+  const [selectedAttempt, setSelectedAttempt] = useState(null);
   const mediaRecorderRef = useRef(null);
+  const mediaStreamRef = useRef(null);
   const chunksRef = useRef([]);
 
   const currentQuestion = questions[questionIndex] || null;
@@ -365,7 +481,9 @@ export default function PteTaskPractice() {
   const Icon = task?.icon;
   const requiresAi = freeformAiTasks.has(task?.slug);
   const isSpeakingPractice = speakingRecorderTasks.has(task?.slug);
-  const supportsObjectiveCheck = objectiveTasks.has(task?.slug) || currentQuestion?.practiceMode === "choice" || currentQuestion?.practiceMode === "short-answer";
+  const supportsObjectiveCheck = !isSpeakingPractice && (
+    objectiveTasks.has(task?.slug) || currentQuestion?.practiceMode === "choice" || currentQuestion?.practiceMode === "short-answer"
+  );
   const effectiveTask = useMemo(() => ({
     ...task,
     prompt: currentQuestion?.prompt || task?.prompt,
@@ -374,6 +492,107 @@ export default function PteTaskPractice() {
     minWords: currentQuestion?.minWords ?? task?.minWords,
     maxWords: currentQuestion?.maxWords ?? task?.maxWords,
   }), [currentQuestion, task]);
+  const currentStructuredResponseText = useMemo(() => buildStructuredResponseText({
+    task: effectiveTask,
+    responseText,
+    blankResponses,
+    reorderItems,
+  }), [blankResponses, effectiveTask, reorderItems, responseText]);
+  const speakingPrepSeconds = effectiveTask.prepSeconds ?? task?.prepSeconds ?? 0;
+  const speakingAnswerSeconds = effectiveTask.answerSeconds ?? task?.answerSeconds ?? 40;
+
+  const cleanupMediaStream = useCallback(() => {
+    mediaStreamRef.current?.getTracks?.().forEach((track) => track.stop());
+    mediaStreamRef.current = null;
+  }, []);
+
+  const beginRecording = useCallback(async () => {
+    const stream = mediaStreamRef.current;
+    if (!stream) {
+      setTaskPhase("idle");
+      setError("Microphone access is not active. Start the task again.");
+      return;
+    }
+    try {
+      const recorder = new MediaRecorder(stream);
+      chunksRef.current = [];
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) chunksRef.current.push(event.data);
+      };
+      recorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: recorder.mimeType || "audio/webm" });
+        if (recordedUrl) URL.revokeObjectURL(recordedUrl);
+        setRecordedBlob(blob);
+        setRecordedUrl(URL.createObjectURL(blob));
+        setTaskPhase("review");
+        setNotice("Speaking attempt recorded. Review it and submit for scoring.");
+        cleanupMediaStream();
+      };
+      mediaRecorderRef.current = recorder;
+      setRecordingSeconds(0);
+      setRecording(true);
+      setTaskPhase("recording");
+      setPhaseSeconds(speakingAnswerSeconds);
+      recorder.start();
+    } catch (recordError) {
+      cleanupMediaStream();
+      setTaskPhase("idle");
+      setError(recordError.message || "Recording could not start.");
+    }
+  }, [cleanupMediaStream, recordedUrl, speakingAnswerSeconds]);
+
+  const stopRecording = useCallback(() => {
+    if (!mediaRecorderRef.current || mediaRecorderRef.current.state === "inactive") return;
+    mediaRecorderRef.current.stop();
+    setRecording(false);
+    setPhaseSeconds(0);
+  }, []);
+
+  const startSpeakingTask = async () => {
+    setError("");
+    setNotice("");
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setError("Microphone recording is not supported in this browser.");
+      return;
+    }
+    try {
+      if (recordedUrl) URL.revokeObjectURL(recordedUrl);
+      setRecordedUrl("");
+      setRecordedBlob(null);
+      setRecordingSeconds(0);
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream;
+      if (speakingPrepSeconds > 0) {
+        setTaskPhase("preparing");
+        setPhaseSeconds(speakingPrepSeconds);
+        setNotice(`Preparation started. Recording will begin automatically in ${speakingPrepSeconds} seconds.`);
+      } else {
+        setNotice("Recording started.");
+        await beginRecording();
+      }
+    } catch (recordError) {
+      cleanupMediaStream();
+      setTaskPhase("idle");
+      setError(recordError.message || "Microphone access was not granted.");
+    }
+  };
+
+  const resetSpeakingTask = () => {
+    if (mediaRecorderRef.current?.state && mediaRecorderRef.current.state !== "inactive") {
+      mediaRecorderRef.current.stop();
+    }
+    cleanupMediaStream();
+    setRecording(false);
+    setRecordingSeconds(0);
+    setTaskPhase("idle");
+    setPhaseSeconds(0);
+    setRecordedBlob(null);
+    if (recordedUrl) URL.revokeObjectURL(recordedUrl);
+    setRecordedUrl("");
+    setResult(null);
+    setNotice("");
+    setError("");
+  };
 
   useEffect(() => {
     let active = true;
@@ -394,6 +613,7 @@ export default function PteTaskPractice() {
   }, [slug]);
 
   useEffect(() => {
+    cleanupMediaStream();
     setQuestionIndex(0);
     setResponseText("");
     setSelectedOptions([]);
@@ -404,16 +624,21 @@ export default function PteTaskPractice() {
     setNotice("");
     setRecording(false);
     setRecordingSeconds(0);
+    setTaskPhase("idle");
+    setPhaseSeconds(0);
+    setAttemptHistory([]);
+    setSelectedAttempt(null);
     setRecordedUrl((current) => {
       if (current) URL.revokeObjectURL(current);
       return "";
     });
     setRecordedBlob(null);
-  }, [slug]);
+  }, [cleanupMediaStream, slug]);
 
   useEffect(() => () => {
     if (recordedUrl) URL.revokeObjectURL(recordedUrl);
-  }, [recordedUrl]);
+    cleanupMediaStream();
+  }, [cleanupMediaStream, recordedUrl]);
 
   useEffect(() => {
     if (!currentQuestion) {
@@ -433,6 +658,51 @@ export default function PteTaskPractice() {
     return () => window.clearInterval(timer);
   }, [recording]);
 
+  useEffect(() => {
+    if (!isSpeakingPractice || !user?.uid) {
+      setAttemptHistory([]);
+      return undefined;
+    }
+    let active = true;
+    setHistoryLoading(true);
+    fetchUserPteTaskResponses(user.uid)
+      .then((records) => {
+        if (!active) return;
+        const filtered = records
+          .filter((item) => item.taskSlug === task.slug && String(item.questionId || "") === String(currentQuestion?.id || ""))
+          .slice(0, 12);
+        setAttemptHistory(filtered);
+      })
+      .catch(() => {
+        if (active) setAttemptHistory([]);
+      })
+      .finally(() => {
+        if (active) setHistoryLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [currentQuestion?.id, isSpeakingPractice, task.slug, user?.uid]);
+
+  useEffect(() => {
+    if (!isSpeakingPractice || !taskPhase || taskPhase === "idle" || taskPhase === "review") return undefined;
+    const timer = window.setInterval(() => {
+      setPhaseSeconds((current) => {
+        if (current <= 1) {
+          window.clearInterval(timer);
+          if (taskPhase === "preparing") {
+            void beginRecording();
+          } else if (taskPhase === "recording") {
+            stopRecording();
+          }
+          return 0;
+        }
+        return current - 1;
+      });
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [beginRecording, isSpeakingPractice, stopRecording, taskPhase]);
+
   useSEO({
     title: task?.seoTitle || "PTE Practice | A Plus Academy",
     description: task?.description || "Free PTE practice with AI scoring for text-based tasks.",
@@ -445,6 +715,7 @@ export default function PteTaskPractice() {
   if (task.slug === "write-essay") return <Navigate to="/pte/write-essay" replace />;
 
   const resetForNextQuestion = (nextIndex) => {
+    cleanupMediaStream();
     setQuestionIndex(nextIndex);
     setResponseText("");
     setSelectedOptions([]);
@@ -455,6 +726,8 @@ export default function PteTaskPractice() {
     setNotice("");
     setRecording(false);
     setRecordingSeconds(0);
+    setTaskPhase("idle");
+    setPhaseSeconds(0);
     if (recordedUrl) URL.revokeObjectURL(recordedUrl);
     setRecordedUrl("");
     setRecordedBlob(null);
@@ -516,79 +789,6 @@ export default function PteTaskPractice() {
     setError("");
   };
 
-  const startRecording = async () => {
-    setError("");
-    setNotice("");
-    if (!navigator.mediaDevices?.getUserMedia) {
-      setError("Microphone recording is not supported in this browser.");
-      return;
-    }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      chunksRef.current = [];
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) chunksRef.current.push(event.data);
-      };
-      recorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: recorder.mimeType || "audio/webm" });
-        if (recordedUrl) URL.revokeObjectURL(recordedUrl);
-        setRecordedBlob(blob);
-        setRecordedUrl(URL.createObjectURL(blob));
-        setNotice("Speaking attempt recorded. Play it back, then save the attempt to your account if needed.");
-        stream.getTracks().forEach((track) => track.stop());
-      };
-      mediaRecorderRef.current = recorder;
-      setRecordingSeconds(0);
-      setRecordedUrl("");
-      recorder.start();
-      setRecording(true);
-    } catch (recordError) {
-      setError(recordError.message || "Microphone access was not granted.");
-    }
-  };
-
-  const stopRecording = () => {
-    if (!mediaRecorderRef.current || mediaRecorderRef.current.state === "inactive") return;
-    mediaRecorderRef.current.stop();
-    setRecording(false);
-  };
-
-  const saveSpeakingAttempt = async () => {
-    if (!user) {
-      setError("Login with Google to save this speaking attempt in your account.");
-      return;
-    }
-    if (!recordedUrl) {
-      setError("Record your speaking response first.");
-      return;
-    }
-    setSavingAttempt(true);
-    setError("");
-    try {
-      await submitPteTaskResponse({
-        user,
-        task,
-        question: currentQuestion || effectiveTask,
-        responseText,
-        result: {
-          total: null,
-          maximum: 90,
-          criteria: [],
-          mode: "adaptive",
-          resultType: "speaking-attempt",
-        },
-        attemptKind: "speaking",
-        durationSeconds: recordingSeconds,
-      });
-      setNotice("Speaking attempt saved to your account history.");
-    } catch (saveError) {
-      setError(saveError.message || "Speaking attempt could not be saved.");
-    } finally {
-      setSavingAttempt(false);
-    }
-  };
-
   const submit = async () => {
     setError("");
     setNotice("");
@@ -603,12 +803,7 @@ export default function PteTaskPractice() {
       return;
     }
 
-    const structuredResponseText = buildStructuredResponseText({
-      task: effectiveTask,
-      responseText,
-      blankResponses,
-      reorderItems,
-    });
+    const structuredResponseText = currentStructuredResponseText;
 
     if ((requiresAi || supportsObjectiveCheck) && currentQuestion?.practiceMode !== "choice" && !structuredResponseText.trim() && !isSpeakingPractice) {
       setError("Write your response before checking the question.");
@@ -644,19 +839,23 @@ export default function PteTaskPractice() {
           ...scored,
           taskSlug: task.slug,
           responseText: scored.transcript,
+          audioUrl: recordedUrl,
           analysis: { ...buildAnalysis(scored.transcript), wordCount: countWords(scored.transcript) },
         };
         setResponseText(scored.transcript);
         setResult(finalResult);
-        await submitPteTaskResponse({
+        const savedAttempt = await submitPteTaskResponse({
           user,
           task,
           question: currentQuestion || effectiveTask,
           responseText: scored.transcript,
+          transcript: scored.transcript,
           result: finalResult,
           attemptKind: "speaking-score",
           durationSeconds: recordingSeconds,
+          audioBlob: recordedBlob,
         });
+        setAttemptHistory((current) => [savedAttempt, ...current].slice(0, 12));
         setNotice("Recording transcribed and scored. This remains a practice estimate, not an official Pearson score.");
       } catch (speechError) {
         setError(speechError.message || "Speaking response could not be transcribed.");
@@ -820,7 +1019,7 @@ export default function PteTaskPractice() {
                       ? "Type your answer below. Only typed text is sent for scoring."
                       : supportsObjectiveCheck
                         ? "Check your answer instantly against the starter answer key."
-                        : "Record your answer, play it back, and save the attempt to your account."}
+                        : "Follow the task timer, record your answer, then review the scored attempt in your history."}
                   </Typography>
                 </Box>
                 {currentQuestion?.practiceMode !== "choice" ? <Chip label={`${wordCount} words`} sx={{ alignSelf: { xs: "flex-start", md: "center" }, borderRadius: 1, fontWeight: 900 }} /> : null}
@@ -834,14 +1033,20 @@ export default function PteTaskPractice() {
                       <Box>
                         <Typography fontWeight={900}>Speaking recorder</Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {recording ? `Recording live: ${recordingSeconds}s` : recordedUrl ? `Recorded length: ${recordingSeconds}s` : "Use the microphone to practise this speaking task."}
+                          {taskPhase === "preparing"
+                            ? `Prepare: ${phaseSeconds}s`
+                            : taskPhase === "recording"
+                              ? `Recording live: ${phaseSeconds}s left`
+                              : recordedUrl
+                                ? `Recorded length: ${recordingSeconds}s`
+                                : "Use the microphone to practise this speaking task."}
                         </Typography>
                       </Box>
                     </Stack>
                     <Stack direction="row" gap={1} flexWrap="wrap">
-                      {!recording ? (
-                        <Button variant="contained" startIcon={<MicIcon />} onClick={startRecording} sx={{ borderRadius: 1, textTransform: "none", fontWeight: 900 }}>
-                          Start recording
+                      {taskPhase === "idle" || taskPhase === "review" ? (
+                        <Button variant="contained" startIcon={<MicIcon />} onClick={startSpeakingTask} sx={{ borderRadius: 1, textTransform: "none", fontWeight: 900 }}>
+                          {recordedUrl ? "Start again" : "Start task"}
                         </Button>
                       ) : (
                         <Button color="error" variant="contained" startIcon={<StopIcon />} onClick={stopRecording} sx={{ borderRadius: 1, textTransform: "none", fontWeight: 900 }}>
@@ -849,15 +1054,22 @@ export default function PteTaskPractice() {
                         </Button>
                       )}
                       {recordedUrl ? (
-                      <Button variant="outlined" component="a" href={recordedUrl} target="_blank" rel="noreferrer" sx={{ borderRadius: 1, textTransform: "none", fontWeight: 900 }}>
-                          Play recording
+                        <Button variant="outlined" onClick={resetSpeakingTask} sx={{ borderRadius: 1, textTransform: "none", fontWeight: 900 }}>
+                          Re-do
                         </Button>
                       ) : null}
-                      <Button variant="outlined" startIcon={savingAttempt ? <CircularProgress size={16} /> : <SaveIcon />} onClick={saveSpeakingAttempt} disabled={savingAttempt || !recordedUrl} sx={{ borderRadius: 1, textTransform: "none", fontWeight: 900 }}>
-                        Save attempt
-                      </Button>
                     </Stack>
                   </Stack>
+                  <Stack direction="row" gap={1} flexWrap="wrap" sx={{ mt: 1.5 }}>
+                    {speakingPrepSeconds > 0 ? <Chip label={`Prepare ${speakingPrepSeconds}s`} sx={{ borderRadius: 1, fontWeight: 900 }} /> : null}
+                    <Chip label={`Answer ${speakingAnswerSeconds}s`} sx={{ borderRadius: 1, fontWeight: 900 }} />
+                    <Chip label="AI score after recording" sx={{ borderRadius: 1, fontWeight: 900, bgcolor: "#ecfdf5", color: "#047857" }} />
+                  </Stack>
+                  {recordedUrl ? (
+                    <Box sx={{ mt: 1.8 }}>
+                      <audio controls src={recordedUrl} style={{ width: "100%" }} />
+                    </Box>
+                  ) : null}
                 </Paper>
               )}
 
@@ -969,7 +1181,7 @@ export default function PteTaskPractice() {
                 disabled={
                   submitting ||
                   (requiresAi && (!user || wordCount < (effectiveTask.minWords || 1))) ||
-                  (!requiresAi && supportsObjectiveCheck && currentQuestion?.practiceMode !== "choice" && !responseText.trim()) ||
+                  (!requiresAi && supportsObjectiveCheck && currentQuestion?.practiceMode !== "choice" && !currentStructuredResponseText.trim()) ||
                   (!requiresAi && supportsObjectiveCheck && currentQuestion?.practiceMode === "choice" && !selectedOptions.length) ||
                   (!requiresAi && !supportsObjectiveCheck && isSpeakingPractice && !recordedBlob)
                 }
@@ -982,6 +1194,67 @@ export default function PteTaskPractice() {
           </Paper>
 
           {result && <PteCoachResult result={result} />}
+
+          {isSpeakingPractice && (
+            <Paper elevation={0} sx={{ p: { xs: 2.5, md: 3 }, borderRadius: 1, border: "1px solid #dfe9e4", bgcolor: "#fff" }}>
+              <Stack spacing={2}>
+                <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" gap={1.5}>
+                  <Box>
+                    <Typography component="h2" variant="h5" fontWeight={900}>
+                      My speaking attempts
+                    </Typography>
+                    <Typography color="text.secondary">
+                      Saved attempts for this exact question, with score details and audio replay.
+                    </Typography>
+                  </Box>
+                  <Stack direction="row" gap={1} flexWrap="wrap">
+                    {(speakingRecommendations[task.slug] || []).slice(0, 2).map((item) => (
+                      <Chip key={item} label={item} sx={{ borderRadius: 1, fontWeight: 900, bgcolor: `${section?.color || "#0f766e"}14`, color: section?.color || "#0f766e" }} />
+                    ))}
+                  </Stack>
+                </Stack>
+
+                {historyLoading ? <LinearProgress /> : null}
+
+                {!historyLoading && !attemptHistory.length ? (
+                  <Alert severity="info">No scored attempts have been saved for this question yet.</Alert>
+                ) : null}
+
+                <Stack spacing={1.2}>
+                  {attemptHistory.map((attempt) => (
+                    <Paper key={attempt.id} variant="outlined" sx={{ p: 2, borderRadius: 1, bgcolor: "#fbfefc" }}>
+                      <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" gap={1.5}>
+                        <Box>
+                          <Typography fontWeight={900}>{formatAttemptDate(attempt.createdAt)}</Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {attempt.resultType || "speaking"} {attempt.mode ? `· ${attempt.mode}` : ""}
+                          </Typography>
+                        </Box>
+                        <Stack direction="row" gap={1} flexWrap="wrap" alignItems="center">
+                          <Chip
+                            label={Number.isFinite(Number(attempt.score)) ? `${attempt.score}/${attempt.scoreMaximum || 90}` : "Saved"}
+                            sx={{ borderRadius: 1, fontWeight: 900, bgcolor: "#ecfdf5", color: "#047857" }}
+                          />
+                          <Button variant="outlined" onClick={() => setSelectedAttempt(attempt)} sx={{ borderRadius: 1, textTransform: "none", fontWeight: 900 }}>
+                            Score Info
+                          </Button>
+                        </Stack>
+                      </Stack>
+                    </Paper>
+                  ))}
+                </Stack>
+
+                <Paper variant="outlined" sx={{ p: 2, borderRadius: 1, bgcolor: "#fbfefc" }}>
+                  <Typography fontWeight={900} sx={{ mb: 1.2 }}>Recommended next lessons</Typography>
+                  <Stack direction="row" gap={1} flexWrap="wrap">
+                    {(speakingRecommendations[task.slug] || []).map((item) => (
+                      <Chip key={item} label={item} sx={{ borderRadius: 1, fontWeight: 800 }} />
+                    ))}
+                  </Stack>
+                </Paper>
+              </Stack>
+            </Paper>
+          )}
 
           <Paper elevation={0} sx={{ p: 3, borderRadius: 1, border: "1px solid #dfe9e4", bgcolor: "#fff" }}>
             <Typography component="h2" variant="h5" fontWeight={900} gutterBottom>
@@ -997,6 +1270,7 @@ export default function PteTaskPractice() {
           </Paper>
         </Stack>
       </Container>
+      {selectedAttempt ? <AttemptHistoryDialog attempt={selectedAttempt} onClose={() => setSelectedAttempt(null)} task={task} sectionColor={section?.color || "#0f766e"} /> : null}
     </Box>
   );
 }
