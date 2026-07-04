@@ -268,8 +268,8 @@ const Header = () => {
         color="inherit"
         elevation={0}
         sx={{
-          backdropFilter: "blur(14px)",
-          background: "rgba(255,255,255,0.55)", // glass-morphism
+          backdropFilter: "none",
+          background: "#ffffff",
           transition: "all 0.3s ease",
           boxShadow: scrolled
             ? "0 6px 20px rgba(0,0,0,0.12)"

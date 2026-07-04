@@ -293,7 +293,7 @@ const SiteAiTutor = () => {
         sx={{
           position: "fixed",
           right: { xs: 12, md: 20 },
-          bottom: { xs: 88, md: 32 },
+          bottom: { xs: 132, md: 88 },
           zIndex: 1200,
         }}
       >
