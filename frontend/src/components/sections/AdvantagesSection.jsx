@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Button, Grid, Typography, useMediaQuery } from "@mui/material";
+import { Box, Typography, useMediaQuery } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -65,38 +65,51 @@ export default function AdvantagesSection() {
   const isMobile = useMediaQuery("(max-width:900px)");
 
   return (
-    <Box sx={{ py: 8, px: { xs: 2, md: 6 }, backgroundColor: "#f0f4f8" }}>
-      <Typography
-        variant="h4"
+    <Box sx={{ py: 8, px: { xs: 2, md: 6 }, backgroundColor: "#1f2327" }}>
+      <Box
         sx={{
-          mb: 1.5,
-          textAlign: "center",
-          color: "#004aad",
-          fontWeight: 700,
-          fontSize: {
-            xs: "1.5rem",
-            sm: "1.8rem",
-            md: "2rem",
-            lg: "2.2rem",
-          },
+          display: "flex",
+          flexDirection: { xs: "column", lg: "row" },
+          justifyContent: "space-between",
+          alignItems: { xs: "flex-start", lg: "flex-end" },
+          gap: 2.5,
+          pb: { xs: 3, md: 4 },
+          mb: 4,
+          borderBottom: "1px solid rgba(255,255,255,0.12)",
         }}
       >
-        Why Families Use A Plus Academy
-      </Typography>
+        <Box sx={{ maxWidth: 840 }}>
+          <Typography sx={{ color: "#29b554", fontWeight: 900, mb: 1 }}>
+            Trusted family support
+          </Typography>
+          <Typography
+            variant="h4"
+            sx={{
+              color: "#fff",
+              fontWeight: 800,
+              fontSize: {
+                xs: "1.7rem",
+                md: "3rem",
+              },
+              lineHeight: 1.05,
+            }}
+          >
+            Why families use A Plus Academy
+          </Typography>
+        </Box>
 
-      <Typography
-        sx={{
-          maxWidth: 900,
-          mx: "auto",
-          mb: 5,
-          textAlign: "center",
-          color: "#445",
-          lineHeight: 1.8,
-        }}
-      >
-        The homepage should immediately explain why the platform is useful, what type of support it offers, and how
-        parents or students can move from search to action.
-      </Typography>
+        <Typography
+          sx={{
+            maxWidth: 520,
+            color: "rgba(255,255,255,0.74)",
+            lineHeight: 1.8,
+            fontSize: { xs: "0.95rem", md: "1rem" },
+          }}
+        >
+          Families should quickly understand what support is available, how tutor matching works, and what makes the
+          platform more dependable than random listings.
+        </Typography>
+      </Box>
 
       <motion.div
         initial={isMobile ? "show" : "hidden"}
@@ -104,16 +117,17 @@ export default function AdvantagesSection() {
         viewport={{ once: true, amount: 0.2 }}
         variants={isMobile ? {} : containerVariants}
       >
-        <Grid
-          container
-          spacing={3}
+        <Box
           sx={{
             display: "grid",
             gridTemplateColumns: {
               xs: "1fr",
-              sm: "1fr 1fr",
-              lg: "1fr 1fr 1fr",
+              md: "repeat(2, minmax(0, 1fr))",
+              xl: "repeat(3, minmax(0, 1fr))",
             },
+            gap: 3,
+            gridAutoRows: "1fr",
+            alignItems: "stretch",
           }}
         >
           {cardsData.map((card) => {
@@ -124,73 +138,45 @@ export default function AdvantagesSection() {
                 <Box
                   sx={{
                     position: "relative",
-                    borderRadius: "22px",
+                    borderRadius: "18px",
                     overflow: "hidden",
                     width: "100%",
                     height: "100%",
-                    minHeight: { xs: 280, sm: 320, md: 340 },
-                    "&::before": {
-                      content: '""',
-                      position: "absolute",
-                      inset: 0,
-                      padding: "2px",
-                      borderRadius: "22px",
-                      background: "linear-gradient(120deg, #00a6ff, #00ff8f, #00a6ff)",
-                      backgroundSize: "200% 200%",
-                      animation: "gradientMove 4s linear infinite",
-                      WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                      WebkitMaskComposite: "xor",
-                      maskComposite: "exclude",
-                      zIndex: 1,
-                    },
-                    "@keyframes gradientMove": {
-                      "0%": { backgroundPosition: "0% 50%" },
-                      "50%": { backgroundPosition: "100% 50%" },
-                      "100%": { backgroundPosition: "0% 50%" },
-                    },
+                    minHeight: { xs: 250, sm: 260, md: 270 },
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    background: "#111514",
+                    boxShadow: "0 12px 28px rgba(0,0,0,0.18)",
                   }}
                 >
                   <Box
                     sx={{
-                      position: "relative",
-                      zIndex: 2,
-                      p: 4,
-                      borderRadius: "20px",
-                      background: "rgba(255, 255, 255, 0.25)",
-                      backdropFilter: "blur(15px)",
-                      boxShadow: "0 12px 32px rgba(0, 0, 0, 0.15)",
-                      transition: "transform 0.4s ease, box-shadow 0.4s ease",
-                      minHeight: { xs: 280, sm: 320, md: 340 },
+                      p: { xs: 3, md: 3.5 },
                       height: "100%",
                       display: "flex",
                       flexDirection: "column",
                       justifyContent: "space-between",
-                      "&:hover": {
-                        transform: isMobile ? "none" : "translateY(-10px)",
-                        boxShadow: isMobile
-                          ? "0 12px 32px rgba(0,0,0,0.15)"
-                          : "0 25px 70px rgba(0,0,0,0.30)",
-                      },
+                      gap: 2,
                     }}
                   >
-                    <Box sx={{ maxWidth: "280px", pr: 6 }}>
+                    <Box sx={{ pr: 7 }}>
                       <Typography
                         component={RouterLink}
                         to={card.href}
                         variant="h6"
-                        fontWeight={700}
+                        fontWeight={800}
                         sx={{
                           display: "inline-block",
-                          mb: 1,
-                          color: "#29b554",
+                          mb: 1.1,
+                          color: "#6ee7b7",
                           textDecoration: "none",
-                          "&:hover": { color: "#004aad" },
+                          lineHeight: 1.35,
+                          "&:hover": { color: "#fff" },
                         }}
                       >
                         {card.title}
                       </Typography>
 
-                      <Typography sx={{ fontSize: "0.95rem", color: "#333", lineHeight: 1.8 }}>
+                      <Typography sx={{ fontSize: "0.95rem", color: "rgba(255,255,255,0.74)", lineHeight: 1.8 }}>
                         {card.description}
                       </Typography>
                     </Box>
@@ -200,17 +186,10 @@ export default function AdvantagesSection() {
                       src={card.icon}
                       alt={card.title}
                       sx={{
-                        position: "absolute",
-                        bottom: 16,
-                        right: 16,
-                        width: { xs: 42, sm: 52, md: 64, lg: 70 },
+                        alignSelf: "flex-end",
+                        width: { xs: 42, sm: 48, md: 54 },
                         height: "auto",
-                        transform: "rotate(-15deg)",
-                        filter: "drop-shadow(0px 6px 20px rgba(0,0,0,0.25))",
-                        transition: "all 0.35s ease",
-                        "&:hover": {
-                          transform: isMobile ? "rotate(-15deg)" : "rotate(-10deg) scale(1.15)",
-                        },
+                        opacity: 0.92,
                       }}
                     />
                   </Box>
@@ -218,7 +197,7 @@ export default function AdvantagesSection() {
               </MotionWrapper>
             );
           })}
-        </Grid>
+        </Box>
       </motion.div>
     </Box>
   );

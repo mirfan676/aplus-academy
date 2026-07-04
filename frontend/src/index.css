@@ -5,7 +5,7 @@
   font-weight: 400;
   color-scheme: light;
   color: #212121;
-  background-color: #fafafa;
+  background-color: #0a0a0a;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -16,7 +16,7 @@ html, body, #root {
   padding: 0;
   min-height: 100%;
   width: 100%;
-  background-color: #fafafa; /* light neutral background */
+  background-color: #0a0a0a;
 }
 
 /* Optional: link styling (since MUI <Link> handles its own styles too) */

@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Grid, Typography, Link, IconButton, Divider } from "@mui/material";
+import { Box, Divider, Grid, IconButton, Link, Typography } from "@mui/material";
 import {
   Facebook,
   Instagram,
@@ -15,10 +15,8 @@ const academyLinks = [
   { label: "Find a Tutor", href: "/teachers" },
   { label: "Become a Tutor", href: "/register" },
   { label: "Study Abroad", href: "/study-abroad" },
-  { label: "Referral Program", href: "/referral-program" },
   { label: "Career Opportunities", href: "/career-opportunities" },
   { label: "Blog", href: "/blog" },
-  { label: "Languages", href: "/languages" },
   { label: "Language Courses", href: "/courses/languages" },
   { label: "Buy Courses", href: "/buy-courses" },
 ];
@@ -46,17 +44,6 @@ const socialLinks = [
   { label: "LinkedIn", icon: <LinkedIn />, link: "https://www.linkedin.com" },
 ];
 
-const popularSearchLinks = [
-  { label: "Female Home Tutor Lahore", href: "/female-home-tutor-lahore" },
-  { label: "Home Tuition Lahore", href: "/home-tuition-lahore" },
-  { label: "O Level Tutors Lahore", href: "/o-level-tutors-lahore" },
-  { label: "A Level Tutors Pakistan", href: "/a-level-tutors-pakistan" },
-  { label: "Quran Tutor with Tajweed", href: "/quran-tutor-with-tajweed" },
-  { label: "IELTS Tutor Pakistan", href: "/ielts-tutor-pakistan" },
-  { label: "English Tutor Lahore", href: "/english-tutor-lahore" },
-  { label: "Verified Tutors Pakistan", href: "/verified-tutors-pakistan" },
-];
-
 export default function Footer() {
   return (
     <Box
@@ -67,6 +54,7 @@ export default function Footer() {
         pt: 10,
         pb: 6,
         px: { xs: 3, md: 6 },
+        mb: 0,
       }}
     >
       <Grid container spacing={6} justifyContent="center">
@@ -79,12 +67,7 @@ export default function Footer() {
               justifyContent: { xs: "center", md: "flex-start" },
             }}
           >
-            <Box
-              component="img"
-              src="/logo-footer.svg"
-              alt="A Plus Home Tutors"
-              sx={{ height: 120, mr: 1 }}
-            />
+            <Box component="img" src="/logo-footer.svg" alt="A Plus Academy" sx={{ height: 120, mr: 1 }} />
           </Box>
 
           <Box
@@ -96,9 +79,8 @@ export default function Footer() {
             }}
           >
             <Typography variant="body1" sx={{ opacity: 0.85, lineHeight: 1.7 }}>
-              A Plus Home Tutors is Pakistan's trusted home and online tutoring
-              network, connecting students with verified educators for O/A Levels,
-              Quran with Tajweed, school subjects, and one-to-one academic support.
+              A Plus Academy helps families find home and online tutors, subject specialists, and structured academic
+              support for school students, board classes, language learning, and one-to-one preparation.
             </Typography>
           </Box>
         </Grid>
@@ -163,8 +145,7 @@ export default function Footer() {
             }}
           >
             <Typography variant="body2" sx={{ mb: 1, opacity: 0.85 }}>
-              Lahore, Karachi, Islamabad, Rawalpindi, Faisalabad, and online
-              tutoring across Pakistan.
+              Lahore, Karachi, Islamabad, Rawalpindi, Faisalabad, and online tutoring across Pakistan.
             </Typography>
 
             <Typography variant="body2" sx={{ opacity: 0.85 }}>
@@ -198,40 +179,9 @@ export default function Footer() {
 
       <Divider sx={{ borderColor: "rgba(255,255,255,0.1)", my: 4 }} />
 
-      <Box sx={{ maxWidth: 1120, mx: "auto", mb: 4 }}>
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: 700, color: "#29b554" }}>
-          Popular Searches
-        </Typography>
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.2 }}>
-          {popularSearchLinks.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              underline="none"
-              sx={{
-                color: "#fff",
-                opacity: 0.82,
-                border: "1px solid rgba(255,255,255,0.16)",
-                borderRadius: 1,
-                px: 1.4,
-                py: 0.7,
-                fontSize: 14,
-                "&:hover": { opacity: 1, color: "#00ff8f", borderColor: "#00ff8f" },
-              }}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </Box>
-      </Box>
-
       <Box sx={{ textAlign: "center", opacity: 0.7 }}>
-        <Typography variant="body2">
-          © {new Date().getFullYear()} A Plus Home Tutors - All rights reserved.
-        </Typography>
-        <Typography variant="caption">
-          Empowering students across Pakistan, from basics to brilliance.
-        </Typography>
+        <Typography variant="body2">© {new Date().getFullYear()} A Plus Academy - All rights reserved.</Typography>
+        <Typography variant="caption">Practical tutor support for students and families across Pakistan.</Typography>
       </Box>
     </Box>
   );

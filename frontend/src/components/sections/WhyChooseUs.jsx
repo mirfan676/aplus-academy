@@ -1,10 +1,10 @@
-import { Box, Typography, Grid, Chip } from "@mui/material";
+import { Box, Typography, Chip } from "@mui/material";
 import { motion } from "framer-motion";
 
 const features = [
   {
     image: "/icons/experienced.jpg",
-    fit: "cover",
+    fit: "contain",
     badge: "Academic support",
     title: "Experienced tutors for real academic needs",
     desc:
@@ -12,7 +12,7 @@ const features = [
   },
   {
     image: "/icons/trusted.jpg",
-    fit: "cover",
+    fit: "contain",
     badge: "Parent confidence",
     title: "Trusted support for parents and families",
     desc:
@@ -20,19 +20,11 @@ const features = [
   },
   {
     image: "/icons/success.jpg",
-    fit: "cover",
+    fit: "contain",
     badge: "Long-term growth",
     title: "Support beyond one subject or one exam",
     desc:
       "Many families need help across school years, entry tests, language learning, and future planning. Strong tutoring should support that wider journey.",
-  },
-  {
-    image: "/icons/verified.svg",
-    fit: "contain",
-    badge: "Modern learning",
-    title: "Modern learning guidance for this era",
-    desc:
-      "Students now benefit from better planning, digital study habits, and practical learning systems alongside tutor hiring and subject selection.",
   },
 ];
 
@@ -42,40 +34,66 @@ const WhyChooseUs = () => {
       sx={{
         py: 8,
         px: { xs: 2, md: 6 },
-        background: "#e8f2ff",
+        background: "#e7ebef",
       }}
     >
-      <Typography
-        variant="h4"
-        fontWeight={700}
+      <Box
         sx={{
-          mb: 1.5,
-          textAlign: "center",
-          color: "#004aad",
-          fontSize: { xs: "1.6rem", sm: "1.9rem", md: "2.1rem" },
+          display: "flex",
+          flexDirection: { xs: "column", lg: "row" },
+          justifyContent: "space-between",
+          alignItems: { xs: "flex-start", lg: "flex-end" },
+          gap: 2.5,
+          pb: { xs: 3, md: 4 },
+          mb: 4,
+          borderBottom: "1px solid rgba(16,32,25,0.1)",
         }}
       >
-        Why Families Choose A Plus Academy
-      </Typography>
+        <Box sx={{ maxWidth: 820 }}>
+          <Typography sx={{ color: "#0f766e", fontWeight: 900, mb: 1 }}>
+            Academic direction
+          </Typography>
+          <Typography
+            variant="h4"
+            fontWeight={800}
+            sx={{
+              color: "#102019",
+              fontSize: { xs: "1.7rem", md: "3rem" },
+              lineHeight: 1.05,
+            }}
+          >
+            Why families choose A Plus Academy
+          </Typography>
+        </Box>
 
-      <Typography
+        <Typography
+          sx={{
+            maxWidth: 530,
+            color: "#475569",
+            lineHeight: 1.8,
+            fontSize: { xs: "0.95rem", md: "1rem" },
+          }}
+        >
+          A tutoring platform should help with tutor discovery, class-level guidance, exam preparation, and future
+          study direction. The aim is to make academic decisions easier for parents and more effective for students.
+        </Typography>
+      </Box>
+
+      <Box
         sx={{
-          maxWidth: 920,
-          mx: "auto",
-          mb: 5,
-          textAlign: "center",
-          color: "#445",
-          lineHeight: 1.8,
-          fontSize: { xs: "0.95rem", md: "1rem" },
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            md: "repeat(2, minmax(0, 1fr))",
+            xl: "repeat(3, minmax(0, 1fr))",
+          },
+          gap: 3,
+          gridAutoRows: "1fr",
+          alignItems: "stretch",
         }}
       >
-        A tutoring platform should help with tutor discovery, class-level guidance, exam preparation, and future study
-        direction. The aim is to make academic decisions easier for parents and more effective for students.
-      </Typography>
-
-      <Grid container spacing={3}>
         {features.map((feature) => (
-          <Grid item xs={12} sm={6} md={3} key={feature.title} sx={{ display: "flex" }}>
+          <Box key={feature.title} sx={{ display: "flex" }}>
             <motion.div
               initial={{ opacity: 0, y: 36 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -98,13 +116,13 @@ const WhyChooseUs = () => {
                 <Box
                   sx={{
                     position: "relative",
-                    minHeight: 220,
+                    minHeight: 240,
                     background:
                       "linear-gradient(180deg, rgba(244,249,255,1) 0%, rgba(233,244,255,1) 100%)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    p: 2,
+                    p: 2.5,
                   }}
                 >
                   <Chip
@@ -126,11 +144,12 @@ const WhyChooseUs = () => {
                     alt={feature.title}
                     sx={{
                       width: "100%",
-                      height: 180,
+                      height: 210,
                       objectFit: feature.fit,
                       objectPosition: "center",
                       display: "block",
-                      borderRadius: feature.fit === "cover" ? "16px" : 0,
+                      borderRadius: "16px",
+                      background: "#fff",
                     }}
                   />
                 </Box>
@@ -154,9 +173,9 @@ const WhyChooseUs = () => {
                 </Box>
               </Box>
             </motion.div>
-          </Grid>
+          </Box>
         ))}
-      </Grid>
+      </Box>
     </Box>
   );
 };

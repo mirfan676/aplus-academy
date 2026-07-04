@@ -4,7 +4,7 @@ import useSEO from "../hooks/useSEO";
 
 const Home = () => {
   useSEO({
-    title: "A Plus Academy | Home Tutors, Career Roadmaps, PTE Practice and Student Guidance",
+    title: "A Plus Academy Pakistan | Home Tutors, Career Roadmaps and PTE Practice",
     description:
       "Find home and online tutors in Pakistan, explore class-wise academic guidance, career roadmaps, PTE practice, exam help, and trusted teacher support for parents and students.",
     canonical: "https://www.aplusacademy.pk/",

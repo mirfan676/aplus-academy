@@ -28,7 +28,7 @@ export default function HeroSection() {
         flexDirection: { xs: "column", md: "row" },
         px: { xs: 3, sm: 5, md: 10 },
         pt: { xs: 4, sm: 6, md: 10 },
-        pb: { xs: 5, md: 0 },
+        pb: { xs: 7, md: 5 },
         backgroundColor: "#f5f5f7",
         position: "relative",
       }}
@@ -53,7 +53,7 @@ export default function HeroSection() {
             color: "#004aad",
           }}
         >
-          Trusted Home Tutors, Career Guidance, and PTE Support
+          A Plus Academy Home Tutors, Career Guidance, and PTE Support
         </Typography>
 
         <Typography
@@ -71,6 +71,7 @@ export default function HeroSection() {
         <Box
           sx={{
             mt: 3,
+            mb: { xs: 2.5, md: 4 },
             display: "flex",
             flexDirection: { xs: "column", sm: "row" },
             gap: 2,

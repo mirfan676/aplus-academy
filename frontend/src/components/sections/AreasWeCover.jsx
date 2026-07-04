@@ -1,14 +1,10 @@
 import React from "react";
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import LahoreIcon from "../icons/LahoreIcon";
 import KarachiIcon from "../icons/KarachiIcon";
 import IslamabadIcon from "../icons/IslamabadIcon";
 import RawalpindiIcon from "../icons/RawalpindiIcon";
-import FaisalabadIcon from "../icons/FaisalabadIcon";
-import MultanIcon from "../icons/MultanIcon";
-import PeshawarIcon from "../icons/PeshawarIcon";
-import QuettaIcon from "../icons/QuettaIcon";
 
 const areas = [
   {
@@ -39,127 +35,113 @@ const areas = [
       "Rawalpindi students commonly need Matric, FSc, English, Maths, Science, and language support with practical timing options.",
     icon: <RawalpindiIcon size={64} />,
   },
-  {
-    name: "Faisalabad",
-    coverage: "Main residential and education-focused areas where parents prefer steady local tutors or online specialists when needed.",
-    description:
-      "Support is often requested for school subjects, board preparation, concept revision, and regular homework follow-up.",
-    icon: <FaisalabadIcon size={64} />,
-  },
-  {
-    name: "Multan",
-    coverage: "Key city areas and nearby neighborhoods where students need support from primary classes up to higher studies.",
-    description:
-      "Multan families often ask for disciplined tutors who can maintain weekly progress, not just complete classwork.",
-    icon: <MultanIcon size={64} />,
-  },
-  {
-    name: "Peshawar",
-    coverage: "Urban localities and online coverage for families who want qualified academic or Quran tutors with clearer availability checks.",
-    description:
-      "Peshawar demand often includes school subjects, Quran education, English improvement, and exam-focused guidance.",
-    icon: <PeshawarIcon size={64} />,
-  },
-  {
-    name: "Quetta",
-    coverage: "Selective local coverage plus online tutoring routes for students who need dependable support where local supply may vary.",
-    description:
-      "Quetta families can still use the platform for subject matching, online tuition, and academic planning guidance.",
-    icon: <QuettaIcon size={64} />,
-  },
 ];
 
 const AreasWeCover = () => {
   return (
-    <Box sx={{ py: 8, px: { xs: 2, md: 6 }, backgroundColor: "#fafafa" }}>
-      <Typography
-        variant="h4"
-        fontWeight={700}
+    <Box sx={{ py: 8, px: { xs: 2, md: 6 }, backgroundColor: "#2a2f33" }}>
+      <Box
         sx={{
-          mb: 1.5,
-          textAlign: "center",
-          color: "#004aad",
-          fontSize: { xs: "1.5rem", sm: "1.8rem", md: "2rem", lg: "2.2rem" },
+          display: "flex",
+          flexDirection: { xs: "column", lg: "row" },
+          justifyContent: "space-between",
+          alignItems: { xs: "flex-start", lg: "flex-end" },
+          gap: 2,
+          pb: { xs: 3, md: 4 },
+          mb: 4,
+          borderBottom: "1px solid rgba(255,255,255,0.12)",
         }}
       >
-        Cities and Areas Where We Help Students Find Tutors
-      </Typography>
+        <Box sx={{ maxWidth: 860 }}>
+          <Typography sx={{ color: "#29b554", fontWeight: 900, mb: 1 }}>
+            Where we help families
+          </Typography>
+          <Typography
+            variant="h4"
+            fontWeight={800}
+            sx={{
+              color: "#fff",
+              fontSize: { xs: "1.75rem", md: "3rem" },
+              lineHeight: 1.05,
+            }}
+          >
+            Cities and areas where students most often request tutors
+          </Typography>
+          <Typography
+            sx={{
+              mt: 1.2,
+              maxWidth: 920,
+              color: "rgba(255,255,255,0.72)",
+              lineHeight: 1.8,
+              fontSize: { xs: "0.95rem", md: "1rem" },
+            }}
+          >
+            Tutor availability depends on the subject, class level, preferred timing, and location. These are the main
+            cities where families most often request support, while online tutoring remains available across Pakistan.
+          </Typography>
+        </Box>
 
-      <Typography
+        <Button
+          component={RouterLink}
+          to="/teachers"
+          variant="outlined"
+          sx={{
+            textTransform: "none",
+            fontWeight: 800,
+            borderRadius: "999px",
+            px: 2.6,
+            py: 1,
+            borderColor: "rgba(255,255,255,0.35)",
+            color: "#fff",
+            "&:hover": {
+              borderColor: "#29b554",
+              background: "rgba(41,181,84,0.12)",
+            },
+          }}
+        >
+          See all locations
+        </Button>
+      </Box>
+
+      <Box
         sx={{
-          maxWidth: 920,
-          mx: "auto",
-          mb: 5,
-          textAlign: "center",
-          color: "#445",
-          lineHeight: 1.8,
-          fontSize: { xs: "0.95rem", md: "1rem" },
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", xl: "repeat(2, minmax(0, 1fr))" },
+          gap: 3,
+          gridAutoRows: "1fr",
         }}
       >
-        Tutor availability depends on the subject, class level, preferred timing, and area. In major cities, A Plus
-        Academy can often match both home tutors and online tutors depending on travel and specialist demand.
-      </Typography>
-
-      <Grid container spacing={3}>
         {areas.map((area) => (
-          <Grid item xs={12} sm={6} md={6} key={area.name} sx={{ display: "flex" }}>
+          <Box key={area.name} sx={{ display: "flex" }}>
             <Box
               sx={{
                 position: "relative",
-                borderRadius: "22px",
-                overflow: "hidden",
+                borderRadius: "18px",
                 width: "100%",
-                minHeight: 260,
-                "&::before": {
-                  content: '""',
-                  position: "absolute",
-                  inset: 0,
-                  padding: "1px",
-                  borderRadius: "22px",
-                  background: "linear-gradient(120deg, #00a6ff, #00ff8f, #00a6ff)",
-                  backgroundSize: "200% 200%",
-                  animation: "gradientMove 4s linear infinite",
-                  WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                  WebkitMaskComposite: "xor",
-                  maskComposite: "exclude",
-                  zIndex: 1,
-                },
-                "@keyframes gradientMove": {
-                  "0%": { backgroundPosition: "0% 50%" },
-                  "50%": { backgroundPosition: "100% 50%" },
-                  "100%": { backgroundPosition: "0% 50%" },
-                },
+                minHeight: 320,
+                border: "1px solid rgba(255,255,255,0.08)",
+                background: "#111514",
+                boxShadow: "0 12px 28px rgba(16,32,25,0.08)",
               }}
             >
               <Box
                 sx={{
-                  position: "relative",
-                  zIndex: 2,
                   p: 3,
-                  borderRadius: "20px",
-                  background: "rgba(255, 255, 255, 0.25)",
-                  backdropFilter: "blur(15px)",
-                  boxShadow: "0 12px 32px rgba(0,0,0,0.15)",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
                   height: "100%",
-                  minHeight: 260,
-                  transition: "transform 0.4s ease, box-shadow 0.4s ease",
-                  "&:hover": {
-                    transform: "translateY(-10px)",
-                    boxShadow: "0 25px 70px rgba(0,0,0,0.30)",
-                  },
+                  minHeight: 320,
                 }}
               >
-                <Box sx={{ maxWidth: { xs: "100%", md: "80%" }, pr: 5 }}>
-                  <Typography variant="h6" fontWeight={700} sx={{ mb: 1, color: "#29b554" }}>
+                <Box sx={{ maxWidth: { xs: "100%", md: "84%" }, pr: 6 }}>
+                  <Typography variant="h6" fontWeight={800} sx={{ mb: 1, color: "#fff" }}>
                     {area.name}
                   </Typography>
-                  <Typography sx={{ fontSize: "0.95rem", color: "#004aad", lineHeight: 1.75, fontWeight: 700, mb: 1 }}>
+                  <Typography sx={{ fontSize: "0.95rem", color: "#6ee7b7", lineHeight: 1.75, fontWeight: 700, mb: 1 }}>
                     {area.coverage}
                   </Typography>
-                  <Typography sx={{ fontSize: "0.95rem", color: "#333", lineHeight: 1.8 }}>
+                  <Typography sx={{ fontSize: "0.95rem", color: "rgba(255,255,255,0.74)", lineHeight: 1.8 }}>
                     {area.description}
                   </Typography>
                 </Box>
@@ -184,23 +166,20 @@ const AreasWeCover = () => {
                 <Box
                   sx={{
                     position: "absolute",
-                    bottom: 12,
-                    right: 12,
-                    width: { xs: 40, sm: 50, md: 60, lg: 70 },
+                    top: 22,
+                    right: 22,
+                    width: { xs: 40, sm: 48, md: 56 },
                     height: "auto",
-                    transform: "rotate(-15deg)",
-                    filter: "drop-shadow(0px 6px 20px rgba(0,0,0,0.25))",
-                    transition: "all 0.35s ease",
-                    "&:hover": { transform: "rotate(-10deg) scale(1.15)" },
+                    opacity: 0.92,
                   }}
                 >
                   {area.icon}
                 </Box>
               </Box>
             </Box>
-          </Grid>
+          </Box>
         ))}
-      </Grid>
+      </Box>
     </Box>
   );
 };

@@ -1,8 +1,6 @@
 import React, { useMemo, useRef, useState } from "react";
-import { Box, Button, Chip, Container, IconButton, Stack, Typography } from "@mui/material";
+import { Box, Button, Chip, Container, Stack, Typography } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import StarIcon from "@mui/icons-material/Star";
 import { languageCourses } from "../../pages/courses/languageCoursesData";
 
@@ -27,43 +25,69 @@ const categoryGroups = [
 export default function LanguageCoursesShowcase() {
   const [activeGroup, setActiveGroup] = useState("all");
   const railRef = useRef(null);
+  const dragStateRef = useRef({ isDown: false, startX: 0, startScrollLeft: 0 });
 
   const visibleCourses = useMemo(() => {
     const group = categoryGroups.find((item) => item.key === activeGroup) || categoryGroups[0];
     return languageCourses.filter(group.filter);
   }, [activeGroup]);
 
-  const move = (direction) => {
+  const beginDrag = (clientX) => {
     const rail = railRef.current;
     if (!rail) return;
-    rail.scrollBy({ left: direction * 330, behavior: "smooth" });
+    dragStateRef.current = {
+      isDown: true,
+      startX: clientX,
+      startScrollLeft: rail.scrollLeft,
+    };
+  };
+
+  const moveDrag = (clientX) => {
+    const rail = railRef.current;
+    const drag = dragStateRef.current;
+    if (!rail || !drag.isDown) return;
+    rail.scrollLeft = drag.startScrollLeft - (clientX - drag.startX);
+  };
+
+  const endDrag = () => {
+    dragStateRef.current.isDown = false;
   };
 
   return (
-    <Box sx={{ py: 8, px: { xs: 2, md: 6 }, backgroundColor: "#eef4fb" }}>
+    <Box sx={{ py: 8, px: { xs: 2, md: 6 }, backgroundColor: "#1b1f22" }}>
       <Container maxWidth="xl">
         <Stack spacing={3}>
-          <Box>
-            <Typography
-              component={RouterLink}
-              to="/courses/languages"
-              variant="h4"
-              fontWeight={800}
-              sx={{
-                color: "#004aad",
-                textDecoration: "none",
-                fontSize: { xs: "1.55rem", md: "2.05rem" },
-                "&:hover": { color: "#29b554" },
-              }}
-            >
-              Language courses from home
-            </Typography>
-            <Typography sx={{ mt: 1.1, maxWidth: 920, color: "#445", lineHeight: 1.8 }}>
-              Explore structured English, PTE, German, Chinese, Korean, Japanese, and Arabic learning options with clear monthly pricing, guided support, and level-based progress.
-            </Typography>
-          </Box>
+          <Stack
+            direction={{ xs: "column", lg: "row" }}
+            spacing={2}
+            justifyContent="space-between"
+            alignItems={{ xs: "flex-start", lg: "center" }}
+            sx={{ pb: { xs: 3, md: 4 }, borderBottom: "1px solid rgba(255,255,255,0.12)" }}
+          >
+            <Box sx={{ maxWidth: 860 }}>
+              <Typography sx={{ color: "#29b554", fontWeight: 900, mb: 1 }}>
+                Language courses from home
+              </Typography>
+              <Typography
+                component={RouterLink}
+                to="/courses/languages"
+                variant="h4"
+                fontWeight={800}
+                sx={{
+                  color: "#fff",
+                  textDecoration: "none",
+                  fontSize: { xs: "1.75rem", md: "3rem" },
+                  lineHeight: 1.05,
+                  "&:hover": { color: "#29b554" },
+                }}
+              >
+                Learn English, PTE, and global languages with guided online support
+              </Typography>
+              <Typography sx={{ mt: 1.2, maxWidth: 920, color: "rgba(255,255,255,0.72)", lineHeight: 1.8 }}>
+                Explore structured English, PTE, German, Chinese, Korean, Japanese, and Arabic learning options with clear monthly pricing, guided support, and level-based progress.
+              </Typography>
+            </Box>
 
-          <Stack direction={{ xs: "column", md: "row" }} spacing={2} justifyContent="space-between" alignItems={{ xs: "flex-start", md: "center" }}>
             <Stack direction="row" spacing={1.2} sx={{ flexWrap: "wrap", rowGap: 1.2 }}>
               {categoryGroups.map((group) => (
                 <Chip
@@ -82,26 +106,30 @@ export default function LanguageCoursesShowcase() {
                 />
               ))}
             </Stack>
-
-            <Stack direction="row" spacing={1}>
-              <IconButton onClick={() => move(-1)} sx={{ border: "1px solid #cfe2ee", background: "#fff" }}>
-                <ChevronLeftIcon />
-              </IconButton>
-              <IconButton onClick={() => move(1)} sx={{ border: "1px solid #cfe2ee", background: "#fff" }}>
-                <ChevronRightIcon />
-              </IconButton>
-            </Stack>
           </Stack>
 
           <Box
             ref={railRef}
+            onMouseDown={(event) => beginDrag(event.clientX)}
+            onMouseMove={(event) => moveDrag(event.clientX)}
+            onMouseUp={endDrag}
+            onMouseLeave={endDrag}
             sx={{
               display: "flex",
               gap: 2,
               overflowX: "auto",
               scrollSnapType: "x mandatory",
               pb: 1,
-              scrollbarWidth: "thin",
+              cursor: "grab",
+              userSelect: "none",
+              WebkitOverflowScrolling: "touch",
+              scrollBehavior: "smooth",
+              overscrollBehaviorX: "contain",
+              touchAction: "pan-x",
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+              "&::-webkit-scrollbar": { display: "none" },
+              "&:active": { cursor: "grabbing" },
               "& > *": { scrollSnapAlign: "start" },
             }}
           >
