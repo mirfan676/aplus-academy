@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-07-06-technology-education-and-digital-skills",
+    "title": "Technology Education and Digital Skills",
+    "description": "A concise education-news summary covering recent developments in IT & Technology and the common themes connecting them.",
+    "topic": "Technology Education and Digital Skills",
+    "category": "IT & Technology",
+    "publishedAt": "2026-07-06T07:55:21.870893+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/people-sitting-down-near-table-with-assorted-laptop-computers-3184465/",
+      "credit": "Pexels free photo",
+      "alt": "Students collaborating with laptops in a training session",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-07-05-higher-education-admissions-and-student-support",
     "title": "Higher Education: Admissions and Student Support",
     "description": "A concise education-news summary covering recent developments in Bachelors / Masters and the common themes connecting them.",
