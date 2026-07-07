@@ -11,6 +11,7 @@ import {
 import { ArrowForward, CalendarMonth } from "@mui/icons-material";
 import { Link as RouterLink } from "react-router-dom";
 import useSEO from "../../hooks/useSEO";
+import { fetchBlogIndex } from "../../services/blogData";
 
 const formatDate = (value) =>
   new Intl.DateTimeFormat("en-PK", {
@@ -33,11 +34,7 @@ const BlogList = () => {
   });
 
   useEffect(() => {
-    fetch("/blogs/index.json", { cache: "no-store" })
-      .then((response) => {
-        if (!response.ok) throw new Error("Blog index could not be loaded.");
-        return response.json();
-      })
+    fetchBlogIndex()
       .then((data) => setPosts(Array.isArray(data) ? data : []))
       .catch((err) => setError(err.message));
   }, []);
@@ -121,7 +118,7 @@ const BlogList = () => {
                 <Stack direction="row" spacing={1} alignItems="center" color="text.secondary">
                   <CalendarMonth color="primary" fontSize="small" />
                   <Typography variant="body2" fontWeight={700}>
-                    {formatDate(post.publishedAt)} · {post.readTime}
+                    {formatDate(post.publishedAt)} - {post.readTime}
                   </Typography>
                   {index === 0 && (
                     <Chip

@@ -8,13 +8,15 @@ import {
   signInWithRedirect,
   signOut,
 } from "firebase/auth";
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { adminEmails, auth, db, googleProvider, hasFirebaseConfig } from "../firebase";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [profileRole, setProfileRole] = useState("user");
+  const [isBlogEditor, setIsBlogEditor] = useState(false);
   const [loading, setLoading] = useState(hasFirebaseConfig);
   const [authError, setAuthError] = useState("");
 
@@ -33,33 +35,53 @@ export const AuthProvider = ({ children }) => {
 
     return onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
-      setLoading(false);
+      setProfileRole("user");
+      setIsBlogEditor(false);
 
       if (currentUser && db) {
+        const email = (currentUser.email || "").toLowerCase();
+        const isBootstrapAdmin = adminEmails.includes(email);
+        const userRef = doc(db, "users", currentUser.uid);
+        const editorRef = doc(db, "blogEditors", email);
+        const [profileSnapshot, editorSnapshot] = await Promise.all([
+          getDoc(userRef).catch(() => null),
+          getDoc(editorRef).catch(() => null),
+        ]);
+        const existingRole = profileSnapshot?.data()?.role;
+        const role = existingRole || (isBootstrapAdmin ? "admin" : "user");
+
         await setDoc(
-          doc(db, "users", currentUser.uid),
+          userRef,
           {
             uid: currentUser.uid,
             name: currentUser.displayName || "",
             email: currentUser.email || "",
             photoURL: currentUser.photoURL || "",
             provider: "google",
-            role: adminEmails.includes((currentUser.email || "").toLowerCase()) ? "admin" : "user",
+            role,
             lastLoginAt: serverTimestamp(),
           },
           { merge: true },
         );
+
+        setProfileRole(role);
+        setIsBlogEditor(Boolean(editorSnapshot?.exists()));
       }
+
+      setLoading(false);
     });
   }, []);
 
-  const isAdmin = Boolean(user?.email && adminEmails.includes(user.email.toLowerCase()));
+  const isAdmin = Boolean(user?.email && (adminEmails.includes(user.email.toLowerCase()) || profileRole === "admin"));
+  const canManageBlogs = Boolean(isAdmin || profileRole === "blog-editor" || isBlogEditor);
 
   const value = useMemo(
     () => ({
       user,
       loading,
       isAdmin,
+      canManageBlogs,
+      profileRole,
       authError,
       hasFirebaseConfig,
       signInWithGoogle: async () => {
@@ -87,7 +109,7 @@ export const AuthProvider = ({ children }) => {
       },
       logout: () => (auth ? signOut(auth) : Promise.resolve()),
     }),
-    [user, loading, isAdmin, authError],
+    [user, loading, isAdmin, canManageBlogs, profileRole, authError],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

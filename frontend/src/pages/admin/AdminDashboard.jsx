@@ -26,6 +26,7 @@ import L from "leaflet";
 import { collection, getCountFromServer } from "firebase/firestore";
 import { db } from "../../firebase";
 import { fetchTeachersForAdmin } from "../../services/appData";
+import { fetchBlogIndex } from "../../services/blogData";
 import { useAuth } from "../../contexts/useAuth";
 import "leaflet/dist/leaflet.css";
 
@@ -68,7 +69,7 @@ const AdminDashboard = () => {
       try {
         const [tutorRecords, blogRes] = await Promise.all([
           fetchTeachersForAdmin(),
-          fetch("/blogs/index.json", { cache: "no-store" }).then((res) => (res.ok ? res.json() : [])),
+          fetchBlogIndex(),
         ]);
 
         setTutors((tutorRecords || []).map(normalizeTutor));
@@ -147,6 +148,9 @@ const AdminDashboard = () => {
         <Stack direction={{ xs: "column", sm: "row" }} justifyContent="flex-end" spacing={1.5} sx={{ mb: 2 }}>
           <Button component={RouterLink} to="/admin/manage" variant="outlined" startIcon={<EditNoteIcon />} sx={{ fontWeight: 900 }}>
             Manage jobs, teachers and team
+          </Button>
+          <Button component={RouterLink} to="/admin/blogs" variant="outlined" startIcon={<ArticleIcon />} sx={{ fontWeight: 900 }}>
+            Manage blogs
           </Button>
           <Button component={RouterLink} to="/admin/firestore" variant="outlined" startIcon={<CloudSyncIcon />} sx={{ fontWeight: 900 }}>
             Firestore data

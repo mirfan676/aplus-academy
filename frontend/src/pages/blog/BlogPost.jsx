@@ -12,6 +12,7 @@ import {
 import { ArrowBack, CalendarMonth, OpenInNew } from "@mui/icons-material";
 import { Link as RouterLink, useParams } from "react-router-dom";
 import useSEO from "../../hooks/useSEO";
+import { fetchBlogPostBySlug } from "../../services/blogData";
 
 const siteUrl = "https://www.aplusacademy.pk";
 
@@ -59,11 +60,7 @@ const BlogPost = () => {
   useEffect(() => {
     setPost(null);
     setError("");
-    fetch(`/blogs/${slug}.json`, { cache: "no-store" })
-      .then((response) => {
-        if (!response.ok) throw new Error("This blog post is not available.");
-        return response.json();
-      })
+    fetchBlogPostBySlug(slug)
       .then(setPost)
       .catch((err) => setError(err.message));
   }, [slug]);
@@ -136,6 +133,11 @@ const BlogPost = () => {
     );
   }
 
+  const hasAdminContent = Boolean(post.rawContent || post.htmlContent || post.subtitle);
+  const heroUrl = post.heroImage?.url || "https://www.aplusacademy.pk/aplus-logo.png";
+  const references = post.references || [];
+  const images = post.images || (post.heroImage ? [post.heroImage] : []);
+
   return (
     <Box component="article">
       <Box
@@ -144,7 +146,7 @@ const BlogPost = () => {
           display: "flex",
           alignItems: "flex-end",
           color: "#fff",
-          backgroundImage: `linear-gradient(180deg, rgba(4, 20, 16, 0.25), rgba(4, 20, 16, 0.92)), url(${post.heroImage.url})`,
+          backgroundImage: `linear-gradient(180deg, rgba(4, 20, 16, 0.25), rgba(4, 20, 16, 0.92)), url(${heroUrl})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -184,22 +186,69 @@ const BlogPost = () => {
         </Container>
       </Box>
 
-      <Container sx={{ py: { xs: 5, md: 8 }, maxWidth: "980px !important" }}>
+      <Container sx={{ py: { xs: 5, md: 8 }, maxWidth: hasAdminContent ? "1120px !important" : "980px !important" }}>
         <Typography
           component="p"
           variant="h6"
           color="text.secondary"
           sx={{ lineHeight: 1.8, mb: 4 }}
         >
-          {post.description}
+          {post.subtitle || post.description}
         </Typography>
+
+        {hasAdminContent && (
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "180px minmax(0, 1fr)" },
+              gap: { xs: 3, md: 5 },
+              alignItems: "start",
+            }}
+          >
+            <Box sx={{ color: "text.secondary", borderTop: "3px solid #102019", pt: 2 }}>
+              <Typography variant="body2" fontWeight={900} color="text.primary">
+                A Plus Academy
+              </Typography>
+              <Typography variant="body2">{formatDate(post.publishedAt)}</Typography>
+              <Typography variant="body2">{post.readTime}</Typography>
+            </Box>
+
+            <Box
+              sx={{
+                "& p": { fontSize: "1.08rem", lineHeight: 1.9, color: "text.secondary", mb: 2.4 },
+                "& h2": { fontSize: { xs: "1.8rem", md: "2.25rem" }, lineHeight: 1.18, mt: 4.5, mb: 1.5 },
+                "& h3": { fontSize: "1.45rem", lineHeight: 1.25, mt: 3.5, mb: 1.2 },
+                "& img": { maxWidth: "100%", borderRadius: 1 },
+                "& a": { color: "#198754", fontWeight: 800 },
+                "& blockquote": {
+                  borderLeft: "4px solid #198754",
+                  m: "28px 0",
+                  pl: 2.5,
+                  color: "#102019",
+                  fontSize: "1.22rem",
+                  lineHeight: 1.75,
+                },
+              }}
+            >
+              {post.rawContent && (
+                <Typography sx={{ whiteSpace: "pre-line", fontSize: "1.08rem", lineHeight: 1.9, color: "text.secondary" }}>
+                  {post.rawContent}
+                </Typography>
+              )}
+              {post.htmlContent && <Box dangerouslySetInnerHTML={{ __html: post.htmlContent }} />}
+            </Box>
+          </Box>
+        )}
+
+        {!hasAdminContent && (
+          <>
 
         <Box sx={{ mb: 5, p: 3, borderRadius: 1, bgcolor: "#f7fbf8", border: "1px solid #e3eee7" }}>
           <Typography component="h2" variant="h5" fontWeight={800} gutterBottom>
             Key takeaways
           </Typography>
           <Stack component="ul" spacing={1.2} sx={{ pl: 3, mb: 0 }}>
-            {post.takeaways.map((item) => (
+            {(post.takeaways || []).map((item) => (
               <Typography component="li" key={item} sx={{ lineHeight: 1.7 }}>
                 {item}
               </Typography>
@@ -248,13 +297,18 @@ const BlogPost = () => {
           </Box>
         ))}
 
-        <Divider sx={{ my: 5 }} />
+          </>
+        )}
 
-        <Typography component="h2" variant="h4" fontWeight={800} gutterBottom>
-          References
-        </Typography>
+        {(references.length > 0 || images.length > 0) && <Divider sx={{ my: 5 }} />}
+
+        {(references.length > 0 || images.length > 0) && (
+          <Typography component="h2" variant="h4" fontWeight={800} gutterBottom>
+            References
+          </Typography>
+        )}
         <Stack spacing={1.5}>
-          {post.references.map((reference) => (
+          {references.map((reference) => (
             <Box
               key={`${reference.title}-${reference.url}`}
               component="a"
@@ -285,7 +339,7 @@ const BlogPost = () => {
               </Typography>
             </Box>
           ))}
-          {(post.images || [post.heroImage]).filter(Boolean).map((image, index) => (
+          {images.filter(Boolean).map((image, index) => (
             <Box
               key={`${image.url}-${index}`}
               component={image.sourceUrl ? "a" : "div"}

@@ -17,9 +17,34 @@ service cloud.firestore {
       ];
     }
 
+    function isBlogManager() {
+      return isAdmin() || (
+        signedIn()
+        && request.auth.token.email is string
+        && exists(/databases/$(database)/documents/blogEditors/$(request.auth.token.email))
+      );
+    }
+
     match /users/{uid} {
-      allow read, create, update: if isOwner(uid) || isAdmin();
+      allow read, create: if isOwner(uid) || isAdmin();
+      allow update: if isAdmin() || (
+        isOwner(uid)
+        && (
+          request.resource.data.role == resource.data.role
+          || (!("role" in resource.data) && request.resource.data.role == "user")
+        )
+      );
       allow delete: if isAdmin();
+    }
+
+    match /blogEditors/{email} {
+      allow read: if isBlogManager();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /blogPosts/{slug} {
+      allow read: if resource.data.status == "published" || isBlogManager();
+      allow create, update, delete: if isBlogManager();
     }
 
     match /parentProfiles/{uid} {

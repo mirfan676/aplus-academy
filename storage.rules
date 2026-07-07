@@ -13,6 +13,14 @@ service firebase.storage {
       ];
     }
 
+    function isBlogManager() {
+      return isAdmin() || (
+        signedIn()
+        && request.auth.token.email is string
+        && firestore.exists(/databases/(default)/documents/blogEditors/$(request.auth.token.email))
+      );
+    }
+
     match /teachers/{teacherId}/{fileName} {
       allow read: if true;
       allow write: if isAdmin()
@@ -24,6 +32,13 @@ service firebase.storage {
       allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
       allow write: if signedIn()
         && (request.auth.uid == uid || isAdmin())
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    match /blog-images/{slug}/{fileName} {
+      allow read: if true;
+      allow write: if isBlogManager()
         && request.resource.size < 5 * 1024 * 1024
         && request.resource.contentType.matches('image/.*');
     }

@@ -2,8 +2,8 @@ import { Navigate } from "react-router-dom";
 import { Box, CircularProgress } from "@mui/material";
 import { useAuth } from "../../contexts/useAuth";
 
-const AdminRoute = ({ children }) => {
-  const { isAdmin, loading, user } = useAuth();
+const AdminRoute = ({ children, blogManager = false }) => {
+  const { canManageBlogs, isAdmin, loading, user } = useAuth();
 
   if (loading) {
     return (
@@ -14,7 +14,11 @@ const AdminRoute = ({ children }) => {
   }
 
   if (!user) return <Navigate to="/admin/login" replace />;
-  if (!isAdmin) return <Navigate to="/account" replace />;
+  if (blogManager) {
+    if (!canManageBlogs) return <Navigate to="/account" replace />;
+  } else if (!isAdmin) {
+    return <Navigate to="/account" replace />;
+  }
 
   return children;
 };
