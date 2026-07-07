@@ -25,6 +25,7 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import SaveIcon from "@mui/icons-material/Save";
 import { Link as RouterLink } from "react-router-dom";
 import { useAuth } from "../../contexts/useAuth";
+import { hasFirebaseStorage } from "../../firebase";
 import {
   addBlogEditor,
   createSlug,
@@ -235,13 +236,15 @@ const BlogAdmin = () => {
 
             <Stack spacing={2.2}>
               <TextField label="Featured image URL" value={editPost.heroImage?.url || ""} onChange={(event) => updateHeroImage("url", event.target.value)} fullWidth />
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} alignItems={{ xs: "stretch", sm: "center" }}>
-                <Button component="label" variant="outlined" startIcon={<AddPhotoAlternateIcon />} sx={{ fontWeight: 900 }}>
-                  Upload featured image
-                  <input hidden type="file" accept="image/*" onChange={(event) => setImageFile(event.target.files?.[0] || null)} />
-                </Button>
-                <Typography color="text.secondary">{imageFile ? imageFile.name : "Storage upload works when Firebase Storage is enabled."}</Typography>
-              </Stack>
+              {hasFirebaseStorage && (
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} alignItems={{ xs: "stretch", sm: "center" }}>
+                  <Button component="label" variant="outlined" startIcon={<AddPhotoAlternateIcon />} sx={{ fontWeight: 900 }}>
+                    Upload featured image
+                    <input hidden type="file" accept="image/*" onChange={(event) => setImageFile(event.target.files?.[0] || null)} />
+                  </Button>
+                  <Typography color="text.secondary">{imageFile ? imageFile.name : "Firebase Storage upload enabled."}</Typography>
+                </Stack>
+              )}
               {(editPost.heroImage?.url || imageFile) && (
                 <Box
                   component="img"
