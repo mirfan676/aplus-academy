@@ -1,0 +1,153 @@
+{
+  "slug": "2026-07-07-programming-education-and-coding-skills",
+  "title": "Programming Education and Coding Skills",
+  "seoTitle": "Programming Education and Coding Skills",
+  "description": "A concise education-news summary covering recent developments in Programming and the common themes connecting them.",
+  "topic": "Programming Education and Coding Skills",
+  "category": "Programming",
+  "publishedAt": "2026-07-07T06:56:03.743065+00:00",
+  "updatedAt": "2026-07-07T06:56:03.743065+00:00",
+  "readTime": "3 min read",
+  "wordCount": 561,
+  "heroImage": {
+    "url": "https://images.pexels.com/photos/270348/pexels-photo-270348.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "sourceUrl": "https://www.pexels.com/photo/coding-script-270348/",
+    "credit": "Pexels free photo",
+    "alt": "Code editor for programming lessons",
+    "kind": "pexels",
+    "placement": "hero"
+  },
+  "images": [
+    {
+      "url": "https://images.pexels.com/photos/270348/pexels-photo-270348.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/coding-script-270348/",
+      "credit": "Pexels free photo",
+      "alt": "Code editor for programming lessons",
+      "kind": "pexels",
+      "placement": "hero"
+    },
+    {
+      "url": "https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/turned-on-monitor-screen-1181675/",
+      "credit": "Pexels free photo",
+      "alt": "Programming code displayed on a computer screen",
+      "kind": "pexels",
+      "placement": "student impact"
+    },
+    {
+      "url": "https://images.pexels.com/photos/546819/pexels-photo-546819.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/close-up-photo-of-programming-of-codes-546819/",
+      "credit": "Pexels free photo",
+      "alt": "Close-up of programming code for software learning",
+      "kind": "pexels",
+      "placement": "parent action plan"
+    },
+    {
+      "url": "https://images.pexels.com/photos/574071/pexels-photo-574071.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/person-using-macbook-pro-574071/",
+      "credit": "Pexels free photo",
+      "alt": "Developer working on a laptop for coding practice",
+      "kind": "pexels",
+      "placement": "tutor guidance"
+    }
+  ],
+  "takeaways": [
+    "Computer Science Education Will Look Different in the Age of AI, Says Code.org’s New CEO",
+    "Anthropic partners with CodePath to bring Claude to the US’s largest collegiate computer science program",
+    "AI can build apps without coders. Will computer science jobs survive?"
+  ],
+  "sections": [
+    {
+      "heading": "Overview",
+      "body": "Interest in programming education continues to develop across different regions and institutions. Recent items in the news point to a shared pattern: Education Week covered \"Computer Science Education Will Look Different in the Age of AI, Says Code.org’s New CEO.\" The development reflects ongoing changes in programming education.\n\nWhile each story comes from a different context, the common theme is a move toward more structured learning, clearer teaching standards, and sustained engagement beyond occasional study. The sections below summarise the key developments first, then draw out the themes connecting them."
+    },
+    {
+      "heading": "Why this matters globally",
+      "body": "The sources from Education Week, Anthropic, India Today show how programming education is changing across different education systems. Institutions are paying more attention to measurable progress, flexible learning options, and the quality of student support. For readers, the important point is not that every country has the same system. The useful lesson is that learners who can prove their skills through writing, speaking, testing, recitation, coding, or portfolio work are better prepared when policies and requirements change."
+    },
+    {
+      "heading": "Emerging themes",
+      "body": "Several themes connect these developments. First, programming education is becoming more structured, with programmes and institutions placing greater emphasis on planned instruction rather than informal study alone. Second, families and learners continue to play an important role in maintaining progress outside the classroom, especially where revision, practice, or long-term skill development is required. Third, demand for qualified instructors is rising because coding fundamentals, software projects, debugging habits, computer science concepts, and portfolio building requires consistency, correction, and clear learning standards."
+    },
+    {
+      "heading": "The role of digital learning",
+      "body": "Digital learning appears across the sources as a supporting trend rather than a complete replacement for instruction. Online platforms can widen access, organise practice, and provide flexible learning options, but educational quality still depends on curriculum design, feedback, and sustained engagement."
+    },
+    {
+      "heading": "Conclusion",
+      "body": "The developments from India point to broader interest in programming education. While the models differ by country and institution, the common thread is clear: learners are looking for more organised instruction, stronger guidance, and learning formats that can continue beyond a single classroom session. The trend is not only about more enrolment; it is about how education providers structure learning so that students can sustain progress over time."
+    }
+  ],
+  "sourceAnalyses": [
+    {
+      "source": "Education Week",
+      "title": "Computer Science Education Will Look Different in the Age of AI, Says Code.org’s New CEO",
+      "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxQWVAzVTFWZ3BJNHVpSzU0RzJ3NDVzZnBfYmM5T1BuQXJTUkFWQ05NSW1JNlNMR0NQT243VnFkTVZubkRkNWVMeWdjLXdUZEFibmdTMmZLMHhfRFRLdVV4cGJfX2pLa2djT0VGMENtSW9aVlNyenUtc2xueE82Q016MWlLQTZaeWIxR0JHdjVWaEwxd1ZULW9WSWRCQndRX2dxSm5US0VwWS1qRkd5TUxVbDZCWTFkeklQRXZOSDFIdTljS2tOcnNubXB4Nkd0N1NxUTBWU3dUTE5BOUlmc3Z3eWxB?oc=5",
+      "publishedAt": "Thu, 26 Mar 2026 07:00:00 GMT",
+      "heading": "Education Week",
+      "summary": "Education Week covered \"Computer Science Education Will Look Different in the Age of AI, Says Code.org’s New CEO.\" The development reflects ongoing changes in programming education. The source describes a current development in programming education. It shows how institutions, learners, or families are adjusting to changing expectations in this field. Alongside the other sources, it helps show how education delivery and learner demand are changing."
+    },
+    {
+      "source": "Anthropic",
+      "title": "Anthropic partners with CodePath to bring Claude to the US’s largest collegiate computer science program",
+      "url": "https://news.google.com/rss/articles/CBMibkFVX3lxTE1USWwzTlYxR0RTbXR2eDI4Y0tHZDM3VzZrbkplMjdrSUlIaG00NkEtZHFYQW9xVlRCaUlYa1NLS2pfcElMVVFEekMyZ2dSMTdieVU2cE5jd18zN1pPRUZRU0VsTVBkZjFGQ0E3d1l3?oc=5",
+      "publishedAt": "Fri, 13 Feb 2026 08:00:00 GMT",
+      "heading": "Anthropic",
+      "summary": "Anthropic covered \"Anthropic partners with CodePath to bring Claude to the US’s largest collegiate computer science program.\" The development reflects ongoing changes in programming education. The source describes a current development in programming education. It shows how institutions, learners, or families are adjusting to changing expectations in this field. Alongside the other sources, it helps show how education delivery and learner demand are changing."
+    },
+    {
+      "source": "India Today",
+      "title": "AI can build apps without coders. Will computer science jobs survive?",
+      "url": "https://news.google.com/rss/articles/CBMiygFBVV95cUxOdU9ZaEhkZUlDTExlSDdXYzVXdjBKTkNKd1c4WkFzWVVWT2M2SkdFMnZsTjluenJJeUpuU3R3bTNQRVd2blJDMjJSNVVkTzM4LU1WUGFDZGR6OWlKNGNDaUNEdE11bm9ObVNOUEREYWpnb1hyZWswSld0bTRrYU5vV3duZVdsNnNXWWktdGh1Z2lqU0hRSU95QTRPelBFbXZRdHcxMTdhSG5uaWoyU3NLc3lFZmYwWDB5Y1pYX29RaU12Ti1hU3ZSYW5R0gHPAUFVX3lxTE1JYXdmNHFXYm1QX0pVYkRfcXZPU2FyUWJJMGcwSDhyaFhxMDFGZC1aVHVscW85T1lnb3I5MWpwdUl1SVpkbHFDdXhNSXVGX2stWFlqQVhzeFpWc1ZISFoyVmhOUFFwMW54ZHltWmV4SU9RVmMyWjJMSzdrQ0xaQzZoR2swaEV5YjRXblAxYmd3N05FT3lEdjJFM0pIQTZhcHBhU1JJdkVVckxsVWhSVF9RTE1nbXl0M0g5cEJmMXNSSmV3VHJYcUExanQzbHI4Zw?oc=5",
+      "publishedAt": "Wed, 11 Mar 2026 07:00:00 GMT",
+      "heading": "India Today",
+      "summary": "India Today covered \"AI can build apps without coders. Will computer science jobs survive?.\" The development reflects ongoing changes in programming education. The source describes a current development in programming education. It shows how institutions, learners, or families are adjusting to changing expectations in this field. Alongside the other sources, it helps show how education delivery and learner demand are changing."
+    }
+  ],
+  "references": [
+    {
+      "title": "Computer Science Education Will Look Different in the Age of AI, Says Code.org’s New CEO - Education Week",
+      "source": "Education Week",
+      "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxQWVAzVTFWZ3BJNHVpSzU0RzJ3NDVzZnBfYmM5T1BuQXJTUkFWQ05NSW1JNlNMR0NQT243VnFkTVZubkRkNWVMeWdjLXdUZEFibmdTMmZLMHhfRFRLdVV4cGJfX2pLa2djT0VGMENtSW9aVlNyenUtc2xueE82Q016MWlLQTZaeWIxR0JHdjVWaEwxd1ZULW9WSWRCQndRX2dxSm5US0VwWS1qRkd5TUxVbDZCWTFkeklQRXZOSDFIdTljS2tOcnNubXB4Nkd0N1NxUTBWU3dUTE5BOUlmc3Z3eWxB?oc=5",
+      "publishedAt": "Thu, 26 Mar 2026 07:00:00 GMT"
+    },
+    {
+      "title": "Anthropic partners with CodePath to bring Claude to the US’s largest collegiate computer science program - Anthropic",
+      "source": "Anthropic",
+      "url": "https://news.google.com/rss/articles/CBMibkFVX3lxTE1USWwzTlYxR0RTbXR2eDI4Y0tHZDM3VzZrbkplMjdrSUlIaG00NkEtZHFYQW9xVlRCaUlYa1NLS2pfcElMVVFEekMyZ2dSMTdieVU2cE5jd18zN1pPRUZRU0VsTVBkZjFGQ0E3d1l3?oc=5",
+      "publishedAt": "Fri, 13 Feb 2026 08:00:00 GMT"
+    },
+    {
+      "title": "AI can build apps without coders. Will computer science jobs survive? - India Today",
+      "source": "India Today",
+      "url": "https://news.google.com/rss/articles/CBMiygFBVV95cUxOdU9ZaEhkZUlDTExlSDdXYzVXdjBKTkNKd1c4WkFzWVVWT2M2SkdFMnZsTjluenJJeUpuU3R3bTNQRVd2blJDMjJSNVVkTzM4LU1WUGFDZGR6OWlKNGNDaUNEdE11bm9ObVNOUEREYWpnb1hyZWswSld0bTRrYU5vV3duZVdsNnNXWWktdGh1Z2lqU0hRSU95QTRPelBFbXZRdHcxMTdhSG5uaWoyU3NLc3lFZmYwWDB5Y1pYX29RaU12Ti1hU3ZSYW5R0gHPAUFVX3lxTE1JYXdmNHFXYm1QX0pVYkRfcXZPU2FyUWJJMGcwSDhyaFhxMDFGZC1aVHVscW85T1lnb3I5MWpwdUl1SVpkbHFDdXhNSXVGX2stWFlqQVhzeFpWc1ZISFoyVmhOUFFwMW54ZHltWmV4SU9RVmMyWjJMSzdrQ0xaQzZoR2swaEV5YjRXblAxYmd3N05FT3lEdjJFM0pIQTZhcHBhU1JJdkVVckxsVWhSVF9RTE1nbXl0M0g5cEJmMXNSSmV3VHJYcUExanQzbHI4Zw?oc=5",
+      "publishedAt": "Wed, 11 Mar 2026 07:00:00 GMT"
+    },
+    {
+      "title": "Why HubSpot CEO Yamini Rangan told her son to study computer science, even as coding is dead - The Times of India",
+      "source": "The Times of India",
+      "url": "https://news.google.com/rss/articles/CBMijwJBVV95cUxNbk5wTDMwcXg3cWZIWVNQcnUtYWVUMTdUeU44SVAxLUhZekdoTVJTeWlsaVhyM3FVejdVUVpHNVBaY0FxVVVmRnJWam5vbzFOSlROWG5wRWtMYXhhamxqY0pudXc2ZW5SMmlJR0YtNGNYbWxDTlBDaUkwQjFkMVJZZnRkYjZyRk9ubDIyT3p2WFM1dW9lZFJDaURUaVZwNzNMZGdGWnRJakVHVDJ5ODZ2aWVfbDM2VVYydHJkQ05aekQwMUV6MW9mN2did2l4TmxiQmZTY2x1Ujdqc3NKYVpERVYtc3l4SEpBZVVfTmJNOGZRQndfX3NrY1dPTXE3ZnBMRDhrTTVORElxbDFFTTZB0gGUAkFVX3lxTFBUUVJDZlVUR0tSWWxOYklTYWpsTWVBcmpRZG95OXpTNU1wcDRFUjhoMjNicjlHcl94Y1BYemVHTmZieXpxakFKNlptam9BSjNVMUdhUVBsQ01jY0VOenBHMml6VDMxb1Fncnd3SXcxclZjeVdEYjVhV2Y4U0JiWjdLTy1NUXNjSjVSRnBIejVqX2NXOTRkaXhIMnl0X1RwemJoME43X09rd3FLMlRYdXAtbjQ1djhkNUlhVU1uSlFXWUlnenVQMWZJTUtHRTFQQjJVWHk1VUM3Qi1Vc0RKVFY3ZWNGYVRLSXNaZlpWYWhhR29BRHN6ejU2Qzh2a0dHeGZkTWlfQ0pFbG1RdW41OFU5cnBkQw?oc=5",
+      "publishedAt": "Tue, 03 Feb 2026 08:00:00 GMT"
+    },
+    {
+      "title": "Coding, Computer Science Now Compulsory Subjects in Pakistani Schools - ProPakistani",
+      "source": "ProPakistani",
+      "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNWFBlMTZwVnI3cFNVMTdDVHhlbmNnMjAtcVpGZTVocUJCQ3hJQzl6Z05ZMVY0QmsxVFE2X1BadVFYQlhYRkxVbTZkY0FJSFBPTGtfcXVXMXdrRTVVSmxUYUp6UGNMNGJPcnBvbEpmLWwtMDhDNU1Ma0VSekZVWlNUMjdRQnYxMlJoNWxMS3dWOXplX0pRSWN6MmV1c0sxXzJFVVdBaVd6QdIBrAFBVV95cUxPSHVKRnJvd2tPbS1OcFMyQXZWMkR6bEhqbkc2ZWI4VGh0QzlMempkaDRYcDctVDltSjZtNE02ZFVrdUo5Q0NmaFVybG1LQ21vQ2EyRzk4eDRSUnBwNHVHZlJCVjVoVGh1TUNOTFVfZ2lBV2V1eXlfdXJOV3JoSlViYzZGcWJaV3EzVmw4SzNYc0szOE41V2R5Wk4zU2NldU41bFhPRlFhXzQwcmRp?oc=5",
+      "publishedAt": "Sat, 16 May 2026 07:00:00 GMT"
+    },
+    {
+      "title": "Brown professors devise course to explore generative AI in computer science education - Brown University",
+      "source": "Brown University",
+      "url": "https://news.google.com/rss/articles/CBMidkFVX3lxTFBBaTIwTWhycjN5OXdyRkNMZC1SVFhaQTFPRlpBb1EweFlVWWpGckhFSHctNzRxVTQ1V1BGWWczRG1Cd3JzNERyLXV4RG9Tb2JtT2xwR3ItZkpMSWlsU3JPUlZxYVMwOTF3RHJCVmtDMkNxeF9XQlE?oc=5",
+      "publishedAt": "Thu, 11 Jun 2026 07:00:00 GMT"
+    }
+  ],
+  "tags": [
+    "coding",
+    "education",
+    "programming",
+    "skills"
+  ],
+  "generatedBy": "scripts/create_blog.py",
+  "generationNote": "Created from public RSS/news summaries, relevance filtering, and original editorial synthesis. References are included for attribution and reader verification."
+}
