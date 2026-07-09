@@ -23,6 +23,92 @@ const formatDate = (value) =>
     year: "numeric",
   }).format(new Date(value));
 
+const allowedTags = new Set([
+  "a",
+  "article",
+  "blockquote",
+  "br",
+  "div",
+  "em",
+  "figcaption",
+  "figure",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "hr",
+  "img",
+  "li",
+  "ol",
+  "p",
+  "section",
+  "span",
+  "strong",
+  "sub",
+  "sup",
+  "table",
+  "tbody",
+  "td",
+  "th",
+  "thead",
+  "tr",
+  "u",
+  "ul",
+]);
+
+const sanitizeBlogHtml = (html) => {
+  if (!html || typeof window === "undefined") return "";
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+
+  doc.querySelectorAll("script, style, link, meta, title, iframe, object, embed, form, input, button, textarea").forEach((node) => node.remove());
+
+  const sanitizeNode = (node) => {
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+
+    const tagName = node.tagName.toLowerCase();
+    if (!allowedTags.has(tagName)) {
+      const parent = node.parentNode;
+      if (!parent) return;
+      while (node.firstChild) parent.insertBefore(node.firstChild, node);
+      parent.removeChild(node);
+      return;
+    }
+
+    [...node.attributes].forEach((attribute) => {
+      const name = attribute.name.toLowerCase();
+      const value = attribute.value || "";
+      const isSafeHref = name === "href" && /^(https?:|mailto:|tel:|\/)/i.test(value);
+      const isSafeSrc = name === "src" && /^(https?:|data:|\/)/i.test(value);
+      const isAlt = name === "alt";
+      const isTitle = name === "title";
+      const isTarget = name === "target";
+
+      if (isSafeHref || isSafeSrc || isAlt || isTitle || isTarget) return;
+      node.removeAttribute(attribute.name);
+    });
+
+    node.removeAttribute("class");
+    node.removeAttribute("id");
+    node.removeAttribute("style");
+
+    if (tagName === "a") {
+      node.setAttribute("rel", "noopener noreferrer");
+      if (!node.getAttribute("target")) {
+        node.setAttribute("target", "_blank");
+      }
+    }
+
+    [...node.children].forEach(sanitizeNode);
+  };
+
+  [...doc.body.children].forEach(sanitizeNode);
+  return doc.body.innerHTML.trim();
+};
+
 const ArticleImage = ({ image }) => {
   if (!image?.url) return null;
 
@@ -73,44 +159,38 @@ const BlogPost = () => {
     canonical: post ? `${siteUrl}/blog/${post.slug}` : `${siteUrl}/blog`,
     ogUrl: post ? `${siteUrl}/blog/${post.slug}` : `${siteUrl}/blog`,
     ogImage: post?.heroImage?.url || "https://www.aplusacademy.pk/aplus-logo.png",
+    type: post ? "article" : "website",
+    publishedTime: post?.publishedAt,
+    modifiedTime: post?.updatedAt || post?.publishedAt,
+    section: post?.topic || post?.category || "Education",
+    tags: [post?.topic, post?.category].filter(Boolean),
+    structuredData: post
+      ? {
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          headline: post.title,
+          description: post.description,
+          image: post.heroImage?.url,
+          datePublished: post.publishedAt,
+          dateModified: post.updatedAt || post.publishedAt,
+          author: {
+            "@type": "Organization",
+            name: "A Plus Academy",
+          },
+          publisher: {
+            "@type": "Organization",
+            name: "A Plus Academy",
+            logo: {
+              "@type": "ImageObject",
+              url: "https://www.aplusacademy.pk/aplus-logo.png",
+            },
+          },
+          mainEntityOfPage: `${siteUrl}/blog/${post.slug}`,
+          articleSection: post.topic || post.category || "Education",
+          keywords: [post.topic, post.category].filter(Boolean).join(", "),
+        }
+      : undefined,
   });
-
-  useEffect(() => {
-    if (!post) return undefined;
-
-    const id = `blog-structured-data-${post.slug}`;
-    const existing = document.getElementById(id);
-    if (existing) existing.remove();
-
-    const script = document.createElement("script");
-    script.id = id;
-    script.type = "application/ld+json";
-    script.textContent = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "BlogPosting",
-      headline: post.title,
-      description: post.description,
-      image: post.heroImage?.url,
-      datePublished: post.publishedAt,
-      dateModified: post.updatedAt || post.publishedAt,
-      author: {
-        "@type": "Organization",
-        name: "A Plus Academy",
-      },
-      publisher: {
-        "@type": "Organization",
-        name: "A Plus Academy",
-        logo: {
-          "@type": "ImageObject",
-          url: "https://www.aplusacademy.pk/aplus-logo.png",
-        },
-      },
-      mainEntityOfPage: `${siteUrl}/blog/${post.slug}`,
-    });
-    document.head.appendChild(script);
-
-    return () => script.remove();
-  }, [post]);
 
   if (error) {
     return (
@@ -139,7 +219,8 @@ const BlogPost = () => {
   const images = post.images || (post.heroImage ? [post.heroImage] : []);
   const adminHtml = String(post.htmlContent || "").trim();
   const adminRaw = String(post.rawContent || "").trim();
-  const shouldRenderRaw = !adminHtml && adminRaw;
+  const sanitizedAdminHtml = sanitizeBlogHtml(adminHtml);
+  const shouldRenderRaw = !sanitizedAdminHtml && adminRaw;
 
   return (
     <Box component="article">
@@ -271,7 +352,7 @@ const BlogPost = () => {
                   {adminRaw}
                 </Typography>
               )}
-              {adminHtml && <Box dangerouslySetInnerHTML={{ __html: adminHtml }} />}
+              {sanitizedAdminHtml && <Box dangerouslySetInnerHTML={{ __html: sanitizedAdminHtml }} />}
             </Box>
           </Box>
         )}

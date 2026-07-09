@@ -271,8 +271,13 @@ const blogPages = blogIndex.flatMap((post) => {
       slug: `blog/${post.slug}`,
       title: fullPost.seoTitle || `${post.title} | A Plus Academy Blog`,
       description: post.description,
+      type: "article",
       heading: post.title,
       intro: post.description,
+      image: fullPost.heroImage?.url || "https://www.aplusacademy.pk/aplus-logo.png",
+      publishedAt: fullPost.publishedAt,
+      updatedAt: fullPost.updatedAt || fullPost.publishedAt,
+      topic: fullPost.topic || fullPost.category || "Education",
       sections: [
         ...((fullPost.sections || []).slice(0, 1)),
         ...sourceSections,
@@ -372,19 +377,71 @@ const upsertCanonical = (html, href) => {
     : html.replace("</head>", `    ${canonicalTag}\n  </head>`);
 };
 
+const upsertOrInsert = (html, regex, replacement) =>
+  regex.test(html) ? html.replace(regex, replacement) : html.replace("</head>", `    ${replacement}\n  </head>`);
+
 const replaceHead = (html, page) => {
   const title = escapeHtml(page.title);
   const description = escapeHtml(page.description || page.intro || page.title);
   const canonical = canonicalUrl(page.slug);
+  const image = escapeHtml(page.image || "https://www.aplusacademy.pk/aplus-logo.png");
+  const ogType = page.type === "article" ? "article" : "website";
+  const structuredData = page.type === "article"
+    ? {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        headline: page.heading || page.title,
+        description: page.description || page.intro || page.title,
+        image: page.image || "https://www.aplusacademy.pk/aplus-logo.png",
+        datePublished: page.publishedAt,
+        dateModified: page.updatedAt || page.publishedAt,
+        articleSection: page.topic || "Education",
+        mainEntityOfPage: canonical,
+        author: {
+          "@type": "Organization",
+          name: "A Plus Academy",
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "A Plus Academy",
+          logo: {
+            "@type": "ImageObject",
+            url: "https://www.aplusacademy.pk/aplus-logo.png",
+          },
+        },
+      }
+    : {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        name: page.heading || page.title,
+        description: page.description || page.intro || page.title,
+        url: canonical,
+        isPartOf: {
+          "@type": "WebSite",
+          name: "A Plus Academy",
+          url: siteUrl,
+        },
+      };
 
   let output = html.replace(/<title>.*?<\/title>/i, `<title>${title}</title>`);
   output = upsertMeta(output, 'name="description"', `<meta name="description" content="${description}" />`);
+  output = upsertMeta(output, 'name="robots"', `<meta name="robots" content="index, follow" />`);
   output = upsertMeta(output, 'property="og:title"', `<meta property="og:title" content="${title}" />`);
   output = upsertMeta(output, 'property="og:description"', `<meta property="og:description" content="${description}" />`);
+  output = upsertMeta(output, 'property="og:image"', `<meta property="og:image" content="${image}" />`);
   output = upsertMeta(output, 'property="og:url"', `<meta property="og:url" content="${escapeHtml(canonical)}" />`);
+  output = upsertMeta(output, 'property="og:type"', `<meta property="og:type" content="${ogType}" />`);
+  output = upsertMeta(output, 'property="og:site_name"', `<meta property="og:site_name" content="A Plus Academy" />`);
+  output = upsertMeta(output, 'property="og:locale"', `<meta property="og:locale" content="en_PK" />`);
   output = upsertMeta(output, 'name="twitter:title"', `<meta name="twitter:title" content="${title}" />`);
   output = upsertMeta(output, 'name="twitter:description"', `<meta name="twitter:description" content="${description}" />`);
+  output = upsertMeta(output, 'name="twitter:image"', `<meta name="twitter:image" content="${image}" />`);
   output = upsertCanonical(output, canonical);
+  output = upsertOrInsert(
+    output,
+    /<script\s+type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/i,
+    `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`,
+  );
   return output;
 };
 

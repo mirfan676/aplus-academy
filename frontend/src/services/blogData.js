@@ -81,10 +81,10 @@ export const fetchStaticBlogIndex = async () => {
 export const fetchPublishedFirestoreBlogs = async () => {
   if (!hasFirebaseConfig || !db) return [];
 
-  const snapshot = await getDocs(
-    query(collection(db, "blogPosts"), where("status", "==", "published"), orderBy("publishedAt", "desc")),
-  );
-  return snapshot.docs.map((item) => normalizeBlogPost(item.id, item.data()));
+  const snapshot = await getDocs(query(collection(db, "blogPosts"), where("status", "==", "published")));
+  return snapshot.docs
+    .map((item) => normalizeBlogPost(item.id, item.data()))
+    .sort((a, b) => new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0));
 };
 
 export const fetchAllBlogPostsForAdmin = async () => {

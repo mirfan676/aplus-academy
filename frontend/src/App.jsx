@@ -101,6 +101,18 @@ function ScrollManager() {
 function AppShell() {
   const location = useLocation();
   const isAdminPage = location.pathname.startsWith("/admin");
+  const isPrivatePage = isAdminPage || location.pathname.startsWith("/account");
+
+  useEffect(() => {
+    let robotsTag = document.querySelector("meta[name='robots']");
+    if (!robotsTag) {
+      robotsTag = document.createElement("meta");
+      robotsTag.name = "robots";
+      document.head.appendChild(robotsTag);
+    }
+
+    robotsTag.content = isPrivatePage ? "noindex, nofollow" : "index, follow";
+  }, [isPrivatePage]);
 
   return (
     <>

@@ -8,6 +8,7 @@ export default function NotFound() {
     description:
       "The page you requested could not be found. Browse verified tutors or latest home tuition jobs at A Plus Home Tutors.",
     canonical: "https://www.aplusacademy.pk/",
+    robots: "noindex, follow",
   });
 
   return (
