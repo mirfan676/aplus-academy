@@ -137,65 +137,89 @@ const BlogPost = () => {
   const heroUrl = post.heroImage?.url || "https://www.aplusacademy.pk/aplus-logo.png";
   const references = post.references || [];
   const images = post.images || (post.heroImage ? [post.heroImage] : []);
+  const adminHtml = String(post.htmlContent || "").trim();
+  const adminRaw = String(post.rawContent || "").trim();
+  const shouldRenderRaw = !adminHtml && adminRaw;
 
   return (
     <Box component="article">
-      <Box
-        sx={{
-          minHeight: { xs: 460, md: 560 },
-          display: "flex",
-          alignItems: "flex-end",
-          color: "#fff",
-          backgroundImage: `linear-gradient(180deg, rgba(4, 20, 16, 0.25), rgba(4, 20, 16, 0.92)), url(${heroUrl})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
+      <Box sx={{ bgcolor: "#f4f7f5", borderBottom: "1px solid #dce8e1" }}>
         <Container sx={{ py: { xs: 6, md: 8 } }}>
           <Button
             component={RouterLink}
             to="/blog"
             startIcon={<ArrowBack />}
-            sx={{ color: "#fff", mb: 2, textTransform: "none", fontWeight: 700 }}
+            sx={{ color: "#102019", mb: 2, textTransform: "none", fontWeight: 700 }}
           >
             Blog
           </Button>
-          <Chip
-            label={post.topic}
-            color="primary"
-            sx={{ borderRadius: 1, color: "#fff", fontWeight: 700, mb: 2 }}
-          />
-          <Typography
-            component="h1"
-            variant="h2"
+
+          <Box
             sx={{
-              fontWeight: 800,
-              lineHeight: 1.08,
-              maxWidth: 920,
-              fontSize: { xs: "2.15rem", md: "4rem" },
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 1.1fr) minmax(320px, 0.9fr)" },
+              gap: { xs: 3, md: 5 },
+              alignItems: "center",
             }}
           >
-            {post.title}
-          </Typography>
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 2 }}>
-            <CalendarMonth fontSize="small" />
-            <Typography>
-              {formatDate(post.publishedAt)} · {post.readTime}
-            </Typography>
-          </Stack>
+            <Box>
+              <Chip
+                label={post.topic}
+                color="primary"
+                sx={{ borderRadius: 1, color: "#fff", fontWeight: 700, mb: 2 }}
+              />
+              <Typography
+                component="h1"
+                variant="h2"
+                sx={{
+                  fontWeight: 800,
+                  lineHeight: 1.08,
+                  maxWidth: 920,
+                  color: "#102019",
+                  fontSize: { xs: "2rem", md: "3.7rem" },
+                }}
+              >
+                {post.title}
+              </Typography>
+              <Typography
+                component="p"
+                variant="h6"
+                color="text.secondary"
+                sx={{ mt: 2, maxWidth: 760, lineHeight: 1.8 }}
+              >
+                {post.subtitle || post.description}
+              </Typography>
+              <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 2, color: "text.secondary" }}>
+                <CalendarMonth fontSize="small" />
+                <Typography>
+                  {formatDate(post.publishedAt)} · {post.readTime}
+                </Typography>
+              </Stack>
+            </Box>
+
+            <Box
+              component="img"
+              src={heroUrl}
+              alt={post.heroImage?.alt || post.title}
+              sx={{
+                width: "100%",
+                aspectRatio: "16 / 10",
+                objectFit: "cover",
+                borderRadius: 2,
+                display: "block",
+                boxShadow: "0 18px 38px rgba(16, 32, 25, 0.12)",
+              }}
+            />
+          </Box>
         </Container>
       </Box>
 
-      <Container sx={{ py: { xs: 5, md: 8 }, maxWidth: hasAdminContent ? "1120px !important" : "980px !important" }}>
-        <Typography
-          component="p"
-          variant="h6"
-          color="text.secondary"
-          sx={{ lineHeight: 1.8, mb: 4 }}
-        >
-          {post.subtitle || post.description}
-        </Typography>
-
+      <Container
+        sx={{
+          py: { xs: 5, md: 8 },
+          maxWidth: hasAdminContent ? "1120px !important" : "980px !important",
+        }}
+      >
         {hasAdminContent && (
           <Box
             sx={{
@@ -216,7 +240,12 @@ const BlogPost = () => {
             <Box
               sx={{
                 "& p": { fontSize: "1.08rem", lineHeight: 1.9, color: "text.secondary", mb: 2.4 },
-                "& h2": { fontSize: { xs: "1.8rem", md: "2.25rem" }, lineHeight: 1.18, mt: 4.5, mb: 1.5 },
+                "& h2": {
+                  fontSize: { xs: "1.8rem", md: "2.25rem" },
+                  lineHeight: 1.18,
+                  mt: 4.5,
+                  mb: 1.5,
+                },
                 "& h3": { fontSize: "1.45rem", lineHeight: 1.25, mt: 3.5, mb: 1.2 },
                 "& img": { maxWidth: "100%", borderRadius: 1 },
                 "& a": { color: "#198754", fontWeight: 800 },
@@ -230,73 +259,78 @@ const BlogPost = () => {
                 },
               }}
             >
-              {post.rawContent && (
-                <Typography sx={{ whiteSpace: "pre-line", fontSize: "1.08rem", lineHeight: 1.9, color: "text.secondary" }}>
-                  {post.rawContent}
+              {shouldRenderRaw && (
+                <Typography
+                  sx={{
+                    whiteSpace: "pre-line",
+                    fontSize: "1.08rem",
+                    lineHeight: 1.9,
+                    color: "text.secondary",
+                  }}
+                >
+                  {adminRaw}
                 </Typography>
               )}
-              {post.htmlContent && <Box dangerouslySetInnerHTML={{ __html: post.htmlContent }} />}
+              {adminHtml && <Box dangerouslySetInnerHTML={{ __html: adminHtml }} />}
             </Box>
           </Box>
         )}
 
         {!hasAdminContent && (
           <>
-
-        <Box sx={{ mb: 5, p: 3, borderRadius: 1, bgcolor: "#f7fbf8", border: "1px solid #e3eee7" }}>
-          <Typography component="h2" variant="h5" fontWeight={800} gutterBottom>
-            Key takeaways
-          </Typography>
-          <Stack component="ul" spacing={1.2} sx={{ pl: 3, mb: 0 }}>
-            {(post.takeaways || []).map((item) => (
-              <Typography component="li" key={item} sx={{ lineHeight: 1.7 }}>
-                {item}
+            <Box sx={{ mb: 5, p: 3, borderRadius: 1, bgcolor: "#f7fbf8", border: "1px solid #e3eee7" }}>
+              <Typography component="h2" variant="h5" fontWeight={800} gutterBottom>
+                Key takeaways
               </Typography>
+              <Stack component="ul" spacing={1.2} sx={{ pl: 3, mb: 0 }}>
+                {(post.takeaways || []).map((item) => (
+                  <Typography component="li" key={item} sx={{ lineHeight: 1.7 }}>
+                    {item}
+                  </Typography>
+                ))}
+              </Stack>
+            </Box>
+
+            {(post.sections || []).slice(0, 1).map((section) => (
+              <Box key={section.heading} sx={{ mb: 4 }}>
+                <Typography component="h2" variant="h4" fontWeight={800} gutterBottom>
+                  {section.heading}
+                </Typography>
+                <Typography sx={{ lineHeight: 1.9, color: "text.secondary", whiteSpace: "pre-line" }}>
+                  {section.body}
+                </Typography>
+              </Box>
             ))}
-          </Stack>
-        </Box>
 
-        {(post.sections || []).slice(0, 1).map((section) => (
-          <Box key={section.heading} sx={{ mb: 4 }}>
-            <Typography component="h2" variant="h4" fontWeight={800} gutterBottom>
-              {section.heading}
-            </Typography>
-            <Typography sx={{ lineHeight: 1.9, color: "text.secondary", whiteSpace: "pre-line" }}>
-              {section.body}
-            </Typography>
-          </Box>
-        ))}
+            <ArticleImage image={post.images?.[1]} />
 
-        <ArticleImage image={post.images?.[1]} />
+            {post.sourceAnalyses?.map((analysis, index) => (
+              <Box key={`${analysis.source}-${analysis.title}`} sx={{ mb: 5 }}>
+                <Chip
+                  label={analysis.source}
+                  color="primary"
+                  sx={{ borderRadius: 1, color: "#fff", fontWeight: 800, mb: 1.5 }}
+                />
+                <Typography component="h2" variant="h4" fontWeight={800} gutterBottom>
+                  {analysis.title}
+                </Typography>
+                <Typography sx={{ lineHeight: 1.95, color: "text.secondary", whiteSpace: "pre-line" }}>
+                  {analysis.summary}
+                </Typography>
+                <ArticleImage image={post.images?.[index + 2]} />
+              </Box>
+            ))}
 
-        {post.sourceAnalyses?.map((analysis, index) => (
-          <Box key={`${analysis.source}-${analysis.title}`} sx={{ mb: 5 }}>
-            <Chip
-              label={analysis.source}
-              color="primary"
-              sx={{ borderRadius: 1, color: "#fff", fontWeight: 800, mb: 1.5 }}
-            />
-            <Typography component="h2" variant="h4" fontWeight={800} gutterBottom>
-              {analysis.title}
-            </Typography>
-            <Typography sx={{ lineHeight: 1.95, color: "text.secondary", whiteSpace: "pre-line" }}>
-              {analysis.summary}
-            </Typography>
-            <ArticleImage image={post.images?.[index + 2]} />
-          </Box>
-        ))}
-
-        {(post.sections || []).slice(post.sourceAnalyses ? 1 : 0).map((section) => (
-          <Box key={section.heading} sx={{ mb: 4 }}>
-            <Typography component="h2" variant="h4" fontWeight={800} gutterBottom>
-              {section.heading}
-            </Typography>
-            <Typography sx={{ lineHeight: 1.9, color: "text.secondary", whiteSpace: "pre-line" }}>
-              {section.body}
-            </Typography>
-          </Box>
-        ))}
-
+            {(post.sections || []).slice(post.sourceAnalyses ? 1 : 0).map((section) => (
+              <Box key={section.heading} sx={{ mb: 4 }}>
+                <Typography component="h2" variant="h4" fontWeight={800} gutterBottom>
+                  {section.heading}
+                </Typography>
+                <Typography sx={{ lineHeight: 1.9, color: "text.secondary", whiteSpace: "pre-line" }}>
+                  {section.body}
+                </Typography>
+              </Box>
+            ))}
           </>
         )}
 

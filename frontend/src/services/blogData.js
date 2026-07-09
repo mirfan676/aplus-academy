@@ -44,7 +44,11 @@ const timestampToIso = (value) => {
 };
 
 export const normalizeBlogPost = (id, data = {}) => {
-  const publishedAt = timestampToIso(data.publishedAt) || timestampToIso(data.createdAt) || new Date().toISOString();
+  const publishedAt =
+    timestampToIso(data.publishedAt) ||
+    timestampToIso(data.updatedAt) ||
+    timestampToIso(data.createdAt) ||
+    new Date().toISOString();
   const heroImage = data.heroImage || {
     url: data.featuredImageUrl || "",
     alt: data.featuredImageAlt || data.title || "A Plus Academy blog image",
@@ -93,6 +97,14 @@ export const fetchBlogPostBySlug = async (slug) => {
   if (hasFirebaseConfig && db) {
     const snapshot = await getDoc(doc(db, "blogPosts", slug)).catch(() => null);
     if (snapshot?.exists()) return normalizeBlogPost(snapshot.id, snapshot.data());
+
+    const querySnapshot = await getDocs(
+      query(collection(db, "blogPosts"), where("slug", "==", slug)),
+    ).catch(() => null);
+    if (querySnapshot?.docs?.length) {
+      const match = querySnapshot.docs[0];
+      return normalizeBlogPost(match.id, match.data());
+    }
   }
 
   const response = await fetch(`/blogs/${slug}.json`, { cache: "no-store" });

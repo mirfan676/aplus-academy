@@ -142,7 +142,7 @@ export default function AdvantagesSection() {
                     overflow: "hidden",
                     width: "100%",
                     height: "100%",
-                    minHeight: { xs: 250, sm: 260, md: 270 },
+                    minHeight: { xs: 220, sm: 220, md: 230 },
                     border: "1px solid rgba(255,255,255,0.08)",
                     background: "#111514",
                     boxShadow: "0 12px 28px rgba(0,0,0,0.18)",
@@ -154,11 +154,11 @@ export default function AdvantagesSection() {
                       height: "100%",
                       display: "flex",
                       flexDirection: "column",
-                      justifyContent: "space-between",
-                      gap: 2,
+                      justifyContent: "flex-start",
+                      gap: 2.25,
                     }}
                   >
-                    <Box sx={{ pr: 7 }}>
+                    <Box>
                       <Typography
                         component={RouterLink}
                         to={card.href}
@@ -181,17 +181,18 @@ export default function AdvantagesSection() {
                       </Typography>
                     </Box>
 
-                    <Box
-                      component="img"
-                      src={card.icon}
-                      alt={card.title}
-                      sx={{
-                        alignSelf: "flex-end",
-                        width: { xs: 42, sm: 48, md: 54 },
-                        height: "auto",
-                        opacity: 0.92,
-                      }}
-                    />
+                    <Box sx={{ pt: 1, mt: "auto", display: "flex", justifyContent: "flex-end" }}>
+                      <Box
+                        component="img"
+                        src={card.icon}
+                        alt={card.title}
+                        sx={{
+                          width: { xs: 42, sm: 48, md: 54 },
+                          height: "auto",
+                          opacity: 0.92,
+                        }}
+                      />
+                    </Box>
                   </Box>
                 </Box>
               </MotionWrapper>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Alert,
   Box,
@@ -76,7 +76,7 @@ const BlogAdmin = () => {
     [editPost.rawContent, editPost.htmlContent],
   );
 
-  const loadAdminData = async () => {
+  const loadAdminData = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
@@ -92,11 +92,11 @@ const BlogAdmin = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAdmin]);
 
   useEffect(() => {
     loadAdminData();
-  }, [isAdmin]);
+  }, [loadAdminData]);
 
   const updateField = (field, value) => {
     setEditPost((current) => ({ ...current, [field]: value }));

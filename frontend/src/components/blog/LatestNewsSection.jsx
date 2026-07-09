@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { ArrowForward } from "@mui/icons-material";
 import { Link as RouterLink } from "react-router-dom";
+import { fetchBlogIndex } from "../../services/blogData";
 
 const formatDate = (value) =>
   new Intl.DateTimeFormat("en-PK", {
@@ -21,8 +22,7 @@ const LatestNewsSection = () => {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    fetch("/blogs/index.json", { cache: "no-store" })
-      .then((response) => (response.ok ? response.json() : []))
+    fetchBlogIndex()
       .then((data) => setPosts(Array.isArray(data) ? data.slice(0, 3) : []))
       .catch(() => setPosts([]));
   }, []);

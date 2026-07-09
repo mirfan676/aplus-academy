@@ -116,7 +116,7 @@ const WhyChooseUs = () => {
                 <Box
                   sx={{
                     position: "relative",
-                    minHeight: 240,
+                    minHeight: { xs: 210, md: 220 },
                     background:
                       "linear-gradient(180deg, rgba(244,249,255,1) 0%, rgba(233,244,255,1) 100%)",
                     display: "flex",
@@ -144,12 +144,13 @@ const WhyChooseUs = () => {
                     alt={feature.title}
                     sx={{
                       width: "100%",
-                      height: 210,
+                      height: { xs: 170, md: 180 },
                       objectFit: feature.fit,
                       objectPosition: "center",
                       display: "block",
                       borderRadius: "16px",
                       background: "#fff",
+                      p: feature.fit === "contain" ? 1 : 0,
                     }}
                   />
                 </Box>
