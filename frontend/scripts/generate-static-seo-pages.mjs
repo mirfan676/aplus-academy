@@ -350,7 +350,7 @@ const renderFallback = (page) => {
     .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
     .join("\n          ");
 
-  return `<main style="font-family:Roboto,Arial,sans-serif;max-width:1120px;margin:0 auto;padding:40px 20px;line-height:1.7;color:#102019;">
+  const fallbackContent = `<main style="font-family:Roboto,Arial,sans-serif;max-width:1120px;margin:0 auto;padding:40px 20px;line-height:1.7;color:#102019;">
         <h1>${escapeHtml(page.heading || page.title)}</h1>
         <p>${escapeHtml(page.intro || page.description)}</p>
         ${sections}
@@ -362,6 +362,24 @@ const renderFallback = (page) => {
           ${renderLinks(page.links)}
         </nav>
       </main>`;
+
+  return `<div style="min-height:100vh;display:grid;place-items:center;padding:40px 20px;background:#f7fbf8;">
+        <div style="width:min(100%,420px);text-align:center;">
+          <img src="https://www.aplusacademy.pk/aplus-logo.png" alt="A Plus Academy" style="width:108px;height:auto;margin:0 auto 18px;" />
+          <div style="font:800 2rem/1.15 Roboto,Arial,sans-serif;color:#102019;margin-bottom:10px;">A Plus Academy</div>
+          <div style="font:500 1rem/1.7 Roboto,Arial,sans-serif;color:#55756a;margin:0 auto 26px;max-width:340px;">
+            Loading tutors, blog posts, courses, and student tools...
+          </div>
+          <div style="display:grid;gap:12px;">
+            <span style="display:block;height:14px;border-radius:999px;background:linear-gradient(90deg,#e3efe8 0%,#f4fbf7 50%,#e3efe8 100%);"></span>
+            <span style="display:block;height:14px;border-radius:999px;background:linear-gradient(90deg,#e3efe8 0%,#f4fbf7 50%,#e3efe8 100%);width:88%;margin:0 auto;"></span>
+            <span style="display:block;height:14px;border-radius:999px;background:linear-gradient(90deg,#e3efe8 0%,#f4fbf7 50%,#e3efe8 100%);width:72%;margin:0 auto;"></span>
+          </div>
+        </div>
+      </div>
+      <noscript>
+        ${fallbackContent}
+      </noscript>`;
 };
 
 const upsertMeta = (html, selector, replacement) => {

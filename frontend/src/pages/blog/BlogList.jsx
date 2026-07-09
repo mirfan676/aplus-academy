@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   Alert,
   Box,
+  Button,
   Chip,
   Container,
   IconButton,
@@ -23,6 +24,7 @@ const formatDate = (value) =>
 const BlogList = () => {
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState("");
+  const [visibleCount, setVisibleCount] = useState(16);
 
   useSEO({
     title: "A Plus Academy Blog | Education News and Learning Trends",
@@ -55,8 +57,11 @@ const BlogList = () => {
       .catch((err) => setError(err.message));
   }, []);
 
+  const visiblePosts = posts.slice(0, visibleCount);
+  const hasMore = visibleCount < posts.length;
+
   return (
-    <Box>
+    <Box sx={{ bgcolor: "#f7fbf8", minHeight: "100vh" }}>
       <Box
         component="section"
         sx={{
@@ -99,23 +104,47 @@ const BlogList = () => {
           </Alert>
         )}
 
-        <Stack sx={{ borderTop: "1px solid #dde9e1", bgcolor: "#fff" }}>
-          {posts.map((post, index) => (
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(2, minmax(0, 1fr))",
+              xl: "repeat(4, minmax(0, 1fr))",
+            },
+            gap: { xs: 2, md: 3 },
+          }}
+        >
+          {visiblePosts.map((post, index) => (
             <Box
               key={post.slug}
               component={RouterLink}
               to={`/blog/${post.slug}`}
               sx={{
-                display: "grid",
-                gridTemplateColumns: { xs: "1fr", md: "220px 1fr auto" },
-                gap: { xs: 2, md: 4 },
-                alignItems: "center",
-                py: { xs: 3, md: 3.5 },
+                display: "flex",
+                flexDirection: "column",
+                minHeight: 420,
+                borderRadius: 2,
+                overflow: "hidden",
+                bgcolor: "#fff",
+                border: "1px solid #dbe8e2",
                 color: "inherit",
                 textDecoration: "none",
-                borderBottom: "1px solid #dde9e1",
-                "&:hover h2": { color: "#29b554" },
-                "&:hover .blog-arrow": { bgcolor: "#29b554", color: "#fff" },
+                boxShadow: "0 14px 32px rgba(16, 32, 25, 0.06)",
+                transition: "transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease",
+                "&:hover": {
+                  transform: "translateY(-6px)",
+                  borderColor: "#4ed0c6",
+                  background: "linear-gradient(145deg, #e8fff5 0%, #eef8ff 52%, #e4f7ff 100%)",
+                  boxShadow: "0 18px 38px rgba(16, 32, 25, 0.14)",
+                },
+                "&:hover h2": { color: "#0d6f63" },
+                "&:hover .blog-arrow": {
+                  bgcolor: "#102019",
+                  color: "#fff",
+                  borderColor: "#102019",
+                  transform: "translateX(4px)",
+                },
               }}
             >
               <Box
@@ -124,14 +153,21 @@ const BlogList = () => {
                 alt={post.heroImage?.alt || post.title}
                 sx={{
                   width: "100%",
-                  height: { xs: 180, md: 130 },
+                  aspectRatio: "16 / 10",
                   objectFit: "cover",
-                  borderRadius: 2,
                   display: "block",
                 }}
               />
-              <Stack spacing={1}>
-                <Stack direction="row" spacing={1} alignItems="center" color="text.secondary">
+
+              <Stack spacing={1.5} sx={{ p: { xs: 2, md: 2.25 }, flex: 1 }}>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  alignItems="center"
+                  flexWrap="wrap"
+                  useFlexGap
+                  color="text.secondary"
+                >
                   <CalendarMonth color="primary" fontSize="small" />
                   <Typography variant="body2" fontWeight={700}>
                     {formatDate(post.publishedAt)} - {post.readTime}
@@ -145,33 +181,61 @@ const BlogList = () => {
                     />
                   )}
                 </Stack>
+
                 <Typography
                   component="h2"
                   variant="h5"
                   fontWeight={900}
-                  sx={{ transition: "color 0.2s ease", lineHeight: 1.25 }}
+                  sx={{
+                    transition: "color 0.2s ease",
+                    lineHeight: 1.22,
+                    fontSize: { xs: "1.5rem", md: "1.65rem" },
+                  }}
                 >
                   {post.title}
                 </Typography>
-                <Typography color="text.secondary" sx={{ lineHeight: 1.65, maxWidth: 780 }}>
+
+                <Typography color="text.secondary" sx={{ lineHeight: 1.72 }}>
                   {post.description}
                 </Typography>
+
+                <Box sx={{ mt: "auto", pt: 1 }}>
+                  <IconButton
+                    className="blog-arrow"
+                    aria-label={`Read ${post.title}`}
+                    sx={{
+                      border: "1px solid #d7e3dd",
+                      color: "#102019",
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    <ArrowForward />
+                  </IconButton>
+                </Box>
               </Stack>
-              <IconButton
-                className="blog-arrow"
-                aria-label={`Read ${post.title}`}
-                sx={{
-                  justifySelf: { xs: "flex-start", md: "end" },
-                  border: "1px solid #dde9e1",
-                  color: "#102019",
-                  transition: "all 0.2s ease",
-                }}
-              >
-                <ArrowForward />
-              </IconButton>
             </Box>
           ))}
-        </Stack>
+        </Box>
+
+        {hasMore && (
+          <Stack alignItems="center" sx={{ pt: { xs: 4, md: 5 } }}>
+            <Button
+              variant="contained"
+              onClick={() => setVisibleCount((current) => current + 16)}
+              sx={{
+                px: 4,
+                py: 1.2,
+                borderRadius: 1,
+                textTransform: "none",
+                fontWeight: 900,
+                bgcolor: "#102019",
+                "&:hover": { bgcolor: "#1a5044" },
+              }}
+            >
+              Load More Articles
+            </Button>
+          </Stack>
+        )}
       </Container>
     </Box>
   );
