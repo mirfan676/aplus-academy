@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { initializeApp } from "firebase/app";
+import { collection, getDocs, getFirestore, query, where } from "firebase/firestore";
 import { allLandingPages } from "../src/pages/landing/landingPages.js";
 import { languageCourses } from "../src/pages/courses/languageCoursesData.js";
 
@@ -9,6 +11,7 @@ const frontendRoot = path.resolve(__dirname, "..");
 const distDir = path.join(frontendRoot, "dist");
 const publicDir = path.join(frontendRoot, "public");
 const siteUrl = "https://www.aplusacademy.pk";
+const defaultBlogImage = "https://www.aplusacademy.pk/aplus-logo.png";
 
 const indexPath = path.join(distDir, "index.html");
 
@@ -30,6 +33,9 @@ const baseLinks = [
   ["/learning-tools/improve-english-grammar", "Grammar Tool"],
   ["/learning-tools/text-to-mcqs-short-questions", "Study Questions Tool"],
   ["/learning-tools/pte-essay-practice", "PTE Essay Practice"],
+  ["/pte", "PTE Practice"],
+  ["/pte/write-essay", "PTE Write Essay"],
+  ["/career-roadmap", "Career Roadmap"],
   ["/courses/languages", "Language Courses"],
   ["/courses/languages/english", "English Language Course"],
   ["/courses/languages/german", "German Language Course"],
@@ -145,6 +151,38 @@ const basePages = [
       "Paste study notes, lesson text, or a long paragraph to create a compact revision pack with summary points, short questions, and MCQs.",
   },
   {
+    slug: "pte",
+    title: "Free PTE Practice Tests and AI Scoring | A Plus Academy",
+    description:
+      "Practise PTE tasks with free text-based scoring, writing support, and structured preparation for students preparing for English proficiency tests.",
+    heading: "Free PTE practice with guided scoring",
+    intro:
+      "A Plus Academy offers PTE practice support with structured task pages, AI-based text scoring, writing help, and guided improvement for English test preparation.",
+    sections: [
+      {
+        title: "What PTE learners can practise here",
+        body:
+          "Students can work through writing, reading, listening, and selected speaking-focused preparation pages with guided feedback, score indicators, and sample responses.",
+      },
+    ],
+  },
+  {
+    slug: "career-roadmap",
+    title: "Career Roadmap for Students in Pakistan | A Plus Academy",
+    description:
+      "Explore career roadmaps after matric, intermediate, graduation, and skills-based pathways with practical guidance for Pakistani students and parents.",
+    heading: "Career roadmap guidance for students in Pakistan",
+    intro:
+      "A Plus Academy helps students explore academic, language, and skills-based pathways with practical career roadmap guidance for different stages of study.",
+    sections: [
+      {
+        title: "How to use the roadmap",
+        body:
+          "Students can compare study paths, exams, language requirements, and skill-building options after matric, FSC, ICS, ICom, and university-level study.",
+      },
+    ],
+  },
+  {
     slug: "learning-tools/pte-essay-practice",
     title: "Free PTE Essay Practice and Writing Scorer | A Plus Academy",
     description:
@@ -257,10 +295,84 @@ const readJson = (filePath, fallback) => {
   }
 };
 
-const blogIndex = readJson(path.join(publicDir, "blogs", "index.json"), []);
+const firebaseConfig = {
+  apiKey: process.env.VITE_FIREBASE_API_KEY,
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.VITE_FIREBASE_APP_ID,
+};
+
+const hasFirebaseConfig = Object.values(firebaseConfig).every(Boolean);
+
+const normalizeFirestoreBlogPost = (id, data = {}) => {
+  const toIso = (value) => {
+    if (!value) return "";
+    if (typeof value === "string") return value;
+    if (typeof value.toDate === "function") return value.toDate().toISOString();
+    return "";
+  };
+
+  const publishedAt =
+    toIso(data.publishedAt) ||
+    toIso(data.updatedAt) ||
+    toIso(data.createdAt) ||
+    new Date().toISOString();
+
+  return {
+    ...data,
+    id,
+    slug: data.slug || id,
+    title: data.title || "Untitled blog",
+    description: data.description || data.subtitle || "",
+    topic: data.topic || data.category || "A Plus Academy",
+    category: data.category || "Blog",
+    publishedAt,
+    updatedAt: toIso(data.updatedAt) || publishedAt,
+    heroImage: data.heroImage || {
+      url: data.featuredImageUrl || defaultBlogImage,
+      alt: data.featuredImageAlt || data.title || "A Plus Academy blog image",
+      credit: data.featuredImageCredit || "",
+    },
+    sections: Array.isArray(data.sections) ? data.sections : [],
+    sourceAnalyses: Array.isArray(data.sourceAnalyses) ? data.sourceAnalyses : [],
+  };
+};
+
+const fetchPublishedFirestoreBlogsForBuild = async () => {
+  if (!hasFirebaseConfig) return [];
+
+  try {
+    const app = initializeApp(firebaseConfig, "seo-build");
+    const db = getFirestore(app);
+    const snapshot = await getDocs(query(collection(db, "blogPosts"), where("status", "==", "published")));
+    return snapshot.docs
+      .map((item) => normalizeFirestoreBlogPost(item.id, item.data()))
+      .sort((a, b) => new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0));
+  } catch (error) {
+    console.warn("Firestore build fetch skipped:", error.message);
+    return [];
+  }
+};
+
+const staticBlogIndex = readJson(path.join(publicDir, "blogs", "index.json"), []);
+const firestoreBlogIndex = await fetchPublishedFirestoreBlogsForBuild();
+const mergedBlogMap = new Map();
+
+staticBlogIndex.forEach((post) => {
+  const fullPost = readJson(path.join(publicDir, "blogs", `${post.slug}.json`), post);
+  mergedBlogMap.set(post.slug, fullPost);
+});
+
+firestoreBlogIndex.forEach((post) => {
+  mergedBlogMap.set(post.slug, post);
+});
+
+const blogIndex = [...mergedBlogMap.values()].sort((a, b) => new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0));
 const blogIndexLinks = blogIndex.map((post) => [`/blog/${post.slug}`, post.title]);
 const blogPages = blogIndex.flatMap((post) => {
-  const fullPost = readJson(path.join(publicDir, "blogs", `${post.slug}.json`), post);
+  const fullPost = post;
   const sourceSections = (fullPost.sourceAnalyses || []).slice(0, 2).map((source) => ({
     title: source.title,
     body: source.summary,
@@ -270,11 +382,11 @@ const blogPages = blogIndex.flatMap((post) => {
     {
       slug: `blog/${post.slug}`,
       title: fullPost.seoTitle || `${post.title} | A Plus Academy Blog`,
-      description: post.description,
+      description: fullPost.description || post.description,
       type: "article",
       heading: post.title,
-      intro: post.description,
-      image: fullPost.heroImage?.url || "https://www.aplusacademy.pk/aplus-logo.png",
+      intro: fullPost.description || post.description,
+      image: fullPost.heroImage?.url || defaultBlogImage,
       publishedAt: fullPost.publishedAt,
       updatedAt: fullPost.updatedAt || fullPost.publishedAt,
       topic: fullPost.topic || fullPost.category || "Education",
