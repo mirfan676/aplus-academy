@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-07-12-design-and-multimedia-education",
+    "title": "Design and Multimedia Education",
+    "description": "A concise education-news summary covering recent developments in Graphics & Multimedia and the common themes connecting them.",
+    "topic": "Design and Multimedia Education",
+    "category": "Graphics & Multimedia",
+    "publishedAt": "2026-07-12T06:13:16.168111+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/196645/pexels-photo-196645.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/person-using-computer-196645/",
+      "credit": "Pexels free photo",
+      "alt": "Designer working on a laptop for multimedia projects",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-07-11-ielts-and-english-proficiency-testing",
     "title": "IELTS and English Proficiency Testing",
     "description": "A concise education-news summary covering recent developments in IELTS and the common themes connecting them.",
