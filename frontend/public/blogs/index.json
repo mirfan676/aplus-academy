@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-07-13-k-12-education-curriculum-and-classroom-learning",
+    "title": "K-12 Education: Curriculum and Classroom Learning",
+    "description": "A concise education-news summary covering recent developments in K-12 and the common themes connecting them.",
+    "topic": "K-12 Education: Curriculum and Classroom Learning",
+    "category": "K-12",
+    "publishedAt": "2026-07-13T06:30:36.643335+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/5212345/pexels-photo-5212345.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/a-child-studying-with-a-tutor-5212345/",
+      "credit": "Pexels free photo",
+      "alt": "Child studying with a tutor at a desk",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-07-12-design-and-multimedia-education",
     "title": "Design and Multimedia Education",
     "description": "A concise education-news summary covering recent developments in Graphics & Multimedia and the common themes connecting them.",
