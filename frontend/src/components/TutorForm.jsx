@@ -144,9 +144,37 @@ export default function TutorRegistration() {
   const [selectedHigherSubject, setSelectedHigherSubject] = useState("");
   const [coords, setCoords] = useState({ lat: "", lng: "" });
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("info");
   const [loading, setLoading] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [locationBlocked, setLocationBlocked] = useState(false);
+
+  const setFeedback = (text, type = "info") => {
+    setMessage(text);
+    setMessageType(type);
+  };
+
+  const getSubmissionErrorMessage = (error) => {
+    if (!error) return "We could not submit your registration right now. Please try again.";
+
+    if (error.code === "permission-denied" || /Missing or insufficient permissions/i.test(error.message || "")) {
+      return "Your registration could not be completed right now. Please sign in again and try once more.";
+    }
+
+    if (error.code === "unauthenticated") {
+      return "Please sign in with your Google account before submitting your registration.";
+    }
+
+    if (error.code === "unavailable") {
+      return "The registration service is temporarily unavailable. Please try again in a moment.";
+    }
+
+    if (/Profile image must be smaller than 5 MB/i.test(error.message || "")) {
+      return "Profile image must be smaller than 5 MB.";
+    }
+
+    return "We could not submit your registration right now. Please review your details and try again.";
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -230,16 +258,28 @@ export default function TutorRegistration() {
   // ----------------------------------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
+    setFeedback("", "info");
 
-    if (!formData.agree) return setMessage("⚠️ Please agree to Terms.");
-    if (!user || !db) return setMessage("Please sign in with Google before registering.");
+    if (!formData.agree) {
+      setFeedback("Please agree to the Terms and Privacy Policy before continuing.", "warning");
+      return;
+    }
+
+    if (!user || !db) {
+      setFeedback("Please sign in with Google before registering.", "warning");
+      return;
+    }
+
     if (storage && !formData.image && !user.photoURL) {
       setImageError(true);
-      return setMessage("Please upload a profile picture or add one to your Google account.");
+      setFeedback("Please upload a profile picture or add one to your Google account.", "warning");
+      return;
     }
-    if (higherEducation.includes(formData.qualification) && !selectedHigherSubject)
-      return setMessage("⚠️ Please select your subject for higher qualification.");
+
+    if (higherEducation.includes(formData.qualification) && !selectedHigherSubject) {
+      setFeedback("Please select your higher qualification subject before submitting.", "warning");
+      return;
+    }
 
     setLoading(true);
 
@@ -287,23 +327,24 @@ export default function TutorRegistration() {
           uid: user.uid,
           name: formData.name || user.displayName || "",
           email: user.email || "",
-          photoURL: user.photoURL || "",
-          role: "teacher",
+          photoURL,
+          requestedRole: "teacher",
           applicationStatus: "pending",
           updatedAt: serverTimestamp(),
         },
         { merge: true },
       );
 
-      setMessage("Tutor application saved to Firebase for review.");
+      setFeedback("Your tutor registration has been submitted successfully and is now under review.", "success");
       setFormData((current) => ({ ...current, image: null, agree: false }));
       setMajorSubjects([]);
       setSelectedHigherSubject("");
     } catch (err) {
       console.error(err);
-      setMessage(err.message || "Tutor application could not be saved to Firebase.");
+      setFeedback(getSubmissionErrorMessage(err), "error");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // ----------------------------------------------------------
@@ -321,18 +362,18 @@ export default function TutorRegistration() {
             Your Google account verifies your email and connects the application to your A Plus Academy profile.
           </Typography>
           {!hasFirebaseConfig && <Alert severity="warning" sx={{ mb: 2 }}>Firebase web app variables are not configured.</Alert>}
-          {message && <Alert severity="warning" sx={{ mb: 2 }}>{message}</Alert>}
+          {message && <Alert severity={messageType} sx={{ mb: 2 }}>{message}</Alert>}
           <Button
             variant="contained"
             size="large"
             startIcon={<GoogleIcon />}
             disabled={!hasFirebaseConfig}
             onClick={async () => {
-              setMessage("");
+              setFeedback("", "info");
               try {
                 await signInWithGoogle();
               } catch (error) {
-                setMessage(error.message || "Google sign-in could not be started.");
+                setFeedback(error.message || "Google sign-in could not be started.", "error");
               }
             }}
             sx={{ fontWeight: 900 }}
@@ -483,7 +524,7 @@ export default function TutorRegistration() {
               </Button>
 
               {message && (
-                <Alert severity={message.includes("success") ? "success" : message.startsWith("❌") ? "error" : "info"} sx={{ mt: 3, textAlign: "center" }}>
+                <Alert severity={messageType} sx={{ mt: 3, textAlign: "center" }}>
                   {message}
                 </Alert>
               )}
