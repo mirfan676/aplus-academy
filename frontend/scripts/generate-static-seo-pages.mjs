@@ -412,6 +412,36 @@ const pagePath = (slug) => `/${slug}`.replace(/\/$/, "") || "/";
 const canonicalUrl = (slug) => `${siteUrl}${pagePath(slug) === "/" ? "" : pagePath(slug)}`;
 const plainTitle = (title = "") => title.replace(/\s*\|\s*/g, " and ");
 
+const formatLastmod = (value) => {
+  if (!value) return new Date().toISOString().slice(0, 10);
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? new Date().toISOString().slice(0, 10) : date.toISOString().slice(0, 10);
+};
+
+const buildSitemapXml = (allPages) => {
+  const entries = allPages
+    .map((page) => {
+      const lastmod = formatLastmod(page.updatedAt || page.publishedAt);
+      const priority = page.type === "article" ? "0.7" : page.slug === "" ? "1.0" : "0.8";
+      return [
+        "  <url>",
+        `    <loc>${escapeHtml(canonicalUrl(page.slug))}</loc>`,
+        `    <lastmod>${lastmod}</lastmod>`,
+        `    <priority>${priority}</priority>`,
+        "  </url>",
+      ].join("\n");
+    })
+    .join("\n");
+
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    entries,
+    '</urlset>',
+    '',
+  ].join("\n");
+};
+
 const buildSeoParagraphs = (page) => {
   const topic = plainTitle(page.title);
   const focus = page.eyebrow || page.heading || topic;
@@ -591,4 +621,9 @@ const writePage = (page) => {
 
 pages.forEach(writePage);
 
+const sitemapXml = buildSitemapXml(pages);
+fs.writeFileSync(path.join(distDir, "sitemap.xml"), sitemapXml);
+fs.writeFileSync(path.join(publicDir, "sitemap.xml"), sitemapXml);
+
 console.log(`Generated ${pages.length} crawlable SEO HTML pages.`);
+console.log(`Updated sitemap with ${pages.length} URLs.`);
