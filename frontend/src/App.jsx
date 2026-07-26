@@ -14,7 +14,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 import RouteRedirect from "./components/RouteRedirect";
 import LandingPage from "./pages/landing/LandingPage";
-import { allLandingPages } from "./pages/landing/landingPages";
+import { allLandingPages, localAreaSeoPages } from "./pages/landing/landingPages";
 import BlogList from "./pages/blog/BlogList";
 import BlogPost from "./pages/blog/BlogPost";
 import CareerRoadmap from "./pages/career-roadmap/CareerRoadmap";
@@ -169,6 +169,9 @@ function AppShell() {
         <Route path="/ielts-tutor-pakistan" element={<LandingPage page={allLandingPages.ieltsTutorPakistan} />} />
         <Route path="/english-tutor-lahore" element={<LandingPage page={allLandingPages.englishTutorLahore} />} />
         <Route path="/verified-tutors-pakistan" element={<LandingPage page={allLandingPages.verifiedTutorsPakistan} />} />
+        {Object.values(localAreaSeoPages).map((page) => (
+          <Route key={page.slug} path={`/${page.slug}`} element={<LandingPage page={page} />} />
+        ))}
         <Route path="/about" element={<AboutUs />} />
         <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
