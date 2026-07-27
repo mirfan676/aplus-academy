@@ -73,17 +73,61 @@ function filterTeachers(
 
 // ------------------------------------------------------
 export default function TeacherDirectory() {
+  const [searchParams] = useSearchParams();
+  const selectedSubjectParam = searchParams.get("subject") || "";
+  const selectedCityParam = searchParams.get("city") || "";
+  const pageTitle = selectedSubjectParam
+    ? `${selectedSubjectParam} Tutors in Pakistan | Home and Online ${selectedSubjectParam} Tutors`
+    : selectedCityParam
+      ? `Tutors in ${selectedCityParam} | Find Home and Online Tutors`
+      : "Find Home and Online Tutors in Pakistan | Verified Tutors";
+  const pageDescription = selectedSubjectParam
+    ? `Browse verified ${selectedSubjectParam} tutors in Pakistan for home tuition and online classes. Compare tutor profiles, cities, and subjects through A Plus Home Tutors.`
+    : selectedCityParam
+      ? `Browse verified tutors in ${selectedCityParam} for home tuition and online classes. Compare subjects, tutor profiles, and academic support options.`
+      : "Browse verified home and online tutors across Pakistan by city, subject, and distance. Find tutors for school subjects, O Level, A Level, Quran, IELTS, and more.";
+
   useSEO({
-    title: "Find Verified Home and Online Tutors in Pakistan - A Plus Home Tutors",
-    description:
-      "Browse verified home and online tutors across Pakistan by city, subject, and distance.",
+    title: pageTitle,
+    description: pageDescription,
     canonical: "https://www.aplusacademy.pk/teachers",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "CollectionPage",
+          name: pageTitle,
+          url: "https://www.aplusacademy.pk/teachers",
+          description: pageDescription,
+          about: {
+            "@type": "Service",
+            name: selectedSubjectParam ? `${selectedSubjectParam} tutoring` : "Home and online tutoring",
+          },
+        },
+        {
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "Home",
+              item: "https://www.aplusacademy.pk/",
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: "Tutors",
+              item: "https://www.aplusacademy.pk/teachers",
+            },
+          ],
+        },
+      ],
+    },
   });
 
   const [teachers, setTeachers] = useState([]);
-  const [searchParams] = useSearchParams();
   const [selectedCity, setSelectedCity] = useState("");
-  const [selectedSubject, setSelectedSubject] = useState(searchParams.get("subject") || "");
+  const [selectedSubject, setSelectedSubject] = useState(selectedSubjectParam);
   const [search, setSearch] = useState("");
   const [visibleCount, setVisibleCount] = useState(12);
   const [loading, setLoading] = useState(true);
@@ -186,10 +230,11 @@ export default function TeacherDirectory() {
             fontSize: "1.05rem",
           }}
         >
-          A Plus Academy connects students with experienced and verified tutors
+          A Plus Home Tutors helps families and students compare verified tutors
           for home tuition and online classes across Pakistan. Browse teachers
-          for Matric, O Levels, A Levels, Intermediate, Quran, Maths, Science,
-          and more. Filter tutors by city, subject, and distance.
+          for Matric, FSc, O Level, A Level, Quran with Tajweed, IELTS, English,
+          Maths, Physics, Chemistry, Biology, Computer Science, and more. Filter
+          tutor profiles by city, subject, and distance to find a better match faster.
         </Typography>
 
         {/* MAP SECTION */}

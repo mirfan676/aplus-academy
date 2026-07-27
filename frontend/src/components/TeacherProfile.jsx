@@ -27,9 +27,54 @@ const TeacherProfile = () => {
       ? `${teacher.name} - Verified Tutor | A Plus Home Tutors`
       : "Verified Tutor Profile - A Plus Home Tutors",
     description: teacher
-      ? `View ${teacher.name}'s tutor profile, subjects, experience, and preferred teaching areas.`
+      ? `View ${teacher.name}'s tutor profile, subjects, experience, city, and preferred teaching areas through A Plus Home Tutors.`
       : "View verified tutor profiles at A Plus Home Tutors.",
     canonical: `https://www.aplusacademy.pk/teacher/${id}`,
+    structuredData: teacher
+      ? {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Person",
+              name: teacher.name,
+              description: teacher.bio || `${teacher.name} is a tutor listed on A Plus Home Tutors.`,
+              address: teacher.city
+                ? {
+                    "@type": "PostalAddress",
+                    addressLocality: teacher.city,
+                    addressCountry: "PK",
+                  }
+                : undefined,
+              knowsAbout: teacher.subjects,
+              image: teacher.thumbnail || undefined,
+              url: `https://www.aplusacademy.pk/teacher/${id}`,
+            },
+            {
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                {
+                  "@type": "ListItem",
+                  position: 1,
+                  name: "Home",
+                  item: "https://www.aplusacademy.pk/",
+                },
+                {
+                  "@type": "ListItem",
+                  position: 2,
+                  name: "Tutors",
+                  item: "https://www.aplusacademy.pk/teachers",
+                },
+                {
+                  "@type": "ListItem",
+                  position: 3,
+                  name: teacher.name,
+                  item: `https://www.aplusacademy.pk/teacher/${id}`,
+                },
+              ],
+            },
+          ],
+        }
+      : undefined,
   });
 
   useEffect(() => {

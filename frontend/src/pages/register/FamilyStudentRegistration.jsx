@@ -65,6 +65,7 @@ const FamilyStudentRegistration = ({ role }) => {
     title: `${copy.title} | A Plus Academy`,
     description: copy.description,
     canonical: `https://www.aplusacademy.pk/register/${role}`,
+    robots: "noindex, follow",
   });
 
   const steps = useMemo(

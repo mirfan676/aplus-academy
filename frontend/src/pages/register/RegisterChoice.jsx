@@ -49,10 +49,39 @@ const RegisterChoice = () => {
   const navigate = useNavigate();
   const { hasFirebaseConfig, signInWithGoogle, user } = useAuth();
   useSEO({
-    title: "Register with A Plus Academy | Teacher, Parent or Student",
+    title: "Register with A Plus Home Tutors | Teacher, Parent or Student",
     description:
-      "Choose whether to register as a teacher, parent, or student with A Plus Academy for tutoring, tutor requests, and profile management.",
+      "Choose whether to register as a teacher, parent, or student with A Plus Home Tutors for tutor registration, tutor requests, and profile management.",
     canonical: "https://www.aplusacademy.pk/register",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          name: "Register with A Plus Home Tutors",
+          url: "https://www.aplusacademy.pk/register",
+          description:
+            "Choose whether to register as a teacher, parent, or student with A Plus Home Tutors for tutor registration, tutor requests, and profile management.",
+        },
+        {
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "Home",
+              item: "https://www.aplusacademy.pk/",
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: "Register",
+              item: "https://www.aplusacademy.pk/register",
+            },
+          ],
+        },
+      ],
+    },
   });
 
   return (

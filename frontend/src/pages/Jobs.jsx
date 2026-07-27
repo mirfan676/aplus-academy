@@ -8,10 +8,39 @@ import useSEO from "../hooks/useSEO";
 
 export default function Jobs() {
   useSEO({
-    title: "Latest Home Tutor Jobs - A Plus Home Tutors Pakistan",
+    title: "Home Tutor Jobs in Pakistan | Latest Tuition Jobs",
     description:
-      "Browse verified home tuition and online tutor jobs across Pakistan with A Plus Home Tutors.",
+      "Browse home tuition and online tutor jobs across Pakistan for school subjects, O Level, A Level, Quran, IELTS, English, and university tutoring.",
     canonical: "https://www.aplusacademy.pk/jobs",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "CollectionPage",
+          name: "Home Tutor Jobs in Pakistan | Latest Tuition Jobs",
+          url: "https://www.aplusacademy.pk/jobs",
+          description:
+            "Browse home tuition and online tutor jobs across Pakistan for school subjects, O Level, A Level, Quran, IELTS, English, and university tutoring.",
+        },
+        {
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "Home",
+              item: "https://www.aplusacademy.pk/",
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: "Jobs",
+              item: "https://www.aplusacademy.pk/jobs",
+            },
+          ],
+        },
+      ],
+    },
   });
 
   const [jobs, setJobs] = useState([]);
@@ -160,7 +189,8 @@ export default function Jobs() {
           align="center"
           sx={{ mb: 4, color: "#333" }}
         >
-          Browse verified home tuition jobs and connect with parents looking for qualified tutors.
+          Browse the latest home tuition and online tutor jobs across Pakistan for school subjects, O Level, A Level,
+          Quran, IELTS, spoken English, and academic support.
         </Typography>
 
         <Box

@@ -48,6 +48,7 @@ const HireForm = () => {
     description:
       "Send a secure tutor hiring request to A Plus Home Tutors and connect with a verified teacher.",
     canonical: `https://www.aplusacademy.pk/hire/${teacherId || ""}`,
+    robots: "noindex, follow",
   });
 
   // Fetch teacher info

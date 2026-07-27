@@ -27,27 +27,48 @@ const BlogList = () => {
   const [visibleCount, setVisibleCount] = useState(16);
 
   useSEO({
-    title: "A Plus Academy Blog | Education News and Learning Trends",
+    title: "Education Blog for Parents, Students and Tutors in Pakistan",
     description:
-      "Read compact education summaries and trend analysis across tutoring, exams, language learning, Quran education, skills, and digital learning.",
+      "Read education guidance, tutoring advice, exam tips, language-learning updates, and student support content from A Plus Home Tutors in Pakistan.",
     canonical: "https://www.aplusacademy.pk/blog",
     ogUrl: "https://www.aplusacademy.pk/blog",
     ogImage: "https://www.aplusacademy.pk/aplus-logo.png",
     structuredData: {
       "@context": "https://schema.org",
-      "@type": "Blog",
-      name: "A Plus Academy Blog",
-      url: "https://www.aplusacademy.pk/blog",
-      description:
-        "Read compact education summaries and trend analysis across tutoring, exams, language learning, Quran education, skills, and digital learning.",
-      publisher: {
-        "@type": "Organization",
-        name: "A Plus Academy",
-        logo: {
-          "@type": "ImageObject",
-          url: "https://www.aplusacademy.pk/aplus-logo.png",
+      "@graph": [
+        {
+          "@type": "Blog",
+          name: "A Plus Academy Blog",
+          url: "https://www.aplusacademy.pk/blog",
+          description:
+            "Read education guidance, tutoring advice, exam tips, language-learning updates, and student support content from A Plus Home Tutors in Pakistan.",
+          publisher: {
+            "@type": "Organization",
+            name: "A Plus Academy",
+            logo: {
+              "@type": "ImageObject",
+              url: "https://www.aplusacademy.pk/aplus-logo.png",
+            },
+          },
         },
-      },
+        {
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "Home",
+              item: "https://www.aplusacademy.pk/",
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: "Blog",
+              item: "https://www.aplusacademy.pk/blog",
+            },
+          ],
+        },
+      ],
     },
   });
 

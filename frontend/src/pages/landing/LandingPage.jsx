@@ -90,7 +90,37 @@ const LandingPage = ({ page }) => {
     description: page.description,
     canonical,
     ogImage: page.image,
+    ogImageAlt: page.imageAlt,
     ogUrl: canonical,
+    structuredData: {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          name: page.title,
+          url: canonical,
+          description: page.description,
+          primaryImageOfPage: page.image,
+        },
+        {
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "Home",
+              item: "https://www.aplusacademy.pk/",
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: page.eyebrow || page.heading,
+              item: canonical,
+            },
+          ],
+        },
+      ],
+    },
   });
 
   useEffect(() => {

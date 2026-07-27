@@ -2,6 +2,7 @@ import { useEffect } from "react";
 
 const defaultImage = "https://www.aplusacademy.pk/aplus-logo.png";
 const defaultLocale = "en_PK";
+const structuredDataSelector = "script[data-seo-structured='true']";
 
 const setOrCreateMetaByName = (name, content) => {
   let tag = document.querySelector(`meta[name='${name}']`);
@@ -32,6 +33,7 @@ const useSEO = ({
   description,
   canonical,
   ogImage = defaultImage,
+  ogImageAlt = "A Plus Academy",
   ogUrl,
   robots = "index, follow",
   type = "website",
@@ -67,11 +69,14 @@ const useSEO = ({
     if (title) setOrCreateMetaByProperty("og:title", title);
     if (description) setOrCreateMetaByProperty("og:description", description);
     if (ogImage) setOrCreateMetaByProperty("og:image", ogImage);
+    if (ogImageAlt) setOrCreateMetaByProperty("og:image:alt", ogImageAlt);
 
     setOrCreateMetaByName("twitter:card", "summary_large_image");
+    setOrCreateMetaByName("twitter:site", "@aplus_pk");
     setOrCreateMetaByName("twitter:title", title || "");
     setOrCreateMetaByName("twitter:description", description || "");
     setOrCreateMetaByName("twitter:image", ogImage || defaultImage);
+    setOrCreateMetaByName("twitter:image:alt", ogImageAlt || "A Plus Academy");
 
     if (type === "article") {
       if (publishedTime) setOrCreateMetaByProperty("article:published_time", publishedTime);
@@ -96,26 +101,28 @@ const useSEO = ({
       removeMetaByProperty("article:tag");
     }
 
+    document.querySelectorAll(structuredDataSelector).forEach((script) => script.remove());
+
+    let mountedScript = null;
     if (structuredData) {
-      const id = `seo-structured-data-${canonical || title || "page"}`;
-      const existing = document.getElementById(id);
-      if (existing) existing.remove();
-
-      const script = document.createElement("script");
-      script.id = id;
-      script.type = "application/ld+json";
-      script.textContent = JSON.stringify(structuredData);
-      document.head.appendChild(script);
-
-      return () => script.remove();
+      mountedScript = document.createElement("script");
+      mountedScript.type = "application/ld+json";
+      mountedScript.dataset.seoStructured = "true";
+      mountedScript.textContent = JSON.stringify(structuredData);
+      document.head.appendChild(mountedScript);
     }
 
-    return undefined;
+    return () => {
+      if (mountedScript?.parentNode) {
+        mountedScript.parentNode.removeChild(mountedScript);
+      }
+    };
   }, [
     title,
     description,
     canonical,
     ogImage,
+    ogImageAlt,
     ogUrl,
     robots,
     type,

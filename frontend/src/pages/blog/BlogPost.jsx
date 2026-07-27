@@ -155,6 +155,7 @@ const BlogPost = () => {
     title: post?.seoTitle || post?.title || "A Plus Academy Blog",
     description:
       post?.description ||
+      post?.subtitle ||
       "Education news, tutoring guidance, and study insights from A Plus Academy.",
     canonical: post ? `${siteUrl}/blog/${post.slug}` : `${siteUrl}/blog`,
     ogUrl: post ? `${siteUrl}/blog/${post.slug}` : `${siteUrl}/blog`,
@@ -167,27 +168,54 @@ const BlogPost = () => {
     structuredData: post
       ? {
           "@context": "https://schema.org",
-          "@type": "BlogPosting",
-          headline: post.title,
-          description: post.description,
-          image: post.heroImage?.url,
-          datePublished: post.publishedAt,
-          dateModified: post.updatedAt || post.publishedAt,
-          author: {
-            "@type": "Organization",
-            name: "A Plus Academy",
-          },
-          publisher: {
-            "@type": "Organization",
-            name: "A Plus Academy",
-            logo: {
-              "@type": "ImageObject",
-              url: "https://www.aplusacademy.pk/aplus-logo.png",
+          "@graph": [
+            {
+              "@type": "BlogPosting",
+              headline: post.title,
+              description: post.description || post.subtitle,
+              image: post.heroImage?.url,
+              datePublished: post.publishedAt,
+              dateModified: post.updatedAt || post.publishedAt,
+              author: {
+                "@type": "Organization",
+                name: "A Plus Academy",
+              },
+              publisher: {
+                "@type": "Organization",
+                name: "A Plus Academy",
+                logo: {
+                  "@type": "ImageObject",
+                  url: "https://www.aplusacademy.pk/aplus-logo.png",
+                },
+              },
+              mainEntityOfPage: `${siteUrl}/blog/${post.slug}`,
+              articleSection: post.topic || post.category || "Education",
+              keywords: [post.topic, post.category].filter(Boolean).join(", "),
             },
-          },
-          mainEntityOfPage: `${siteUrl}/blog/${post.slug}`,
-          articleSection: post.topic || post.category || "Education",
-          keywords: [post.topic, post.category].filter(Boolean).join(", "),
+            {
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                {
+                  "@type": "ListItem",
+                  position: 1,
+                  name: "Home",
+                  item: "https://www.aplusacademy.pk/",
+                },
+                {
+                  "@type": "ListItem",
+                  position: 2,
+                  name: "Blog",
+                  item: "https://www.aplusacademy.pk/blog",
+                },
+                {
+                  "@type": "ListItem",
+                  position: 3,
+                  name: post.title,
+                  item: `${siteUrl}/blog/${post.slug}`,
+                },
+              ],
+            },
+          ],
         }
       : undefined,
   });

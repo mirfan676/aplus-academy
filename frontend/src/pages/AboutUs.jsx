@@ -23,6 +23,35 @@ const AboutUs = () => {
     canonical: "https://www.aplusacademy.pk/about",
     ogImage: "https://www.aplusacademy.pk/aplus-logo.png",
     ogUrl: "https://www.aplusacademy.pk/about",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "AboutPage",
+          name: "About A Plus Home Tutors",
+          url: "https://www.aplusacademy.pk/about",
+          description:
+            "Learn about A Plus Home Tutors, Pakistan's trusted platform for home and online tutoring.",
+        },
+        {
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "Home",
+              item: "https://www.aplusacademy.pk/",
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: "About",
+              item: "https://www.aplusacademy.pk/about",
+            },
+          ],
+        },
+      ],
+    },
   });
 
   return (

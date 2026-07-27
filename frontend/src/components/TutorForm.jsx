@@ -125,7 +125,8 @@ export default function TutorRegistration() {
     title: "Register as a Tutor - A Plus Home Tutors Pakistan",
     description:
       "Apply to join A Plus Home Tutors and connect with students looking for verified home and online tutors across Pakistan.",
-    canonical: "https://www.aplusacademy.pk/register",
+    canonical: "https://www.aplusacademy.pk/register/teacher",
+    robots: "noindex, follow",
   });
 
   const [formData, setFormData] = useState({
