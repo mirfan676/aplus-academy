@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-07-28-quran-memorization-and-tajweed-education",
+    "title": "Quran Memorization and Tajweed Education",
+    "description": "A concise education-news summary covering recent developments in Qur'an & Tajweed and the common themes connecting them.",
+    "topic": "Quran Memorization and Tajweed Education",
+    "category": "Qur'an & Tajweed",
+    "publishedAt": "2026-07-28T06:03:38.023626+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/8164397/pexels-photo-8164397.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/a-quran-book-on-the-stand-8164397/",
+      "credit": "Pexels free photo",
+      "alt": "Quran placed on a wooden stand for recitation practice",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-07-27-programming-education-and-coding-skills",
     "title": "Programming Education and Coding Skills",
     "description": "A concise education-news summary covering recent developments in Programming and the common themes connecting them.",
@@ -1004,23 +1021,6 @@
       "sourceUrl": "https://www.pexels.com/photo/a-quran-book-on-the-stand-8164397/",
       "credit": "Pexels free photo",
       "alt": "Quran placed on a wooden stand for recitation practice",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-05-29-board-exams-and-school-assessment",
-    "title": "Competitive Exams and Assessment Updates",
-    "description": "A concise education-news summary covering recent developments in Competitive Exams and the common themes connecting them.",
-    "topic": "Competitive Exams and Assessment Updates",
-    "category": "Competitive Exams",
-    "publishedAt": "2026-05-29T10:19:45.818143+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/256417/pexels-photo-256417.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/books-on-library-shelf-256417/",
-      "credit": "Pexels free photo",
-      "alt": "Library books for competitive exam preparation",
       "kind": "pexels",
       "placement": "hero"
     }
