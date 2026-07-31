@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-07-31-design-and-multimedia-education",
+    "title": "Design and Multimedia Education",
+    "description": "A concise education-news summary covering recent developments in Graphics & Multimedia and the common themes connecting them.",
+    "topic": "Design and Multimedia Education",
+    "category": "Graphics & Multimedia",
+    "publishedAt": "2026-07-31T06:23:43.488354+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/196645/pexels-photo-196645.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/person-using-computer-196645/",
+      "credit": "Pexels free photo",
+      "alt": "Designer working on a laptop for multimedia projects",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-07-30-ielts-and-english-proficiency-testing",
     "title": "IELTS and English Proficiency Testing",
     "description": "A concise education-news summary covering recent developments in IELTS and the common themes connecting them.",
@@ -998,29 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/person-using-computer-196645/",
       "credit": "Pexels free photo",
       "alt": "Designer working on a laptop for multimedia projects",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-06-01-global-trends-in-ielts-and-english-proficiency-testing",
-    "title": "IELTS and English Proficiency Testing",
-    "description": "A concise education-news summary covering recent developments in IELTS and the common themes connecting them.",
-    "topic": "IELTS and English Proficiency Testing",
-    "category": "IELTS",
-    "publishedAt": "2026-06-01T08:45:39.457562+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "keywords": [
-        "ielts",
-        "abroad",
-        "english",
-        "language"
-      ],
-      "url": "https://images.pexels.com/photos/5940831/pexels-photo-5940831.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/person-writing-on-white-paper-5940831/",
-      "credit": "Pexels free photo",
-      "alt": "Student writing study notes",
       "kind": "pexels",
       "placement": "hero"
     }
