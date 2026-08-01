@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-08-01-competitive-exams-and-assessment-updates",
+    "title": "Competitive Exams and Assessment Updates",
+    "description": "A concise education-news summary covering recent developments in Competitive Exams and the common themes connecting them.",
+    "topic": "Competitive Exams and Assessment Updates",
+    "category": "Competitive Exams",
+    "publishedAt": "2026-08-01T06:08:58.577036+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/256417/pexels-photo-256417.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/books-on-library-shelf-256417/",
+      "credit": "Pexels free photo",
+      "alt": "Library books for competitive exam preparation",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-07-31-design-and-multimedia-education",
     "title": "Design and Multimedia Education",
     "description": "A concise education-news summary covering recent developments in Graphics & Multimedia and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/a-child-studying-with-a-tutor-5212345/",
       "credit": "Pexels free photo",
       "alt": "Child studying with a tutor at a desk",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-06-02-global-trends-in-graphics-and-multimedia-education",
-    "title": "Design and Multimedia Education",
-    "description": "A concise education-news summary covering recent developments in Graphics & Multimedia and the common themes connecting them.",
-    "topic": "Design and Multimedia Education",
-    "category": "Graphics & Multimedia",
-    "publishedAt": "2026-06-02T08:06:14.381153+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/196645/pexels-photo-196645.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/person-using-computer-196645/",
-      "credit": "Pexels free photo",
-      "alt": "Designer working on a laptop for multimedia projects",
       "kind": "pexels",
       "placement": "hero"
     }
