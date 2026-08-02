@@ -1018,7 +1018,7 @@ export const localAreaSeoPages = {
     area: "Garden Town Lahore",
     focusKey: "O Level home tutors",
     focusLabel: "O Level Tutors",
-    title: "O Level Home Tutors in Garden Town Lahore | Cambridge Tuition",
+    title: "O Level Tutors in Garden Town Lahore | Cambridge Tuition",
     description:
       "Find O Level home tutors in Garden Town Lahore for Cambridge Maths, Physics, Chemistry, Biology, English, Accounting, Economics, and Computer Science.",
     heading: "O Level home tutors in Garden Town Lahore for Cambridge subject support",
@@ -1064,7 +1064,7 @@ export const localAreaSeoPages = {
     area: "Johar Town Lahore",
     focusKey: "female home tutors",
     focusLabel: "Female Tutors",
-    title: "Female Home Tutors in Johar Town Lahore | Home Tuition for Girls and Kids",
+    title: "Female Tutors in Johar Town Lahore | Home Tuition",
     description:
       "Find female home tutors in Johar Town Lahore for primary classes, school subjects, Matric, FSc, O Level, Quran, spoken English, and homework support.",
     heading: "Female home tutors in Johar Town Lahore for younger learners and focused home support",
@@ -1110,7 +1110,7 @@ export const localAreaSeoPages = {
     area: "Bahria Town Islamabad",
     focusKey: "Quran tutors",
     focusLabel: "Quran Tutors",
-    title: "Quran Tutors in Bahria Town Islamabad | Tajweed and Nazra Classes",
+    title: "Quran Tutors in Bahria Town Islamabad | Tajweed Classes",
     description:
       "Find Quran tutors in Bahria Town Islamabad for Nazra, Tajweed, makharij, daily recitation, beginner Quran reading, and home or online classes.",
     heading: "Quran tutors in Bahria Town Islamabad for Tajweed, Nazra and steady home learning",
@@ -1133,7 +1133,7 @@ export const localAreaSeoPages = {
     area: "DHA Islamabad",
     focusKey: "O Level home tutors",
     focusLabel: "O Level Tutors",
-    title: "O Level Home Tutors in DHA Islamabad | Cambridge Subject Tutors",
+    title: "O Level Tutors in DHA Islamabad | Cambridge Tuition",
     description:
       "Find O Level home tutors in DHA Islamabad for Maths, Physics, Chemistry, Biology, English, Business, Economics, and Computer Science.",
     heading: "O Level home tutors in DHA Islamabad for Cambridge revision and exam technique",
@@ -1156,7 +1156,7 @@ export const localAreaSeoPages = {
     area: "DHA Karachi",
     focusKey: "home tutors",
     focusLabel: "Home Tutors",
-    title: "Home Tutors in DHA Karachi | Verified Tutors for Home and Online Tuition",
+    title: "Home Tutors in DHA Karachi | Verified Home Tuition",
     description:
       "Find home tutors in DHA Karachi for school subjects, Matric, Intermediate, O Level, A Level, IELTS, Quran, and spoken English.",
     heading: "Home tutors in DHA Karachi for school support, Cambridge exams and language learning",
@@ -1179,7 +1179,7 @@ export const localAreaSeoPages = {
     area: "Gulshan-e-Iqbal Karachi",
     focusKey: "A Level home tutors",
     focusLabel: "A Level Tutors",
-    title: "A Level Home Tutors in Gulshan-e-Iqbal Karachi | Cambridge Specialists",
+    title: "A Level Tutors in Gulshan-e-Iqbal Karachi | Cambridge",
     description:
       "Find A Level home tutors in Gulshan-e-Iqbal Karachi for Maths, Further Maths, Physics, Chemistry, Biology, Accounting, Business, Economics, and Computer Science.",
     heading: "A Level home tutors in Gulshan-e-Iqbal Karachi for advanced Cambridge subjects",
@@ -1202,7 +1202,7 @@ export const localAreaSeoPages = {
     area: "Clifton Karachi",
     focusKey: "female home tutors",
     focusLabel: "Female Tutors",
-    title: "Female Home Tutors in Clifton Karachi | Home Tuition for Kids and Girls",
+    title: "Female Tutors in Clifton Karachi | Home Tuition",
     description:
       "Find female home tutors in Clifton Karachi for primary classes, school subjects, Matric, O Level, spoken English, Quran, and homework support.",
     heading: "Female home tutors in Clifton Karachi for younger learners, school work and language support",
@@ -1248,7 +1248,7 @@ export const localAreaSeoPages = {
     area: "People's Colony Faisalabad",
     focusKey: "Matric home tutors",
     focusLabel: "Matric Tutors",
-    title: "Matric Home Tutors in People's Colony Faisalabad | Board Exam Tuition",
+    title: "Matric Tutors in People's Colony Faisalabad | Board Tuition",
     description:
       "Find Matric home tutors in People's Colony Faisalabad for Maths, Physics, Chemistry, Biology, English, Urdu, Islamiat, and exam preparation.",
     heading: "Matric home tutors in People's Colony Faisalabad for board concepts and exam preparation",
@@ -1271,7 +1271,7 @@ export const localAreaSeoPages = {
     area: "Canal Road Faisalabad",
     focusKey: "female home tutors",
     focusLabel: "Female Tutors",
-    title: "Female Home Tutors on Canal Road Faisalabad | Home Tuition for Girls and Kids",
+    title: "Female Tutors on Canal Road Faisalabad | Home Tuition",
     description:
       "Find female home tutors on Canal Road Faisalabad for primary classes, school homework, Matric, FSc, Quran, spoken English, and concept learning.",
     heading: "Female home tutors on Canal Road Faisalabad for children, school support and concept building",
@@ -1294,7 +1294,7 @@ export const localAreaSeoPages = {
     area: "Gulgasht Multan",
     focusKey: "home tutors",
     focusLabel: "Home Tutors",
-    title: "Home Tutors in Gulgasht Multan | Verified Home and Online Tuition",
+    title: "Home Tutors in Gulgasht Multan | Verified Tuition",
     description:
       "Find home tutors in Gulgasht Multan for school subjects, Matric, FSc, O Level, IELTS, Quran, English, and university support.",
     heading: "Home tutors in Gulgasht Multan for school studies, exams and language learning",
@@ -1317,7 +1317,7 @@ export const localAreaSeoPages = {
     area: "Cantt Multan",
     focusKey: "Quran home tutors",
     focusLabel: "Quran Tutors",
-    title: "Quran Home Tutors in Cantt Multan | Tajweed and Nazra Classes",
+    title: "Quran Tutors in Cantt Multan | Tajweed Classes",
     description:
       "Find Quran home tutors in Cantt Multan for Nazra, Tajweed, makharij, daily recitation, beginner Quran classes, and home or online learning.",
     heading: "Quran home tutors in Cantt Multan for Tajweed, Nazra and regular recitation",
@@ -1340,7 +1340,7 @@ export const localAreaSeoPages = {
     area: "Bosan Road Multan",
     focusKey: "English language tutors",
     focusLabel: "English Tutors",
-    title: "English Language Tutors on Bosan Road Multan | Spoken English and Grammar",
+    title: "English Tutors on Bosan Road Multan | Spoken English",
     description:
       "Find English language tutors on Bosan Road Multan for spoken English, grammar, writing, vocabulary, school English, interview practice, and IELTS basics.",
     heading: "English language tutors on Bosan Road Multan for speaking confidence, grammar and writing",

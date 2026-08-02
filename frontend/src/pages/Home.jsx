@@ -6,7 +6,7 @@ const Home = () => {
   useSEO({
     title: "Home Tutors in Pakistan | A Plus Home Tutors",
     description:
-      "Find home tutors, online tutors, female tutors, Quran tutors, IELTS tutors, and O Level or A Level tutors in Lahore, Islamabad, Karachi, Faisalabad, Multan, and across Pakistan.",
+      "Find verified home tutors, online tutors, female tutors, Quran tutors, IELTS tutors, and O Level or A Level tutors across Pakistan.",
     canonical: "https://www.aplusacademy.pk/",
     ogUrl: "https://www.aplusacademy.pk/",
     structuredData: {
@@ -17,7 +17,7 @@ const Home = () => {
           name: "Home Tutors in Pakistan | A Plus Home Tutors",
           url: "https://www.aplusacademy.pk/",
           description:
-            "Find home tutors, online tutors, female tutors, Quran tutors, IELTS tutors, and O Level or A Level tutors in Lahore, Islamabad, Karachi, Faisalabad, Multan, and across Pakistan.",
+            "Find verified home tutors, online tutors, female tutors, Quran tutors, IELTS tutors, and O Level or A Level tutors across Pakistan.",
           isPartOf: {
             "@type": "WebSite",
             name: "A Plus Academy",

@@ -34,6 +34,20 @@ const classLinks = [
   { label: "Graphics & Multimedia", href: "/graphics-multimedia" },
 ];
 
+const localSeoLinks = [
+  { label: "Garden Town O Level Tutors", href: "/o-levels-home-tutors-garden-town-lahore" },
+  { label: "DHA Lahore Tutors", href: "/home-tutors-dha-lahore" },
+  { label: "Johar Town Female Tutors", href: "/female-home-tutors-johar-town-lahore" },
+  { label: "F-11 Islamabad Tutors", href: "/home-tutors-f-11-islamabad" },
+  { label: "Bahria Town Quran Tutors", href: "/quran-tutors-bahria-town-islamabad" },
+  { label: "DHA Karachi Tutors", href: "/home-tutors-dha-karachi" },
+  { label: "Gulshan A Level Tutors", href: "/a-level-home-tutors-gulshan-e-iqbal-karachi" },
+  { label: "Clifton Female Tutors", href: "/female-home-tutors-clifton-karachi" },
+  { label: "D-Ground Faisalabad Tutors", href: "/home-tutors-d-ground-faisalabad" },
+  { label: "Gulgasht Multan Tutors", href: "/home-tutors-gulgasht-multan" },
+  { label: "Bosan Road English Tutors", href: "/english-language-tutors-bosan-road-multan" },
+];
+
 const socialLinks = [
   { label: "Facebook", icon: <Facebook />, link: "https://www.facebook.com/aplushometutorspk" },
   { label: "Instagram", icon: <Instagram />, link: "https://www.instagram.com/aplushometutorspk" },
@@ -113,6 +127,29 @@ export default function Footer() {
             Classes
           </Typography>
           {classLinks.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              underline="none"
+              sx={{
+                display: "block",
+                color: "#fff",
+                opacity: 0.8,
+                py: 0.5,
+                transition: "all 0.2s ease",
+                "&:hover": { opacity: 1, color: "#00ff8f", transform: "translateX(3px)" },
+              }}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={2}>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 700, color: "#29b554" }}>
+            Popular Areas
+          </Typography>
+          {localSeoLinks.map((item) => (
             <Link
               key={item.label}
               href={item.href}

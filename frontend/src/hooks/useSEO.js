@@ -3,6 +3,7 @@ import { useEffect } from "react";
 const defaultImage = "https://www.aplusacademy.pk/aplus-logo.png";
 const defaultLocale = "en_PK";
 const structuredDataSelector = "script[data-seo-structured='true']";
+const hreflangSelector = "link[data-seo-hreflang='true']";
 
 const setOrCreateMetaByName = (name, content) => {
   let tag = document.querySelector(`meta[name='${name}']`);
@@ -60,6 +61,19 @@ const useSEO = ({
         document.head.appendChild(link);
       }
       link.href = canonical;
+
+      document.querySelectorAll(hreflangSelector).forEach((tag) => tag.remove());
+      [
+        ["en-pk", canonical],
+        ["x-default", canonical],
+      ].forEach(([hreflang, href]) => {
+        const alternate = document.createElement("link");
+        alternate.rel = "alternate";
+        alternate.hreflang = hreflang;
+        alternate.href = href;
+        alternate.dataset.seoHreflang = "true";
+        document.head.appendChild(alternate);
+      });
     }
 
     setOrCreateMetaByProperty("og:site_name", "A Plus Academy");

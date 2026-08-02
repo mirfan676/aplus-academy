@@ -599,6 +599,16 @@ const replaceHead = (html, page) => {
   output = upsertCanonical(output, canonical);
   output = upsertOrInsert(
     output,
+    /<link\s+rel=["']alternate["']\s+hreflang=["']en-pk["'][^>]*>/i,
+    `<link rel="alternate" hreflang="en-pk" href="${escapeHtml(canonical)}" />`,
+  );
+  output = upsertOrInsert(
+    output,
+    /<link\s+rel=["']alternate["']\s+hreflang=["']x-default["'][^>]*>/i,
+    `<link rel="alternate" hreflang="x-default" href="${escapeHtml(canonical)}" />`,
+  );
+  output = upsertOrInsert(
+    output,
     /<script\s+type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/i,
     `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`,
   );
