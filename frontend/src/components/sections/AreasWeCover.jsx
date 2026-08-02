@@ -37,6 +37,20 @@ const areas = [
   },
 ];
 
+const localAreaLinks = [
+  { label: "O Level Tutors in Garden Town Lahore", href: "/o-levels-home-tutors-garden-town-lahore" },
+  { label: "Home Tutors in DHA Lahore", href: "/home-tutors-dha-lahore" },
+  { label: "Female Tutors in Johar Town Lahore", href: "/female-home-tutors-johar-town-lahore" },
+  { label: "O Level Tutors in DHA Islamabad", href: "/o-level-home-tutors-dha-islamabad" },
+  { label: "Quran Tutors in Bahria Town Islamabad", href: "/quran-tutors-bahria-town-islamabad" },
+  { label: "A Level Tutors in Gulshan-e-Iqbal Karachi", href: "/a-level-home-tutors-gulshan-e-iqbal-karachi" },
+  { label: "Female Tutors in Clifton Karachi", href: "/female-home-tutors-clifton-karachi" },
+  { label: "Matric Tutors in People's Colony Faisalabad", href: "/matric-home-tutors-peoples-colony-faisalabad" },
+  { label: "Female Tutors on Canal Road Faisalabad", href: "/female-home-tutors-canal-road-faisalabad" },
+  { label: "Quran Tutors in Cantt Multan", href: "/quran-home-tutors-cantt-multan" },
+  { label: "English Tutors on Bosan Road Multan", href: "/english-language-tutors-bosan-road-multan" },
+];
+
 const AreasWeCover = () => {
   return (
     <Box sx={{ py: 8, px: { xs: 2, md: 6 }, backgroundColor: "#2a2f33" }}>
@@ -179,6 +193,65 @@ const AreasWeCover = () => {
             </Box>
           </Box>
         ))}
+      </Box>
+
+      <Box
+        sx={{
+          mt: 3,
+          p: { xs: 2.5, md: 3 },
+          borderRadius: "18px",
+          border: "1px solid rgba(255,255,255,0.08)",
+          background: "rgba(255,255,255,0.03)",
+        }}
+      >
+        <Typography variant="h6" sx={{ color: "#fff", fontWeight: 800, mb: 1 }}>
+          Popular tutor areas people search for most
+        </Typography>
+        <Typography
+          sx={{
+            color: "rgba(255,255,255,0.72)",
+            lineHeight: 1.8,
+            fontSize: { xs: "0.95rem", md: "1rem" },
+            mb: 2,
+          }}
+        >
+          Explore detailed pages for high-demand city areas where families often look for home tutors, Cambridge support,
+          Quran classes, and spoken English help.
+        </Typography>
+
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))", lg: "repeat(3, minmax(0, 1fr))" },
+            gap: 1.25,
+          }}
+        >
+          {localAreaLinks.map((item) => (
+            <Button
+              key={item.href}
+              component={RouterLink}
+              to={item.href}
+              variant="text"
+              sx={{
+                justifyContent: "flex-start",
+                textTransform: "none",
+                fontWeight: 700,
+                borderRadius: "12px",
+                px: 1.2,
+                py: 1,
+                color: "#d9fff0",
+                background: "rgba(41,181,84,0.08)",
+                border: "1px solid rgba(41,181,84,0.18)",
+                '&:hover': {
+                  background: "rgba(41,181,84,0.16)",
+                  borderColor: "rgba(41,181,84,0.4)",
+                },
+              }}
+            >
+              {item.label}
+            </Button>
+          ))}
+        </Box>
       </Box>
     </Box>
   );
