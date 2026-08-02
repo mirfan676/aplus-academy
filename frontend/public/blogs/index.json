@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-08-02-k-12-education-curriculum-and-classroom-learning",
+    "title": "K-12 Education: Curriculum and Classroom Learning",
+    "description": "A concise education-news summary covering recent developments in K-12 and the common themes connecting them.",
+    "topic": "K-12 Education: Curriculum and Classroom Learning",
+    "category": "K-12",
+    "publishedAt": "2026-08-02T06:12:02.253980+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/5212345/pexels-photo-5212345.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/a-child-studying-with-a-tutor-5212345/",
+      "credit": "Pexels free photo",
+      "alt": "Child studying with a tutor at a desk",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-08-01-competitive-exams-and-assessment-updates",
     "title": "Competitive Exams and Assessment Updates",
     "description": "A concise education-news summary covering recent developments in Competitive Exams and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/students-studying-together-4778621/",
       "credit": "Pexels free photo",
       "alt": "Students studying together for exams",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-06-03-global-trends-in-k-12-education",
-    "title": "K-12 Education: Curriculum and Classroom Learning",
-    "description": "A concise education-news summary covering recent developments in K-12 and the common themes connecting them.",
-    "topic": "K-12 Education: Curriculum and Classroom Learning",
-    "category": "K-12",
-    "publishedAt": "2026-06-03T08:29:06.515129+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/5212345/pexels-photo-5212345.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/a-child-studying-with-a-tutor-5212345/",
-      "credit": "Pexels free photo",
-      "alt": "Child studying with a tutor at a desk",
       "kind": "pexels",
       "placement": "hero"
     }
