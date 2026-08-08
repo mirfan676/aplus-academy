@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-08-08-english-language-learning-and-communication",
+    "title": "English Language Learning and Communication",
+    "description": "A concise education-news summary covering recent developments in English Language and the common themes connecting them.",
+    "topic": "English Language Learning and Communication",
+    "category": "English Language",
+    "publishedAt": "2026-08-08T04:28:18.079421+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/8423402/pexels-photo-8423402.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/students-on-a-classroom-8423402/",
+      "credit": "Pexels free photo by Pavel Danilyuk",
+      "alt": "Students practising English in a classroom discussion",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-08-07-quran-memorization-and-tajweed-education",
     "title": "Quran Memorization and Tajweed Education",
     "description": "A concise education-news summary covering recent developments in Qur'an & Tajweed and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/students-sitting-in-their-classroom-5212331/",
       "credit": "Pexels free photo by Max Fischer",
       "alt": "Students learning with a teacher in a bright classroom",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-06-09-quran-memorization-and-tajweed-education",
-    "title": "Quran Memorization and Tajweed Education",
-    "description": "A concise education-news summary covering recent developments in Qur'an & Tajweed and the common themes connecting them.",
-    "topic": "Quran Memorization and Tajweed Education",
-    "category": "Qur'an & Tajweed",
-    "publishedAt": "2026-06-09T06:58:52.719408+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/7249288/pexels-photo-7249288.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/person-pointing-to-an-open-book-7249288/",
-      "credit": "Pexels free photo",
-      "alt": "Teacher pointing to Quran text during a learning session",
       "kind": "pexels",
       "placement": "hero"
     }
