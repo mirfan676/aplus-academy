@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-08-09-ielts-and-english-proficiency-testing",
+    "title": "IELTS and English Proficiency Testing",
+    "description": "A concise education-news summary covering recent developments in IELTS and the common themes connecting them.",
+    "topic": "IELTS and English Proficiency Testing",
+    "category": "IELTS",
+    "publishedAt": "2026-08-09T04:37:08.105538+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/5940831/pexels-photo-5940831.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/person-writing-on-white-paper-5940831/",
+      "credit": "Pexels free photo",
+      "alt": "Student writing IELTS preparation notes",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-08-08-english-language-learning-and-communication",
     "title": "English Language Learning and Communication",
     "description": "A concise education-news summary covering recent developments in English Language and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/person-holding-a-pencil-3768126/",
       "credit": "Pexels free photo",
       "alt": "Learner preparing written answers for an English test",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-06-10-english-language-learning-and-communication",
-    "title": "English Language Learning and Communication",
-    "description": "A concise education-news summary covering recent developments in English Language and the common themes connecting them.",
-    "topic": "English Language Learning and Communication",
-    "category": "English Language",
-    "publishedAt": "2026-06-10T07:18:07.887204+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/5212331/pexels-photo-5212331.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/students-sitting-in-their-classroom-5212331/",
-      "credit": "Pexels free photo by Max Fischer",
-      "alt": "Students learning with a teacher in a bright classroom",
       "kind": "pexels",
       "placement": "hero"
     }
