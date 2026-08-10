@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-08-10-design-and-multimedia-education",
+    "title": "Design and Multimedia Education",
+    "description": "A concise education-news summary covering recent developments in Graphics & Multimedia and the common themes connecting them.",
+    "topic": "Design and Multimedia Education",
+    "category": "Graphics & Multimedia",
+    "publishedAt": "2026-08-10T04:54:58.369439+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/196645/pexels-photo-196645.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/person-using-computer-196645/",
+      "credit": "Pexels free photo",
+      "alt": "Designer working on a laptop for multimedia projects",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-08-09-ielts-and-english-proficiency-testing",
     "title": "IELTS and English Proficiency Testing",
     "description": "A concise education-news summary covering recent developments in IELTS and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/person-drawing-on-paper-4348404/",
       "credit": "Pexels free photo",
       "alt": "Creative design sketching for multimedia learning",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-06-11-ielts-and-english-proficiency-testing",
-    "title": "IELTS and English Proficiency Testing",
-    "description": "A concise education-news summary covering recent developments in IELTS and the common themes connecting them.",
-    "topic": "IELTS and English Proficiency Testing",
-    "category": "IELTS",
-    "publishedAt": "2026-06-11T08:16:31.793904+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/3768126/pexels-photo-3768126.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/person-holding-a-pencil-3768126/",
-      "credit": "Pexels free photo",
-      "alt": "Learner preparing written answers for an English test",
       "kind": "pexels",
       "placement": "hero"
     }
