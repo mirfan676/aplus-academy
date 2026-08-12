@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-08-12-k-12-education-curriculum-and-classroom-learning",
+    "title": "K-12 Education: Curriculum and Classroom Learning",
+    "description": "A concise education-news summary covering recent developments in K-12 and the common themes connecting them.",
+    "topic": "K-12 Education: Curriculum and Classroom Learning",
+    "category": "K-12",
+    "publishedAt": "2026-08-12T05:03:16.509358+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/5212345/pexels-photo-5212345.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/a-child-studying-with-a-tutor-5212345/",
+      "credit": "Pexels free photo",
+      "alt": "Child studying with a tutor at a desk",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-08-11-competitive-exams-and-assessment-updates",
     "title": "Competitive Exams and Assessment Updates",
     "description": "A concise education-news summary covering recent developments in Competitive Exams and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/person-writing-on-notebook-5905902/",
       "credit": "Pexels free photo",
       "alt": "Student writing exam revision notes",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-06-13-k-12-education-curriculum-and-classroom-learning",
-    "title": "K-12 Education: Curriculum and Classroom Learning",
-    "description": "A concise education-news summary covering recent developments in K-12 and the common themes connecting them.",
-    "topic": "K-12 Education: Curriculum and Classroom Learning",
-    "category": "K-12",
-    "publishedAt": "2026-06-13T07:07:02.194305+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/8422200/pexels-photo-8422200.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/children-in-a-classroom-8422200/",
-      "credit": "Pexels free photo",
-      "alt": "Children learning together in a classroom",
       "kind": "pexels",
       "placement": "hero"
     }
