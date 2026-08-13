@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-08-13-o-and-a-level-exam-preparation-updates",
+    "title": "O and A Level Exam Preparation Updates",
+    "description": "A concise education-news summary covering recent developments in O & A Level and the common themes connecting them.",
+    "topic": "O and A Level Exam Preparation Updates",
+    "category": "O & A Level",
+    "publishedAt": "2026-08-13T05:06:10.355633+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/4778621/pexels-photo-4778621.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/students-studying-together-4778621/",
+      "credit": "Pexels free photo",
+      "alt": "Students studying together for exams",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-08-12-k-12-education-curriculum-and-classroom-learning",
     "title": "K-12 Education: Curriculum and Classroom Learning",
     "description": "A concise education-news summary covering recent developments in K-12 and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/books-bookstore-book-reading-159711/",
       "credit": "Pexels free photo",
       "alt": "University books arranged for study",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-06-14-o-and-a-level-exam-preparation-updates",
-    "title": "O and A Level Exam Preparation Updates",
-    "description": "A concise education-news summary covering recent developments in O & A Level and the common themes connecting them.",
-    "topic": "O and A Level Exam Preparation Updates",
-    "category": "O & A Level",
-    "publishedAt": "2026-06-14T07:57:31.063793+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/5905902/pexels-photo-5905902.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/person-writing-on-notebook-5905902/",
-      "credit": "Pexels free photo",
-      "alt": "Student writing exam revision notes",
       "kind": "pexels",
       "placement": "hero"
     }
