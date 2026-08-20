@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-08-20-ielts-and-english-proficiency-testing",
+    "title": "IELTS and English Proficiency Testing",
+    "description": "A concise education-news summary covering recent developments in IELTS and the common themes connecting them.",
+    "topic": "IELTS and English Proficiency Testing",
+    "category": "IELTS",
+    "publishedAt": "2026-08-20T03:59:06.304276+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/3768126/pexels-photo-3768126.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/person-holding-a-pencil-3768126/",
+      "credit": "Pexels free photo",
+      "alt": "Learner preparing written answers for an English test",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-08-19-english-language-learning-and-communication",
     "title": "English Language Learning and Communication",
     "description": "A concise education-news summary covering recent developments in English Language and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/person-writing-on-notebook-4145153/",
       "credit": "Pexels free photo",
       "alt": "English language notebook for test preparation",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-06-20-competitive-exams-and-assessment-updates",
-    "title": "Competitive Exams and Assessment Updates",
-    "description": "A concise education-news summary covering recent developments in Competitive Exams and the common themes connecting them.",
-    "topic": "Competitive Exams and Assessment Updates",
-    "category": "Competitive Exams",
-    "publishedAt": "2026-06-20T07:09:09.063390+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/256417/pexels-photo-256417.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/books-on-library-shelf-256417/",
-      "credit": "Pexels free photo",
-      "alt": "Library books for competitive exam preparation",
       "kind": "pexels",
       "placement": "hero"
     }
