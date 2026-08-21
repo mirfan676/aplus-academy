@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-08-21-design-and-multimedia-education",
+    "title": "Design and Multimedia Education",
+    "description": "A concise education-news summary covering recent developments in Graphics & Multimedia and the common themes connecting them.",
+    "topic": "Design and Multimedia Education",
+    "category": "Graphics & Multimedia",
+    "publishedAt": "2026-08-21T04:02:02.229401+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/4348404/pexels-photo-4348404.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/person-drawing-on-paper-4348404/",
+      "credit": "Pexels free photo",
+      "alt": "Creative design sketching for multimedia learning",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-08-20-ielts-and-english-proficiency-testing",
     "title": "IELTS and English Proficiency Testing",
     "description": "A concise education-news summary covering recent developments in IELTS and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/woman-editing-photos-on-a-computer-6476587/",
       "credit": "Pexels free photo",
       "alt": "Designer editing visual media on a computer",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-06-21-ielts-and-english-proficiency-testing",
-    "title": "IELTS and English Proficiency Testing",
-    "description": "A concise education-news summary covering recent developments in IELTS and the common themes connecting them.",
-    "topic": "IELTS and English Proficiency Testing",
-    "category": "IELTS",
-    "publishedAt": "2026-06-21T08:10:44.778790+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/4145153/pexels-photo-4145153.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/person-writing-on-notebook-4145153/",
-      "credit": "Pexels free photo",
-      "alt": "English language notebook for test preparation",
       "kind": "pexels",
       "placement": "hero"
     }
