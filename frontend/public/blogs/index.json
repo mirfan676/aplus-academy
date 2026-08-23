@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-08-23-o-and-a-level-exam-preparation-updates",
+    "title": "O and A Level Exam Preparation Updates",
+    "description": "A concise education-news summary covering recent developments in O & A Level and the common themes connecting them.",
+    "topic": "O and A Level Exam Preparation Updates",
+    "category": "O & A Level",
+    "publishedAt": "2026-08-23T04:01:31.203039+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/5905902/pexels-photo-5905902.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/person-writing-on-notebook-5905902/",
+      "credit": "Pexels free photo",
+      "alt": "Student writing exam revision notes",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-08-22-k-12-education-curriculum-and-classroom-learning",
     "title": "K-12 Education: Curriculum and Classroom Learning",
     "description": "A concise education-news summary covering recent developments in K-12 and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/students-in-classroom-5427659/",
       "credit": "Pexels free photo",
       "alt": "Students focused during a classroom lesson",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-06-23-k-12-education-curriculum-and-classroom-learning",
-    "title": "K-12 Education: Curriculum and Classroom Learning",
-    "description": "A concise education-news summary covering recent developments in K-12 and the common themes connecting them.",
-    "topic": "K-12 Education: Curriculum and Classroom Learning",
-    "category": "K-12",
-    "publishedAt": "2026-06-23T06:59:23.514035+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/8613089/pexels-photo-8613089.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/teacher-and-students-in-classroom-8613089/",
-      "credit": "Pexels free photo",
-      "alt": "Teacher guiding students during a school lesson",
       "kind": "pexels",
       "placement": "hero"
     }
