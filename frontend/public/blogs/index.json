@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-08-25-competitive-exams-and-assessment-updates",
+    "title": "Competitive Exams and Assessment Updates",
+    "description": "A concise education-news summary covering recent developments in Competitive Exams and the common themes connecting them.",
+    "topic": "Competitive Exams and Assessment Updates",
+    "category": "Competitive Exams",
+    "publishedAt": "2026-08-25T04:00:03.511175+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/256417/pexels-photo-256417.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/books-on-library-shelf-256417/",
+      "credit": "Pexels free photo",
+      "alt": "Library books for competitive exam preparation",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-08-24-higher-education-admissions-and-student-support",
     "title": "Higher Education: Admissions and Student Support",
     "description": "A concise education-news summary covering recent developments in Bachelors / Masters and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/person-using-laptop-computer-3861958/",
       "credit": "Pexels free photo",
       "alt": "Laptop workspace for digital skills learning",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-06-25-higher-education-admissions-and-student-support",
-    "title": "Higher Education: Admissions and Student Support",
-    "description": "A concise education-news summary covering recent developments in Bachelors / Masters and the common themes connecting them.",
-    "topic": "Higher Education: Admissions and Student Support",
-    "category": "Bachelors / Masters",
-    "publishedAt": "2026-06-25T06:56:48.238317+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/8197543/pexels-photo-8197543.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/group-of-students-studying-8197543/",
-      "credit": "Pexels free photo",
-      "alt": "University students collaborating on coursework",
       "kind": "pexels",
       "placement": "hero"
     }
