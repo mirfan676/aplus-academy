@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-08-26-technology-education-and-digital-skills",
+    "title": "Technology Education and Digital Skills",
+    "description": "A concise education-news summary covering recent developments in IT & Technology and the common themes connecting them.",
+    "topic": "Technology Education and Digital Skills",
+    "category": "IT & Technology",
+    "publishedAt": "2026-08-26T04:03:33.648728+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/person-holding-pen-near-laptop-computer-3861969/",
+      "credit": "Pexels free photo",
+      "alt": "Technology learner working beside a laptop",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-08-25-competitive-exams-and-assessment-updates",
     "title": "Competitive Exams and Assessment Updates",
     "description": "A concise education-news summary covering recent developments in Competitive Exams and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/person-using-macbook-pro-574071/",
       "credit": "Pexels free photo",
       "alt": "Developer working on a laptop for coding practice",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-06-26-technology-education-and-digital-skills",
-    "title": "Technology Education and Digital Skills",
-    "description": "A concise education-news summary covering recent developments in IT & Technology and the common themes connecting them.",
-    "topic": "Technology Education and Digital Skills",
-    "category": "IT & Technology",
-    "publishedAt": "2026-06-26T07:03:33.873908+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/3861958/pexels-photo-3861958.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/person-using-laptop-computer-3861958/",
-      "credit": "Pexels free photo",
-      "alt": "Laptop workspace for digital skills learning",
       "kind": "pexels",
       "placement": "hero"
     }
