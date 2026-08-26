@@ -1,0 +1,32 @@
+name: Notify IndexNow
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/indexnow.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  notify-search-engines:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wait for the Vercel deployment
+        run: |
+          for attempt in {1..20}; do
+            if curl --fail --silent --show-error "https://www.aplusacademy.pk/2047ac3b-1da6-4604-afd7-1726eecdbc3d.txt" | grep -qx "2047ac3b-1da6-4604-afd7-1726eecdbc3d"; then
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "The deployed IndexNow ownership key was not available in time."
+          exit 1
+
+      - name: Submit the live sitemap to IndexNow
+        run: node frontend/scripts/submit-indexnow.mjs
