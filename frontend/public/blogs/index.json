@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-08-28-quran-memorization-and-tajweed-education",
+    "title": "Quran Memorization and Tajweed Education",
+    "description": "A concise education-news summary covering recent developments in Qur'an & Tajweed and the common themes connecting them.",
+    "topic": "Quran Memorization and Tajweed Education",
+    "category": "Qur'an & Tajweed",
+    "publishedAt": "2026-08-28T15:24:00.584731+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/8522578/pexels-photo-8522578.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/close-up-shot-of-a-book-8522578/",
+      "credit": "Pexels free photo",
+      "alt": "Open Quran pages for tajweed and hifz revision",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-08-27-programming-education-and-coding-skills",
     "title": "Programming Education and Coding Skills",
     "description": "A concise education-news summary covering recent developments in Programming and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/students-in-the-classroom-5676741/",
       "credit": "Pexels free photo",
       "alt": "University students collaborating during class",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-06-28-quran-memorization-and-tajweed-education",
-    "title": "Quran Memorization and Tajweed Education",
-    "description": "A concise education-news summary covering recent developments in Qur'an & Tajweed and the common themes connecting them.",
-    "topic": "Quran Memorization and Tajweed Education",
-    "category": "Qur'an & Tajweed",
-    "publishedAt": "2026-06-28T07:10:46.143823+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/15694717/pexels-photo-15694717.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/quran-book-on-windowsill-15694717/",
-      "credit": "Pexels free photo",
-      "alt": "Quran book near a window for daily recitation",
       "kind": "pexels",
       "placement": "hero"
     }
