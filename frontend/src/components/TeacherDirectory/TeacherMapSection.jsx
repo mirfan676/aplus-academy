@@ -1,6 +1,6 @@
 // TeacherMapSection.jsx
 import React, { Suspense } from "react";
-import { Box, CircularProgress } from "@mui/material";
+import { Box, Button, CircularProgress } from "@mui/material";
 
 const LazyMap = React.lazy(() => import("./LazyMapSection"));
 
@@ -43,20 +43,24 @@ export default function TeacherMapSection({
         </Suspense>
       ) : (
         <Box
-          onMouseEnter={() => setMapVisible(true)}
           sx={{
             height: "100%",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            cursor: "pointer",
             background: "#e8f2ff",
             color: "#004aad",
             fontWeight: 600,
             fontSize: "1.05rem",
           }}
         >
-          Hover to load map 🗺️
+          <Button
+            variant="contained"
+            onClick={() => setMapVisible(true)}
+            sx={{ fontWeight: 700 }}
+          >
+            View tutor map
+          </Button>
         </Box>
       )}
     </Box>

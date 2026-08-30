@@ -71,32 +71,20 @@ export const normalizeTeacher = (teacher, index = 0, collectionName = "teachers"
 };
 
 const fetchTeachersFromCollection = async (collectionName) => {
-  const snapshots = [];
   const baseCollection = collection(db, collectionName);
-  const approvedQueries = [
-    query(baseCollection, where("verified", "==", true), limit(300)),
-    query(baseCollection, where("Verified", "==", "Yes"), limit(300)),
-    query(baseCollection, where("status", "==", "approved"), limit(300)),
-  ];
+  // Public Firestore rules allow only profiles explicitly marked as verified.
+  // Keeping this query aligned with those rules avoids rejected requests on every page visit.
+  const snapshot = await getDocs(
+    query(baseCollection, where("verified", "==", true), limit(300))
+  );
 
-  for (const approvedQuery of approvedQueries) {
-    try {
-      const snapshot = await getDocs(approvedQuery);
-      if (!snapshot.empty) snapshots.push(snapshot);
-    } catch {
-      // A legacy field may not exist. Continue with the remaining approved-only query shapes.
-    }
-  }
-
-  const teachersById = new Map();
-  snapshots.forEach((snapshot) => {
-    snapshot.docs.forEach((docSnapshot, index) => {
-      const data = { id: docSnapshot.id, ...docSnapshot.data() };
-      teachersById.set(docSnapshot.id, normalizeTeacher(data, index, collectionName));
-    });
-  });
-
-  return [...teachersById.values()];
+  return snapshot.docs.map((docSnapshot, index) =>
+    normalizeTeacher(
+      { id: docSnapshot.id, ...docSnapshot.data() },
+      index,
+      collectionName
+    )
+  );
 };
 
 export const fetchTeachersFromFirestore = async () => {

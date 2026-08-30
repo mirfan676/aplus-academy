@@ -11,32 +11,8 @@ import { useSearchParams } from "react-router-dom";
 import TeacherFilters from "./TeacherFilters";
 import TeacherList from "./TeacherList";
 import TeacherMapSection from "./TeacherMapSection";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
 import useSEO from "../../hooks/useSEO";
 import { fetchTeachersFromFirestore, hasTeacherDataConfig } from "../../services/teacherData";
-
-// ------------------------------------------------------
-// FIX LEAFLET ICON ISSUE
-// ------------------------------------------------------
-delete L.Icon.Default.prototype._getIconUrl;
-
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-  iconUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-  shadowUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-});
-
-// Custom tutor icon
-const personIcon = new L.Icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/512/1946/1946429.png",
-  iconSize: [40, 40],
-  iconAnchor: [20, 40],
-  popupAnchor: [0, -40],
-});
 
 // ------------------------------------------------------
 // FILTER FUNCTION (city + subject + search + distance)
@@ -148,7 +124,7 @@ export default function TeacherDirectory() {
       setError("");
 
       if (!hasTeacherDataConfig) {
-        setError("Firebase is not configured yet, so teachers cannot load directly from Firestore.");
+        setError("Tutor profiles are temporarily unavailable. Please try again shortly.");
         setLoading(false);
         return;
       }
@@ -157,11 +133,11 @@ export default function TeacherDirectory() {
         const firestoreTeachers = await fetchTeachersFromFirestore();
         setTeachers(firestoreTeachers);
         if (!firestoreTeachers.length) {
-          setError("No teacher records were found in Firestore. Add or sync teachers to the teachers/tutors collection.");
+          setError("No tutor profiles are available yet. Please adjust your filters or check again soon.");
         }
       } catch (err) {
         console.error(err);
-        setError("Unable to fetch teacher data from Firebase Firestore.");
+        setError("Tutor profiles could not be loaded right now. Please refresh the page or try again shortly.");
       } finally {
         setLoading(false);
       }
@@ -243,7 +219,6 @@ export default function TeacherDirectory() {
           setMapVisible={setMapVisible}
           filtered={filtered}
           userLocation={userLocation}
-          personIcon={personIcon}
         />
 
         {/* FILTERS */}
