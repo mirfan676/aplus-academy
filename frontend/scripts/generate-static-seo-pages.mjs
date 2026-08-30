@@ -64,10 +64,10 @@ const baseLinks = [
 const basePages = [
   {
     slug: "",
-    title: "A Plus Home Tutors - Home and Online Tuition in Pakistan",
+    title: "Online Academy in Pakistan & Home Tutors | A Plus Academy",
     description:
-      "A Plus Academy helps students find verified home tutors, online tutors, Quran teachers, IELTS coaches, English tutors, and subject specialists across Pakistan.",
-    heading: "Trusted home and online tutors for Pakistani students",
+      "Online academy in Pakistan for verified home tutors, online classes, language courses, Quran teachers, O Level, A Level, IELTS, and PTE support.",
+    heading: "Online academy in Pakistan for home and online learning",
     intro:
       "A Plus Academy connects families with tutors for school subjects, O and A Level, Quran with Tajweed, IELTS, English language, programming, IT skills, competitive exams, and university support.",
     sections: [
@@ -75,6 +75,11 @@ const basePages = [
         title: "Find trusted tutors for important learning goals",
         body:
           "Students can explore tutor profiles, request home tuition, arrange online classes, apply as a tutor, read education updates, and use free study tools for vocabulary, grammar, MCQs, short questions, and revision.",
+      },
+      {
+        title: "Online learning with a practical academic plan",
+        body:
+          "Students and families can use A Plus Academy to compare learning goals, choose home or online class options, explore language courses, and build a realistic routine for school support, exams, or future skills.",
       },
     ],
   },
@@ -200,9 +205,9 @@ const basePages = [
   },
   {
     slug: "courses/languages",
-    title: "Language Courses in Pakistan | Learn Any Language from Home",
+    title: "Language Courses in Pakistan | Online Language School",
     description:
-      "Explore English, German, Chinese, Korean, Japanese, and Arabic language courses from home with guided levels, speaking practice, and structured learning paths.",
+      "Online language school in Pakistan for English, German, Chinese, Korean, Japanese, and Arabic courses with live classes and guided progression.",
     heading: "Learn any language from home",
     intro:
       "A Plus Academy offers language course guidance for English, German, Chinese, Korean, Japanese, and Arabic with beginner to advanced pathways for students and working learners.",
@@ -250,7 +255,7 @@ const basePages = [
 
 const languageCoursePages = languageCourses.map((course) => ({
   slug: `courses/languages/${course.slug}`,
-  title: `${course.name} Course in Pakistan | A Plus Academy`,
+  title: course.seoTitle || `${course.name} Course in Pakistan | A Plus Academy`,
   description: course.seoDescription,
   heading: course.heroTitle,
   intro: course.heroIntro,
@@ -268,6 +273,11 @@ const languageCoursePages = languageCourses.map((course) => ({
       title: `Learning module ${index + 1}`,
       body: module,
     })),
+    ...(course.seoContent?.paragraphs || []).map((body, index) => ({
+      title: index === 0 ? course.seoContent.heading : `Practical guidance ${index + 1}`,
+      body,
+    })),
+    ...(course.seoFaqs || []).map(([title, body]) => ({ title, body })),
   ],
   links: [
     ["/courses/languages", "Language Courses"],

@@ -11,14 +11,40 @@ import { languageCourses } from "./languageCoursesData";
 const formatPrice = (value) => `Rs. ${value.toLocaleString("en-PK")}`;
 const getFlagUrl = (flagCode) => `https://flagcdn.com/w80/${flagCode}.png`;
 
+const languageCourseFaqs = [
+  ["Which language courses can I study from home in Pakistan?", "A Plus Academy offers English, German, Chinese, Korean, Japanese, and Arabic language course pathways for beginners, students, and working learners."],
+  ["How do I choose the right language course?", "Choose according to your goal, current level, available study time, and whether you need conversation practice, school support, study-abroad preparation, or an exam-oriented route."],
+  ["Are online language classes suitable for beginners?", "Yes. Beginners can learn effectively online when classes include live interaction, teacher correction, small revision tasks, and a clear level-by-level plan."],
+  ["What do language course fees depend on?", "Fees depend on the language, class format, lesson frequency, teacher experience, level, and amount of individual support. Starting prices are shown on each course page."],
+];
+
 export default function LanguageCoursesHome() {
   useSEO({
-    title: "Language Courses in Pakistan | Learn Any Language from Home",
+    title: "Language Courses in Pakistan | Online Language School",
     description:
-      "Explore English, German, Chinese, Korean, Japanese, and Arabic language courses from home with guided levels, speaking practice, and structured learning paths.",
+      "Online language school in Pakistan for English, German, Chinese, Korean, Japanese, and Arabic courses with live classes and guided progression.",
     canonical: "https://www.aplusacademy.pk/courses/languages",
     ogUrl: "https://www.aplusacademy.pk/courses/languages",
     ogImage: "https://www.aplusacademy.pk/aplus-logo.png",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "CollectionPage",
+          name: "Language Courses in Pakistan",
+          description: "Online language school in Pakistan with structured courses in English, German, Chinese, Korean, Japanese, and Arabic.",
+          url: "https://www.aplusacademy.pk/courses/languages",
+        },
+        {
+          "@type": "FAQPage",
+          mainEntity: languageCourseFaqs.map(([question, answer]) => ({
+            "@type": "Question",
+            name: question,
+            acceptedAnswer: { "@type": "Answer", text: answer },
+          })),
+        },
+      ],
+    },
   });
 
   return (
@@ -193,6 +219,43 @@ export default function LanguageCoursesHome() {
               </Grid>
             ))}
           </Grid>
+
+          <Box component="section" sx={{ p: { xs: 3, md: 4 }, borderRadius: 1, bgcolor: "#fff", border: "1px solid #dce8f1" }}>
+            <Typography component="h2" variant="h4" fontWeight={900} sx={{ color: "#102019", mb: 2 }}>
+              Online language courses in Pakistan for real communication
+            </Typography>
+            <Stack spacing={2}>
+              <Typography component="p" sx={{ color: "#475569", lineHeight: 1.9, m: 0 }}>
+                A language school should do more than introduce a few phrases. Learners need a clear path that starts from their current level and moves toward a practical outcome: stronger communication, school support, a study route, work-related confidence, travel preparation, or a recognised examination goal. A Plus Academy offers online language courses in Pakistan so students and working learners can study from home while still receiving live guidance, correction, and a routine that fits their week.
+              </Typography>
+              <Typography component="p" sx={{ color: "#475569", lineHeight: 1.9, m: 0 }}>
+                The right course depends on the language and the reason for learning it. English learners may need speaking confidence, grammar repair, professional writing, IELTS, or PTE foundations. German learners often need a CEFR-style A1 to B2 route for future study or migration plans. Chinese learners may begin with pinyin and tones before moving toward character recognition and HSK-oriented progress. Korean, Japanese, and Arabic also require their own scripts, grammar patterns, and practical listening or conversation routines. A meaningful course respects those differences instead of using the same lesson style for every language.
+              </Typography>
+              <Typography component="p" sx={{ color: "#475569", lineHeight: 1.9, m: 0 }}>
+                Students in Lahore, Karachi, Islamabad, Faisalabad, Multan, and other Pakistani cities can join online classes without adding travel time to an already busy school, university, or work schedule. Online learning works best when the student participates actively: speaking during lessons, completing small revision tasks, keeping a record of corrections, and returning to weak areas. Teachers can use live sessions to identify pronunciation, vocabulary, grammar, writing, or comprehension problems early, then adjust the next lessons accordingly.
+              </Typography>
+              <Typography component="p" sx={{ color: "#475569", lineHeight: 1.9, m: 0 }}>
+                Before enrolling, ask about level placement, live class frequency, course duration, feedback on speaking and writing, practice material, and what progress should look like after the first month. Course fees start from the prices shown on each page, while the final plan depends on the language, learner level, class format, and amount of teacher support needed. Clear expectations are especially important for learners planning an exam, a study-abroad application, or a deadline connected to work or travel.
+              </Typography>
+              <Typography component="p" sx={{ color: "#475569", lineHeight: 1.9, m: 0 }}>
+                A good language course leaves learners with a habit they can continue after the classes finish: listening carefully, speaking without relying on memorised scripts, reading with context, writing with accuracy, and reviewing vocabulary in useful situations. Select a course, share the learner&apos;s goal and current level, and build a timetable that is realistic enough to sustain. That combination of structured teaching and regular practice is what turns an online course into usable language ability.
+              </Typography>
+            </Stack>
+          </Box>
+
+          <Box component="section" sx={{ p: { xs: 3, md: 4 }, borderRadius: 1, bgcolor: "#fff", border: "1px solid #dce8f1" }}>
+            <Typography component="h2" variant="h4" fontWeight={900} sx={{ color: "#102019", mb: 2 }}>
+              Language course questions
+            </Typography>
+            <Stack spacing={1.5}>
+              {languageCourseFaqs.map(([question, answer]) => (
+                <Box key={question} sx={{ p: 2.2, borderRadius: 1, bgcolor: "#f7fbff" }}>
+                  <Typography component="h3" fontWeight={900} sx={{ color: "#004aad", mb: 0.8 }}>{question}</Typography>
+                  <Typography sx={{ color: "#475569", lineHeight: 1.8 }}>{answer}</Typography>
+                </Box>
+              ))}
+            </Stack>
+          </Box>
 
           {languageCourses.find((course) => course.slug === "english")?.packages ? (
             <Box sx={{ p: { xs: 3, md: 4 }, borderRadius: 1, bgcolor: "#fff", border: "1px solid #dce8f1" }}>

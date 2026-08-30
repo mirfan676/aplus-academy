@@ -7,6 +7,7 @@ import LanguageCoursesShowcase from "./LanguageCoursesShowcase";
 import FAQSection from "./FAQSection";
 import FooterCTA from "./FooterCTA";
 import LatestNewsSection from "../blog/LatestNewsSection";
+import OnlineAcademyGuide from "./OnlineAcademyGuide";
 
 export default function RestoredHomeExperience() {
   return (
@@ -16,6 +17,7 @@ export default function RestoredHomeExperience() {
       <WhyChooseUs />
       <LanguageCoursesShowcase />
       <AreasWeCover />
+      <OnlineAcademyGuide />
 
       <FAQSection />
       <LatestNewsSection />

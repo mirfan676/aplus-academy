@@ -99,7 +99,8 @@ export const languageCourses = [
     heroIntro:
       "Learn German from home with a structured A1 to B2 pathway, guided speaking practice, grammar work, and exam-focused preparation.",
     seoDescription:
-      "Study German online from home with CEFR-aligned levels, speaking practice, grammar, reading, writing, and Goethe-style preparation.",
+      "German language course in Pakistan with online A1 to B2 classes, Goethe-style preparation, speaking practice, and fees from Rs. 12,000.",
+    seoTitle: "German Language Course in Pakistan | Online Classes & Fees",
     gradient: "linear-gradient(135deg, #111827, #b91c1c, #f59e0b)",
     surfaceTint: "#fff7ed",
     accentColor: "#b91c1c",
@@ -140,6 +141,22 @@ export const languageCourses = [
       "Professionals needing basic workplace or relocation communication",
       "Beginners who want a proper A1 to B2 roadmap",
     ],
+    seoContent: {
+      heading: "German language course in Pakistan: a practical A1 to B2 roadmap",
+      paragraphs: [
+        "A German language course in Pakistan should give a learner a clear route from the first greeting to confident, level-appropriate communication. Many students begin because they are considering study, work, family relocation, or a future Germany-related application. The useful first step is not rushing into difficult exam material. It is building the A1 foundation carefully: pronunciation, everyday vocabulary, articles, personal introductions, common verbs, sentence order, numbers, dates, and the language needed for routine situations. A structured online class gives learners a place to ask questions, practise aloud, and correct small errors before they become habits.",
+        "For learners asking how to learn German language in Pakistan, consistency matters more than trying to memorise large word lists in one weekend. Classes should combine a short explanation, guided examples, listening practice, speaking turns, controlled writing, and revision from previous lessons. A learner may start with simple tasks such as introducing family members, booking an appointment, describing a routine, or asking for directions. As confidence grows, A2 and B1 work can introduce longer conversations, practical reading, short emails, opinions, and more accurate grammar. This gradual progression helps learners understand what each CEFR level means in everyday use.",
+        "German language course fees in Lahore and elsewhere in Pakistan can vary according to class size, teacher experience, frequency, the learner's current level, and whether the course includes one-to-one attention. This course starts from Rs. 12,000, while a final monthly plan should be agreed after discussing the target level and schedule. Before joining, students should ask how many live sessions are included, whether feedback is provided on writing and speaking, what revision material is used, and whether the teacher can plan toward a specific A1, A2, B1, or B2 goal. Clear answers make comparing courses much easier.",
+        "Goethe-style preparation is most effective after the learner has built the language skills an exam expects. Instead of teaching only sample answers, classes should develop reading, listening, writing, and speaking together. Learners can practise short messages, comprehension tasks, formal and informal expressions, and spoken responses with teacher feedback. A good teacher explains why a sentence needs a particular word order or article, then gives the learner enough opportunities to use it naturally. That approach is more durable than memorising a script and is useful even when a learner's exam date changes.",
+        "Online German classes are a practical option for learners in Lahore, Karachi, Islamabad, Faisalabad, Multan, and other parts of Pakistan because the course can fit around school, university, or work. Learners still need a quiet place, regular attendance, a notebook or digital document for corrections, and time between classes for review. The aim is not simply to complete lessons; it is to move from recognising German to using it with clarity. Students who track their vocabulary, keep corrected writing samples, and revisit weak grammar points generally make more dependable progress from one level to the next.",
+      ],
+    },
+    seoFaqs: [
+      ["What is included in a German language course in Pakistan?", "A structured course should cover speaking, listening, reading, writing, vocabulary, grammar, revision, and level-based feedback. The exact plan depends on the learner's A1 to B2 target."],
+      ["How much does a German language course cost?", "This course starts from Rs. 12,000. The final fee depends on the class format, weekly schedule, learner level, and amount of individual teacher support required."],
+      ["Can beginners learn German online from Pakistan?", "Yes. Beginners can start online with pronunciation, basic vocabulary, sentence building, listening, and guided speaking practice, provided they follow a regular study routine."],
+      ["Does the course support Goethe exam preparation?", "The course can provide Goethe-style practice after the learner has built the required language foundation for the relevant level."],
+    ],
   },
   {
     slug: "chinese",
@@ -157,7 +174,8 @@ export const languageCourses = [
     heroIntro:
       "Start learning Chinese from home with pinyin, pronunciation, tones, practical conversation, and a gradual HSK-oriented study track.",
     seoDescription:
-      "Learn Chinese online from home with pinyin, tones, characters, speaking practice, and HSK-based progression for beginners and intermediate learners.",
+      "Chinese language course in Pakistan with online pinyin, tones, characters, speaking practice, and HSK-based progression for beginners.",
+    seoTitle: "Chinese Language Course in Pakistan | Learn Chinese Online",
     gradient: "linear-gradient(135deg, #991b1b, #f59e0b)",
     surfaceTint: "#fff7ed",
     accentColor: "#b45309",
@@ -197,6 +215,22 @@ export const languageCourses = [
       "Business-minded learners interested in China-related communication",
       "Beginners starting from zero",
       "Learners who want a guided path instead of only app-based self-study",
+    ],
+    seoContent: {
+      heading: "Chinese language course in Pakistan for practical learning and HSK progress",
+      paragraphs: [
+        "A Chinese language course in Pakistan works best when it starts with the foundations learners need before they face long vocabulary lists or complex characters. For most beginners, this means pinyin, tone awareness, sound practice, greetings, numbers, self-introduction, and basic sentence patterns. Mandarin tones can change meaning, so teacher correction early in the course is valuable. Learners do not need to become perfect on the first day, but they should learn to hear, repeat, and compare sounds with care. That confidence makes later speaking and listening practice much more comfortable.",
+        "Students searching for Chinese language classes in Pakistan often have different goals. Some are preparing for future study, some are interested in business communication, and others want a serious language skill alongside university or work. The course can begin with useful daily themes such as time, family, travel, food, shopping, directions, and classroom language. Rather than treating vocabulary as a random list, each lesson should show how words appear in short conversations, questions, and written examples. Repeated use helps learners recall the language when they need it instead of only recognising it in a book.",
+        "For a learner looking to learn Chinese in Karachi or any other Pakistani city, online classes make it possible to work with a teacher without travelling across the city. A successful remote course still needs active participation. Learners should speak during class, complete small listening exercises, write pinyin or characters by hand where helpful, and review corrections between sessions. Short, steady practice is particularly useful for tones and character familiarity. A teacher can then adapt lessons to problems that appear in real time, such as confusing similar sounds or forgetting word order.",
+        "Character learning should be gradual and meaningful. At beginner level, the priority is recognising high-frequency characters connected to the vocabulary already being used in conversation. Learners can study the components of characters, practise short words and labels, and read controlled sentences rather than trying to memorise hundreds of disconnected symbols. Pinyin remains helpful in the early stages, but the long-term aim is to reduce reliance on it step by step. This approach gives students a more realistic route to reading confidence and avoids making the writing system feel unmanageable.",
+        "An HSK-oriented pathway can help learners organise their progress, but a strong course does not reduce learning to a test. Listening, speaking, reading, writing, vocabulary, and pronunciation should support each other. Before enrolling, learners should discuss their starting point, purpose, available study time, preferred schedule, and any examination plan. This course starts from Rs. 12,500 and can be adjusted for beginner or early-intermediate needs. With regular feedback and sensible weekly goals, a Chinese course can become a practical foundation for future study, work, travel, or formal HSK preparation.",
+      ],
+    },
+    seoFaqs: [
+      ["Can I learn Chinese online from Pakistan?", "Yes. Online Chinese classes can cover pinyin, tones, vocabulary, conversation, character recognition, reading, and HSK-oriented progress with live teacher feedback."],
+      ["What should a beginner learn first in Chinese?", "A beginner should start with pinyin, tones, pronunciation, everyday vocabulary, simple sentence patterns, and guided speaking before taking on more character work."],
+      ["Does the Chinese course include HSK preparation?", "The course can follow an HSK-oriented progression and introduce suitable practice as the learner develops the required foundation."],
+      ["Who can join Chinese language classes?", "The course is suitable for beginners, students planning future study, professionals, travel learners, and people who want a structured alternative to self-study alone."],
     ],
   },
   {

@@ -4,9 +4,9 @@ import useSEO from "../hooks/useSEO";
 
 const Home = () => {
   useSEO({
-    title: "Home Tutors in Pakistan | A Plus Home Tutors",
+    title: "Online Academy in Pakistan & Home Tutors | A Plus Academy",
     description:
-      "Find verified home tutors, online tutors, female tutors, Quran tutors, IELTS tutors, and O Level or A Level tutors across Pakistan.",
+      "Online academy in Pakistan for verified home tutors, online classes, language courses, Quran teachers, O Level, A Level, IELTS, and PTE support.",
     canonical: "https://www.aplusacademy.pk/",
     ogUrl: "https://www.aplusacademy.pk/",
     structuredData: {
@@ -14,10 +14,10 @@ const Home = () => {
       "@graph": [
         {
           "@type": "WebPage",
-          name: "Home Tutors in Pakistan | A Plus Home Tutors",
+          name: "Online Academy in Pakistan & Home Tutors | A Plus Academy",
           url: "https://www.aplusacademy.pk/",
           description:
-            "Find verified home tutors, online tutors, female tutors, Quran tutors, IELTS tutors, and O Level or A Level tutors across Pakistan.",
+            "Online academy in Pakistan for verified home tutors, online classes, language courses, Quran teachers, O Level, A Level, IELTS, and PTE support.",
           isPartOf: {
             "@type": "WebSite",
             name: "A Plus Academy",
@@ -27,6 +27,11 @@ const Home = () => {
             "@type": "Thing",
             name: "Home and online tutoring in Pakistan",
           },
+        },
+        {
+          "@type": "WebSite",
+          name: "A Plus Academy",
+          url: "https://www.aplusacademy.pk/",
         },
         {
           "@type": "BreadcrumbList",

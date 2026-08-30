@@ -16,7 +16,7 @@ export default function LanguageCoursePage() {
   const course = languageCourseMap[slug];
 
   useSEO({
-    title: course ? `${course.name} Course in Pakistan | A Plus Academy` : "Language Courses | A Plus Academy",
+    title: course?.seoTitle || (course ? `${course.name} Course in Pakistan | A Plus Academy` : "Language Courses | A Plus Academy"),
     description:
       course?.seoDescription ||
       "Explore language courses from home with structured learning paths at A Plus Academy.",
@@ -27,6 +27,48 @@ export default function LanguageCoursePage() {
       ? `https://www.aplusacademy.pk/courses/languages/${course.slug}`
       : "https://www.aplusacademy.pk/courses/languages",
     ogImage: "https://www.aplusacademy.pk/aplus-logo.png",
+    structuredData: course
+      ? {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Course",
+              name: `${course.name} Course in Pakistan`,
+              description: course.seoDescription,
+              url: `https://www.aplusacademy.pk/courses/languages/${course.slug}`,
+              provider: {
+                "@type": "Organization",
+                name: "A Plus Academy",
+                url: "https://www.aplusacademy.pk/",
+              },
+              offers: {
+                "@type": "Offer",
+                price: String(course.priceFrom),
+                priceCurrency: "PKR",
+                availability: "https://schema.org/InStock",
+              },
+            },
+            {
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Home", item: "https://www.aplusacademy.pk/" },
+                { "@type": "ListItem", position: 2, name: "Language Courses", item: "https://www.aplusacademy.pk/courses/languages" },
+                { "@type": "ListItem", position: 3, name: course.name, item: `https://www.aplusacademy.pk/courses/languages/${course.slug}` },
+              ],
+            },
+            ...(course.seoFaqs?.length
+              ? [{
+                  "@type": "FAQPage",
+                  mainEntity: course.seoFaqs.map(([question, answer]) => ({
+                    "@type": "Question",
+                    name: question,
+                    acceptedAnswer: { "@type": "Answer", text: answer },
+                  })),
+                }]
+              : []),
+          ],
+        }
+      : undefined,
   });
 
   if (!course) {
@@ -312,6 +354,39 @@ export default function LanguageCoursePage() {
                   </Grid>
                 ))}
               </Grid>
+            </Box>
+          ) : null}
+
+          {course.seoContent?.paragraphs?.length ? (
+            <Box component="section" sx={{ p: { xs: 3, md: 4 }, borderRadius: 1, bgcolor: "#fff", border: `1px solid ${course.surfaceTint}` }}>
+              <Typography component="h2" variant="h4" fontWeight={900} sx={{ color: "#102019", mb: 2 }}>
+                {course.seoContent.heading}
+              </Typography>
+              <Stack spacing={2}>
+                {course.seoContent.paragraphs.map((paragraph) => (
+                  <Typography component="p" key={paragraph} sx={{ color: "#475569", lineHeight: 1.9, m: 0 }}>
+                    {paragraph}
+                  </Typography>
+                ))}
+              </Stack>
+            </Box>
+          ) : null}
+
+          {course.seoFaqs?.length ? (
+            <Box component="section" sx={{ p: { xs: 3, md: 4 }, borderRadius: 1, bgcolor: "#fff", border: `1px solid ${course.surfaceTint}` }}>
+              <Typography component="h2" variant="h4" fontWeight={900} sx={{ color: "#102019", mb: 2 }}>
+                {course.shortName} course frequently asked questions
+              </Typography>
+              <Stack spacing={1.5}>
+                {course.seoFaqs.map(([question, answer]) => (
+                  <Box key={question} sx={{ p: 2.2, borderRadius: 1, bgcolor: course.surfaceTint }}>
+                    <Typography component="h3" fontWeight={900} sx={{ color: course.accentColor, mb: 0.8 }}>
+                      {question}
+                    </Typography>
+                    <Typography sx={{ color: "#475569", lineHeight: 1.8 }}>{answer}</Typography>
+                  </Box>
+                ))}
+              </Stack>
             </Box>
           ) : null}
 
