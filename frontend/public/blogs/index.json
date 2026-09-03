@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-09-03-higher-education-admissions-and-student-support",
+    "title": "Higher Education: Admissions and Student Support",
+    "description": "A concise education-news summary covering recent developments in Bachelors / Masters and the common themes connecting them.",
+    "topic": "Higher Education: Admissions and Student Support",
+    "category": "Bachelors / Masters",
+    "publishedAt": "2026-09-03T08:04:07.980699+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/8197543/pexels-photo-8197543.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/group-of-students-studying-8197543/",
+      "credit": "Pexels free photo",
+      "alt": "University students collaborating on coursework",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-09-02-o-and-a-level-exam-preparation-updates",
     "title": "O and A Level Exam Preparation Updates",
     "description": "A concise education-news summary covering recent developments in O & A Level and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/students-using-laptop-6146978/",
       "credit": "Pexels free photo",
       "alt": "University students using a laptop for research",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-07-04-o-and-a-level-exam-preparation-updates",
-    "title": "O and A Level Exam Preparation Updates",
-    "description": "A concise education-news summary covering recent developments in O & A Level and the common themes connecting them.",
-    "topic": "O and A Level Exam Preparation Updates",
-    "category": "O & A Level",
-    "publishedAt": "2026-07-04T06:29:12.187619+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/256417/pexels-photo-256417.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/books-on-library-shelf-256417/",
-      "credit": "Pexels free photo",
-      "alt": "Books in a library for Cambridge exam preparation",
       "kind": "pexels",
       "placement": "hero"
     }
