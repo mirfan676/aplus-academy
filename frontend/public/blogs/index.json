@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-09-04-competitive-exams-and-assessment-updates",
+    "title": "Competitive Exams and Assessment Updates",
+    "description": "A concise education-news summary covering recent developments in Competitive Exams and the common themes connecting them.",
+    "topic": "Competitive Exams and Assessment Updates",
+    "category": "Competitive Exams",
+    "publishedAt": "2026-09-04T07:59:32.139782+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/256417/pexels-photo-256417.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/books-on-library-shelf-256417/",
+      "credit": "Pexels free photo",
+      "alt": "Library books for competitive exam preparation",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-09-03-higher-education-admissions-and-student-support",
     "title": "Higher Education: Admissions and Student Support",
     "description": "A concise education-news summary covering recent developments in Bachelors / Masters and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/people-sitting-down-near-table-with-assorted-laptop-computers-3184465/",
       "credit": "Pexels free photo",
       "alt": "Students collaborating with laptops in a training session",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-07-05-higher-education-admissions-and-student-support",
-    "title": "Higher Education: Admissions and Student Support",
-    "description": "A concise education-news summary covering recent developments in Bachelors / Masters and the common themes connecting them.",
-    "topic": "Higher Education: Admissions and Student Support",
-    "category": "Bachelors / Masters",
-    "publishedAt": "2026-07-05T06:50:35.284972+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/6146978/pexels-photo-6146978.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/students-using-laptop-6146978/",
-      "credit": "Pexels free photo",
-      "alt": "University students using a laptop for research",
       "kind": "pexels",
       "placement": "hero"
     }
