@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-09-05-technology-education-and-digital-skills",
+    "title": "Technology Education and Digital Skills",
+    "description": "A concise education-news summary covering recent developments in IT & Technology and the common themes connecting them.",
+    "topic": "Technology Education and Digital Skills",
+    "category": "IT & Technology",
+    "publishedAt": "2026-09-05T07:41:17.788273+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/3861958/pexels-photo-3861958.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/person-using-laptop-computer-3861958/",
+      "credit": "Pexels free photo",
+      "alt": "Laptop workspace for digital skills learning",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-09-04-competitive-exams-and-assessment-updates",
     "title": "Competitive Exams and Assessment Updates",
     "description": "A concise education-news summary covering recent developments in Competitive Exams and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/coding-script-270348/",
       "credit": "Pexels free photo",
       "alt": "Code editor for programming lessons",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-07-06-technology-education-and-digital-skills",
-    "title": "Technology Education and Digital Skills",
-    "description": "A concise education-news summary covering recent developments in IT & Technology and the common themes connecting them.",
-    "topic": "Technology Education and Digital Skills",
-    "category": "IT & Technology",
-    "publishedAt": "2026-07-06T07:55:21.870893+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/people-sitting-down-near-table-with-assorted-laptop-computers-3184465/",
-      "credit": "Pexels free photo",
-      "alt": "Students collaborating with laptops in a training session",
       "kind": "pexels",
       "placement": "hero"
     }
