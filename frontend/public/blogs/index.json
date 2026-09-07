@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-09-07-quran-memorization-and-tajweed-education",
+    "title": "Quran Memorization and Tajweed Education",
+    "description": "A concise education-news summary covering recent developments in Qur'an & Tajweed and the common themes connecting them.",
+    "topic": "Quran Memorization and Tajweed Education",
+    "category": "Qur'an & Tajweed",
+    "publishedAt": "2026-09-07T08:19:46.879239+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/15694717/pexels-photo-15694717.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/quran-book-on-windowsill-15694717/",
+      "credit": "Pexels free photo",
+      "alt": "Quran book near a window for daily recitation",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-09-06-programming-education-and-coding-skills",
     "title": "Programming Education and Coding Skills",
     "description": "A concise education-news summary covering recent developments in Programming and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/students-on-a-classroom-8423402/",
       "credit": "Pexels free photo by Pavel Danilyuk",
       "alt": "Students practising English in a classroom discussion",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-07-08-quran-memorization-and-tajweed-education",
-    "title": "Quran Memorization and Tajweed Education",
-    "description": "A concise education-news summary covering recent developments in Qur'an & Tajweed and the common themes connecting them.",
-    "topic": "Quran Memorization and Tajweed Education",
-    "category": "Qur'an & Tajweed",
-    "publishedAt": "2026-07-08T06:07:24.449775+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/8164397/pexels-photo-8164397.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/a-quran-book-on-the-stand-8164397/",
-      "credit": "Pexels free photo",
-      "alt": "Quran placed on a wooden stand for recitation practice",
       "kind": "pexels",
       "placement": "hero"
     }
