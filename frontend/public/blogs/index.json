@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-09-11-k-12-education-curriculum-and-classroom-learning",
+    "title": "K-12 Education: Curriculum and Classroom Learning",
+    "description": "A concise education-news summary covering recent developments in K-12 and the common themes connecting them.",
+    "topic": "K-12 Education: Curriculum and Classroom Learning",
+    "category": "K-12",
+    "publishedAt": "2026-09-11T08:04:29.243206+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/5427671/pexels-photo-5427671.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/kids-sitting-at-the-table-5427671/",
+      "credit": "Pexels free photo",
+      "alt": "Young learners working on classroom activities",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-09-10-design-and-multimedia-education",
     "title": "Design and Multimedia Education",
     "description": "A concise education-news summary covering recent developments in Graphics & Multimedia and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/a-child-studying-with-a-tutor-5212345/",
       "credit": "Pexels free photo",
       "alt": "Child studying with a tutor at a desk",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-07-12-design-and-multimedia-education",
-    "title": "Design and Multimedia Education",
-    "description": "A concise education-news summary covering recent developments in Graphics & Multimedia and the common themes connecting them.",
-    "topic": "Design and Multimedia Education",
-    "category": "Graphics & Multimedia",
-    "publishedAt": "2026-07-12T06:13:16.168111+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/196645/pexels-photo-196645.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/person-using-computer-196645/",
-      "credit": "Pexels free photo",
-      "alt": "Designer working on a laptop for multimedia projects",
       "kind": "pexels",
       "placement": "hero"
     }
