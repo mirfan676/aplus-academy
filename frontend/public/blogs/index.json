@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-10-16-programming-education-and-coding-skills",
+    "title": "Programming Education and Coding Skills",
+    "description": "A concise education-news summary covering recent developments in Programming and the common themes connecting them.",
+    "topic": "Programming Education and Coding Skills",
+    "category": "Programming",
+    "publishedAt": "2026-10-16T08:12:09.146006+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/turned-on-monitor-screen-1181675/",
+      "credit": "Pexels free photo",
+      "alt": "Programming code displayed on a computer screen",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-10-15-technology-education-and-digital-skills",
     "title": "Technology Education and Digital Skills",
     "description": "A concise education-news summary covering recent developments in IT & Technology and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/turned-on-monitor-screen-1181675/",
       "credit": "Pexels free photo",
       "alt": "Programming code displayed on a computer screen",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-08-15-technology-education-and-digital-skills",
-    "title": "Technology Education and Digital Skills",
-    "description": "A concise education-news summary covering recent developments in IT & Technology and the common themes connecting them.",
-    "topic": "Technology Education and Digital Skills",
-    "category": "IT & Technology",
-    "publishedAt": "2026-08-15T03:54:48.853485+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/1181354/pexels-photo-1181354.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/person-using-macbook-pro-1181354/",
-      "credit": "Pexels free photo",
-      "alt": "Student using a laptop for technology learning",
       "kind": "pexels",
       "placement": "hero"
     }
