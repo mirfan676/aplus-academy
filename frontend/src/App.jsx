@@ -37,6 +37,8 @@ import PteEssayAdmin from "./pages/admin/PteEssayAdmin";
 import FirestoreMigrationAdmin from "./pages/admin/FirestoreMigrationAdmin";
 import ContentManager from "./pages/admin/ContentManager";
 import BlogAdmin from "./pages/admin/BlogAdmin";
+import TestCenter from "./pages/test-center/TestCenter";
+import TestResultsAdmin from "./pages/admin/TestResultsAdmin";
 import { AuthProvider } from "./contexts/AuthContext";
 import theme from "./theme";
 import Header from "./components/Header";
@@ -101,7 +103,7 @@ function ScrollManager() {
 function AppShell() {
   const location = useLocation();
   const isAdminPage = location.pathname.startsWith("/admin");
-  const isPrivatePage = isAdminPage || location.pathname.startsWith("/account");
+  const isPrivatePage = isAdminPage || location.pathname.startsWith("/account") || location.pathname.toLowerCase().startsWith("/testcenter") || location.pathname.toLowerCase().startsWith("/test-center");
 
   useEffect(() => {
     let robotsTag = document.querySelector("meta[name='robots']");
@@ -194,6 +196,8 @@ function AppShell() {
         <Route path="/learning-tools/improve-english-grammar" element={<ImproveEnglishGrammar />} />
         <Route path="/learning-tools/text-to-mcqs-short-questions" element={<TextToStudyQuestions />} />
         <Route path="/learning-tools/pte-essay-practice" element={<RouteRedirect to="/pte/write-essay" />} />
+        <Route path="/TestCenter" element={<TestCenter />} />
+        <Route path="/test-center" element={<RouteRedirect to="/TestCenter" />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/account" element={<AccountDashboard />} />
         <Route
@@ -225,6 +229,14 @@ function AppShell() {
           element={
             <AdminRoute>
               <PteEssayAdmin />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/test-results"
+          element={
+            <AdminRoute>
+              <TestResultsAdmin />
             </AdminRoute>
           }
         />

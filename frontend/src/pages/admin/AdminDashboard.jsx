@@ -20,6 +20,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import RateReviewIcon from "@mui/icons-material/RateReview";
 import CloudSyncIcon from "@mui/icons-material/CloudSync";
 import EditNoteIcon from "@mui/icons-material/EditNote";
+import FactCheckIcon from "@mui/icons-material/FactCheck";
 import { Link as RouterLink } from "react-router-dom";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import L from "leaflet";
@@ -42,6 +43,7 @@ const statCards = [
   { key: "users", label: "Google users", icon: PeopleAltIcon, color: "#004aad" },
   { key: "blogs", label: "Blog posts", icon: ArticleIcon, color: "#7c3aed" },
   { key: "locations", label: "Tracked locations", icon: TravelExploreIcon, color: "#ea580c" },
+  { key: "testResults", label: "Test results", icon: FactCheckIcon, color: "#087f8c" },
 ];
 
 const normalizeTutor = (tutor, index) => ({
@@ -57,7 +59,7 @@ const AdminDashboard = () => {
   const { logout, user } = useAuth();
   const [tutors, setTutors] = useState([]);
   const [blogs, setBlogs] = useState([]);
-  const [counts, setCounts] = useState({ users: 0, tutorSubmissions: 0 });
+  const [counts, setCounts] = useState({ users: 0, tutorSubmissions: 0, testResults: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -76,13 +78,15 @@ const AdminDashboard = () => {
         setBlogs(Array.isArray(blogRes) ? blogRes : []);
 
         if (db) {
-          const [usersCount, tutorSubmissionsCount] = await Promise.all([
+          const [usersCount, tutorSubmissionsCount, testResultsCount] = await Promise.all([
             getCountFromServer(collection(db, "users")),
             getCountFromServer(collection(db, "tutorSubmissions")).catch(() => null),
+            getCountFromServer(collection(db, "testResults")).catch(() => null),
           ]);
           setCounts({
             users: usersCount.data().count,
             tutorSubmissions: tutorSubmissionsCount?.data().count || 0,
+            testResults: testResultsCount?.data().count || 0,
           });
         }
       } catch (err) {
@@ -108,6 +112,7 @@ const AdminDashboard = () => {
     users: counts.users,
     blogs: blogs.length,
     locations: cityCounts.length,
+    testResults: counts.testResults,
   };
 
   return (
@@ -155,6 +160,9 @@ const AdminDashboard = () => {
           <Button component={RouterLink} to="/admin/firestore" variant="outlined" startIcon={<CloudSyncIcon />} sx={{ fontWeight: 900 }}>
             Firestore data
           </Button>
+          <Button component={RouterLink} to="/admin/test-results" variant="outlined" startIcon={<FactCheckIcon />} sx={{ fontWeight: 900 }}>
+            Test results
+          </Button>
           <Button component={RouterLink} to="/admin/pte-essays" variant="contained" startIcon={<RateReviewIcon />} sx={{ fontWeight: 900 }}>
             Manage PTE essays
           </Button>
@@ -163,7 +171,7 @@ const AdminDashboard = () => {
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" },
+            gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(5, 1fr)" },
             gap: 2.5,
             mb: 3,
           }}
