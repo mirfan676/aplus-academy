@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Alert, Box, Button, Checkbox, Chip, CircularProgress, Container, FormControlLabel, LinearProgress, Paper, Radio, Stack, TextField, Typography } from "@mui/material";
 import { addDoc, collection, doc, getDoc, serverTimestamp } from "firebase/firestore";
-import { Navigate } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import { db } from "../../firebase";
 import { useAuth } from "../../contexts/useAuth";
 
@@ -55,6 +55,8 @@ const createAttempt = () => shuffle(questionBank).map((question) => {
 
 export default function TestCenter() {
   const { user, loading: authLoading } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [comingSoon, setComingSoon] = useState("");
   const [studentName, setStudentName] = useState("");
   const [studentId, setStudentId] = useState("");
   const [studentIdLoading, setStudentIdLoading] = useState(false);
@@ -217,11 +219,43 @@ export default function TestCenter() {
   if (authLoading) return <Box sx={{ minHeight: "70vh", display: "grid", placeItems: "center" }}><CircularProgress /></Box>;
   if (!user) return <Navigate to="/student/login?returnTo=%2FTestCenter" replace />;
 
+  if (searchParams.get("test") !== "cyber-security-with-ai") {
+    const tests = [
+      { title: "Python Development", description: "Python programming, problem-solving and application development.", available: false, color: "#306998" },
+      { title: "Front End Development", description: "HTML, CSS, JavaScript and modern responsive web interfaces.", available: false, color: "#e44d26" },
+      { title: "Cyber Security With AI", description: "Authorization, risk, security controls, web security and ethical password auditing.", available: true, color: "#087f8c" },
+      { title: "Digital Marketing With AI", description: "Digital campaigns, content, analytics and responsible AI-assisted marketing.", available: false, color: "#7b2cbf" },
+    ];
+    return (
+      <Box sx={{ minHeight: "100vh", bgcolor: "#f7f4ed", py: 5 }}>
+        <Container maxWidth="lg">
+          <Paper sx={{ p: { xs: 3, md: 6 }, bgcolor: "#13233f", color: "white", borderTop: "8px solid #f39c4a", borderRadius: 3 }}>
+            <Typography fontWeight={900} color="#f39c4a">A PLUS ACADEMY</Typography>
+            <Typography component="h1" variant="h2" fontWeight={900} sx={{ mt: 1 }}>Test Center</Typography>
+            <Typography sx={{ mt: 2, color: "#dce6ef", fontSize: 19 }}>Choose your course assessment. Signed in as {user.email}</Typography>
+          </Paper>
+          {comingSoon && <Alert severity="info" sx={{ mt: 3, py: 1.5 }} onClose={() => setComingSoon("")}><b>{comingSoon}</b> is coming soon. A better and more complete assessment version is being prepared.</Alert>}
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)" }, gap: 3, mt: 3 }}>
+            {tests.map((test) => (
+              <Paper key={test.title} sx={{ p: 3.5, borderRadius: 3, borderTop: `7px solid ${test.color}`, display: "flex", flexDirection: "column", minHeight: 245 }}>
+                <Chip label={test.available ? "AVAILABLE NOW" : "COMING SOON"} color={test.available ? "success" : "default"} sx={{ alignSelf: "flex-start", fontWeight: 900 }} />
+                <Typography variant="h4" fontWeight={900} sx={{ mt: 2 }}>{test.title}</Typography>
+                <Typography color="text.secondary" sx={{ mt: 1.5, mb: 3, lineHeight: 1.7 }}>{test.description}</Typography>
+                <Button variant={test.available ? "contained" : "outlined"} sx={{ mt: "auto", alignSelf: "flex-start", fontWeight: 900, bgcolor: test.available ? test.color : undefined }} onClick={() => test.available ? setSearchParams({ test: "cyber-security-with-ai" }) : setComingSoon(test.title)}>{test.available ? "Open assessment" : "View availability"}</Button>
+              </Paper>
+            ))}
+          </Box>
+        </Container>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#f7f4ed", py: 5, userSelect: started ? "none" : "auto" }}>
       {started && !result && <Box sx={{ pointerEvents: "none", position: "fixed", inset: 0, zIndex: 30, display: "grid", placeItems: "center", transform: "rotate(-24deg)", color: "rgba(19,35,63,.06)", fontSize: { xs: 22, md: 42 }, fontWeight: 900, letterSpacing: ".1em" }}>{studentName} · {studentId}</Box>}
       <Container maxWidth="lg">
         {!started && !result && <>
+          <Button onClick={() => setSearchParams({})} sx={{ mb: 2, fontWeight: 800 }}>← Back to all tests</Button>
           <Paper sx={{ p: { xs: 3, md: 6 }, bgcolor: "#13233f", color: "white", borderTop: "8px solid #f39c4a", borderRadius: 3 }}>
             <Typography fontWeight={900} color="#f39c4a">DATA & CYBER SECURITY WITH AI</Typography>
             <Typography component="h1" variant="h2" fontWeight={900} sx={{ mt: 1 }}>Course Assessment</Typography>
