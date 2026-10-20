@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Alert, Box, Button, Checkbox, Chip, CircularProgress, Container, FormControlLabel, LinearProgress, Paper, Radio, Stack, TextField, Typography } from "@mui/material";
 import { addDoc, collection, doc, getDoc, serverTimestamp } from "firebase/firestore";
+import { Navigate } from "react-router-dom";
 import { db } from "../../firebase";
 import { useAuth } from "../../contexts/useAuth";
 
@@ -53,7 +54,7 @@ const createAttempt = () => shuffle(questionBank).map((question) => {
 });
 
 export default function TestCenter() {
-  const { user, loading: authLoading, signInWithGoogle } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [studentName, setStudentName] = useState("");
   const [studentId, setStudentId] = useState("");
   const [studentIdLoading, setStudentIdLoading] = useState(false);
@@ -214,6 +215,7 @@ export default function TestCenter() {
   const topicSummary = useMemo(() => result ? Object.entries(result.topicScores) : [], [result]);
 
   if (authLoading) return <Box sx={{ minHeight: "70vh", display: "grid", placeItems: "center" }}><CircularProgress /></Box>;
+  if (!user) return <Navigate to="/student/login?returnTo=%2FTestCenter" replace />;
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#f7f4ed", py: 5, userSelect: started ? "none" : "auto" }}>
@@ -227,17 +229,17 @@ export default function TestCenter() {
           </Paper>
           <Paper sx={{ mt: 3, p: { xs: 3, md: 4 }, borderRadius: 3 }}>
             {error && <Alert severity="warning" sx={{ mb: 2 }}>{error}</Alert>}
-            {!user ? <Alert severity="info" action={<Button color="inherit" onClick={signInWithGoogle}>Sign in</Button>}>Google sign-in is required so the academy can securely record your result.</Alert> : <Alert severity="success">Signed in as {user.email}</Alert>}
+            <Alert severity="success">Signed in as {user.email}</Alert>
             <Stack direction={{ xs: "column", md: "row" }} spacing={2} sx={{ mt: 3 }}>
               <TextField fullWidth label="Student full name" value={studentName} onChange={(event) => setStudentName(event.target.value)} inputProps={{ maxLength: 60 }} />
               <TextField fullWidth label="Assigned Student ID" value={studentIdLoading ? "Checking..." : studentId || "Not assigned"} InputProps={{ readOnly: true }} helperText="Only an academy administrator can assign or change this ID." />
             </Stack>
-            {user && !studentIdLoading && !studentId && <Alert severity="warning" sx={{ mt: 2 }}>No Student ID is linked to {user.email}. Ask the administrator to assign an available ID such as cc125.</Alert>}
+            {!studentIdLoading && !studentId && <Alert severity="warning" sx={{ mt: 2 }} action={<Button color="inherit" href="https://wa.me/923197659491?text=Hello%20A%20Plus%20Academy%2C%20I%20need%20a%20Student%20ID%20for%20the%20Cyber%20Security%20Test%20or%20I%20want%20to%20register%20for%20the%20course." target="_blank" rel="noopener noreferrer">WhatsApp</Button>}>No Test ID is assigned to {user.email}. Contact the administrator at <b>+92 319 7659491</b> for Test ID generation or course registration.</Alert>}
             <Alert severity="info" sx={{ mt: 3 }}>28 randomized questions · 45 minutes · 70% pass mark · automatic result submission</Alert>
             <Typography variant="h5" fontWeight={900} sx={{ mt: 3 }}>Assessment rules</Typography>
             <Box component="ol" sx={{ lineHeight: 1.8 }}><li>Use only this assessment page.</li><li>Copying, printing, right-click and common capture shortcuts are blocked.</li><li>Leaving fullscreen or switching away records an incident.</li><li>A browser cannot block every operating-system recorder or an external camera.</li><li>The assessment submits automatically when time expires.</li></Box>
             <FormControlLabel control={<Checkbox checked={agreed} onChange={(event) => setAgreed(event.target.checked)} />} label="I understand the rules and will complete the test independently." />
-            <Box><Button variant="contained" size="large" onClick={startTest} sx={{ mt: 2, fontWeight: 900, bgcolor: "#087f8c" }}>Start test in fullscreen</Button></Box>
+            <Box><Button variant="contained" size="large" disabled={!studentId || studentIdLoading} onClick={startTest} sx={{ mt: 2, fontWeight: 900, bgcolor: "#087f8c" }}>Start test in fullscreen</Button></Box>
           </Paper>
         </>}
 

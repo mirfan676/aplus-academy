@@ -30,6 +30,7 @@ import FamilyStudentRegistration from "./pages/register/FamilyStudentRegistratio
 import LanguageCoursesHome from "./pages/courses/LanguageCoursesHome";
 import LanguageCoursePage from "./pages/courses/LanguageCoursePage";
 import AccountDashboard from "./pages/account/AccountDashboard";
+import StudentLogin from "./pages/account/StudentLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminRoute from "./pages/admin/AdminRoute";
@@ -198,6 +199,7 @@ function AppShell() {
         <Route path="/learning-tools/pte-essay-practice" element={<RouteRedirect to="/pte/write-essay" />} />
         <Route path="/TestCenter" element={<TestCenter />} />
         <Route path="/test-center" element={<RouteRedirect to="/TestCenter" />} />
+        <Route path="/student/login" element={<StudentLogin />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/account" element={<AccountDashboard />} />
         <Route
