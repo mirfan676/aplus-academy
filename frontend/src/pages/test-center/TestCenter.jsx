@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Alert, Box, Button, Checkbox, Chip, CircularProgress, Container, FormControlLabel, LinearProgress, Paper, Radio, Stack, TextField, Typography } from "@mui/material";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { db } from "../../firebase";
@@ -335,11 +336,11 @@ export default function TestCenter() {
               <TextField fullWidth label="Student full name" value={studentName} onChange={(event) => setStudentName(event.target.value)} inputProps={{ maxLength: 60 }} />
               <TextField fullWidth label="Assigned Student ID" value={studentIdLoading ? "Checking..." : studentId || "Not assigned"} InputProps={{ readOnly: true }} helperText="Only an academy administrator can assign or change this ID." />
             </Stack>
-            {!studentIdLoading && !studentId && <Alert severity="warning" sx={{ mt: 2 }} action={<Button color="inherit" href="https://wa.me/923197659491?text=Hello%20A%20Plus%20Academy%2C%20I%20need%20a%20Student%20ID%20for%20the%20Cyber%20Security%20Test%20or%20I%20want%20to%20register%20for%20the%20course." target="_blank" rel="noopener noreferrer">WhatsApp</Button>}>No Test ID is assigned to {user.email}. Contact the administrator at <b>+92 319 7659491</b> for Test ID generation or course registration.</Alert>}
+            {!studentIdLoading && !studentId && <Alert severity="warning" sx={{ mt: 2 }} action={<Button color="inherit" startIcon={<WhatsAppIcon />} href="https://wa.me/923066762289?text=Hello%20A%20Plus%20Academy%2C%20I%20need%20a%20Student%20ID%20for%20the%20Cyber%20Security%20Test%20or%20I%20want%20to%20register%20for%20the%20course." target="_blank" rel="noopener noreferrer">WhatsApp</Button>}>No Test ID is assigned to {user.email}. Contact the administrator at <b>+92 306 6762289</b> for Test ID generation or course registration.</Alert>}
             {!attemptLoading && attemptedToday && <Alert severity="info" sx={{ mt: 2 }}>Today’s assessment attempt has already been used. One attempt is available per Student ID each day.</Alert>}
             <Alert severity="info" sx={{ mt: 3 }}>28 randomized questions · 45 minutes · 70% pass mark · automatic result submission</Alert>
             <Typography variant="h5" fontWeight={900} sx={{ mt: 3 }}>Assessment rules</Typography>
-            <Box component="ol" sx={{ lineHeight: 1.8 }}><li>Use only this assessment page.</li><li>Copying, printing, right-click and common capture shortcuts are blocked.</li><li>Assessment activity and page focus are monitored for test integrity.</li><li>A browser cannot block every operating-system recorder or an external camera.</li><li>The assessment submits automatically when time expires or after one minute without activity.</li><li>Each Student ID may complete one attempt per day.</li></Box>
+            <Box component="ol" sx={{ lineHeight: 1.8 }}><li>Use only this assessment page.</li><li>Copying, printing, right-click and common capture shortcuts are blocked.</li><li>Assessment activity and page focus are monitored for test integrity.</li><li>Complete the assessment independently in a quiet and distraction-free environment.</li><li>The assessment submits automatically when time expires or after one minute without activity.</li><li>Each Student ID may complete one attempt per day.</li></Box>
             <FormControlLabel control={<Checkbox checked={agreed} onChange={(event) => setAgreed(event.target.checked)} />} label="I understand the rules and will complete the test independently." />
             <Box><Button variant="contained" size="large" disabled={!studentId || studentIdLoading || attemptLoading || attemptedToday} onClick={startTest} sx={{ mt: 2, fontWeight: 900, bgcolor: "#087f8c" }}>Start test in fullscreen</Button></Box>
           </Paper>
