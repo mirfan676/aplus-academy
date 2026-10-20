@@ -158,6 +158,10 @@ service cloud.firestore {
     match /testResults/{resultId} {
       allow create: if signedIn()
         && request.resource.data.userId == request.auth.uid
+        && request.auth.token.email is string
+        && request.resource.data.userEmail == request.auth.token.email
+        && exists(/databases/$(database)/documents/studentEmailIds/$(request.auth.token.email))
+        && get(/databases/$(database)/documents/studentEmailIds/$(request.auth.token.email)).data.studentId == request.resource.data.studentId
         && request.resource.data.studentName is string
         && request.resource.data.studentName.size() >= 2
         && request.resource.data.studentName.size() <= 60
@@ -174,7 +178,23 @@ service cloud.firestore {
         && request.resource.data.incidents is int
         && request.resource.data.incidents >= 0
         && request.resource.data.incidents <= 1000;
-      allow read, update, delete: if isAdmin();
+      allow read: if isAdmin() || (
+        signedIn() && resource.data.userId == request.auth.uid
+      );
+      allow update, delete: if isAdmin();
+    }
+
+    match /studentEmailIds/{email} {
+      allow read: if isAdmin() || (
+        signedIn()
+        && request.auth.token.email is string
+        && request.auth.token.email == email
+      );
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /studentIds/{studentId} {
+      allow read, create, update, delete: if isAdmin();
     }
 
     match /teacherLeads/{leadId} {

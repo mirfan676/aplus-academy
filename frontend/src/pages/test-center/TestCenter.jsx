@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Alert, Box, Button, Checkbox, Chip, CircularProgress, Container, FormControlLabel, LinearProgress, Paper, Radio, Stack, TextField, Typography } from "@mui/material";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useAuth } from "../../contexts/useAuth";
 
@@ -56,6 +56,7 @@ export default function TestCenter() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
   const [studentName, setStudentName] = useState("");
   const [studentId, setStudentId] = useState("");
+  const [studentIdLoading, setStudentIdLoading] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
@@ -72,6 +73,29 @@ export default function TestCenter() {
   useEffect(() => {
     if (user?.displayName && !studentName) setStudentName(user.displayName);
   }, [user, studentName]);
+
+  useEffect(() => {
+    const loadStudentId = async () => {
+      if (!db || !user?.email) {
+        setStudentId("");
+        return;
+      }
+      setStudentIdLoading(true);
+      setError("");
+      try {
+        const email = user.email.trim().toLowerCase();
+        const snapshot = await getDoc(doc(db, "studentEmailIds", email));
+        setStudentId(snapshot.exists() ? String(snapshot.data().studentId || "") : "");
+      } catch (loadError) {
+        console.error(loadError);
+        setStudentId("");
+        setError("The assigned Student ID could not be checked.");
+      } finally {
+        setStudentIdLoading(false);
+      }
+    };
+    loadStudentId();
+  }, [user?.email]);
 
   const recordIncident = (message) => {
     if (!started || submitted.current) return;
@@ -120,7 +144,8 @@ export default function TestCenter() {
 
   const startTest = async () => {
     if (!user) return setError("Sign in with Google before starting the assessment.");
-    if (!studentName.trim() || !studentId.trim() || !agreed) return setError("Enter the student details and accept the assessment rules.");
+    if (!studentId.trim()) return setError("No Student ID is assigned to this email. Ask an academy administrator to assign one before starting the test.");
+    if (!studentName.trim() || !agreed) return setError("Enter the student name and accept the assessment rules.");
     setError("");
     const attempt = createAttempt();
     setQuestions(attempt);
@@ -205,8 +230,9 @@ export default function TestCenter() {
             {!user ? <Alert severity="info" action={<Button color="inherit" onClick={signInWithGoogle}>Sign in</Button>}>Google sign-in is required so the academy can securely record your result.</Alert> : <Alert severity="success">Signed in as {user.email}</Alert>}
             <Stack direction={{ xs: "column", md: "row" }} spacing={2} sx={{ mt: 3 }}>
               <TextField fullWidth label="Student full name" value={studentName} onChange={(event) => setStudentName(event.target.value)} inputProps={{ maxLength: 60 }} />
-              <TextField fullWidth label="Student ID / roll number" value={studentId} onChange={(event) => setStudentId(event.target.value)} inputProps={{ maxLength: 30 }} />
+              <TextField fullWidth label="Assigned Student ID" value={studentIdLoading ? "Checking..." : studentId || "Not assigned"} InputProps={{ readOnly: true }} helperText="Only an academy administrator can assign or change this ID." />
             </Stack>
+            {user && !studentIdLoading && !studentId && <Alert severity="warning" sx={{ mt: 2 }}>No Student ID is linked to {user.email}. Ask the administrator to assign an available ID such as cc125.</Alert>}
             <Alert severity="info" sx={{ mt: 3 }}>28 randomized questions · 45 minutes · 70% pass mark · automatic result submission</Alert>
             <Typography variant="h5" fontWeight={900} sx={{ mt: 3 }}>Assessment rules</Typography>
             <Box component="ol" sx={{ lineHeight: 1.8 }}><li>Use only this assessment page.</li><li>Copying, printing, right-click and common capture shortcuts are blocked.</li><li>Leaving fullscreen or switching away records an incident.</li><li>A browser cannot block every operating-system recorder or an external camera.</li><li>The assessment submits automatically when time expires.</li></Box>

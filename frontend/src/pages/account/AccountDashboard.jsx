@@ -7,7 +7,7 @@ import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import RateReviewIcon from "@mui/icons-material/RateReview";
 import { Link as RouterLink, Navigate } from "react-router-dom";
-import { doc, getDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useAuth } from "../../contexts/useAuth";
 import { fetchUserPteTaskResponses } from "../../services/pteTaskResponseData";
@@ -16,6 +16,8 @@ const AccountDashboard = () => {
   const { isAdmin, loading, logout, user } = useAuth();
   const [profileRole, setProfileRole] = useState("user");
   const [ptePracticeCount, setPtePracticeCount] = useState(0);
+  const [studentId, setStudentId] = useState("");
+  const [testResults, setTestResults] = useState([]);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -35,6 +37,29 @@ const AccountDashboard = () => {
       .then((records) => setPtePracticeCount(records.length))
       .catch(() => setPtePracticeCount(0));
   }, [user?.uid]);
+
+  useEffect(() => {
+    const loadTests = async () => {
+      if (!db || !user?.uid || !user?.email) {
+        setStudentId("");
+        setTestResults([]);
+        return;
+      }
+      try {
+        const email = user.email.trim().toLowerCase();
+        const [idSnapshot, resultsSnapshot] = await Promise.all([
+          getDoc(doc(db, "studentEmailIds", email)),
+          getDocs(query(collection(db, "testResults"), where("userId", "==", user.uid))),
+        ]);
+        setStudentId(idSnapshot.exists() ? String(idSnapshot.data().studentId || "") : "");
+        setTestResults(resultsSnapshot.docs.map((item) => ({ id: item.id, ...item.data() })).sort((a,b) => (b.submittedAt?.seconds || 0) - (a.submittedAt?.seconds || 0)));
+      } catch (error) {
+        console.error("Test history could not be loaded:", error);
+        setTestResults([]);
+      }
+    };
+    loadTests();
+  }, [user?.uid, user?.email]);
 
   if (!loading && !user) return <Navigate to="/admin/login" replace />;
 
@@ -89,6 +114,17 @@ const AccountDashboard = () => {
             <Button component={RouterLink} to={isTutor ? "/register/teacher" : isFamily ? `/register/${profileRole}` : "/register"} variant="contained">
               Edit profile
             </Button>
+          </Paper>
+
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 2, border: "1px solid #dce8f1" }}>
+            <SchoolIcon color="primary" fontSize="large" />
+            <Typography variant="h6" fontWeight={900} sx={{ mt: 1 }}>Cyber Security Test Center</Typography>
+            <Typography color="text.secondary" sx={{ my: 2 }}>Assigned Student ID: <b>{studentId || "Not assigned"}</b></Typography>
+            <Chip label={`${testResults.length} recorded attempt${testResults.length === 1 ? "" : "s"}`} color="primary" sx={{ color: "#fff", fontWeight: 800, mb: 2 }} />
+            <Stack spacing={1.2} sx={{ mb: 2 }}>
+              {testResults.slice(0,5).map((result) => <Paper key={result.id} variant="outlined" sx={{ p: 1.4 }}><Stack direction="row" justifyContent="space-between"><Typography fontWeight={800}>{result.percentage}%</Typography><Chip size="small" label={result.passed ? "PASS" : "NOT PASSED"} color={result.passed ? "success" : "error"} /></Stack><Typography variant="caption" color="text.secondary">{result.submittedAt?.toDate?.().toLocaleString("en-PK") || "Saved attempt"} · {result.correct}/{result.total}</Typography></Paper>)}
+            </Stack>
+            <Button component={RouterLink} to="/TestCenter" variant="contained" disabled={!studentId}>Open Test Center</Button>
           </Paper>
 
           <Paper elevation={0} sx={{ p: 3, borderRadius: 2, border: "1px solid #dce8f1" }}>
