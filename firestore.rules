@@ -160,6 +160,9 @@ service cloud.firestore {
         && request.resource.data.userId == request.auth.uid
         && request.auth.token.email is string
         && request.resource.data.userEmail == request.auth.token.email
+        && resultId == request.resource.data.studentId + "_ai-cyber-security-foundations-v1_" + request.resource.data.attemptDate
+        && request.resource.data.attemptDate is string
+        && request.resource.data.attemptDate.size() == 10
         && exists(/databases/$(database)/documents/studentEmailIds/$(request.auth.token.email))
         && get(/databases/$(database)/documents/studentEmailIds/$(request.auth.token.email)).data.studentId == request.resource.data.studentId
         && request.resource.data.studentName is string
