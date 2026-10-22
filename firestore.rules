@@ -187,6 +187,23 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    match /testResultDetails/{resultId} {
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.auth.token.email is string
+        && request.resource.data.userEmail == request.auth.token.email
+        && request.resource.data.studentId is string
+        && request.resource.data.attemptDate is string
+        && resultId == request.resource.data.studentId + "_ai-cyber-security-foundations-v1_" + request.resource.data.attemptDate
+        && exists(/databases/$(database)/documents/studentEmailIds/$(request.auth.token.email))
+        && get(/databases/$(database)/documents/studentEmailIds/$(request.auth.token.email)).data.studentId == request.resource.data.studentId
+        && request.resource.data.questionResults is list
+        && request.resource.data.questionResults.size() == 28
+        && existsAfter(/databases/$(database)/documents/testResults/$(resultId))
+        && getAfter(/databases/$(database)/documents/testResults/$(resultId)).data.userId == request.auth.uid;
+      allow read, update, delete: if isAdmin();
+    }
+
     match /studentEmailIds/{email} {
       allow read: if isAdmin() || (
         signedIn()

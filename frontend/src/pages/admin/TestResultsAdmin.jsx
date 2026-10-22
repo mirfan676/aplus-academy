@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Alert, Box, Button, Chip, CircularProgress, Container, Paper, Stack, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Chip, CircularProgress, Container, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Paper, Stack, TextField, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DownloadIcon from "@mui/icons-material/Download";
 import { collection, doc, getDocs, limit, orderBy, query, runTransaction, serverTimestamp } from "firebase/firestore";
@@ -9,6 +9,30 @@ import { db } from "../../firebase";
 
 const formatDate = (value) => value?.toDate?.().toLocaleString("en-PK") || "Pending timestamp";
 const csvCell = (value) => `"${String(value ?? "").replaceAll('"','""')}"`;
+const incidentLabels = {
+  tabHidden: "Test tab hidden",
+  fullscreenExit: "Fullscreen exited",
+  windowBlur: "Test window lost focus",
+  pointerLeftPage: "Pointer left test page",
+  keyboardWhilePointerOutside: "Keyboard used while pointer was outside",
+  restrictedShortcut: "Restricted keyboard shortcut",
+  pasteAttempt: "Paste attempt",
+  contentDropAttempt: "Content drop attempt",
+  browserAutomationDetected: "Browser automation indicator",
+  inactivityAutoSubmit: "Submitted for inactivity",
+};
+
+const topicPercentage = (score) => score?.total ? Math.round((score.correct / score.total) * 100) : 0;
+const aiAssistanceReview = (row) => {
+  const details = row.incidentDetails || {};
+  const evidence = [];
+  if (details.browserAutomationDetected) evidence.push("Browser automation indicator detected");
+  if (details.pasteAttempt) evidence.push(`${details.pasteAttempt} paste attempt(s)`);
+  if (details.contentDropAttempt) evidence.push(`${details.contentDropAttempt} content-drop attempt(s)`);
+  if (row.durationSeconds > 0 && row.durationSeconds < 180) evidence.push(`Very rapid completion (${row.durationSeconds} seconds)`);
+  if (evidence.length) return { level: "Review recommended", color: "warning", evidence };
+  return { level: "No observable indicator", color: "success", evidence: ["No paste, content-drop, browser-automation or unusually rapid completion indicator was recorded."] };
+};
 
 export default function TestResultsAdmin() {
   const { user } = useAuth();
@@ -21,16 +45,19 @@ export default function TestResultsAdmin() {
   const [assignId, setAssignId] = useState("");
   const [assigning, setAssigning] = useState(false);
   const [assignmentMessage, setAssignmentMessage] = useState("");
+  const [selectedResult, setSelectedResult] = useState(null);
 
   useEffect(() => {
     const load = async () => {
       try {
         if (!db) throw new Error("Firebase is not configured.");
-        const [snapshot, assignmentSnapshot] = await Promise.all([
+        const [snapshot, assignmentSnapshot, detailSnapshot] = await Promise.all([
           getDocs(query(collection(db, "testResults"), orderBy("submittedAt", "desc"), limit(250))),
           getDocs(collection(db, "studentIds")),
+          getDocs(collection(db, "testResultDetails")),
         ]);
-        setRows(snapshot.docs.map((item) => ({ id: item.id, ...item.data() })));
+        const detailsById = new Map(detailSnapshot.docs.map((item) => [item.id, item.data()]));
+        setRows(snapshot.docs.map((item) => ({ id: item.id, ...item.data(), questionResults: detailsById.get(item.id)?.questionResults || [] })));
         setAssignments(assignmentSnapshot.docs.map((item) => ({ id: item.id, ...item.data() })).sort((a,b) => String(a.studentId).localeCompare(String(b.studentId))));
       } catch (loadError) {
         console.error(loadError);
@@ -109,9 +136,40 @@ export default function TestResultsAdmin() {
       </Paper>
       <Paper sx={{ p: 2.5, borderRadius: 2 }}>
         <Stack direction={{ xs: "column", md: "row" }} spacing={2} justifyContent="space-between" sx={{ mb: 2 }}><TextField label="Search student, ID or email" value={search} onChange={(event) => setSearch(event.target.value)} sx={{ minWidth: { md: 360 } }} /><Button startIcon={<DownloadIcon />} variant="contained" disabled={!filtered.length} onClick={downloadCsv}>Download CSV</Button></Stack>
-        {loading ? <Box sx={{ py: 8, display: "grid", placeItems: "center" }}><CircularProgress /></Box> : <Box sx={{ overflowX: "auto" }}><Box component="table" sx={{ width: "100%", borderCollapse: "collapse", minWidth: 1050, "th,td": { textAlign: "left", p: 1.4, borderBottom: "1px solid #dce8f1", verticalAlign: "top" }, th: { bgcolor: "#f5f8fb", fontWeight: 900 } }}><thead><tr><th>Student</th><th>Submitted</th><th>Score</th><th>Status</th><th>Integrity activity</th><th>Topic scores</th></tr></thead><tbody>{filtered.map((row) => <tr key={row.id}><td><Typography fontWeight={900}>{row.studentName || "Student"}</Typography><Typography variant="body2">{row.studentId}</Typography><Typography variant="caption" color="text.secondary">{row.userEmail}</Typography></td><td>{formatDate(row.submittedAt)}<Typography variant="caption" display="block">Attempt day: {row.attemptDate || "Legacy"}</Typography></td><td><b>{row.correct} / {row.total}</b><br />{row.percentage}%</td><td><Chip label={row.passed ? "PASS" : "NOT PASSED"} color={row.passed ? "success" : "error"} size="small" />{row.automaticSubmission && <Typography variant="caption" display="block" color="warning.main">Auto-submitted: {row.automaticSubmissionReason || "yes"}</Typography>}</td><td><Typography fontWeight={900}>Total: {row.incidents || 0}</Typography>{Object.entries(row.incidentDetails || {}).map(([type, count]) => <Typography key={type} variant="caption" display="block">{type}: {count}</Typography>)}</td><td>{Object.entries(row.topicScores || {}).map(([topic, score]) => <Typography key={topic} variant="body2">{topic}: {score.correct}/{score.total}</Typography>)}</td></tr>)}</tbody></Box></Box>}
+        {loading ? <Box sx={{ py: 8, display: "grid", placeItems: "center" }}><CircularProgress /></Box> : <Box sx={{ overflowX: "auto" }}><Box component="table" sx={{ width: "100%", borderCollapse: "collapse", minWidth: 1150, "th,td": { textAlign: "left", p: 1.4, borderBottom: "1px solid #dce8f1", verticalAlign: "top" }, th: { bgcolor: "#f5f8fb", fontWeight: 900 } }}><thead><tr><th>Student</th><th>Submitted</th><th>Score</th><th>Status</th><th>Integrity activity</th><th>Topic scores</th><th>Report</th></tr></thead><tbody>{filtered.map((row) => <tr key={row.id}><td><Typography fontWeight={900}>{row.studentName || "Student"}</Typography><Typography variant="body2">{row.studentId}</Typography><Typography variant="caption" color="text.secondary">{row.userEmail}</Typography></td><td>{formatDate(row.submittedAt)}<Typography variant="caption" display="block">Attempt day: {row.attemptDate || "Legacy"}</Typography></td><td><b>{row.correct} / {row.total}</b><br />{row.percentage}%</td><td><Chip label={row.passed ? "PASS" : "NOT PASSED"} color={row.passed ? "success" : "error"} size="small" />{row.automaticSubmission && <Typography variant="caption" display="block" color="warning.main">Auto-submitted: {row.automaticSubmissionReason || "yes"}</Typography>}</td><td><Typography fontWeight={900}>Total: {row.incidents || 0}</Typography>{Object.entries(row.incidentDetails || {}).map(([type, count]) => <Typography key={type} variant="caption" display="block">{incidentLabels[type] || type}: {count}</Typography>)}</td><td>{Object.entries(row.topicScores || {}).map(([topic, score]) => <Typography key={topic} variant="body2">{topic}: {score.correct}/{score.total}</Typography>)}</td><td><Button variant="outlined" onClick={() => setSelectedResult(row)}>Full report</Button></td></tr>)}</tbody></Box></Box>}
         {!loading && !filtered.length && <Alert severity="info">No test results match this search.</Alert>}
       </Paper>
+      <Dialog open={Boolean(selectedResult)} onClose={() => setSelectedResult(null)} maxWidth="lg" fullWidth>
+        {selectedResult && (() => {
+          const topics = Object.entries(selectedResult.topicScores || {});
+          const focusTopics = topics.filter(([, score]) => topicPercentage(score) < 80);
+          const strongTopics = topics.filter(([, score]) => topicPercentage(score) >= 80);
+          const aiReview = aiAssistanceReview(selectedResult);
+          return <>
+            <DialogTitle><Typography variant="h4" fontWeight={900}>Complete Student Assessment Report</Typography><Typography color="text.secondary">{selectedResult.studentName} · {selectedResult.studentId} · {selectedResult.userEmail}</Typography></DialogTitle>
+            <DialogContent dividers>
+              <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(4, 1fr)" }, gap: 2, mb: 3 }}>
+                <Paper variant="outlined" sx={{ p: 2 }}><Typography color="text.secondary">Score</Typography><Typography variant="h4" fontWeight={900}>{selectedResult.correct}/{selectedResult.total}</Typography><Typography>{selectedResult.percentage}% · {selectedResult.passed ? "PASS" : "NOT PASSED"}</Typography></Paper>
+                <Paper variant="outlined" sx={{ p: 2 }}><Typography color="text.secondary">Duration</Typography><Typography variant="h5" fontWeight={900}>{Math.floor((selectedResult.durationSeconds || 0) / 60)}m {(selectedResult.durationSeconds || 0) % 60}s</Typography><Typography>{selectedResult.unanswered || 0} unanswered</Typography></Paper>
+                <Paper variant="outlined" sx={{ p: 2 }}><Typography color="text.secondary">Integrity events</Typography><Typography variant="h4" fontWeight={900}>{selectedResult.incidents || 0}</Typography><Typography>{selectedResult.automaticSubmission ? `Auto-submitted: ${selectedResult.automaticSubmissionReason || "yes"}` : "Student submitted"}</Typography></Paper>
+                <Paper variant="outlined" sx={{ p: 2 }}><Typography color="text.secondary">AI-assistance review</Typography><Chip label={aiReview.level} color={aiReview.color} sx={{ mt: 1 }} /><Typography variant="caption" display="block" sx={{ mt: 1 }}>Indicators only; not proof of AI use.</Typography></Paper>
+              </Box>
+              <Typography variant="h6" fontWeight={900}>Learning analysis</Typography>
+              <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 2, mt: 1, mb: 3 }}>
+                <Alert severity="success"><b>Strong areas:</b> {strongTopics.length ? strongTopics.map(([topic, score]) => `${topic} (${topicPercentage(score)}%)`).join(", ") : "No topic reached 80% yet."}</Alert>
+                <Alert severity={focusTopics.length ? "warning" : "success"}><b>Recommended focus:</b> {focusTopics.length ? focusTopics.map(([topic, score]) => `${topic} (${topicPercentage(score)}%)`).join(", ") : "Maintain performance across all assessed topics."}</Alert>
+              </Box>
+              <Typography variant="h6" fontWeight={900}>Conduct and AI-assistance indicators</Typography>
+              <Stack spacing={.5} sx={{ mt: 1, mb: 3 }}>{aiReview.evidence.map((item) => <Typography key={item}>• {item}</Typography>)}{Object.entries(selectedResult.incidentDetails || {}).map(([type, count]) => <Typography key={type}>• {incidentLabels[type] || type}: {count}</Typography>)}</Stack>
+              <Alert severity="info" sx={{ mb: 3 }}>This review reports browser-observable signals only. It cannot confirm or exclude use of an external phone, another device, another person or an AI tool outside the test page.</Alert>
+              <Divider sx={{ mb: 3 }} />
+              <Typography variant="h6" fontWeight={900} sx={{ mb: 2 }}>Question-by-question review</Typography>
+              {selectedResult.questionResults?.length ? <Stack spacing={1.5}>{selectedResult.questionResults.map((answer) => <Paper key={answer.number} variant="outlined" sx={{ p: 2, borderLeft: `6px solid ${answer.isCorrect ? "#198754" : "#dc3545"}` }}><Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" gap={1}><Typography fontWeight={900}>Q{answer.number}. {answer.question}</Typography><Chip size="small" label={answer.isCorrect ? "CORRECT" : "WRONG"} color={answer.isCorrect ? "success" : "error"} /></Stack><Typography variant="caption" color="text.secondary">{answer.topic}</Typography><Typography sx={{ mt: 1 }}><b>Student answer:</b> {answer.selectedAnswer}</Typography>{!answer.isCorrect && <Typography color="success.dark"><b>Correct answer:</b> {answer.correctAnswer}</Typography>}</Paper>)}</Stack> : <Alert severity="warning">Question-level answers were not stored for this older attempt. Detailed answer reporting is available for tests submitted after this reporting upgrade.</Alert>}
+            </DialogContent>
+            <DialogActions><Button onClick={() => window.print()}>Print report</Button><Button variant="contained" onClick={() => setSelectedResult(null)}>Close</Button></DialogActions>
+          </>;
+        })()}
+      </Dialog>
     </Container>
   </Box>;
 }

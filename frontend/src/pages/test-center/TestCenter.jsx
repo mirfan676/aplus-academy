@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Alert, Box, Button, Checkbox, Chip, CircularProgress, Container, FormControlLabel, LinearProgress, Paper, Radio, Stack, TextField, Typography } from "@mui/material";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
-import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp, writeBatch } from "firebase/firestore";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { db } from "../../firebase";
 import { useAuth } from "../../contexts/useAuth";
@@ -157,6 +157,14 @@ export default function TestCenter() {
       activity();
     };
     const prevent = (event) => event.preventDefault();
+    const preventPaste = (event) => {
+      event.preventDefault();
+      recordIncident("pasteAttempt");
+    };
+    const preventDrop = (event) => {
+      event.preventDefault();
+      recordIncident("contentDropAttempt");
+    };
     document.addEventListener("visibilitychange", visibility);
     document.addEventListener("fullscreenchange", fullscreen);
     document.addEventListener("keydown", restricted);
@@ -168,6 +176,8 @@ export default function TestCenter() {
     window.addEventListener("blur", blur);
     document.addEventListener("copy", prevent);
     document.addEventListener("cut", prevent);
+    document.addEventListener("paste", preventPaste);
+    document.addEventListener("drop", preventDrop);
     document.addEventListener("contextmenu", prevent);
     return () => {
       document.removeEventListener("visibilitychange", visibility);
@@ -181,6 +191,8 @@ export default function TestCenter() {
       window.removeEventListener("blur", blur);
       document.removeEventListener("copy", prevent);
       document.removeEventListener("cut", prevent);
+      document.removeEventListener("paste", preventPaste);
+      document.removeEventListener("drop", preventDrop);
       document.removeEventListener("contextmenu", prevent);
     };
   }, [started, result]);
@@ -206,6 +218,10 @@ export default function TestCenter() {
     setAnswers(Array(attempt.length).fill(null));
     setStarted(true);
     lastActivity.current = Date.now();
+    if (navigator.webdriver) {
+      setIncidents((value) => value + 1);
+      setIncidentDetails((details) => ({ ...details, browserAutomationDetected: (details.browserAutomationDetected || 0) + 1 }));
+    }
     try { await document.documentElement.requestFullscreen?.(); } catch { /* Fullscreen may require browser support. */ }
   };
 
@@ -228,6 +244,14 @@ export default function TestCenter() {
       summary[topic] = { correct: topicQuestions.filter(({ question, questionIndex }) => answers[questionIndex] === question.answer).length, total: topicQuestions.length };
       return summary;
     }, {});
+    const questionResults = questions.map((question, questionIndex) => ({
+      number: questionIndex + 1,
+      topic: question.topic,
+      question: question.question,
+      selectedAnswer: answers[questionIndex] === null ? "Not answered" : question.options[answers[questionIndex]],
+      correctAnswer: question.options[question.answer],
+      isCorrect: answers[questionIndex] === question.answer,
+    }));
     const payload = {
       testId: TEST_ID,
       testTitle: "AI Cyber Security Foundations Assessment",
@@ -253,7 +277,19 @@ export default function TestCenter() {
     try {
       if (!db) throw new Error("The assessment database is not configured.");
       const resultRef = doc(db, "testResults", attemptDocumentId(studentId));
-      await setDoc(resultRef, payload);
+      const detailRef = doc(db, "testResultDetails", resultRef.id);
+      const batch = writeBatch(db);
+      batch.set(resultRef, payload);
+      batch.set(detailRef, {
+        userId: user.uid,
+        userEmail: user.email || "",
+        studentId: studentId.trim(),
+        testId: TEST_ID,
+        attemptDate: pakistanDateKey(),
+        questionResults,
+        createdAt: serverTimestamp(),
+      });
+      await batch.commit();
       setResult({ ...payload, id: resultRef.id });
       setAttemptedToday(true);
       try { await document.exitFullscreen?.(); } catch { /* no-op */ }
@@ -340,7 +376,7 @@ export default function TestCenter() {
             {!attemptLoading && attemptedToday && <Alert severity="info" sx={{ mt: 2 }}>Today’s assessment attempt has already been used. One attempt is available per Student ID each day.</Alert>}
             <Alert severity="info" sx={{ mt: 3 }}>28 randomized questions · 45 minutes · 70% pass mark · automatic result submission</Alert>
             <Typography variant="h5" fontWeight={900} sx={{ mt: 3 }}>Assessment rules</Typography>
-            <Box component="ol" sx={{ lineHeight: 1.8 }}><li>Use only this assessment page.</li><li>Copying, printing, right-click and common capture shortcuts are blocked.</li><li>Assessment activity and page focus are monitored for test integrity.</li><li>Complete the assessment independently in a quiet and distraction-free environment.</li><li>The assessment submits automatically when time expires or after one minute without activity.</li><li>Each Student ID may complete one attempt per day.</li></Box>
+            <Box component="ol" sx={{ lineHeight: 1.8 }}><li>Use only this assessment page.</li><li>Copying, printing, right-click and common capture shortcuts are blocked.</li><li>AI assistants, browser agents and outside help are not permitted during the assessment.</li><li>Assessment activity and page focus are monitored for test integrity.</li><li>Complete the assessment independently in a quiet and distraction-free environment.</li><li>The assessment submits automatically when time expires or after one minute without activity.</li><li>Each Student ID may complete one attempt per day.</li></Box>
             <FormControlLabel control={<Checkbox checked={agreed} onChange={(event) => setAgreed(event.target.checked)} />} label="I understand the rules and will complete the test independently." />
             <Box><Button variant="contained" size="large" disabled={!studentId || studentIdLoading || attemptLoading || attemptedToday} onClick={startTest} sx={{ mt: 2, fontWeight: 900, bgcolor: "#087f8c" }}>Start test in fullscreen</Button></Box>
           </Paper>
