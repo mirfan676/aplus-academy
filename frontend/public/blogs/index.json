@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-10-28-english-language-learning-and-communication",
+    "title": "English Language Learning and Communication",
+    "description": "A concise education-news summary covering recent developments in English Language and the common themes connecting them.",
+    "topic": "English Language Learning and Communication",
+    "category": "English Language",
+    "publishedAt": "2026-10-28T09:41:14.245111+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/5212331/pexels-photo-5212331.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/students-sitting-in-their-classroom-5212331/",
+      "credit": "Pexels free photo by Max Fischer",
+      "alt": "Students learning with a teacher in a bright classroom",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-10-27-quran-memorization-and-tajweed-education",
     "title": "Quran Memorization and Tajweed Education",
     "description": "A concise education-news summary covering recent developments in Qur'an & Tajweed and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/students-and-teaching-inside-a-classroom-8617741/",
       "credit": "Pexels free photo by Yan Krukau",
       "alt": "Teacher guiding students through a language lesson",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-08-28-quran-memorization-and-tajweed-education",
-    "title": "Quran Memorization and Tajweed Education",
-    "description": "A concise education-news summary covering recent developments in Qur'an & Tajweed and the common themes connecting them.",
-    "topic": "Quran Memorization and Tajweed Education",
-    "category": "Qur'an & Tajweed",
-    "publishedAt": "2026-08-28T15:24:00.584731+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/8522578/pexels-photo-8522578.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/close-up-shot-of-a-book-8522578/",
-      "credit": "Pexels free photo",
-      "alt": "Open Quran pages for tajweed and hifz revision",
       "kind": "pexels",
       "placement": "hero"
     }
