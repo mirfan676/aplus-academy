@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-10-29-ielts-and-english-proficiency-testing",
+    "title": "IELTS and English Proficiency Testing",
+    "description": "A concise education-news summary covering recent developments in IELTS and the common themes connecting them.",
+    "topic": "IELTS and English Proficiency Testing",
+    "category": "IELTS",
+    "publishedAt": "2026-10-29T09:59:33.593289+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/3768126/pexels-photo-3768126.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/person-holding-a-pencil-3768126/",
+      "credit": "Pexels free photo",
+      "alt": "Learner preparing written answers for an English test",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-10-28-english-language-learning-and-communication",
     "title": "English Language Learning and Communication",
     "description": "A concise education-news summary covering recent developments in English Language and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/person-writing-on-notebook-4145153/",
       "credit": "Pexels free photo",
       "alt": "English language notebook for test preparation",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-08-29-english-language-learning-and-communication",
-    "title": "English Language Learning and Communication",
-    "description": "A concise education-news summary covering recent developments in English Language and the common themes connecting them.",
-    "topic": "English Language Learning and Communication",
-    "category": "English Language",
-    "publishedAt": "2026-08-29T10:06:24.210694+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/8617741/pexels-photo-8617741.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/students-and-teaching-inside-a-classroom-8617741/",
-      "credit": "Pexels free photo by Yan Krukau",
-      "alt": "Teacher guiding students through a language lesson",
       "kind": "pexels",
       "placement": "hero"
     }
