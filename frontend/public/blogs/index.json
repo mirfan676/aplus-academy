@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-10-31-k-12-education-curriculum-and-classroom-learning",
+    "title": "K-12 Education: Curriculum and Classroom Learning",
+    "description": "A concise education-news summary covering recent developments in K-12 and the common themes connecting them.",
+    "topic": "K-12 Education: Curriculum and Classroom Learning",
+    "category": "K-12",
+    "publishedAt": "2026-10-31T09:40:13.841547+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/8422200/pexels-photo-8422200.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/children-in-a-classroom-8422200/",
+      "credit": "Pexels free photo",
+      "alt": "Children learning together in a classroom",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-10-29-ielts-and-english-proficiency-testing",
     "title": "IELTS and English Proficiency Testing",
     "description": "A concise education-news summary covering recent developments in IELTS and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/woman-editing-photos-on-a-computer-6476587/",
       "credit": "Pexels free photo",
       "alt": "Designer editing visual media on a computer",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-08-30-ielts-and-english-proficiency-testing",
-    "title": "IELTS and English Proficiency Testing",
-    "description": "A concise education-news summary covering recent developments in IELTS and the common themes connecting them.",
-    "topic": "IELTS and English Proficiency Testing",
-    "category": "IELTS",
-    "publishedAt": "2026-08-30T09:15:20.985700+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/4145153/pexels-photo-4145153.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/person-writing-on-notebook-4145153/",
-      "credit": "Pexels free photo",
-      "alt": "English language notebook for test preparation",
       "kind": "pexels",
       "placement": "hero"
     }
