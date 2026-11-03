@@ -1,20 +1,20 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Alert, Box, Button, Checkbox, Chip, CircularProgress, Container, FormControlLabel, LinearProgress, Paper, Radio, Stack, TextField, Typography } from "@mui/material";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
-import { doc, getDoc, serverTimestamp, writeBatch } from "firebase/firestore";
-import { Navigate, useSearchParams } from "react-router-dom";
+import { collection, doc, getDoc, getDocs, query, serverTimestamp, where, writeBatch } from "firebase/firestore";
+import { Link as RouterLink, Navigate, useSearchParams } from "react-router-dom";
 import { db } from "../../firebase";
 import { useAuth } from "../../contexts/useAuth";
 import { lectureFourToSevenQuestions } from "./lectureFourToSevenQuestions";
+import { QUIZZES, quizStateId } from "./quizConfig";
 
 const DURATION = 45 * 60;
 const PASS_MARK = 70;
 const INACTIVITY_WARNING_SECONDS = 45;
 const INACTIVITY_SUBMIT_SECONDS = 60;
-const FOUNDATIONS_TEST_ID = "ai-cyber-security-foundations-v1";
-const LECTURES_TEST_ID = "ai-cyber-security-lectures-04-07-v1";
+const FOUNDATIONS_TEST_ID = QUIZZES[0].id;
+const LECTURES_TEST_ID = QUIZZES[1].id;
 const pakistanDateKey = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Karachi", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
-const attemptDocumentId = (studentId, testId) => `${studentId}_${testId}_${pakistanDateKey()}`;
 
 const questionBank = [
   ["Authorization","Which security principle ensures that only approved people can view information?",["Confidentiality","Integrity","Availability","Accounting"],0],
@@ -66,7 +66,7 @@ export default function TestCenter() {
   const [searchParams, setSearchParams] = useSearchParams();
   const isLectureTest = searchParams.get("assessment") === "lectures-04-07";
   const testId = isLectureTest ? LECTURES_TEST_ID : FOUNDATIONS_TEST_ID;
-  const testTitle = isLectureTest ? "AI Cyber Security Lectures 04-07 Assessment" : "AI Cyber Security Foundations Assessment";
+  const testTitle = isLectureTest ? "Quiz 2" : "Quiz 1";
   const testBank = isLectureTest ? lectureFourToSevenQuestions : questionBank;
   const [comingSoon, setComingSoon] = useState("");
   const [studentName, setStudentName] = useState("");
@@ -79,8 +79,10 @@ export default function TestCenter() {
   const [remaining, setRemaining] = useState(DURATION);
   const [incidents, setIncidents] = useState(0);
   const [incidentDetails, setIncidentDetails] = useState({});
-  const [attemptedToday, setAttemptedToday] = useState(false);
-  const [attemptLoading, setAttemptLoading] = useState(false);
+  const [quizState, setQuizState] = useState(null);
+  const [hasPriorResult, setHasPriorResult] = useState(false);
+  const [attemptLoading, setAttemptLoading] = useState(true);
+  const [accessRefresh, setAccessRefresh] = useState(0);
   const [inactivityWarning, setInactivityWarning] = useState(false);
   const [started, setStarted] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -118,22 +120,26 @@ export default function TestCenter() {
   }, [user?.email]);
 
   useEffect(() => {
-    const checkDailyAttempt = async () => {
-      if (!db || !studentId) return;
-      setAttemptedToday(false);
+    const checkQuizAccess = async () => {
+      if (!db || !studentId || !user?.uid) return;
+      setQuizState(null);
       setAttemptLoading(true);
       try {
-        const snapshot = await getDoc(doc(db, "testResults", attemptDocumentId(studentId, testId)));
-        setAttemptedToday(snapshot.exists());
+        const [stateSnapshot, resultsSnapshot] = await Promise.all([
+          getDoc(doc(db, "quizAttemptState", quizStateId(studentId, testId))),
+          getDocs(query(collection(db, "testResults"), where("userId", "==", user.uid))),
+        ]);
+        setQuizState(stateSnapshot.exists() ? stateSnapshot.data() : null);
+        setHasPriorResult(resultsSnapshot.docs.some((item) => item.data().testId === testId && item.data().studentId === studentId));
       } catch (checkError) {
-        console.error("Daily attempt could not be checked:", checkError);
-        setError("The daily attempt limit could not be checked. Please try again.");
+        console.error("Quiz access could not be checked:", checkError);
+        setError("Quiz access could not be checked. Please try again.");
       } finally {
         setAttemptLoading(false);
       }
     };
-    checkDailyAttempt();
-  }, [studentId, testId]);
+    checkQuizAccess();
+  }, [studentId, testId, user?.uid, accessRefresh]);
 
   const recordIncident = (type) => {
     if (!started || submitted.current) return;
@@ -217,7 +223,8 @@ export default function TestCenter() {
   const startTest = async () => {
     if (!user) return setError("Sign in with Google before starting the assessment.");
     if (!studentId.trim()) return setError("No Student ID is assigned to this email. Ask an academy administrator to assign one before starting the test.");
-    if (attemptedToday) return setError("This Student ID has already completed its test attempt today. The next attempt will be available tomorrow.");
+    if (!quizState) return setError("Quiz access is being set up. Contact the academy administrator.");
+    if (quizState.completedCount >= quizState.allowedCount || (hasPriorResult && quizState.completedCount === 0)) return setError("This quiz has already been completed. Ask the administrator to allow another attempt.");
     if (!studentName.trim() || !agreed) return setError("Enter the student name and accept the assessment rules.");
     setError("");
     const attempt = createAttempt(testBank);
@@ -283,22 +290,26 @@ export default function TestCenter() {
     };
     try {
       if (!db) throw new Error("The assessment database is not configured.");
-      const resultRef = doc(db, "testResults", attemptDocumentId(studentId, testId));
+      const attemptNumber = quizState.completedCount + 1;
+      const resultRef = doc(collection(db, "testResults"));
       const detailRef = doc(db, "testResultDetails", resultRef.id);
+      const stateRef = doc(db, "quizAttemptState", quizStateId(studentId, testId));
       const batch = writeBatch(db);
-      batch.set(resultRef, payload);
+      batch.set(resultRef, { ...payload, attemptNumber });
       batch.set(detailRef, {
         userId: user.uid,
         userEmail: user.email || "",
         studentId: studentId.trim(),
         testId,
+        attemptNumber,
         attemptDate: pakistanDateKey(),
         questionResults,
         createdAt: serverTimestamp(),
       });
+      batch.update(stateRef, { completedCount: attemptNumber, lastResultId: resultRef.id, updatedAt: serverTimestamp() });
       await batch.commit();
-      setResult({ ...payload, id: resultRef.id });
-      setAttemptedToday(true);
+      setResult({ id: resultRef.id });
+      setQuizState((current) => ({ ...current, completedCount: attemptNumber }));
       try { await document.exitFullscreen?.(); } catch { /* no-op */ }
     } catch (saveError) {
       console.error(saveError);
@@ -325,7 +336,7 @@ export default function TestCenter() {
   const answered = answers.filter((answer) => answer !== null).length;
   const timer = `${String(Math.floor(remaining / 60)).padStart(2,"0")}:${String(remaining % 60).padStart(2,"0")}`;
   const current = questions[index];
-  const topicSummary = useMemo(() => result ? Object.entries(result.topicScores) : [], [result]);
+  const quizUnavailable = !quizState || quizState.completedCount >= quizState.allowedCount || (hasPriorResult && quizState.completedCount === 0);
 
   if (authLoading) return <Box sx={{ minHeight: "70vh", display: "grid", placeItems: "center" }}><CircularProgress /></Box>;
   if (!user) return <Navigate to="/student/login?returnTo=%2FTestCenter" replace />;
@@ -334,7 +345,7 @@ export default function TestCenter() {
     const tests = [
       { title: "Python Development", description: "Python programming, problem-solving and application development.", available: false, color: "#306998" },
       { title: "Front End Development", description: "HTML, CSS, JavaScript and modern responsive web interfaces.", available: false, color: "#e44d26" },
-      { title: "Cyber Security With AI", description: "Foundations assessment and the new Lectures 04-07 assessment.", available: true, color: "#087f8c" },
+      { title: "Cyber Security With AI", description: "Quiz 1 and Quiz 2. View your scores in your student dashboard.", available: true, color: "#087f8c" },
       { title: "Digital Marketing With AI", description: "Digital campaigns, content, analytics and responsible AI-assisted marketing.", available: false, color: "#7b2cbf" },
     ];
     return (
@@ -370,11 +381,11 @@ export default function TestCenter() {
           <Paper sx={{ p: { xs: 3, md: 6 }, bgcolor: "#13233f", color: "white", borderTop: "8px solid #f39c4a", borderRadius: 3 }}>
             <Typography fontWeight={900} color="#f39c4a">DATA & CYBER SECURITY WITH AI</Typography>
             <Typography component="h1" variant="h2" fontWeight={900} sx={{ mt: 1 }}>{testTitle}</Typography>
-            <Typography sx={{ mt: 2, color: "#dce6ef", maxWidth: 820, fontSize: 19 }}>{isLectureTest ? "Security controls, phishing and AI, continuity and recovery, and networking fundamentals" : "Authorization, access-control models, cybersecurity risk, response headers, security controls and ethical password auditing"}</Typography>
+            <Typography sx={{ mt: 2, color: "#dce6ef", maxWidth: 820, fontSize: 19 }}>Complete your quiz independently. Your results are available in your student dashboard.</Typography>
           </Paper>
           <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mt: 2 }}>
-            <Button variant={isLectureTest ? "outlined" : "contained"} onClick={() => setSearchParams({ test: "cyber-security-with-ai" })}>Foundations test</Button>
-            <Button variant={isLectureTest ? "contained" : "outlined"} onClick={() => setSearchParams({ test: "cyber-security-with-ai", assessment: "lectures-04-07" })}>Lectures 04-07 test</Button>
+            <Button variant={isLectureTest ? "outlined" : "contained"} onClick={() => setSearchParams({ test: "cyber-security-with-ai" })}>Quiz 1</Button>
+            <Button variant={isLectureTest ? "contained" : "outlined"} onClick={() => setSearchParams({ test: "cyber-security-with-ai", assessment: "lectures-04-07" })}>Quiz 2</Button>
           </Stack>
           <Paper sx={{ mt: 3, p: { xs: 3, md: 4 }, borderRadius: 3 }}>
             {error && <Alert severity="warning" sx={{ mb: 2 }}>{error}</Alert>}
@@ -384,12 +395,13 @@ export default function TestCenter() {
               <TextField fullWidth label="Assigned Student ID" value={studentIdLoading ? "Checking..." : studentId || "Not assigned"} InputProps={{ readOnly: true }} helperText="Only an academy administrator can assign or change this ID." />
             </Stack>
             {!studentIdLoading && !studentId && <Alert severity="warning" sx={{ mt: 2 }} action={<Button color="inherit" startIcon={<WhatsAppIcon />} href="https://wa.me/923066762289?text=Hello%20A%20Plus%20Academy%2C%20I%20need%20a%20Student%20ID%20for%20the%20Cyber%20Security%20Test%20or%20I%20want%20to%20register%20for%20the%20course." target="_blank" rel="noopener noreferrer">WhatsApp</Button>}>No Test ID is assigned to {user.email}. Contact the administrator at <b>+92 306 6762289</b> for Test ID generation or course registration.</Alert>}
-            {!attemptLoading && attemptedToday && <Alert severity="info" sx={{ mt: 2 }}>Today’s assessment attempt has already been used. One attempt is available per Student ID each day.</Alert>}
+            {!attemptLoading && quizUnavailable && studentId && <Alert severity="info" sx={{ mt: 2 }}>{quizState ? "This quiz has already been completed. Contact the administrator if you need another attempt." : "Quiz access is being set up. Contact the academy administrator."}</Alert>}
+            {!attemptLoading && studentId && <Button size="small" onClick={() => setAccessRefresh((value) => value + 1)} sx={{ mt: 1 }}>Check quiz access again</Button>}
             <Alert severity="info" sx={{ mt: 3 }}>28 randomized questions · 45 minutes · 70% pass mark · automatic result submission</Alert>
             <Typography variant="h5" fontWeight={900} sx={{ mt: 3 }}>Assessment rules</Typography>
-            <Box component="ol" sx={{ lineHeight: 1.8 }}><li>Use only this assessment page.</li><li>Copying, printing, right-click and common capture shortcuts are blocked.</li><li>AI assistants, browser agents and outside help are not permitted during the assessment.</li><li>Assessment activity and page focus are monitored for test integrity.</li><li>Complete the assessment independently in a quiet and distraction-free environment.</li><li>The assessment submits automatically when time expires or after one minute without activity.</li><li>Each Student ID may complete one attempt per day.</li></Box>
+            <Box component="ol" sx={{ lineHeight: 1.8 }}><li>Use only this assessment page.</li><li>Copying, printing, right-click and common capture shortcuts are blocked.</li><li>AI assistants, browser agents and outside help are not permitted during the assessment.</li><li>Assessment activity and page focus are monitored for test integrity.</li><li>Complete the assessment independently in a quiet and distraction-free environment.</li><li>The assessment submits automatically when time expires or after one minute without activity.</li><li>Each quiz has one attempt unless the administrator allows a retake.</li></Box>
             <FormControlLabel control={<Checkbox checked={agreed} onChange={(event) => setAgreed(event.target.checked)} />} label="I understand the rules and will complete the test independently." />
-            <Box><Button variant="contained" size="large" disabled={!studentId || studentIdLoading || attemptLoading || attemptedToday} onClick={startTest} sx={{ mt: 2, fontWeight: 900, bgcolor: "#087f8c" }}>Start test in fullscreen</Button></Box>
+            <Box><Button variant="contained" size="large" disabled={!studentId || studentIdLoading || attemptLoading || quizUnavailable} onClick={startTest} sx={{ mt: 2, fontWeight: 900, bgcolor: "#087f8c" }}>Start test in fullscreen</Button></Box>
           </Paper>
         </>}
 
@@ -407,7 +419,7 @@ export default function TestCenter() {
           </Box>
         </>}
 
-        {result && <Paper sx={{ p: { xs: 3, md: 6 }, borderRadius: 3, textAlign: "center" }}><Typography color="#087f8c" fontWeight={900}>RESULT SAVED</Typography><Typography variant="h3" fontWeight={900} sx={{ mt: 2 }}>{studentName}</Typography><Typography variant="h1" fontWeight={900} color="#087f8c" sx={{ my: 2 }}>{result.correct} / {result.total}</Typography><Typography variant="h4" fontWeight={900} color={result.passed ? "success.main" : "error.main"}>{result.passed ? "PASS" : "NOT YET PASSED"} · {result.percentage}%</Typography><Typography sx={{ mt: 2 }}>Result ID: {result.id}</Typography><Box sx={{ maxWidth: 620, mx: "auto", mt: 4, textAlign: "left" }}>{topicSummary.map(([topic, score]) => <Stack key={topic} direction="row" justifyContent="space-between" sx={{ borderTop: "1px solid #ddd", py: 1.5 }}><Typography fontWeight={700}>{topic}</Typography><Typography>{score.correct} / {score.total}</Typography></Stack>)}</Box></Paper>}
+        {result && <Paper sx={{ p: { xs: 3, md: 6 }, borderRadius: 3, textAlign: "center" }}><Typography color="#087f8c" fontWeight={900}>QUIZ SUBMITTED</Typography><Typography sx={{ mt: 2 }}>Your result has been saved to your student dashboard.</Typography><Button component={RouterLink} to="/account" variant="contained" sx={{ mt: 3 }}>View my results</Button></Paper>}
       </Container>
     </Box>
   );

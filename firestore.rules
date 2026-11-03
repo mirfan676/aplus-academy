@@ -161,7 +161,12 @@ service cloud.firestore {
         && request.auth.token.email is string
         && request.resource.data.userEmail == request.auth.token.email
         && request.resource.data.testId in ["ai-cyber-security-foundations-v1", "ai-cyber-security-lectures-04-07-v1"]
-        && resultId == request.resource.data.studentId + "_" + request.resource.data.testId + "_" + request.resource.data.attemptDate
+        && request.resource.data.attemptNumber is int
+        && request.resource.data.attemptNumber >= 1
+        && exists(/databases/$(database)/documents/quizAttemptState/$(request.resource.data.studentId + "_" + request.resource.data.testId))
+        && get(/databases/$(database)/documents/quizAttemptState/$(request.resource.data.studentId + "_" + request.resource.data.testId)).data.completedCount == request.resource.data.attemptNumber - 1
+        && getAfter(/databases/$(database)/documents/quizAttemptState/$(request.resource.data.studentId + "_" + request.resource.data.testId)).data.completedCount == request.resource.data.attemptNumber
+        && getAfter(/databases/$(database)/documents/quizAttemptState/$(request.resource.data.studentId + "_" + request.resource.data.testId)).data.lastResultId == resultId
         && request.resource.data.attemptDate is string
         && request.resource.data.attemptDate.size() == 10
         && exists(/databases/$(database)/documents/studentEmailIds/$(request.auth.token.email))
@@ -196,14 +201,39 @@ service cloud.firestore {
         && request.resource.data.studentId is string
         && request.resource.data.attemptDate is string
         && request.resource.data.testId in ["ai-cyber-security-foundations-v1", "ai-cyber-security-lectures-04-07-v1"]
-        && resultId == request.resource.data.studentId + "_" + request.resource.data.testId + "_" + request.resource.data.attemptDate
+        && request.resource.data.attemptNumber is int
         && exists(/databases/$(database)/documents/studentEmailIds/$(request.auth.token.email))
         && get(/databases/$(database)/documents/studentEmailIds/$(request.auth.token.email)).data.studentId == request.resource.data.studentId
         && request.resource.data.questionResults is list
         && request.resource.data.questionResults.size() == 28
         && existsAfter(/databases/$(database)/documents/testResults/$(resultId))
-        && getAfter(/databases/$(database)/documents/testResults/$(resultId)).data.userId == request.auth.uid;
+        && getAfter(/databases/$(database)/documents/testResults/$(resultId)).data.userId == request.auth.uid
+        && getAfter(/databases/$(database)/documents/testResults/$(resultId)).data.attemptNumber == request.resource.data.attemptNumber;
       allow read, update, delete: if isAdmin();
+    }
+
+    match /quizAttemptState/{stateId} {
+      allow read: if isAdmin() || (
+        signedIn()
+        && request.auth.token.email is string
+        && resource.data.email == request.auth.token.email
+        && exists(/databases/$(database)/documents/studentEmailIds/$(request.auth.token.email))
+        && get(/databases/$(database)/documents/studentEmailIds/$(request.auth.token.email)).data.studentId == resource.data.studentId
+      );
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || (
+        signedIn()
+        && request.auth.token.email is string
+        && resource.data.email == request.auth.token.email
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["completedCount", "lastResultId", "updatedAt"])
+        && request.resource.data.completedCount == resource.data.completedCount + 1
+        && request.resource.data.completedCount <= resource.data.allowedCount
+        && existsAfter(/databases/$(database)/documents/testResults/$(request.resource.data.lastResultId))
+        && getAfter(/databases/$(database)/documents/testResults/$(request.resource.data.lastResultId)).data.userId == request.auth.uid
+        && getAfter(/databases/$(database)/documents/testResults/$(request.resource.data.lastResultId)).data.studentId == resource.data.studentId
+        && getAfter(/databases/$(database)/documents/testResults/$(request.resource.data.lastResultId)).data.testId == resource.data.testId
+        && getAfter(/databases/$(database)/documents/testResults/$(request.resource.data.lastResultId)).data.attemptNumber == request.resource.data.completedCount
+      );
     }
 
     match /studentEmailIds/{email} {

@@ -2,10 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { Alert, Box, Button, Chip, CircularProgress, Container, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Paper, Stack, TextField, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DownloadIcon from "@mui/icons-material/Download";
-import { collection, doc, getDocs, limit, orderBy, query, runTransaction, serverTimestamp } from "firebase/firestore";
+import { collection, doc, getDocs, limit, orderBy, query, runTransaction, serverTimestamp, writeBatch } from "firebase/firestore";
 import { useAuth } from "../../contexts/useAuth";
 import { Link as RouterLink } from "react-router-dom";
 import { db } from "../../firebase";
+import { QUIZZES, quizLabel, quizStateId } from "../test-center/quizConfig";
 
 const formatDate = (value) => value?.toDate?.().toLocaleString("en-PK") || "Pending timestamp";
 const csvCell = (value) => `"${String(value ?? "").replaceAll('"','""')}"`;
@@ -38,6 +39,9 @@ export default function TestResultsAdmin() {
   const { user } = useAuth();
   const [rows, setRows] = useState([]);
   const [assignments, setAssignments] = useState([]);
+  const [quizStates, setQuizStates] = useState({});
+  const [accessBusy, setAccessBusy] = useState(false);
+  const [accessMessage, setAccessMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -51,14 +55,16 @@ export default function TestResultsAdmin() {
     const load = async () => {
       try {
         if (!db) throw new Error("Firebase is not configured.");
-        const [snapshot, assignmentSnapshot, detailSnapshot] = await Promise.all([
+        const [snapshot, assignmentSnapshot, detailSnapshot, stateSnapshot] = await Promise.all([
           getDocs(query(collection(db, "testResults"), orderBy("submittedAt", "desc"), limit(250))),
           getDocs(collection(db, "studentIds")),
           getDocs(collection(db, "testResultDetails")),
+          getDocs(collection(db, "quizAttemptState")),
         ]);
         const detailsById = new Map(detailSnapshot.docs.map((item) => [item.id, item.data()]));
         setRows(snapshot.docs.map((item) => ({ id: item.id, ...item.data(), questionResults: detailsById.get(item.id)?.questionResults || [] })));
         setAssignments(assignmentSnapshot.docs.map((item) => ({ id: item.id, ...item.data() })).sort((a,b) => String(a.studentId).localeCompare(String(b.studentId))));
+        setQuizStates(Object.fromEntries(stateSnapshot.docs.map((item) => [item.id, item.data()])));
       } catch (loadError) {
         console.error(loadError);
         setError("Test results could not be loaded. Check the Firestore rules and connection.");
@@ -80,15 +86,20 @@ export default function TestResultsAdmin() {
       await runTransaction(db, async (transaction) => {
         const emailRef = doc(db, "studentEmailIds", email);
         const idRef = doc(db, "studentIds", studentId);
-        const [emailSnapshot, idSnapshot] = await Promise.all([transaction.get(emailRef), transaction.get(idRef)]);
+        const stateRefs = QUIZZES.map((quiz) => doc(db, "quizAttemptState", quizStateId(studentId, quiz.id)));
+        const [emailSnapshot, idSnapshot, ...stateSnapshots] = await Promise.all([transaction.get(emailRef), transaction.get(idRef), ...stateRefs.map((ref) => transaction.get(ref))]);
         if (idSnapshot.exists() && idSnapshot.data().email !== email) throw new Error(`Student ID ${studentId} is already assigned to another email.`);
         const previousId = emailSnapshot.exists() ? String(emailSnapshot.data().studentId || "") : "";
         if (previousId && previousId !== studentId) transaction.delete(doc(db, "studentIds", previousId));
         const data = { email, studentId, assignedBy: user?.email || "admin", updatedAt: serverTimestamp() };
         transaction.set(emailRef, data, { merge: true });
         transaction.set(idRef, data, { merge: true });
+        stateRefs.forEach((ref, index) => {
+          if (!stateSnapshots[index].exists()) transaction.set(ref, { studentId, testId: QUIZZES[index].id, email, completedCount: 0, allowedCount: 1, lastResultId: "", updatedAt: serverTimestamp() });
+        });
       });
       setAssignments((items) => [...items.filter((item) => item.email !== email && item.studentId !== studentId), { id: studentId, email, studentId }].sort((a,b) => a.studentId.localeCompare(b.studentId)));
+      setQuizStates((states) => Object.fromEntries([...Object.entries(states), ...QUIZZES.map((quiz) => [quizStateId(studentId, quiz.id), states[quizStateId(studentId, quiz.id)] || { studentId, testId: quiz.id, email, completedCount: 0, allowedCount: 1 }])]));
       setAssignmentMessage(`Student ID ${studentId} is now linked to ${email}.`);
       setAssignEmail("");
       setAssignId("");
@@ -100,6 +111,60 @@ export default function TestResultsAdmin() {
     }
   };
 
+  const initializeQuizAccess = async () => {
+    setAccessBusy(true);
+    setAccessMessage("");
+    try {
+      const [resultsSnapshot, statesSnapshot] = await Promise.all([getDocs(collection(db, "testResults")), getDocs(collection(db, "quizAttemptState"))]);
+      const existing = new Map(statesSnapshot.docs.map((item) => [item.id, item.data()]));
+      const allResults = resultsSnapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
+      const changes = [];
+      for (const assignment of assignments) for (const quiz of QUIZZES) {
+        const key = quizStateId(assignment.studentId, quiz.id);
+        const previous = existing.get(key);
+        const history = allResults.filter((item) => item.studentId === assignment.studentId && item.testId === quiz.id);
+        const completedCount = Math.max(previous?.completedCount || 0, history.length);
+        if (!previous || completedCount > previous.completedCount || previous.email !== assignment.email) {
+          changes.push({ key, data: { studentId: assignment.studentId, testId: quiz.id, email: assignment.email, completedCount, allowedCount: Math.max(previous?.allowedCount || 1, completedCount), lastResultId: previous?.lastResultId || history[0]?.id || "", updatedAt: serverTimestamp() } });
+        }
+      }
+      for (let i = 0; i < changes.length; i += 400) {
+        const batch = writeBatch(db);
+        changes.slice(i, i + 400).forEach(({ key, data }) => batch.set(doc(db, "quizAttemptState", key), data));
+        await batch.commit();
+      }
+      setQuizStates((states) => ({ ...states, ...Object.fromEntries(changes.map(({ key, data }) => [key, data])) }));
+      setAccessMessage(`Quiz access synchronized for ${assignments.length} student IDs. ${changes.length} records updated.`);
+    } catch (syncError) {
+      console.error(syncError);
+      setAccessMessage("Quiz access could not be synchronized. No retakes should be granted until this succeeds.");
+    } finally {
+      setAccessBusy(false);
+    }
+  };
+
+  const allowRetake = async (assignment, quiz) => {
+    const key = quizStateId(assignment.studentId, quiz.id);
+    setAccessBusy(true);
+    setAccessMessage("");
+    try {
+      await runTransaction(db, async (transaction) => {
+        const ref = doc(db, "quizAttemptState", key);
+        const snapshot = await transaction.get(ref);
+        if (!snapshot.exists()) throw new Error("Synchronize quiz access first.");
+        const state = snapshot.data();
+        if (state.completedCount < state.allowedCount) throw new Error("An attempt is already available.");
+        transaction.update(ref, { allowedCount: state.allowedCount + 1, approvedBy: user?.email || "admin", updatedAt: serverTimestamp() });
+      });
+      setQuizStates((states) => ({ ...states, [key]: { ...states[key], allowedCount: states[key].allowedCount + 1 } }));
+      setAccessMessage(`${quiz.label} retake allowed for ${assignment.studentId}.`);
+    } catch (grantError) {
+      setAccessMessage(grantError.message || "The retake could not be allowed.");
+    } finally {
+      setAccessBusy(false);
+    }
+  };
+
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     if (!term) return rows;
@@ -107,8 +172,8 @@ export default function TestResultsAdmin() {
   }, [rows, search]);
 
   const downloadCsv = () => {
-    const header = ["Submitted","Student","Student ID","Email","Score","Total","Percentage","Passed","Incidents","Unanswered","Duration seconds","Result ID"];
-    const lines = filtered.map((row) => [formatDate(row.submittedAt),row.studentName,row.studentId,row.userEmail,row.correct,row.total,row.percentage,row.passed ? "Yes" : "No",row.incidents,row.unanswered,row.durationSeconds,row.id].map(csvCell).join(","));
+    const header = ["Quiz","Submitted","Student","Student ID","Email","Score","Total","Percentage","Passed","Incidents","Unanswered","Duration seconds","Result ID"];
+    const lines = filtered.map((row) => [quizLabel(row.testId),formatDate(row.submittedAt),row.studentName,row.studentId,row.userEmail,row.correct,row.total,row.percentage,row.passed ? "Yes" : "No",row.incidents,row.unanswered,row.durationSeconds,row.id].map(csvCell).join(","));
     const blob = new Blob([[header.map(csvCell).join(","),...lines].join("\n")], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -134,9 +199,16 @@ export default function TestResultsAdmin() {
         <Typography variant="subtitle1" fontWeight={900} sx={{ mt: 3 }}>Assigned IDs ({assignments.length})</Typography>
         <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1 }}>{assignments.slice(0,100).map((item) => <Chip key={item.studentId} label={`${item.studentId} · ${item.email}`} variant="outlined" />)}</Box>
       </Paper>
+      <Paper sx={{ p: 2.5, borderRadius: 2, mb: 3 }}>
+        <Typography variant="h5" fontWeight={900}>Quiz access and retakes</Typography>
+        <Typography color="text.secondary" sx={{ mt: .5, mb: 2 }}>Synchronize existing scores once before allowing retakes. Each quiz starts with one attempt. Allow one additional attempt only after a student completes it.</Typography>
+        {accessMessage && <Alert severity={accessMessage.includes("synchronized") || accessMessage.includes("allowed") ? "success" : "warning"} sx={{ mb: 2 }}>{accessMessage}</Alert>}
+        <Button variant="outlined" disabled={accessBusy || loading} onClick={initializeQuizAccess} sx={{ mb: 2 }}>{accessBusy ? "Working..." : "Synchronize quiz access"}</Button>
+        <Stack spacing={1}>{assignments.map((assignment) => <Paper key={assignment.studentId} variant="outlined" sx={{ p: 1.5 }}><Typography fontWeight={800}>{assignment.studentId} · {assignment.email}</Typography><Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ mt: 1 }}>{QUIZZES.map((quiz) => { const state = quizStates[quizStateId(assignment.studentId, quiz.id)]; return <Stack key={quiz.id} direction="row" spacing={1} alignItems="center"><Chip label={`${quiz.label}: ${state ? `${state.completedCount}/${state.allowedCount} used` : "not initialized"}`} size="small" /><Button size="small" variant="outlined" disabled={accessBusy || !state || state.completedCount < state.allowedCount} onClick={() => allowRetake(assignment, quiz)}>Allow retake</Button></Stack>; })}</Stack></Paper>)}</Stack>
+      </Paper>
       <Paper sx={{ p: 2.5, borderRadius: 2 }}>
         <Stack direction={{ xs: "column", md: "row" }} spacing={2} justifyContent="space-between" sx={{ mb: 2 }}><TextField label="Search student, ID or email" value={search} onChange={(event) => setSearch(event.target.value)} sx={{ minWidth: { md: 360 } }} /><Button startIcon={<DownloadIcon />} variant="contained" disabled={!filtered.length} onClick={downloadCsv}>Download CSV</Button></Stack>
-        {loading ? <Box sx={{ py: 8, display: "grid", placeItems: "center" }}><CircularProgress /></Box> : <Box sx={{ overflowX: "auto" }}><Box component="table" sx={{ width: "100%", borderCollapse: "collapse", minWidth: 1150, "th,td": { textAlign: "left", p: 1.4, borderBottom: "1px solid #dce8f1", verticalAlign: "top" }, th: { bgcolor: "#f5f8fb", fontWeight: 900 } }}><thead><tr><th>Student</th><th>Submitted</th><th>Score</th><th>Status</th><th>Integrity activity</th><th>Topic scores</th><th>Report</th></tr></thead><tbody>{filtered.map((row) => <tr key={row.id}><td><Typography fontWeight={900}>{row.studentName || "Student"}</Typography><Typography variant="body2">{row.studentId}</Typography><Typography variant="caption" color="text.secondary">{row.userEmail}</Typography></td><td>{formatDate(row.submittedAt)}<Typography variant="caption" display="block">Attempt day: {row.attemptDate || "Legacy"}</Typography></td><td><b>{row.correct} / {row.total}</b><br />{row.percentage}%</td><td><Chip label={row.passed ? "PASS" : "NOT PASSED"} color={row.passed ? "success" : "error"} size="small" />{row.automaticSubmission && <Typography variant="caption" display="block" color="warning.main">Auto-submitted: {row.automaticSubmissionReason || "yes"}</Typography>}</td><td><Typography fontWeight={900}>Total: {row.incidents || 0}</Typography>{Object.entries(row.incidentDetails || {}).map(([type, count]) => <Typography key={type} variant="caption" display="block">{incidentLabels[type] || type}: {count}</Typography>)}</td><td>{Object.entries(row.topicScores || {}).map(([topic, score]) => <Typography key={topic} variant="body2">{topic}: {score.correct}/{score.total}</Typography>)}</td><td><Button variant="outlined" onClick={() => setSelectedResult(row)}>Full report</Button></td></tr>)}</tbody></Box></Box>}
+        {loading ? <Box sx={{ py: 8, display: "grid", placeItems: "center" }}><CircularProgress /></Box> : <Box sx={{ overflowX: "auto" }}><Box component="table" sx={{ width: "100%", borderCollapse: "collapse", minWidth: 1150, "th,td": { textAlign: "left", p: 1.4, borderBottom: "1px solid #dce8f1", verticalAlign: "top" }, th: { bgcolor: "#f5f8fb", fontWeight: 900 } }}><thead><tr><th>Student</th><th>Quiz</th><th>Submitted</th><th>Score</th><th>Status</th><th>Integrity activity</th><th>Topic scores</th><th>Report</th></tr></thead><tbody>{filtered.map((row) => <tr key={row.id}><td><Typography fontWeight={900}>{row.studentName || "Student"}</Typography><Typography variant="body2">{row.studentId}</Typography><Typography variant="caption" color="text.secondary">{row.userEmail}</Typography></td><td>{quizLabel(row.testId)}</td><td>{formatDate(row.submittedAt)}<Typography variant="caption" display="block">Attempt day: {row.attemptDate || "Legacy"}</Typography></td><td><b>{row.correct} / {row.total}</b><br />{row.percentage}%</td><td><Chip label={row.passed ? "PASS" : "NOT PASSED"} color={row.passed ? "success" : "error"} size="small" />{row.automaticSubmission && <Typography variant="caption" display="block" color="warning.main">Auto-submitted: {row.automaticSubmissionReason || "yes"}</Typography>}</td><td><Typography fontWeight={900}>Total: {row.incidents || 0}</Typography>{Object.entries(row.incidentDetails || {}).map(([type, count]) => <Typography key={type} variant="caption" display="block">{incidentLabels[type] || type}: {count}</Typography>)}</td><td>{Object.entries(row.topicScores || {}).map(([topic, score]) => <Typography key={topic} variant="body2">{topic}: {score.correct}/{score.total}</Typography>)}</td><td><Button variant="outlined" onClick={() => setSelectedResult(row)}>Full report</Button></td></tr>)}</tbody></Box></Box>}
         {!loading && !filtered.length && <Alert severity="info">No test results match this search.</Alert>}
       </Paper>
       <Dialog open={Boolean(selectedResult)} onClose={() => setSelectedResult(null)} maxWidth="lg" fullWidth>
@@ -146,7 +218,7 @@ export default function TestResultsAdmin() {
           const strongTopics = topics.filter(([, score]) => topicPercentage(score) >= 80);
           const aiReview = aiAssistanceReview(selectedResult);
           return <>
-            <DialogTitle><Typography variant="h4" fontWeight={900}>Complete Student Assessment Report</Typography><Typography color="text.secondary">{selectedResult.studentName} · {selectedResult.studentId} · {selectedResult.userEmail}</Typography></DialogTitle>
+            <DialogTitle><Typography variant="h4" fontWeight={900}>Complete Student Assessment Report</Typography><Typography color="text.secondary">{quizLabel(selectedResult.testId)} · {selectedResult.studentName} · {selectedResult.studentId} · {selectedResult.userEmail}</Typography></DialogTitle>
             <DialogContent dividers>
               <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(4, 1fr)" }, gap: 2, mb: 3 }}>
                 <Paper variant="outlined" sx={{ p: 2 }}><Typography color="text.secondary">Score</Typography><Typography variant="h4" fontWeight={900}>{selectedResult.correct}/{selectedResult.total}</Typography><Typography>{selectedResult.percentage}% · {selectedResult.passed ? "PASS" : "NOT PASSED"}</Typography></Paper>

@@ -11,6 +11,7 @@ import { collection, doc, getDoc, getDocs, query, where } from "firebase/firesto
 import { db } from "../../firebase";
 import { useAuth } from "../../contexts/useAuth";
 import { fetchUserPteTaskResponses } from "../../services/pteTaskResponseData";
+import { quizLabel } from "../test-center/quizConfig";
 
 const AccountDashboard = () => {
   const { isAdmin, loading, logout, user } = useAuth();
@@ -122,7 +123,7 @@ const AccountDashboard = () => {
             <Typography color="text.secondary" sx={{ my: 2 }}>Assigned Student ID: <b>{studentId || "Not assigned"}</b></Typography>
             <Chip label={`${testResults.length} recorded attempt${testResults.length === 1 ? "" : "s"}`} color="primary" sx={{ color: "#fff", fontWeight: 800, mb: 2 }} />
             <Stack spacing={1.2} sx={{ mb: 2 }}>
-              {testResults.slice(0,5).map((result) => <Paper key={result.id} variant="outlined" sx={{ p: 1.4 }}><Typography variant="body2" fontWeight={800}>{result.testTitle || "Cyber Security Assessment"}</Typography><Stack direction="row" justifyContent="space-between"><Typography fontWeight={800}>{result.percentage}%</Typography><Chip size="small" label={result.passed ? "PASS" : "NOT PASSED"} color={result.passed ? "success" : "error"} /></Stack><Typography variant="caption" color="text.secondary">{result.submittedAt?.toDate?.().toLocaleString("en-PK") || "Saved attempt"} · {result.correct}/{result.total}</Typography></Paper>)}
+              {testResults.map((result) => <Paper key={result.id} variant="outlined" sx={{ p: 1.4 }}><Typography variant="body2" fontWeight={800}>{quizLabel(result.testId)}</Typography><Stack direction="row" justifyContent="space-between"><Typography fontWeight={800}>{result.percentage}%</Typography><Chip size="small" label={result.passed ? "PASS" : "NOT PASSED"} color={result.passed ? "success" : "error"} /></Stack><Typography variant="caption" color="text.secondary">{result.submittedAt?.toDate?.().toLocaleString("en-PK") || "Saved attempt"} · {result.correct}/{result.total}</Typography></Paper>)}
             </Stack>
             <Button component={RouterLink} to="/TestCenter" variant="contained" disabled={!studentId}>Open Test Center</Button>
           </Paper>
