@@ -1,0 +1,33 @@
+// Seven questions each from Lectures 04, 05, 06 and 07.
+const rows = [
+  ["Security Controls", "Which is an administrative security control?", ["Security awareness training", "Disk encryption", "A door lock", "Antivirus scanning"], 0],
+  ["Security Controls", "Which is a technical preventive control?", ["A firewall rule blocking unwanted traffic", "A post-incident report", "A guard", "An audit review"], 0],
+  ["Security Controls", "An alert about repeated failed sign-ins is mainly which type of control?", ["Detective", "Corrective", "Physical", "Risk transfer"], 0],
+  ["Security Controls", "Restoring a clean backup after data loss is mainly which function?", ["Corrective", "Detective", "Identification", "Avoidance"], 0],
+  ["Security Controls", "Why use defense in depth?", ["One failed control does not leave a system unprotected", "It guarantees attacks cannot happen", "It removes monitoring", "It grants broader access"], 0],
+  ["Security Controls", "Which set includes physical, administrative and technical controls?", ["Door lock, policy, encryption", "Firewall, antivirus, encryption", "Training, policy, procedure", "Camera, lock, barrier"], 0],
+  ["Security Controls", "Which classroom password audit is appropriate?", ["Test instructor-created dummy passwords locally", "Guess a student's Gmail password", "Use leaked credentials", "Test the academy login without a defined scope"], 0],
+  ["Phishing & AI", "An unexpected message demands immediate sign-in through an unfamiliar link. What should you do first?", ["Open the service through its known address", "Click the link", "Reply with a password", "Forward it to classmates"], 0],
+  ["Phishing & AI", "Which sign most strongly suggests impersonation?", ["The sender domain differs from the claimed organization", "The message has a greeting", "The email contains text", "It arrived in the morning"], 0],
+  ["Phishing & AI", "What does a phishing message try to do?", ["Trick a person into revealing information or taking an unsafe action", "Improve email speed", "Encrypt a backup", "Assign an IP address"], 0],
+  ["Phishing & AI", "What should you do with an unexpected MFA approval prompt?", ["Deny it and review account activity", "Approve it", "Share the code", "Turn off MFA"], 0],
+  ["Phishing & AI", "How can generative AI help an attacker create phishing messages?", ["Produce convincing personalized messages at scale", "Guarantee account takeover", "Bypass every filter", "Read encrypted messages"], 0],
+  ["Phishing & AI", "How should a defender use AI analysis of a suspicious email?", ["Verify it against the original message", "Accept every conclusion", "Paste passwords into the prompt", "Send replies without review"], 0],
+  ["Phishing & AI", "A student clicks a suspicious link but enters no details. What next?", ["Stop and report it", "Hide the event", "Download another file", "Give the link to classmates"], 0],
+  ["Continuity", "What does business continuity focus on?", ["Keeping essential work operating during disruption", "Finding every email sender", "Assigning file permissions", "Testing response headers"], 0],
+  ["Continuity", "What does disaster recovery focus on?", ["Restoring technology and data", "Replacing all policies", "Writing phishing messages", "Assigning roles"], 0],
+  ["Continuity", "What does RTO measure?", ["Maximum acceptable time to restore service", "Maximum acceptable data loss in time", "Password age", "DNS response time"], 0],
+  ["Continuity", "What does RPO measure?", ["Maximum acceptable data loss measured in time", "Maximum downtime", "Firewall installation time", "Certificate age"], 0],
+  ["Continuity", "A portal has an RPO of four hours. Which plan supports it?", ["Frequent backups with tested recovery", "Monthly backups", "Backup only after an incident", "HTTPS alone"], 0],
+  ["Continuity", "What proves a backup can support recovery?", ["A successful authorized restore test", "A .backup filename", "A green dashboard only", "A second password"], 0],
+  ["Continuity", "Which is an alternate process during a portal outage?", ["Approved offline attendance", "Disable account controls", "Delete incident logs", "Publish student records"], 0],
+  ["Networking", "What does DNS do?", ["Looks up an address for a domain name", "Encrypts all files", "Assigns student roles", "Stores backups"], 0],
+  ["Networking", "What does a default gateway usually do?", ["Route traffic toward other networks", "Store passwords", "Scan files", "Issue certificates"], 0],
+  ["Networking", "Which device connects devices within one local network?", ["Switch", "Web server", "Password manager", "Backup drive"], 0],
+  ["Networking", "What does a firewall do?", ["Filter traffic by rules", "Guarantee trusted websites", "Translate all domain names", "Replace authentication"], 0],
+  ["Networking", "What does HTTPS primarily protect?", ["Data in transit between browser and site", "All content from fraud", "A computer from all malware", "Deleted files"], 0],
+  ["Networking", "What can ping show?", ["Replies and round-trip delay", "Exact physical location", "Website ethics", "Encrypted contents"], 0],
+  ["Networking", "What does nslookup aplusacademy.pk ask for?", ["DNS information", "An admin password", "Firewall profile", "A malware scan"], 0],
+];
+
+export const lectureFourToSevenQuestions = rows.map(([topic, question, options, answer], id) => ({ id, topic, question, options, answer }));

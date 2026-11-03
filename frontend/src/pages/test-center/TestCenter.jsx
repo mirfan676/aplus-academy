@@ -5,14 +5,16 @@ import { doc, getDoc, serverTimestamp, writeBatch } from "firebase/firestore";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { db } from "../../firebase";
 import { useAuth } from "../../contexts/useAuth";
+import { lectureFourToSevenQuestions } from "./lectureFourToSevenQuestions";
 
 const DURATION = 45 * 60;
 const PASS_MARK = 70;
 const INACTIVITY_WARNING_SECONDS = 45;
 const INACTIVITY_SUBMIT_SECONDS = 60;
-const TEST_ID = "ai-cyber-security-foundations-v1";
+const FOUNDATIONS_TEST_ID = "ai-cyber-security-foundations-v1";
+const LECTURES_TEST_ID = "ai-cyber-security-lectures-04-07-v1";
 const pakistanDateKey = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Karachi", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
-const attemptDocumentId = (studentId) => `${studentId}_${TEST_ID}_${pakistanDateKey()}`;
+const attemptDocumentId = (studentId, testId) => `${studentId}_${testId}_${pakistanDateKey()}`;
 
 const questionBank = [
   ["Authorization","Which security principle ensures that only approved people can view information?",["Confidentiality","Integrity","Availability","Accounting"],0],
@@ -54,7 +56,7 @@ const shuffle = (items) => {
   return copy;
 };
 
-const createAttempt = () => shuffle(questionBank).map((question) => {
+const createAttempt = (bank) => shuffle(bank).map((question) => {
   const options = shuffle(question.options.map((text, index) => ({ text, correct: index === question.answer })));
   return { ...question, options: options.map((item) => item.text), answer: options.findIndex((item) => item.correct) };
 });
@@ -62,6 +64,10 @@ const createAttempt = () => shuffle(questionBank).map((question) => {
 export default function TestCenter() {
   const { user, loading: authLoading } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+  const isLectureTest = searchParams.get("assessment") === "lectures-04-07";
+  const testId = isLectureTest ? LECTURES_TEST_ID : FOUNDATIONS_TEST_ID;
+  const testTitle = isLectureTest ? "AI Cyber Security Lectures 04-07 Assessment" : "AI Cyber Security Foundations Assessment";
+  const testBank = isLectureTest ? lectureFourToSevenQuestions : questionBank;
   const [comingSoon, setComingSoon] = useState("");
   const [studentName, setStudentName] = useState("");
   const [studentId, setStudentId] = useState("");
@@ -114,9 +120,10 @@ export default function TestCenter() {
   useEffect(() => {
     const checkDailyAttempt = async () => {
       if (!db || !studentId) return;
+      setAttemptedToday(false);
       setAttemptLoading(true);
       try {
-        const snapshot = await getDoc(doc(db, "testResults", attemptDocumentId(studentId)));
+        const snapshot = await getDoc(doc(db, "testResults", attemptDocumentId(studentId, testId)));
         setAttemptedToday(snapshot.exists());
       } catch (checkError) {
         console.error("Daily attempt could not be checked:", checkError);
@@ -126,7 +133,7 @@ export default function TestCenter() {
       }
     };
     checkDailyAttempt();
-  }, [studentId]);
+  }, [studentId, testId]);
 
   const recordIncident = (type) => {
     if (!started || submitted.current) return;
@@ -213,7 +220,7 @@ export default function TestCenter() {
     if (attemptedToday) return setError("This Student ID has already completed its test attempt today. The next attempt will be available tomorrow.");
     if (!studentName.trim() || !agreed) return setError("Enter the student name and accept the assessment rules.");
     setError("");
-    const attempt = createAttempt();
+    const attempt = createAttempt(testBank);
     setQuestions(attempt);
     setAnswers(Array(attempt.length).fill(null));
     setStarted(true);
@@ -253,8 +260,8 @@ export default function TestCenter() {
       isCorrect: answers[questionIndex] === question.answer,
     }));
     const payload = {
-      testId: TEST_ID,
-      testTitle: "AI Cyber Security Foundations Assessment",
+      testId,
+      testTitle,
       userId: user.uid,
       userEmail: user.email || "",
       studentName: studentName.trim(),
@@ -276,7 +283,7 @@ export default function TestCenter() {
     };
     try {
       if (!db) throw new Error("The assessment database is not configured.");
-      const resultRef = doc(db, "testResults", attemptDocumentId(studentId));
+      const resultRef = doc(db, "testResults", attemptDocumentId(studentId, testId));
       const detailRef = doc(db, "testResultDetails", resultRef.id);
       const batch = writeBatch(db);
       batch.set(resultRef, payload);
@@ -284,7 +291,7 @@ export default function TestCenter() {
         userId: user.uid,
         userEmail: user.email || "",
         studentId: studentId.trim(),
-        testId: TEST_ID,
+        testId,
         attemptDate: pakistanDateKey(),
         questionResults,
         createdAt: serverTimestamp(),
@@ -327,7 +334,7 @@ export default function TestCenter() {
     const tests = [
       { title: "Python Development", description: "Python programming, problem-solving and application development.", available: false, color: "#306998" },
       { title: "Front End Development", description: "HTML, CSS, JavaScript and modern responsive web interfaces.", available: false, color: "#e44d26" },
-      { title: "Cyber Security With AI", description: "Authorization, risk, security controls, web security and ethical password auditing.", available: true, color: "#087f8c" },
+      { title: "Cyber Security With AI", description: "Foundations assessment and the new Lectures 04-07 assessment.", available: true, color: "#087f8c" },
       { title: "Digital Marketing With AI", description: "Digital campaigns, content, analytics and responsible AI-assisted marketing.", available: false, color: "#7b2cbf" },
     ];
     return (
@@ -362,9 +369,13 @@ export default function TestCenter() {
           <Button onClick={() => setSearchParams({})} sx={{ mb: 2, fontWeight: 800 }}>← Back to all tests</Button>
           <Paper sx={{ p: { xs: 3, md: 6 }, bgcolor: "#13233f", color: "white", borderTop: "8px solid #f39c4a", borderRadius: 3 }}>
             <Typography fontWeight={900} color="#f39c4a">DATA & CYBER SECURITY WITH AI</Typography>
-            <Typography component="h1" variant="h2" fontWeight={900} sx={{ mt: 1 }}>Course Assessment</Typography>
-            <Typography sx={{ mt: 2, color: "#dce6ef", maxWidth: 820, fontSize: 19 }}>Authorization, access-control models, cybersecurity risk, response headers, security controls and ethical password auditing</Typography>
+            <Typography component="h1" variant="h2" fontWeight={900} sx={{ mt: 1 }}>{testTitle}</Typography>
+            <Typography sx={{ mt: 2, color: "#dce6ef", maxWidth: 820, fontSize: 19 }}>{isLectureTest ? "Security controls, phishing and AI, continuity and recovery, and networking fundamentals" : "Authorization, access-control models, cybersecurity risk, response headers, security controls and ethical password auditing"}</Typography>
           </Paper>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mt: 2 }}>
+            <Button variant={isLectureTest ? "outlined" : "contained"} onClick={() => setSearchParams({ test: "cyber-security-with-ai" })}>Foundations test</Button>
+            <Button variant={isLectureTest ? "contained" : "outlined"} onClick={() => setSearchParams({ test: "cyber-security-with-ai", assessment: "lectures-04-07" })}>Lectures 04-07 test</Button>
+          </Stack>
           <Paper sx={{ mt: 3, p: { xs: 3, md: 4 }, borderRadius: 3 }}>
             {error && <Alert severity="warning" sx={{ mb: 2 }}>{error}</Alert>}
             <Alert severity="success">Signed in as {user.email}</Alert>
@@ -383,7 +394,7 @@ export default function TestCenter() {
         </>}
 
         {started && !result && current && <>
-          <Paper sx={{ mb: 2, px: 3, py: 2, bgcolor: "#13233f", color: "white", borderRadius: 2, position: "sticky", top: 8, zIndex: 20 }}><Stack direction="row" justifyContent="space-between"><Typography fontWeight={900}>AI Cyber Security Assessment</Typography><Typography fontFamily="monospace" fontSize={24} fontWeight={900} color={remaining <= 300 ? "#ffb266" : "white"}>{timer}</Typography></Stack></Paper>
+          <Paper sx={{ mb: 2, px: 3, py: 2, bgcolor: "#13233f", color: "white", borderRadius: 2, position: "sticky", top: 8, zIndex: 20 }}><Stack direction="row" justifyContent="space-between"><Typography fontWeight={900}>{testTitle}</Typography><Typography fontFamily="monospace" fontSize={24} fontWeight={900} color={remaining <= 300 ? "#ffb266" : "white"}>{timer}</Typography></Stack></Paper>
           {inactivityWarning && <Alert severity="warning" sx={{ mb: 2 }}>No activity detected. Move the mouse or press a permitted key now. The test will submit automatically after one minute without activity.</Alert>}
           <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 260px" }, gap: 3 }}>
             <Paper sx={{ p: { xs: 3, md: 4 }, borderRadius: 3 }}>
