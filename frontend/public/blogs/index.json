@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-11-08-ielts-and-english-proficiency-testing",
+    "title": "IELTS and English Proficiency Testing",
+    "description": "A concise education-news summary covering recent developments in IELTS and the common themes connecting them.",
+    "topic": "IELTS and English Proficiency Testing",
+    "category": "IELTS",
+    "publishedAt": "2026-11-08T10:24:40.338837+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/4145153/pexels-photo-4145153.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/person-writing-on-notebook-4145153/",
+      "credit": "Pexels free photo",
+      "alt": "English language notebook for test preparation",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-11-07-english-language-learning-and-communication",
     "title": "English Language Learning and Communication",
     "description": "A concise education-news summary covering recent developments in English Language and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/students-in-the-classroom-5676741/",
       "credit": "Pexels free photo",
       "alt": "University students collaborating during class",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-09-07-quran-memorization-and-tajweed-education",
-    "title": "Quran Memorization and Tajweed Education",
-    "description": "A concise education-news summary covering recent developments in Qur'an & Tajweed and the common themes connecting them.",
-    "topic": "Quran Memorization and Tajweed Education",
-    "category": "Qur'an & Tajweed",
-    "publishedAt": "2026-09-07T08:19:46.879239+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/15694717/pexels-photo-15694717.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/quran-book-on-windowsill-15694717/",
-      "credit": "Pexels free photo",
-      "alt": "Quran book near a window for daily recitation",
       "kind": "pexels",
       "placement": "hero"
     }
