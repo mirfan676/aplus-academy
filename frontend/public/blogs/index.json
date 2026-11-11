@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-11-11-o-and-a-level-exam-preparation-updates",
+    "title": "O and A Level Exam Preparation Updates",
+    "description": "A concise education-news summary covering recent developments in O & A Level and the common themes connecting them.",
+    "topic": "O and A Level Exam Preparation Updates",
+    "category": "O & A Level",
+    "publishedAt": "2026-11-11T10:59:41.372221+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/5427659/pexels-photo-5427659.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/students-in-classroom-5427659/",
+      "credit": "Pexels free photo",
+      "alt": "Students focused during a classroom lesson",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-11-10-k-12-education-curriculum-and-classroom-learning",
     "title": "K-12 Education: Curriculum and Classroom Learning",
     "description": "A concise education-news summary covering recent developments in K-12 and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/kids-sitting-at-the-table-5427671/",
       "credit": "Pexels free photo",
       "alt": "Young learners working on classroom activities",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-09-10-design-and-multimedia-education",
-    "title": "Design and Multimedia Education",
-    "description": "A concise education-news summary covering recent developments in Graphics & Multimedia and the common themes connecting them.",
-    "topic": "Design and Multimedia Education",
-    "category": "Graphics & Multimedia",
-    "publishedAt": "2026-09-10T08:09:35.218328+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/5926382/pexels-photo-5926382.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/person-working-on-creative-design-5926382/",
-      "credit": "Pexels free photo",
-      "alt": "Creative workspace for graphic design learning",
       "kind": "pexels",
       "placement": "hero"
     }
