@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-11-15-programming-education-and-coding-skills",
+    "title": "Programming Education and Coding Skills",
+    "description": "A concise education-news summary covering recent developments in Programming and the common themes connecting them.",
+    "topic": "Programming Education and Coding Skills",
+    "category": "Programming",
+    "publishedAt": "2026-11-15T10:56:00.000928+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/574071/pexels-photo-574071.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/person-using-macbook-pro-574071/",
+      "credit": "Pexels free photo",
+      "alt": "Developer working on a laptop for coding practice",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-11-14-technology-education-and-digital-skills",
     "title": "Technology Education and Digital Skills",
     "description": "A concise education-news summary covering recent developments in IT & Technology and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/people-sitting-down-near-table-with-assorted-laptop-computers-3184465/",
       "credit": "Pexels free photo",
       "alt": "Students collaborating with laptops in a training session",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-09-14-competitive-exams-and-assessment-updates",
-    "title": "Competitive Exams and Assessment Updates",
-    "description": "A concise education-news summary covering recent developments in Competitive Exams and the common themes connecting them.",
-    "topic": "Competitive Exams and Assessment Updates",
-    "category": "Competitive Exams",
-    "publishedAt": "2026-09-14T08:56:52.408113+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/256417/pexels-photo-256417.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/books-on-library-shelf-256417/",
-      "credit": "Pexels free photo",
-      "alt": "Library books for competitive exam preparation",
       "kind": "pexels",
       "placement": "hero"
     }
