@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-11-16-quran-memorization-and-tajweed-education",
+    "title": "Quran Memorization and Tajweed Education",
+    "description": "A concise education-news summary covering recent developments in Qur'an & Tajweed and the common themes connecting them.",
+    "topic": "Quran Memorization and Tajweed Education",
+    "category": "Qur'an & Tajweed",
+    "publishedAt": "2026-11-16T11:21:27.921068+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/15694717/pexels-photo-15694717.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/quran-book-on-windowsill-15694717/",
+      "credit": "Pexels free photo",
+      "alt": "Quran book near a window for daily recitation",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-11-15-programming-education-and-coding-skills",
     "title": "Programming Education and Coding Skills",
     "description": "A concise education-news summary covering recent developments in Programming and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/coding-script-270348/",
       "credit": "Pexels free photo",
       "alt": "Code editor for programming lessons",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-09-15-technology-education-and-digital-skills",
-    "title": "Technology Education and Digital Skills",
-    "description": "A concise education-news summary covering recent developments in IT & Technology and the common themes connecting them.",
-    "topic": "Technology Education and Digital Skills",
-    "category": "IT & Technology",
-    "publishedAt": "2026-09-15T08:42:07.222841+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/people-sitting-down-near-table-with-assorted-laptop-computers-3184465/",
-      "credit": "Pexels free photo",
-      "alt": "Students collaborating with laptops in a training session",
       "kind": "pexels",
       "placement": "hero"
     }
