@@ -1,5 +1,22 @@
 [
   {
+    "slug": "2026-11-24-technology-education-and-digital-skills",
+    "title": "Technology Education and Digital Skills",
+    "description": "A concise education-news summary covering recent developments in IT & Technology and the common themes connecting them.",
+    "topic": "Technology Education and Digital Skills",
+    "category": "IT & Technology",
+    "publishedAt": "2026-11-24T13:44:58.955814+00:00",
+    "readTime": "3 min read",
+    "heroImage": {
+      "url": "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=1600",
+      "sourceUrl": "https://www.pexels.com/photo/people-sitting-down-near-table-with-assorted-laptop-computers-3184465/",
+      "credit": "Pexels free photo",
+      "alt": "Students collaborating with laptops in a training session",
+      "kind": "pexels",
+      "placement": "hero"
+    }
+  },
+  {
     "slug": "2026-11-23-competitive-exams-and-assessment-updates",
     "title": "Competitive Exams and Assessment Updates",
     "description": "A concise education-news summary covering recent developments in Competitive Exams and the common themes connecting them.",
@@ -998,23 +1015,6 @@
       "sourceUrl": "https://www.pexels.com/photo/books-on-library-shelf-256417/",
       "credit": "Pexels free photo",
       "alt": "Library books for competitive exam preparation",
-      "kind": "pexels",
-      "placement": "hero"
-    }
-  },
-  {
-    "slug": "2026-09-23-higher-education-admissions-and-student-support",
-    "title": "Higher Education: Admissions and Student Support",
-    "description": "A concise education-news summary covering recent developments in Bachelors / Masters and the common themes connecting them.",
-    "topic": "Higher Education: Admissions and Student Support",
-    "category": "Bachelors / Masters",
-    "publishedAt": "2026-09-23T08:36:06.746458+00:00",
-    "readTime": "3 min read",
-    "heroImage": {
-      "url": "https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1600",
-      "sourceUrl": "https://www.pexels.com/photo/people-walking-in-a-campus-267885/",
-      "credit": "Pexels free photo",
-      "alt": "Students walking on a university campus",
       "kind": "pexels",
       "placement": "hero"
     }
