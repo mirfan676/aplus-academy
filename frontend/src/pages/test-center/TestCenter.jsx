@@ -6,6 +6,7 @@ import { Link as RouterLink, Navigate, useSearchParams } from "react-router-dom"
 import { db } from "../../firebase";
 import { useAuth } from "../../contexts/useAuth";
 import { lectureFourToSevenQuestions } from "./lectureFourToSevenQuestions";
+import { quizThreeQuestions } from "./quizThreeQuestions";
 import { QUIZZES, quizStateId } from "./quizConfig";
 
 const DURATION = 45 * 60;
@@ -14,6 +15,7 @@ const INACTIVITY_WARNING_SECONDS = 45;
 const INACTIVITY_SUBMIT_SECONDS = 60;
 const FOUNDATIONS_TEST_ID = QUIZZES[0].id;
 const LECTURES_TEST_ID = QUIZZES[1].id;
+const QUIZ_THREE_ID = QUIZZES[2].id;
 const pakistanDateKey = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Karachi", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
 
 const questionBank = [
@@ -56,7 +58,12 @@ const shuffle = (items) => {
   return copy;
 };
 
+const normalizeReply = (value) => String(value || "").trim().toLowerCase().replace(/[.,!?]/g, "").replace(/\s+/g, " ");
+const isCorrectAnswer = (question, value) => question.type === "short"
+  ? question.accepted.some((accepted) => normalizeReply(value) === normalizeReply(accepted))
+  : value === question.answer;
 const createAttempt = (bank) => shuffle(bank).map((question) => {
+  if (question.type === "short") return question;
   const options = shuffle(question.options.map((text, index) => ({ text, correct: index === question.answer })));
   return { ...question, options: options.map((item) => item.text), answer: options.findIndex((item) => item.correct) };
 });
@@ -65,9 +72,10 @@ export default function TestCenter() {
   const { user, loading: authLoading } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const isLectureTest = searchParams.get("assessment") === "lectures-04-07";
-  const testId = isLectureTest ? LECTURES_TEST_ID : FOUNDATIONS_TEST_ID;
-  const testTitle = isLectureTest ? "Quiz 2" : "Quiz 1";
-  const testBank = isLectureTest ? lectureFourToSevenQuestions : questionBank;
+  const isQuizThree = searchParams.get("assessment") === "lectures-07-09";
+  const testId = isQuizThree ? QUIZ_THREE_ID : isLectureTest ? LECTURES_TEST_ID : FOUNDATIONS_TEST_ID;
+  const testTitle = isQuizThree ? "Quiz 3" : isLectureTest ? "Quiz 2" : "Quiz 1";
+  const testBank = isQuizThree ? quizThreeQuestions : isLectureTest ? lectureFourToSevenQuestions : questionBank;
   const [comingSoon, setComingSoon] = useState("");
   const [studentName, setStudentName] = useState("");
   const [studentId, setStudentId] = useState("");
@@ -241,13 +249,13 @@ export default function TestCenter() {
 
   const submitTest = async (automatic = false, automaticReason = "") => {
     if (submitted.current || !questions.length) return;
-    const unanswered = answers.filter((answer) => answer === null).length;
+    const unanswered = answers.filter((answer) => answer === null || String(answer).trim() === "").length;
     if (!automatic && unanswered && !window.confirm(`${unanswered} question(s) are unanswered. Submit anyway?`)) return;
     if (!automatic && !window.confirm("Submit this test now? This cannot be undone.")) return;
     submitted.current = true;
     setSaving(true);
     setError("");
-    const correct = questions.reduce((total, question, questionIndex) => total + (answers[questionIndex] === question.answer ? 1 : 0), 0);
+    const correct = questions.reduce((total, question, questionIndex) => total + (isCorrectAnswer(question, answers[questionIndex]) ? 1 : 0), 0);
     const percentage = Math.round((correct / questions.length) * 100);
     const inactivityIncident = automaticReason === "inactivity" ? 1 : 0;
     const finalIncidentDetails = inactivityIncident
@@ -255,16 +263,17 @@ export default function TestCenter() {
       : incidentDetails;
     const topicScores = [...new Set(questions.map((question) => question.topic))].reduce((summary, topic) => {
       const topicQuestions = questions.map((question, questionIndex) => ({ question, questionIndex })).filter(({ question }) => question.topic === topic);
-      summary[topic] = { correct: topicQuestions.filter(({ question, questionIndex }) => answers[questionIndex] === question.answer).length, total: topicQuestions.length };
+      summary[topic] = { correct: topicQuestions.filter(({ question, questionIndex }) => isCorrectAnswer(question, answers[questionIndex])).length, total: topicQuestions.length };
       return summary;
     }, {});
     const questionResults = questions.map((question, questionIndex) => ({
       number: questionIndex + 1,
       topic: question.topic,
       question: question.question,
-      selectedAnswer: answers[questionIndex] === null ? "Not answered" : question.options[answers[questionIndex]],
-      correctAnswer: question.options[question.answer],
-      isCorrect: answers[questionIndex] === question.answer,
+      answerType: question.type || "mcq",
+      selectedAnswer: answers[questionIndex] === null ? "Not answered" : question.type === "short" ? answers[questionIndex] : question.options[answers[questionIndex]],
+      correctAnswer: question.type === "short" ? question.answer : question.options[question.answer],
+      isCorrect: isCorrectAnswer(question, answers[questionIndex]),
     }));
     const payload = {
       testId,
@@ -333,7 +342,7 @@ export default function TestCenter() {
     return () => window.clearInterval(inactivityTimer);
   }, [started, result, questions, answers, incidents, incidentDetails]);
 
-  const answered = answers.filter((answer) => answer !== null).length;
+  const answered = answers.filter((answer) => answer !== null && String(answer).trim() !== "").length;
   const timer = `${String(Math.floor(remaining / 60)).padStart(2,"0")}:${String(remaining % 60).padStart(2,"0")}`;
   const current = questions[index];
   const quizUnavailable = !quizState || quizState.completedCount >= quizState.allowedCount || (hasPriorResult && quizState.completedCount === 0);
@@ -345,7 +354,7 @@ export default function TestCenter() {
     const tests = [
       { title: "Python Development", description: "Python programming, problem-solving and application development.", available: false, color: "#306998" },
       { title: "Front End Development", description: "HTML, CSS, JavaScript and modern responsive web interfaces.", available: false, color: "#e44d26" },
-      { title: "Cyber Security With AI", description: "Quiz 1 and Quiz 2. View your scores in your student dashboard.", available: true, color: "#087f8c" },
+      { title: "Cyber Security With AI", description: "Quiz 1, Quiz 2 and Quiz 3. View your scores in your student dashboard.", available: true, color: "#087f8c" },
       { title: "Digital Marketing With AI", description: "Digital campaigns, content, analytics and responsible AI-assisted marketing.", available: false, color: "#7b2cbf" },
     ];
     return (
@@ -384,8 +393,9 @@ export default function TestCenter() {
             <Typography sx={{ mt: 2, color: "#dce6ef", maxWidth: 820, fontSize: 19 }}>Complete your quiz independently. Your results are available in your student dashboard.</Typography>
           </Paper>
           <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mt: 2 }}>
-            <Button variant={isLectureTest ? "outlined" : "contained"} onClick={() => setSearchParams({ test: "cyber-security-with-ai" })}>Quiz 1</Button>
+            <Button variant={!isLectureTest && !isQuizThree ? "contained" : "outlined"} onClick={() => setSearchParams({ test: "cyber-security-with-ai" })}>Quiz 1</Button>
             <Button variant={isLectureTest ? "contained" : "outlined"} onClick={() => setSearchParams({ test: "cyber-security-with-ai", assessment: "lectures-04-07" })}>Quiz 2</Button>
+            <Button variant={isQuizThree ? "contained" : "outlined"} onClick={() => setSearchParams({ test: "cyber-security-with-ai", assessment: "lectures-07-09" })}>Quiz 3</Button>
           </Stack>
           <Paper sx={{ mt: 3, p: { xs: 3, md: 4 }, borderRadius: 3 }}>
             {error && <Alert severity="warning" sx={{ mb: 2 }}>{error}</Alert>}
@@ -412,7 +422,7 @@ export default function TestCenter() {
             <Paper sx={{ p: { xs: 3, md: 4 }, borderRadius: 3 }}>
               <Stack direction="row" justifyContent="space-between"><Typography color="text.secondary" fontWeight={800}>Question {index + 1} of {questions.length}</Typography><Chip label={current.topic} /></Stack>
               <Typography variant="h5" fontWeight={800} sx={{ my: 3 }}>{current.question}</Typography>
-              <Stack spacing={1.5}>{current.options.map((option, optionIndex) => <Paper key={option} component="label" variant="outlined" sx={{ p: 1.5, cursor: "pointer", borderWidth: 2, borderColor: answers[index] === optionIndex ? "#087f8c" : "divider", bgcolor: answers[index] === optionIndex ? "#eef9fa" : "white" }}><Radio checked={answers[index] === optionIndex} onChange={() => setAnswers((values) => values.map((value, answerIndex) => answerIndex === index ? optionIndex : value))} />{String.fromCharCode(65 + optionIndex)}. {option}</Paper>)}</Stack>
+              {current.type === "short" ? <TextField fullWidth multiline minRows={2} label="Short reply" value={answers[index] || ""} inputProps={{ maxLength: 120 }} onChange={(event) => setAnswers((values) => values.map((value, answerIndex) => answerIndex === index ? event.target.value : value))} /> : <Stack spacing={1.5}>{current.options.map((option, optionIndex) => <Paper key={option} component="label" variant="outlined" sx={{ p: 1.5, cursor: "pointer", borderWidth: 2, borderColor: answers[index] === optionIndex ? "#087f8c" : "divider", bgcolor: answers[index] === optionIndex ? "#eef9fa" : "white" }}><Radio checked={answers[index] === optionIndex} onChange={() => setAnswers((values) => values.map((value, answerIndex) => answerIndex === index ? optionIndex : value))} />{String.fromCharCode(65 + optionIndex)}. {option}</Paper>)}</Stack>}
               <Stack direction="row" justifyContent="space-between" sx={{ mt: 4 }}><Button disabled={index === 0} onClick={() => setIndex((value) => value - 1)}>Previous</Button>{index < questions.length - 1 ? <Button variant="contained" onClick={() => setIndex((value) => value + 1)}>Next</Button> : <Button color="error" variant="contained" disabled={saving} onClick={() => submitTest(false)}>{saving ? "Saving..." : "Submit test"}</Button>}</Stack>
             </Paper>
             <Paper sx={{ p: 3, borderRadius: 3, alignSelf: "start" }}><Typography variant="h6" fontWeight={900}>Progress</Typography><LinearProgress variant="determinate" value={(answered / questions.length) * 100} sx={{ my: 2 }} /><Typography>Answered: <b>{answered} / {questions.length}</b></Typography></Paper>
@@ -424,3 +434,4 @@ export default function TestCenter() {
     </Box>
   );
 }
+

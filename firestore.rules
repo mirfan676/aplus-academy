@@ -160,7 +160,7 @@ service cloud.firestore {
         && request.resource.data.userId == request.auth.uid
         && request.auth.token.email is string
         && request.resource.data.userEmail == request.auth.token.email
-        && request.resource.data.testId in ["ai-cyber-security-foundations-v1", "ai-cyber-security-lectures-04-07-v1"]
+        && request.resource.data.testId in ["ai-cyber-security-foundations-v1", "ai-cyber-security-lectures-04-07-v1", "ai-cyber-security-lectures-07-09-v1"]
         && request.resource.data.attemptNumber is int
         && request.resource.data.attemptNumber >= 1
         && exists(/databases/$(database)/documents/quizAttemptState/$(request.resource.data.studentId + "_" + request.resource.data.testId))
@@ -200,7 +200,7 @@ service cloud.firestore {
         && request.resource.data.userEmail == request.auth.token.email
         && request.resource.data.studentId is string
         && request.resource.data.attemptDate is string
-        && request.resource.data.testId in ["ai-cyber-security-foundations-v1", "ai-cyber-security-lectures-04-07-v1"]
+        && request.resource.data.testId in ["ai-cyber-security-foundations-v1", "ai-cyber-security-lectures-04-07-v1", "ai-cyber-security-lectures-07-09-v1"]
         && request.resource.data.attemptNumber is int
         && exists(/databases/$(database)/documents/studentEmailIds/$(request.auth.token.email))
         && get(/databases/$(database)/documents/studentEmailIds/$(request.auth.token.email)).data.studentId == request.resource.data.studentId
@@ -254,3 +254,4 @@ service cloud.firestore {
     }
   }
 }
+
