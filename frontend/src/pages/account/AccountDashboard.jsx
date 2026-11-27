@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Button, Container, Paper, Stack, Typography, Avatar, Chip } from "@mui/material";
+import { Box, Button, Container, Paper, Stack, Typography, Avatar, Chip, LinearProgress, Alert } from "@mui/material";
 import SchoolIcon from "@mui/icons-material/School";
 import WorkIcon from "@mui/icons-material/Work";
 import EditIcon from "@mui/icons-material/Edit";
@@ -11,7 +11,7 @@ import { collection, doc, getDoc, getDocs, query, where } from "firebase/firesto
 import { db } from "../../firebase";
 import { useAuth } from "../../contexts/useAuth";
 import { fetchUserPteTaskResponses } from "../../services/pteTaskResponseData";
-import { quizLabel } from "../test-center/quizConfig";
+import { QUIZZES, quizLabel } from "../test-center/quizConfig";
 
 const AccountDashboard = () => {
   const { isAdmin, loading, logout, user } = useAuth();
@@ -19,6 +19,7 @@ const AccountDashboard = () => {
   const [ptePracticeCount, setPtePracticeCount] = useState(0);
   const [studentId, setStudentId] = useState("");
   const [testResults, setTestResults] = useState([]);
+  const [testResultsError, setTestResultsError] = useState(false);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -47,6 +48,7 @@ const AccountDashboard = () => {
         return;
       }
       try {
+        setTestResultsError(false);
         const email = user.email.trim().toLowerCase();
         const [idSnapshot, resultsSnapshot] = await Promise.all([
           getDoc(doc(db, "studentEmailIds", email)),
@@ -57,15 +59,19 @@ const AccountDashboard = () => {
       } catch (error) {
         console.error("Test history could not be loaded:", error);
         setTestResults([]);
+        setTestResultsError(true);
       }
     };
     loadTests();
   }, [user?.uid, user?.email]);
 
-  if (!loading && !user) return <Navigate to="/admin/login" replace />;
+  if (!loading && !user) return <Navigate to="/student/login?returnTo=%2Faccount" replace />;
 
   const isTutor = profileRole === "teacher" || profileRole === "tutor";
   const isFamily = profileRole === "parent" || profileRole === "student";
+  const completedQuizIds = new Set(testResults.map((result) => result.testId));
+  const completedQuizCount = QUIZZES.filter((quiz) => completedQuizIds.has(quiz.id)).length;
+  const quizProgress = Math.round((completedQuizCount / QUIZZES.length) * 100);
 
   return (
     <Box sx={{ bgcolor: "#eef5ff", minHeight: "100vh", py: { xs: 5, md: 8 } }}>
@@ -119,8 +125,15 @@ const AccountDashboard = () => {
 
           <Paper elevation={0} sx={{ p: 3, borderRadius: 2, border: "1px solid #dce8f1" }}>
             <SchoolIcon color="primary" fontSize="large" />
-            <Typography variant="h6" fontWeight={900} sx={{ mt: 1 }}>Cyber Security Test Center</Typography>
+            <Typography id="cyber-security-results" variant="h6" fontWeight={900} sx={{ mt: 1 }}>Cyber Security Test Center</Typography>
             <Typography color="text.secondary" sx={{ my: 2 }}>Assigned Student ID: <b>{studentId || "Not assigned"}</b></Typography>
+            <Typography fontWeight={800}>Quiz progress: {completedQuizCount} of {QUIZZES.length} completed</Typography>
+            <LinearProgress variant="determinate" value={quizProgress} aria-label="Cyber Security quiz progress" sx={{ height: 10, borderRadius: 5, mt: 1, mb: 1.5 }} />
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 2 }}>
+              {QUIZZES.map((quiz) => <Chip key={quiz.id} label={`${quiz.label}: ${completedQuizIds.has(quiz.id) ? "Completed" : "Not completed"}`} size="small" color={completedQuizIds.has(quiz.id) ? "success" : "default"} />)}
+            </Stack>
+            {testResultsError && <Alert severity="warning" sx={{ mb: 2 }}>Results could not be loaded. Refresh this page or contact the academy administrator.</Alert>}
+            <Typography fontWeight={800} sx={{ mb: 1 }}>Saved scores</Typography>
             <Chip label={`${testResults.length} recorded attempt${testResults.length === 1 ? "" : "s"}`} color="primary" sx={{ color: "#fff", fontWeight: 800, mb: 2 }} />
             <Stack spacing={1.2} sx={{ mb: 2 }}>
               {testResults.map((result) => <Paper key={result.id} variant="outlined" sx={{ p: 1.4 }}><Typography variant="body2" fontWeight={800}>{quizLabel(result.testId)}</Typography><Stack direction="row" justifyContent="space-between"><Typography fontWeight={800}>{result.percentage}%</Typography><Chip size="small" label={result.passed ? "PASS" : "NOT PASSED"} color={result.passed ? "success" : "error"} /></Stack><Typography variant="caption" color="text.secondary">{result.submittedAt?.toDate?.().toLocaleString("en-PK") || "Saved attempt"} · {result.correct}/{result.total}</Typography></Paper>)}
@@ -176,3 +189,4 @@ const AccountDashboard = () => {
 };
 
 export default AccountDashboard;
+
