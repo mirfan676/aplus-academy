@@ -13,6 +13,9 @@ import { useAuth } from "../../contexts/useAuth";
 import { fetchUserPteTaskResponses } from "../../services/pteTaskResponseData";
 import { QUIZZES, quizLabel } from "../test-center/quizConfig";
 
+const TOTAL_CYBER_QUIZZES = 6;
+const TOTAL_CERTIFICATE_ASSESSMENTS = TOTAL_CYBER_QUIZZES + 1;
+
 const AccountDashboard = () => {
   const { isAdmin, loading, logout, user } = useAuth();
   const [profileRole, setProfileRole] = useState("user");
@@ -71,7 +74,8 @@ const AccountDashboard = () => {
   const isFamily = profileRole === "parent" || profileRole === "student";
   const completedQuizIds = new Set(testResults.map((result) => result.testId));
   const completedQuizCount = QUIZZES.filter((quiz) => completedQuizIds.has(quiz.id)).length;
-  const quizProgress = Math.round((completedQuizCount / QUIZZES.length) * 100);
+  const quizProgress = Math.round((completedQuizCount / TOTAL_CYBER_QUIZZES) * 100);
+  const certificateProgress = Math.round((completedQuizCount / TOTAL_CERTIFICATE_ASSESSMENTS) * 100);
 
   return (
     <Box sx={{ bgcolor: "#eef5ff", minHeight: "100vh", py: { xs: 5, md: 8 } }}>
@@ -127,11 +131,20 @@ const AccountDashboard = () => {
             <SchoolIcon color="primary" fontSize="large" />
             <Typography id="cyber-security-results" variant="h6" fontWeight={900} sx={{ mt: 1 }}>Cyber Security Test Center</Typography>
             <Typography color="text.secondary" sx={{ my: 2 }}>Assigned Student ID: <b>{studentId || "Not assigned"}</b></Typography>
-            <Typography fontWeight={800}>Quiz progress: {completedQuizCount} of {QUIZZES.length} completed</Typography>
+            <Typography fontWeight={800}>Quiz progress: {completedQuizCount} of {TOTAL_CYBER_QUIZZES} completed</Typography>
             <LinearProgress variant="determinate" value={quizProgress} aria-label="Cyber Security quiz progress" sx={{ height: 10, borderRadius: 5, mt: 1, mb: 1.5 }} />
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 2 }}>
-              {QUIZZES.map((quiz) => <Chip key={quiz.id} label={`${quiz.label}: ${completedQuizIds.has(quiz.id) ? "Completed" : "Not completed"}`} size="small" color={completedQuizIds.has(quiz.id) ? "success" : "default"} />)}
+              {Array.from({ length: TOTAL_CYBER_QUIZZES }, (_, index) => {
+                const label = `Quiz ${index + 1}`;
+                const releasedQuiz = QUIZZES.find((quiz) => quiz.label === label);
+                const completed = releasedQuiz && completedQuizIds.has(releasedQuiz.id);
+                return <Chip key={label} label={`${label}: ${completed ? "Completed" : releasedQuiz ? "Not completed" : "Upcoming"}`} size="small" color={completed ? "success" : "default"} />;
+              })}
             </Stack>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>Certificate pathway: six quizzes and one final exam</Typography>
+            <Typography fontWeight={800}>{completedQuizCount} of {TOTAL_CERTIFICATE_ASSESSMENTS} assessments completed</Typography>
+            <LinearProgress variant="determinate" value={certificateProgress} aria-label="Cyber Security certificate pathway progress" sx={{ height: 8, borderRadius: 5, mt: 1, mb: 1.5 }} />
+            <Chip label="Final exam: Upcoming" size="small" sx={{ mb: 2 }} />
             {testResultsError && <Alert severity="warning" sx={{ mb: 2 }}>Results could not be loaded. Refresh this page or contact the academy administrator.</Alert>}
             <Typography fontWeight={800} sx={{ mb: 1 }}>Saved scores</Typography>
             <Chip label={`${testResults.length} recorded attempt${testResults.length === 1 ? "" : "s"}`} color="primary" sx={{ color: "#fff", fontWeight: 800, mb: 2 }} />
